@@ -1,3 +1,7 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
 #' GeoLift Example Data - PreTest
 #'
 #' Simulated data of daily conversions for 40 US cities for a period of 90 days.

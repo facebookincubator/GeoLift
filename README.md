@@ -33,7 +33,7 @@ devtools::install_github("facebookincubator/GeoLift")
 - nicocru@fb.com, Nicolas Cruces, Facebook Marketing Science Partner
 
 ## Join the GeoLift community
-- [Facebook page](www.facebook.com/groups/fbgeolift/)
+- [Facebook page](https://www.facebook.com/groups/fbgeolift/)
 
 ## License
 GeoLift is MIT licensed, as found in the LICENSE file.

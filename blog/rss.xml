@@ -2,21 +2,21 @@
 <rss version="2.0">
     <channel>
         <title>GeoLift Blog</title>
-        <link>https://facebookincubator.github.io/GeoLift/blog</link>
+        <link>https://facebookincubator.github.io/blog</link>
         <description>GeoLift Blog</description>
         <lastBuildDate>Sat, 02 Oct 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <item>
             <title><![CDATA[A Brief Review of Geo Measurement Approaches]]></title>
-            <link>https://facebookincubator.github.io/GeoLift/blog/geo-measurement-review</link>
+            <link>https://facebookincubator.github.io/blog/geo-measurement-review</link>
             <guid>geo-measurement-review</guid>
             <pubDate>Sat, 02 Oct 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[Intro to Quasi-Experiments]]></description>
         </item>
         <item>
             <title><![CDATA[Welcome]]></title>
-            <link>https://facebookincubator.github.io/GeoLift/blog/welcome</link>
+            <link>https://facebookincubator.github.io/blog/welcome</link>
             <guid>welcome</guid>
             <pubDate>Fri, 01 Oct 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[Welcome to GeoLift's blog where we discuss anything related to:]]></description>

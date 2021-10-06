@@ -22,6 +22,6 @@ Five reasons why you should use GeoLift:
 
 ## Getting Started
 
-Get started by **[installing the GeoLift R package](https://github.com)**.
+Get started by **[installing the GeoLift R package](https://github.com/facebookincubator/GeoLift)**.
 
-Or try our **[GeoLift walkthrough](https://docusaurus.new)**.
+Or try our **[GeoLift walkthrough](./GettingStarted/Walkthrough)**.

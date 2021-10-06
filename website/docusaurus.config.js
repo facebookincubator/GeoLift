@@ -12,7 +12,7 @@
 (module.exports = {
   title: 'GeoLift',
   tagline: 'The solution to calculate Lift at a geo-level',
-  url: 'https://facebookincubator.github.io/',
+  url: 'https://facebookincubator.github.io/GeoLift',
   baseUrl: '/GeoLift/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',

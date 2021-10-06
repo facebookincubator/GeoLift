@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://facebookincubator.github.io/blog</id>
+    <id>https://facebookincubator.github.io/GeoLift/blog</id>
     <title>GeoLift Blog</title>
     <updated>2021-10-02T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://facebookincubator.github.io/blog"/>
+    <link rel="alternate" href="https://facebookincubator.github.io/GeoLift/blog"/>
     <subtitle>GeoLift Blog</subtitle>
-    <icon>https://facebookincubator.github.io/img/favicon.ico</icon>
+    <icon>https://facebookincubator.github.io/GeoLift/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[A Brief Review of Geo Measurement Approaches]]></title>
         <id>geo-measurement-review</id>
-        <link href="https://facebookincubator.github.io/blog/geo-measurement-review"/>
+        <link href="https://facebookincubator.github.io/GeoLift/blog/geo-measurement-review"/>
         <updated>2021-10-02T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Intro to Quasi-Experiments]]></summary>
         <author>
@@ -21,7 +21,7 @@
     <entry>
         <title type="html"><![CDATA[Welcome]]></title>
         <id>welcome</id>
-        <link href="https://facebookincubator.github.io/blog/welcome"/>
+        <link href="https://facebookincubator.github.io/GeoLift/blog/welcome"/>
         <updated>2021-10-01T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Welcome to GeoLift's blog where we discuss anything related to:]]></summary>
         <author>

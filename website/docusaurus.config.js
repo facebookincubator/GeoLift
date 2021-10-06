@@ -13,7 +13,7 @@
   title: 'GeoLift',
   tagline: 'The solution to calculate Lift at a geo-level',
   url: 'https://facebookincubator.github.io/',
-  baseUrl: '/',
+  baseUrl: '/GeoLift/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',

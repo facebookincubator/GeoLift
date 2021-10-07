@@ -21,7 +21,10 @@ GeoLiftPower(
   model = "none",
   fixed_effects = TRUE,
   stat_func = NULL,
-  ProgressBar = FALSE
+  ProgressBar = FALSE,
+  parallel = TRUE,
+  parallel_setup = "sequential",
+  import_augsynth_from = "library(augsynth)"
 )
 }
 \arguments{
@@ -91,6 +94,16 @@ effects in the model. Set to TRUE by default.}
 
 \item{ProgressBar}{A logic flag indicating whether to display a progress bar
 to track progress. Set to FALSE by default.}
+
+\item{parallel}{A logic flag indicating whether to use parallel computing to
+speed up calculations. Set to TRUE by default.}
+
+\item{parallel_setup}{A string indicating parallel workers set-up.
+Set to "sequential" by default.}
+
+\item{import_augsynth_from}{Points to where the augsynth package
+should be imported from to send to the nodes. Not recommended to modify
+the default value.}
 }
 \value{
 GeoLiftPower object that contains:

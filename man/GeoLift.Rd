@@ -65,11 +65,10 @@ through jackknifing techniques.  Set to FALSE by default.}
 \item{stat_test}{A string indicating the test statistic.
 \itemize{
          \item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
-         \item{"Negative":}{ One-way test against positive effects i.e. -sum(x).
+         \item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
          Recommended for Negative Lift tests.}
-         \item{"Positive":}{ One-way test against negative effects i.e. sum(x).
+         \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
          Recommended for Positive Lift tests.}
-         \item{"Average":}{ Test against the average post-treatment effect i.e. abs(sum(x)).}
 }}
 
 \item{print}{A logic flag indicating whether to print the results or not.

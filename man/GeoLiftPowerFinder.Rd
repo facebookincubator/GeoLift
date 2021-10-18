@@ -19,13 +19,13 @@ GeoLiftPowerFinder(
   normalize = FALSE,
   model = "none",
   fixed_effects = TRUE,
-  stat_func = NULL,
   dtw = 0,
   ProgressBar = FALSE,
   plot_best = FALSE,
   run_stochastic_process = FALSE,
   parallel = TRUE,
   parallel_setup = "sequential",
+  side_of_test = "two_sided",
   import_augsynth_from = "library(augsynth)"
 )
 }
@@ -74,8 +74,6 @@ fit and reduce L2 imbalance metrics.
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
 effects in the model. Set to TRUE by default.}
 
-\item{stat_func}{Function to compute test statistic. NULL by default.}
-
 \item{dtw}{Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
 on this metric while dtw = 0 (default) relies on correlations only.}
 
@@ -99,9 +97,17 @@ speed up calculations. Set to TRUE by default.}
 \item{parallel_setup}{A string indicating parallel workers set-up.
 Set to "sequential" by default.}
 
+\item{side_of_test}{A string indicating whether confidence will be determined
+using a one sided or a two sided test.
+\itemize{
+         \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+         \item{"one_sided":}{ One-sided test against positive or negaative effects i.e. 
+         If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+         If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+         }}
+
 \item{import_augsynth_from}{Points to where the augsynth package
-should be imported from to send to the nodes. Not recommended to modify
-the default value.}
+should be imported from to send to the nodes.}
 }
 \value{
 Data frame with the ordered list of best locations and their

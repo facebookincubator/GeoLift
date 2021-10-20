@@ -93,8 +93,7 @@ speed up calculations. Set to TRUE by default.}
 Set to "sequential" by default.}
 
 \item{import_augsynth_from}{Points to where the augsynth package
-should be imported from to send to the nodes. Not recommended to modify
-the default value.}
+should be imported from to send to the nodes.}
 }
 \value{
 Table of average power by number of locations.

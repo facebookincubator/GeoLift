@@ -1,3 +1,7 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
 # Suppress 'no visible binding for global variable' warnings
 utils::globalVariables(
   c(
@@ -39,7 +43,9 @@ utils::globalVariables(
     "treatment_start",
     "summ",
     "pvalue",
-    "effect_size"
+    "effect_size",
+    "AvgScaledL2Imbalance",
+    "Investment"
   )
 )
 
@@ -655,16 +661,22 @@ build_cluster <- function(parallel_setup,
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
-#' @param stat_func Function to compute test statistic. NULL by default.
 #' @param ProgressBar A logic flag indicating whether to display a progress bar
 #' to track progress. Set to FALSE by default.
 #' @param parallel A logic flag indicating whether to use parallel computing to
 #' speed up calculations. Set to TRUE by default.
 #' @param parallel_setup A string indicating parallel workers set-up.
 #' Set to "sequential" by default.
+#' @param side_of_test A string indicating whether confidence will be determined
+#' using a one sided or a two sided test.
+#' \itemize{
+#'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+#'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+#'          }
 #' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes. Not recommended to modify
-#' the default value.
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' GeoLiftPower object that contains:
@@ -695,10 +707,10 @@ GeoLiftPower <- function(data,
                          normalize = FALSE,
                          model = "none",
                          fixed_effects = TRUE,
-                         stat_func = NULL,
                          ProgressBar = FALSE,
                          parallel = TRUE,
                          parallel_setup = "sequential",
+                         side_of_test = "two_sided",
                          import_augsynth_from = "library(augsynth)"){
 
   if (parallel == TRUE){
@@ -740,6 +752,10 @@ GeoLiftPower <- function(data,
   }
 
   for (es in effect_size){ #iterate through lift %
+
+    stat_func <- type_of_test(side_of_test = side_of_test,
+                              alternative_hypothesis = ifelse(es > 0, "Positive", "Negative"))
+
     for (tp in treatment_periods){ #lifts
       t_n <- max(data$time) - tp + 1 #Number of simulations without extrapolation
 
@@ -1021,8 +1037,7 @@ plot.GeoLiftPower <- function(x,
 #' @param parallel_setup A string indicating parallel workers set-up.
 #' Set to "sequential" by default.
 #' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes. Not recommended to modify
-#' the default value.
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' Table of average power by number of locations.
@@ -1327,6 +1342,53 @@ stochastic_market_selector <- function(
 }
 
 
+#' Decides type of statistical function being applied for Conformal
+#' Inference.
+#'
+#' @description
+#'
+#' \code{type_of_test} returns stat_func being used for GeoLiftPower;
+#' GeoLiftPowerFinder & GeoLift.
+#'
+#' @param side_of_test A string indicating whether confidence will be determined
+#' using a one sided or a two sided test.
+#' \itemize{
+#'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+#'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+#'          }
+#' @param alternative_hypothesis A string indicating what is the alternative hypothesis being tested. Defaults to NULL.
+#' \itemize{
+#'          \item{"negative":}{ H0: ES >= 0; HA: ES < 0.}
+#'          \item{"positive":}{ H0: ES <= 0; HA: ES > 0.}
+#' }
+#' @return
+#' Statistical function being used to sum ATT effects over all treatment periods.
+#'
+#' @export
+type_of_test <- function(side_of_test="two_sided", alternative_hypothesis=NULL){
+  if (side_of_test == "two_sided"){
+    stat_func <- function(x) sum(abs(x))
+  } else if (side_of_test == "one_sided"){
+    if (is.null(alternative_hypothesis)){
+      stop("If running a one sided test, please define alternative_hypotehsis parameter.
+  Either 'positive' or 'negative'")
+    }
+    if (tolower(alternative_hypothesis) == "negative"){
+      stat_func <- function(x) -sum(x)
+    } else if (tolower(alternative_hypothesis) == "positive"){
+      stat_func <- function(x) sum(x)
+    } else {
+      stop("Please define a valid alternative_hypothesis. Can be either {'Negative', 'Positive'}.")
+    }
+  } else {
+    stop("Please define a valid side_of_test. Can be either {'one_sided', 'two_sided'}.")
+  }
+  return(stat_func)
+}
+
+
 #' Power calculations for unknown test market locations, number of
 #' test markets, and test duration.
 #'
@@ -1393,8 +1455,7 @@ stochastic_market_selector <- function(
 #' @param parallel_setup A string indicating parallel workers set-up.
 #' Set to "sequential" by default.
 #' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes. Not recommended to modify
-#' the default value.
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' Data frame with the ordered list of best locations and their
@@ -1659,7 +1720,6 @@ GeoLiftPower.search <- function(data,
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
-#' @param stat_func Function to compute test statistic. NULL by default.
 #' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
 #' on this metric while dtw = 0 (default) relies on correlations only.
 #' @param ProgressBar A logic flag indicating whether to display a progress bar
@@ -1677,9 +1737,16 @@ GeoLiftPower.search <- function(data,
 #' speed up calculations. Set to TRUE by default.
 #' @param parallel_setup A string indicating parallel workers set-up.
 #' Set to "sequential" by default.
+#' @param side_of_test A string indicating whether confidence will be determined
+#' using a one sided or a two sided test.
+#' \itemize{
+#'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+#'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+#'          }
 #' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes. Not recommended to modify
-#' the default value.
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' Data frame with the ordered list of best locations and their
@@ -1699,13 +1766,13 @@ GeoLiftPowerFinder <- function(data,
                                normalize = FALSE,
                                model = "none",
                                fixed_effects = TRUE,
-                               stat_func = NULL,
                                dtw = 0,
                                ProgressBar = FALSE,
                                plot_best = FALSE,
                                run_stochastic_process = FALSE,
                                parallel = TRUE,
                                parallel_setup = "sequential",
+                               side_of_test = "two_sided",
                                import_augsynth_from = "library(augsynth)"){
 
   if (parallel == TRUE){
@@ -1760,6 +1827,10 @@ GeoLiftPowerFinder <- function(data,
       BestMarkets,
       run_stochastic_process = run_stochastic_process)
     for (es in effect_size){ #iterate through lift %
+
+      stat_func <- type_of_test(side_of_test = side_of_test,
+                                alternative_hypothesis = ifelse(es > 0, "positive", "negative"))
+
       for (tp in treatment_periods){ #lifts
 
         if(ProgressBar == TRUE){
@@ -1955,6 +2026,417 @@ GeoLiftPowerFinder <- function(data,
 
 }
 
+#' GeoLift Market Selection algorithm based on a Power Analysis.
+#'
+#' @description
+#'
+#' \code{GeoLiftMarketSelection} provides a ranking of test markets  for a
+#' GeoLift test based on a power analysis.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit, It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param treatment_periods List of treatment periods to calculate power for.
+#' @param N List of number of test markets to calculate power for.
+#' @param X List of names of covariates.
+#' @param Y_id Name of the outcome variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param effect_size A vector of effect sizes to test by default a
+#' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
+#' Only input sequences that are entirely positive or negative and that include
+#' zero.
+#' @param lookback_window A number indicating how far in time the simulations
+#' for the power analysis should go. For instance, a value equal to 5 will simulate
+#' power for the last five possible tests. By default lookback_window = -1 which
+#' will set the window to the smallest provided test \code{min(treatment_periods)}.
+#' @param include_markets A list of markets or locations that should be part of the
+#' test group. Make sure to specify an N as large or larger than the number of
+#' provided markets or locations.
+#' @param exclude_markets A list of markets or locations that will be removed from the
+#' analysis.
+#' @param cpic Number indicating the Cost Per Incremental Conversion.
+#' @param budget Number indicating the maximum budget available for a GeoLift test.
+#' @param alpha Significance Level. By default 0.1.
+#' @param normalize A logic flag indicating whether to scale the outcome which is
+#' useful to accelerate computing speed when the magnitude of the data is large. The
+#' default is FALSE.
+#' @param model A string indicating the outcome model used to augment the Augmented
+#' Synthetic Control Method. Augmentation through a prognostic function can improve
+#' fit and reduce L2 imbalance metrics.
+#' \itemize{
+#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
+#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+#'                          to improve fit for larger panels (more than 40 locations and 100
+#'                          time-stamps. }
+#'          }
+#' @param fixed_effects A logic flag indicating whether to include unit fixed
+#' effects in the model. Set to TRUE by default.
+#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
+#' on this metric while dtw = 0 (default) relies on correlations only.
+#' @param ProgressBar A logic flag indicating whether to display a progress bar
+#' to track progress. Set to FALSE by default.
+#' @param plot_best A logic flag indicating whether to plot the best 4 tests for
+#' each treatment length. Set to FALSE by default.
+#' @param run_stochastic_process A logic flag indicating whether to select test
+#' markets through random sampling of the the similarity matrix. Given that
+#' interpolation biases may be relevant if the synthetic control matches
+#' the characteristics of the test unit by averaging away large discrepancies
+#' between the characteristics of the test and the units in the synthetic controls,
+#' it is recommended to only use random sampling after making sure all units are
+#' similar. This parameter is set by default to FALSE.
+#' @param parallel A logic flag indicating whether to use parallel computing to
+#' speed up calculations. Set to TRUE by default.
+#' @param parallel_setup A string indicating parallel workers set-up.
+#' Set to "sequential" by default.
+#' @param side_of_test A string indicating whether confidence will be determined
+#' using a one sided or a two sided test.
+#' \itemize{
+#'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+#'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+#'          }
+#' @param import_augsynth_from Points to where the augsynth package
+#' should be imported from to send to the nodes.
+#'
+#' @return
+#' A list with two Data Frames. \itemize{
+#'          \item{"BestMarkets":}{Data Frame with a ranking of the best markets
+#'          based on power, Scaled L2 Imbalance, Minimum Detectable Effect, and
+#'          proportion of total KPI in the test markets.}
+#'          \item{"PowerCurves":}{Data Frame with the resulting power curves for
+#'          each recommended market}
+#' }
+#'
+#' @export
+GeoLiftMarketSelection <- function(data,
+                                   treatment_periods,
+                                   N = 1,
+                                   X = c(),
+                                   Y_id = "Y",
+                                   location_id = "location",
+                                   time_id = "time",
+                                   effect_size = seq(0,0.25,0.05),
+                                   lookback_window = -1,
+                                   include_markets = c(),
+                                   exclude_markets = c(),
+                                   cpic = 1,
+                                   budget = NULL,
+                                   alpha = 0.1,
+                                   normalize = FALSE,
+                                   model = "none",
+                                   fixed_effects = TRUE,
+                                   dtw = 0,
+                                   ProgressBar = FALSE,
+                                   plot_best = FALSE,
+                                   run_stochastic_process = FALSE,
+                                   parallel = TRUE,
+                                   parallel_setup = "sequential",
+                                   side_of_test = "two_sided",
+                                   import_augsynth_from = "library(augsynth)"
+){
+
+  if (parallel == TRUE){
+    cl <- build_cluster(
+      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from)
+  }
+
+  # Part 1: Treatment and pre-treatment periods
+  data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
+  max_time <- max(data$time)
+  data$location <- tolower(data$location)
+  include_markets <- tolower(include_markets)
+  exclude_markets <- tolower(exclude_markets)
+
+  # Data Checks
+
+  # Small Pre-treatment Periods
+  if (max(treatment_periods)/max_time > 0.8){
+    message(paste0("Warning: Small pre-treatment period.
+                   \nTthe treatment is larger that 80% of all available data."))
+  }
+
+  # More include_markets than N
+  if(length(include_markets) > 0 & min(N) < length(include_markets)){
+    message(paste0("More forced markets than total test ones.",
+                   " Consider increasing the values of N."))
+    return(NULL)
+  }
+
+  #Check that the provided markets exist in the data.
+  if(!all(tolower(include_markets) %in% tolower(unique(data$location)))){
+    message(paste0("One or more markets in include_markets were not",
+                   " found in the data. Check the provided list and try again."))
+    return(NULL)
+  }
+
+  #Check that the provided markets exist in the data.
+  if(!all(tolower(exclude_markets) %in% tolower(unique(data$location)))){
+    message(paste0("One or more markets in exclude_markets were not",
+                   " found in the data. Check the provided list and try again."))
+    return(NULL)
+  }
+
+  #Make sure all simulated effect sizes have the same sign.
+  if(min(effect_size < 0 & max(effect_size) > 0)){
+    message(paste0("The specified simulated effect sizes are not all of the same ",
+                   " sign. \nTry again with a vector of all positive or negative effects",
+                   " sizes that includes zero."))
+    return(NULL)
+  }
+
+  results <- data.frame(matrix(ncol=8,nrow=0))
+  colnames(results) <- c("location",
+                         "pvalue",
+                         "duration",
+                         "lift",
+                         "treatment_start",
+                         "investment",
+                         "cpic",
+                         "ScaledL2Imbalance")
+
+  if (lookback_window < 0){
+    lookback_window <- min(treatment_periods)
+  }
+
+  #Exclude markets input by user by filter them out from the uploaded file data
+  if(length(exclude_markets) > 0){
+    data <- data[!(data$location %in% exclude_markets),]
+  }
+
+  BestMarkets <- MarketSelection(data,
+                                 location_id = "location",
+                                 time_id = "time",
+                                 Y_id = "Y",
+                                 dtw = dtw)
+
+  # Aggregated Y Per Location
+  AggYperLoc <- data %>%
+    dplyr::group_by(location) %>%
+    dplyr::summarize(Total_Y = sum(Y))
+
+  #NEWCHANGE: Progress Bar
+  num_sim <- length(N) * length(treatment_periods) * length(effect_size)
+  if(ProgressBar == TRUE) {
+    pb <- progress::progress_bar$new(format = "  Running Simulations [:bar] :percent",
+                                     total = num_sim,
+                                     clear = FALSE,
+                                     width= 60)
+  }
+
+
+  for (n in N){
+    BestMarkets_aux <- stochastic_market_selector(
+      n,
+      BestMarkets,
+      run_stochastic_process = run_stochastic_process)
+
+    # Force included markets into the selection
+    if(length(include_markets) > 0){
+      temp_Markets <- NULL
+      for (row in 1:nrow(BestMarkets_aux)){
+        if(all(include_markets %in% BestMarkets_aux[row,])){
+          temp_Markets <- rbind(temp_Markets, BestMarkets_aux[row,])
+        }
+      }
+      BestMarkets_aux <- temp_Markets
+    }
+
+    for (es in effect_size){ #iterate through lift %
+
+      stat_func <- type_of_test(side_of_test = side_of_test,
+                                alternative_hypothesis = ifelse(es > 0, "positive", "negative"))
+
+      for (tp in treatment_periods){ #lifts
+
+        if(ProgressBar == TRUE){
+          pb$tick()
+        }
+
+        t_n <- max(data$time) - tp + 1 #Number of simulations without extrapolation (latest start time possible for #tp)
+
+        for(sim in 1:(lookback_window)){
+
+          if (parallel == TRUE){
+            a <- foreach(test = 1:nrow(as.matrix(BestMarkets_aux)), #NEWCHANGE: Horizon = earliest start time for simulations
+                         .combine=cbind,
+                         .errorhandling = 'stop',
+                         .verbose = FALSE) %dopar% {
+                           suppressMessages(pvalueCalc(
+                             data = data,
+                             sim = sim,
+                             max_time = max_time,
+                             tp = tp,
+                             es = es,
+                             locations = as.list(as.matrix(BestMarkets_aux)[test,]),
+                             cpic = cpic,
+                             X,
+                             type = "pValue",
+                             normalize = normalize,
+                             fixed_effects = fixed_effects,
+                             model = model,
+                             stat_func = stat_func))
+
+                         }
+
+
+            if(!is.null(dim(a))){
+              for (i in 1:ncol(a)) {
+                results <- rbind(results, data.frame(location = a[[1,i]],
+                                                     pvalue = as.numeric(a[[2,i]]),
+                                                     duration = as.numeric(a[[3,i]]),
+                                                     lift = as.numeric(a[[4,i]]),
+                                                     treatment_start = as.numeric(a[[5,i]]),
+                                                     investment = as.numeric(a[[6,i]]),
+                                                     cpic = cpic,
+                                                     ScaledL2Imbalance = as.numeric(a[[7,i]]) ) )
+              }
+            } else if (length(a) >0){
+              results <- rbind(results, data.frame(location = a[1],
+                                                   pvalue = as.numeric(a[2]),
+                                                   duration = as.numeric(a[3]),
+                                                   lift = as.numeric(a[4]),
+                                                   treatment_start = as.numeric(a[5]),
+                                                   investment = as.numeric(a[6]),
+                                                   cpic = cpic,
+                                                   ScaledL2Imbalance = as.numeric(a[7]) ) )
+            }
+
+
+          } else{
+            for (test in 1:nrow(as.matrix(BestMarkets_aux))) {
+              aux <- NULL
+              aux <- suppressMessages(pvalueCalc(
+                data = data,
+                sim = sim,
+                max_time = max_time,
+                tp = tp,
+                es = es,
+                locations = as.list(as.matrix(BestMarkets_aux)[test,]),
+                cpic = cpic,
+                X,
+                type = "pValue",
+                normalize = normalize,
+                fixed_effects = fixed_effects,
+                model = model,
+                stat_func = stat_func))
+
+
+              results <- rbind(results, data.frame(location=aux[1],
+                                                   pvalue = as.numeric(aux[2]),
+                                                   duration = as.numeric(aux[3]),
+                                                   lift = as.numeric(aux[4]),
+                                                   treatment_start = as.numeric(aux[5]),
+                                                   investment = as.numeric(aux[6]),
+                                                   cpic = cpic,
+                                                   ScaledL2Imbalance = as.numeric(aux[7]) ) )
+            }
+          }
+        }
+      } #tp
+    }
+  }
+
+  if (parallel == TRUE){
+    parallel::stopCluster(cl)
+  }
+
+  # Step 1 - Sort
+  results$location <- strsplit(stringr::str_replace_all(results$location, ", ", ","),split = ",")
+  results$location <- lapply(results$location, sort)
+  results$location <- lapply(results$location, function(x) paste(x, collapse = ", "))
+  results$location <- unlist(results$location)
+
+  #Step 2 - Compute Significant
+  results <- results %>%
+    dplyr::mutate(pow = ifelse(pvalue < 0.1, 1, 0)) %>%
+    #   dplyr::filter(significant > 0) %>%
+    dplyr::distinct()
+
+  #Step 3 - Compute average Metrics
+  results <- results %>%
+    dplyr::group_by(location, duration, lift) %>%
+    dplyr::summarise(power = mean(pow),
+                     AvgScaledL2Imbalance = mean(ScaledL2Imbalance),
+                     Investment = mean(investment), .groups = "keep")
+
+  # Step 4 - Find the MDE that achieved power
+  resultsM <- NULL
+
+  for (locs in unique(results$location)){
+    for(ts in c(10,15)) { #for(ts in treatment_periods)
+      resultsFindAux <- results %>% dplyr::filter(location  == locs & duration == ts & power > 0.8)
+
+      if ( min(seq(0,0.25,0.025)) < 0){ #if ( min(effect_size) < 0){
+        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift != 0)
+        MDEAux <- suppressWarnings(max(resultsFindAux$lift))
+        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift == MDEAux)
+
+      } else {
+        MDEAux <- suppressWarnings(min(resultsFindAux$lift))
+        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift == MDEAux)
+      }
+
+      if (MDEAux != 0) { # Drop tests significant with ES = 0
+        resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
+      }
+    }
+  }
+
+  # Step 5 - Add Percent of Y in test markets
+  # Step 5.1 - Create the overall prop
+  AggYperLoc <- data %>% #data %>%
+    dplyr::group_by(location) %>%
+    dplyr::summarize(Total_Y = sum(Y))
+
+  # Step 5.2 - Attach to Table
+  resultsM$ProportionTotal_Y <- 1
+  resultsM$Locs <- strsplit(stringr::str_replace_all(resultsM$location, ", ", ","),split = ",")
+
+  for (row in 1:nrow(resultsM)) {
+    resultsM$ProportionTotal_Y[row] <- as.numeric(AggYperLoc %>%
+                                                    dplyr::filter (location %in% resultsM$Locs[[row]]) %>%
+                                                    dplyr::summarize(total = sum(Total_Y))) /
+      sum(AggYperLoc$Total_Y)
+  }
+
+  # Step 6 - Remove any duplicates
+  resultsM <- resultsM %>% dplyr::group_by(location, duration) %>% dplyr::slice_max(order_by = power, n = 1)
+
+  # Step 7 - Sort Before Ranking
+  resultsM <- resultsM %>%
+    dplyr::arrange(dplyr::desc(power),
+                   AvgScaledL2Imbalance,
+                   lift,
+                   dplyr::desc(ProportionTotal_Y))
+
+
+  # Step 8 - Remove the Locs column
+  resultsM <- dplyr::select (resultsM, -c(Locs))
+
+  # Step 9 - Rename columns
+  resultsM <- dplyr::rename(resultsM,
+                            Average_MDE = lift,
+                            Power = power)
+
+  # Step 10 - Remove tests out of budget (if aplicable)
+  if (!is.null(budget)){
+    resultsM <- resultsM %>% dplyr::filter(budget > Investment)
+  }
+
+  # Step 11 - Create Ranking
+  resultsM$rank <- 1:nrow(resultsM)
+
+  class(results) <- c("GeoLift.MarketSelection", class(resultsM))
+
+  return(list(BestMarkets = as.data.frame(resultsM), PowerCurves = as.data.frame(results)))
+
+}
+
 
 #' GeoLift inference calculation.
 #'
@@ -1993,11 +2475,10 @@ GeoLiftPowerFinder <- function(data,
 #' @param stat_test A string indicating the test statistic.
 #' \itemize{
 #'          \item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
-#'          \item{"Negative":}{ One-way test against positive effects i.e. -sum(x).
+#'          \item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
 #'          Recommended for Negative Lift tests.}
-#'          \item{"Positive":}{ One-way test against negative effects i.e. sum(x).
+#'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 #'          Recommended for Positive Lift tests.}
-#'          \item{"Average":}{ Test against the average post-treatment effect i.e. abs(sum(x)).}
 #' }
 #' @param print A logic flag indicating whether to print the results or not.
 #' Set to TRUE by default.
@@ -2136,15 +2617,19 @@ GeoLift <- function(Y_id = "Y",
                               "Upper.Conf.Int")
 
   #NEWCHANGE: To avoid running the time-consuming summary process, create and store the object for re-use
-  if(tolower(stat_test) == "negative"){
-    sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = function(x) -sum(x))
-  } else if(tolower(stat_test) == "positive"){
-    sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = function(x) sum(x))
-  } else if(tolower(stat_test) == "average"){
-    sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = function(x) abs(sum(x)))
+  if (tolower(stat_test) == "total"){
+    side_of_test <- "two_sided"
+    alternative_hypothesis <- NULL
+  } else if (tolower(stat_test) == "negative" | tolower(stat_test) == "positive"){
+    side_of_test <- "one_sided"
+    alternative_hypothesis <- stat_test
   } else {
-    sum_augsyn <- summary(augsyn, alpha = alpha)
+    stop("stat_test must be one of {'total', 'negative', 'positive'}.")
   }
+  stat_func <- type_of_test(side_of_test = side_of_test,
+                            alternative_hypothesis = alternative_hypothesis)
+
+  sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = stat_func)
 
   if(paste(augsyn$call)[1] == "single_augsynth"){
     mean <- sum_augsyn[['average_att']][['Estimate']] #Use summary object

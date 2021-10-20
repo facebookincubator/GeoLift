@@ -103,7 +103,7 @@ Set to "sequential" by default.}
 using a one sided or a two sided test.
 \itemize{
          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-         \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+         \item{"one_sided":}{ One-sided test against positive or negaative effects i.e. 
          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
          }}

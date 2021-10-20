@@ -12,12 +12,12 @@ type_of_test(side_of_test = "two_sided", alternative_hypothesis = NULL)
 using a one sided or a two sided test.
 \itemize{
          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-         \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+         \item{"one_sided":}{ One-sided test against positive or negaative effects i.e. 
          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
          }}
 
-\item{alternative_hypothesis}{A string indicating what is the alternative hypothesis being tested. Defaults to NULL.
+\item{alternative_hypothesis}{A string indicating what is the alternative hypothesis being tested. Defaults to NULL. 
 \itemize{
          \item{"negative":}{ H0: ES >= 0; HA: ES < 0.}
          \item{"positive":}{ H0: ES <= 0; HA: ES > 0.}

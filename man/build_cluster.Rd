@@ -7,7 +7,7 @@
 build_cluster(parallel_setup, import_augsynth_from)
 }
 \arguments{
-\item{parallel_setup}{A string indicating parallel workers set-up.
+\item{parallel_setup}{A string indicating parallel workers set-up. 
 Can be "sequential" or "parallel".}
 
 \item{import_augsynth_from}{Points to where the augsynth package

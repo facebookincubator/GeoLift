@@ -82,9 +82,9 @@ GeoDataRead <- function(data,
                         format = "mm/dd/yyyy",
                         X = c(),
                         summary = FALSE) {
-
+  
   format <- tolower(format)
-
+  
   # Acceptable date formats
   valid_formats_day <- c("mm/dd/yyyy", "mm-dd-yyyy", "mm.dd.yyyy", "mmddyyyy",
                          "dd/mm/yyyy", "dd-mm-yyyy", "dd.mm.yyyy", "ddmmyyyy",
@@ -94,29 +94,29 @@ GeoDataRead <- function(data,
   valid_formats_month <- c("mm/yyyy", "mm-yyyy", "mm.yyyy", "mmyyyy",
                            "yyyy/mm", "yyyy-mm", "yyyy.mm", "yyyymm")
   valid_formats <- c(valid_formats_day, valid_formats_week, valid_formats_month)
-
+  
   if (!(format %in% valid_formats) ){
     message("Error: Please enter a valid date format. Valid formats are:")
     print(valid_formats)
     return(NULL)
   }
-
+  
   # Rename variables to standard names used by GeoLift
   data <- data %>% dplyr::rename(date = date_id,
                                  Y = Y_id,
                                  location = location_id)
-
+  
   # Remove white spaces in date variable
   data$date <- as.character(data$date)
   data$date <- trimws(data$date)
-
+  
   # Location in lower-case for compatibility with GeoLift
   data$location <- tolower(data$location)
   initial_locations <- length(unique(data$location))
-
+  
   #NEWCHANGE: Remove commas from locations
   data$location <- gsub(",", "", gsub("([a-zA-Z]),", "\\1", data$location))
-
+  
   # Determine the separator
   if (str_count(format, pattern = fixed("/")) > 0){
     sep <- "/"
@@ -127,40 +127,40 @@ GeoDataRead <- function(data,
   } else {
     sep <- ""
   }
-
+  
   # Make sure the data is complete for formats without sep
   if ( sep == "" & min(nchar(data$date)) != nchar(format)) {
     message("Error: The length of the date is incorrect.")
     message("Make sure the entries have trailig zeroes (1/1/2012 -> 01/01/2012)")
     return(NULL)
   }
-
+  
   # Remove separators
-
+  
   if (format %in% valid_formats_day){
     date_format <- gsub(sep,"",format) #Remove sep
     date_format <- gsub("yyyy","Y",date_format)
     date_format <- gsub("mm","m",date_format)
     date_format <- gsub("dd","d",date_format)
     date_format <- unlist(strsplit(date_format, split = ""))
-
+    
     reformat <- paste0("%",date_format[1], sep, "%", date_format[2], sep, "%", date_format[3])
-
+    
     data$date_unix <- data$date
     # Create date in unix time
     data$date_unix <- data$date_unix %>%
       as.Date(reformat) %>%
       as.POSIXct(format="%Y-%m-%d") %>%
       as.numeric()
-
+    
   } else if (format %in% valid_formats_week) {
     date_format <- gsub(sep,"",format) #Remove sep
     date_format <- gsub("yyyy","Y",date_format)
     date_format <- gsub("ww","W",date_format)
     date_format <- unlist(strsplit(date_format, split = ""))
-
+    
     reformat <- paste0("%",date_format[1], sep, "%", date_format[2], sep, "%w")
-
+    
     data$date_unix <- data$date
     data$date_unix <- paste0(data$date_unix, sep, "0")
     # Create date in unix time
@@ -168,15 +168,15 @@ GeoDataRead <- function(data,
       as.Date(reformat) %>%
       as.POSIXct(format="%Y-%m-%d") %>%
       as.numeric()
-
+    
   } else if (format %in% valid_formats_month) {
     date_format <- gsub(sep,"",format) #Remove sep
     date_format <- gsub("yyyy","Y",date_format)
     date_format <- gsub("mm","m",date_format)
     date_format <- unlist(strsplit(date_format, split = ""))
-
+    
     reformat <- paste0("%",date_format[1], sep, "%", date_format[2], sep, "%d")
-
+    
     data$date_unix <- data$date
     data$date_unix <- paste0(data$date_unix, sep, "1")
     # Create date in unix time
@@ -185,35 +185,35 @@ GeoDataRead <- function(data,
       as.POSIXct(format="%Y-%m-%d") %>%
       as.numeric()
   }
-
+  
   #Remove NAs from date conversion
   if (sum(is.na(data$date_unix)) > 0){
     message(paste0(sum(is.na(data$date_unix)), " rows dropped due to inconsistent time format."))
     data <- data[is.na(data$date_unix) == FALSE,]
   }
-
+  
   # Find the time increments
   time_increments <- unique(sort(data$date_unix, FALSE))[2] -
     unique(sort(data$date_unix, FALSE))[1]
-
+  
   data$time <- (data$date_unix-min(data$date_unix))/
     as.numeric(time_increments) + 1
-
+  
   #Recode to avoid missing weeks (time increases always by 1)
   TimePeriods <- data.frame(time = sort(unique(data$time)))
   TimePeriods$ID <- seq.int(nrow(TimePeriods))
-
+  
   data <- data %>% dplyr::left_join(TimePeriods, by = "time")
   data$time <- data$ID
-
+  
   data <- subset(data, select = -c(date_unix, ID))
-
+  
   #Remove revenue with zeroes
   #data <- filter(data, Y > 0)
-
+  
   # Remove null conversion values
   data <- data[!is.na(data$Y), ]
-
+  
   # Remove cities with missing time periods
   total_periods <- max(data$time)
   complete_cases <- table(data$location, data$time)
@@ -222,8 +222,8 @@ GeoDataRead <- function(data,
   incomplete_locations <- length(complete) - length(complete[complete==TRUE])
   complete <- complete[complete==TRUE]
   data <- data %>% dplyr::filter(location %in% names(complete))
-
-
+  
+  
   # Aggregate Outcomes by time and location
   data_raw <- data
   data <- data_raw %>% dplyr::group_by(location, time) %>% dplyr::summarize(Y = sum(Y))
@@ -231,7 +231,7 @@ GeoDataRead <- function(data,
     data_aux <- data_raw %>% dplyr::group_by(location, time) %>% dplyr::summarize(!!var := sum(!!sym(var)))
     data <- data %>% dplyr::left_join(data_aux, by = c("location", "time"))
   }
-
+  
   # Print summary of Data Reading
   if (summary == TRUE) {
     message(paste0(
@@ -242,9 +242,9 @@ GeoDataRead <- function(data,
       "\n* Time Periods: ", total_periods,
       "\n* Final Number of Locations (Complete): ", length(unique(data$location))  ) )
   }
-
+  
   return(as.data.frame(data))
-
+  
 }
 
 
@@ -273,13 +273,13 @@ GeoPlot <- function(data,
                     time_id = "time",
                     location_id = "location",
                     treatment_start = 0){
-
+  
   if (treatment_start == 0){
     size_vline <- 0
   } else{
     size_vline <- 0.8
   }
-
+  
   p <- ggplot(data,aes(y = !!sym(Y_id),x = !!sym(time_id), colour = !!sym(location_id), label = !!sym(location_id) )) +
     geom_line(show.legend = FALSE) +
     geom_vline(xintercept = treatment_start, linetype="dashed", size = size_vline, color = "grey35") +
@@ -287,7 +287,7 @@ GeoPlot <- function(data,
     xlim(1,1.15*(max(data[[time_id]])))+
     ylab("") +
     theme_minimal()
-
+  
   print(p)
 }
 
@@ -330,58 +330,58 @@ TrimControls <- function(data,
                          max_controls = 20,
                          test_locations = c(),
                          forced_control_locations = c()){
-
-
+  
+  
   data <- data %>% dplyr::rename(time = time_id,
                                  Y = Y_id,
                                  location = location_id)
-
+  
   if (max_controls > length(unique(data$location))){
     print("Error: There can't be more controls than total locations.")
     return(NULL)
   }
-
+  
   # Calculate the Average Time-Series
   avg_Y <- data %>% dplyr::group_by(time) %>% dplyr::summarize(Y_mean = mean(Y))
-
+  
   # Append it to the data
   data_aux <- data %>% dplyr::left_join(avg_Y, by = "time")
-
+  
   # Compute the difference for each time/location
   data_aux$diff <- data_aux$Y - data_aux$Y_mean
-
+  
   # Calculate the average difference
   data_aux <- data_aux %>% dplyr::group_by(location) %>% dplyr::summarize(mean_diff = mean(diff))
-
+  
   # Calculate the percentiles for stratified sampling
   perc <- quantile(data_aux$mean_diff, probs = seq(0, 1, 0.2))
   perc <- unname(perc)
-
+  
   data_aux$percentile <- 0
-
+  
   for (location in 1:nrow(data_aux)){
     for(percentile in 1:(length(perc)-1)){
       if (data_aux$mean_diff[location] > perc[percentile] &
           data_aux$mean_diff[location] <= perc[percentile+1]){
-
+        
         data_aux$percentile[location] <- percentile
-
+        
       }
     }
   }
-
+  
   data_locs <- data_aux %>%
     dplyr::filter(!(location %in% test_locations)) %>%
     dplyr::group_by(percentile) %>%
     dplyr::sample_n(round(max_controls/length(perc)), replace = TRUE) %>%
     dplyr::distinct(location)
-
+  
   final_locations <- unique(c(data_locs$location, test_locations, forced_control_locations))
-
+  
   data <- data %>% dplyr::filter(location %in% final_locations)
-
+  
   return(data)
-
+  
 }
 
 
@@ -408,16 +408,16 @@ fn_treatment <- function(df,
                          locations,
                          treatment_start_time,
                          treatment_end_time) {
-
+  
   df$D <- 0
   df$D[df$location %in% locations &
          treatment_start_time <= df$time &
          df$time <= treatment_end_time] <- 1
-
+  
   df <- df %>% dplyr::filter(time <= treatment_end_time) #Remove periods after treatment
-
+  
   return(df)
-
+  
 }
 
 
@@ -478,25 +478,25 @@ pvalueCalc <- function(data,
                        fixed_effects = FALSE,
                        stat_func = stat_func,
                        model = "none") {
-
+  
   treatment_start_time <- max_time - tp - sim + 2
   treatment_end_time <- treatment_start_time + tp - 1
   pre_test_duration <- treatment_start_time - 1
   pre_treatment_start_time <- 1
-
+  
   if (normalize == TRUE){ # NEWCHANGE: Normalize by the sd
     factor <- sd(as.matrix(data$Y))
     data$Y <- data$Y/factor
   }
-
+  
   data_aux <- fn_treatment(data, locations=locations,
                            treatment_start_time,
                            treatment_end_time)
-
+  
   data_aux$Y_inc <- data_aux$Y
   data_aux$Y_inc[data_aux$D==1] <- data_aux$Y_inc[data_aux$D==1]*(1+es)
-
-
+  
+  
   if (length(X) == 0){
     PowerCalc <- augsynth::augsynth(Y_inc ~ D,
                                     unit = location,
@@ -511,7 +511,7 @@ pvalueCalc <- function(data,
     fmla <- as.formula(paste("Y_inc ~ D |",
                              sapply(list(X),
                                     paste, collapse = "+")))
-
+    
     PowerCalc <- augsynth::augsynth(fmla,
                                     unit = location,
                                     time = time,
@@ -521,12 +521,12 @@ pvalueCalc <- function(data,
                                     scm = T,
                                     fixedeff = fixed_effects)
   }
-
-
+  
+  
   #NEWCHANGES: Option for quick imbalance-based calcs or p-value
   if (type == "pValue") {
     #pVal <- summary(PowerCalc)$average_att$p_val
-
+    
     wide_data <- PowerCalc$data
     new_wide_data <- wide_data
     new_wide_data$X <- cbind(wide_data$X, wide_data$y)
@@ -550,9 +550,9 @@ pvalueCalc <- function(data,
     pVal <- NA
     ScaledL2Imbalance <- NA
   }
-
+  
   investment <- cpic*sum(data_aux$Y[data_aux$D==1])*(es)
-
+  
   return (
     c(paste(locations, collapse=", "),
       pVal,
@@ -570,7 +570,7 @@ pvalueCalc <- function(data,
 #' This function builds the cluster and imports the necessary packages
 #' to run Geolift: augsynth, dplyr and tidyr.
 #'
-#' @param parallel_setup A string indicating parallel workers set-up.
+#' @param parallel_setup A string indicating parallel workers set-up. 
 #' Can be "sequential" or "parallel".
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
@@ -587,18 +587,18 @@ build_cluster <- function(parallel_setup,
   } else {
     stop('Please specify a valid set-up. Can be one of "sequential" or "parallel".')
   }
-
+  
   doParallel::registerDoParallel(cl)
-
+  
   message("Importing functions into cluster.")
   parallel::clusterCall(cl, function()
     eval(parse(text=import_augsynth_from)))
-
+  
   parallel::clusterCall(cl, function()
     attachNamespace('dplyr'))
   parallel::clusterCall(cl, function()
     attachNamespace('tidyr'))
-
+  
   parallel::clusterExport(
     cl,
     c('fn_treatment','pvalueCalc', 'MarketSelection'),
@@ -671,7 +671,7 @@ build_cluster <- function(parallel_setup,
 #' using a one sided or a two sided test.
 #' \itemize{
 #'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e. 
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
@@ -712,22 +712,22 @@ GeoLiftPower <- function(data,
                          parallel_setup = "sequential",
                          side_of_test = "two_sided",
                          import_augsynth_from = "library(augsynth)"){
-
+  
   if (parallel == TRUE){
     cl <- build_cluster(
       parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from)
   }
-
+  
   # Part 1: Treatment and pre-treatment periods
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)
   data$location <- tolower(data$location)
-
+  
   if (max(treatment_periods)/max_time > 0.8){
     message(paste0("Warning: Small pre-treatment period.
                    \nTthe treatment is larger that 80% of all available data."))
   }
-
+  
   results <- data.frame(matrix(ncol=8,nrow=0))
   colnames(results) <- c("location",
                          "pvalue",
@@ -737,32 +737,32 @@ GeoLiftPower <- function(data,
                          "investment",
                          "cpic",
                          "ScaledL2Imbalance")
-
+  
   if (horizon < 0){ #NEWCHANGE
     horizon = max(treatment_periods)
   }
-
+  
   num_sim <- length(effect_size)*length(treatment_periods)
-
+  
   if(ProgressBar == TRUE) {
     pb <- progress::progress_bar$new(format = "  Running Simulations [:bar] :percent",
                                      total = num_sim,
                                      clear = FALSE,
                                      width= 60)
   }
-
+  
   for (es in effect_size){ #iterate through lift %
-
+    
     stat_func <- type_of_test(side_of_test = side_of_test,
                               alternative_hypothesis = ifelse(es > 0, "Positive", "Negative"))
-
+    
     for (tp in treatment_periods){ #lifts
       t_n <- max(data$time) - tp + 1 #Number of simulations without extrapolation
-
+      
       if(ProgressBar == TRUE){
         pb$tick()
       }
-
+      
       if (parallel == TRUE){
         a <- foreach(sim = 1:(t_n - horizon + 1), #NEWCHANGE: Horizon = earliest start time for simulations
                      .combine=cbind,
@@ -781,11 +781,11 @@ GeoLiftPower <- function(data,
                          fixed_effects = fixed_effects,
                          model = model,
                          stat_func = stat_func)
-
+                       
                      }
-
+        
         #print(a)
-
+        
         for (i in 1:ncol(a)) {
           results <- rbind(results, data.frame(location = a[[1,i]],
                                                pvalue = as.numeric(a[[2,i]]),
@@ -813,7 +813,7 @@ GeoLiftPower <- function(data,
             fixed_effects = fixed_effects,
             model = model,
             stat_func = stat_func))
-
+          
           results <- rbind(results, data.frame(location=aux[1],
                                                pvalue = as.numeric(aux[2]),
                                                duration = as.numeric(aux[3]),
@@ -826,16 +826,16 @@ GeoLiftPower <- function(data,
       }
     }
   }
-
+  
   if (parallel == TRUE){
     parallel::stopCluster(cl)
   }
-
+  
   class(results) <- c("GeoLiftPower", class(results))
-
+  
   results$pow <- 0
   results$pow[results$pvalue < alpha] <- 1
-
+  
   return(results)
 }
 
@@ -863,41 +863,41 @@ plot.GeoLiftPower <- function(x,
                               table = TRUE,
                               actual_values = FALSE,
                               ...) {
-
+  
   if (!inherits(x, 'GeoLiftPower')) {
     stop('object must be class GeoLiftPower')
   }
-
+  
   treatment_periods <- unique(x$duration)
   lift <- unique(x$lift)
-
+  
   #NewChange: Standardize Plots
   PowerPlot <- x %>%
     dplyr::group_by(duration, lift) %>%
     #dplyr::mutate(power = 1 - pvalue) %>%
     #dplyr::summarise(power = mean(power))
     dplyr::summarise(power = mean(pow))
-
+  
   spending <- x %>% dplyr::group_by(duration, lift) %>% dplyr::summarize(inv = mean(investment))
-
+  
   if (table == TRUE){
     print(as.data.frame(PowerPlot))
   }
-
-
+  
+  
   if(actual_values == FALSE){
-
+    
     if (sum(spending$inv > 0)) {
-
+      
       for(dur in unique(PowerPlot$duration)){
-
+        
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
-
+        
         CostPerLift <- as.numeric(x %>%
                                     dplyr::filter(duration == dur, lift > 0) %>%
                                     dplyr::mutate(AvgCost = investment / lift) %>%
                                     dplyr::summarise(mean(AvgCost)))
-
+        
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE)  +
           scale_x_continuous(sec.axis = sec_axis(~. *CostPerLift, name = "Estimated Investment"))  +
@@ -906,17 +906,17 @@ plot.GeoLiftPower <- function(x,
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
-
-
+        
+        
         plot(PowerPlot_graph)
       }
-
+      
     } else {
-
+      
       for(dur in unique(PowerPlot$duration)){
-
+        
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
-
+        
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE)  +
           ylim(0,1) +
@@ -924,26 +924,26 @@ plot.GeoLiftPower <- function(x,
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
-
-
+        
+        
         plot(PowerPlot_graph)
       }
-
+      
     }
-
+    
   } else if(actual_values == TRUE){
-
+    
     if (sum(spending$inv > 0)) {
-
+      
       for(dur in unique(PowerPlot$duration)){
-
+        
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
-
+        
         CostPerLift <- as.numeric(x %>%
                                     dplyr::filter(duration == dur, lift > 0) %>%
                                     dplyr::mutate(AvgCost = investment / lift) %>%
                                     dplyr::summarise(mean(AvgCost)))
-
+        
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE)  +
           geom_line(color="gray80", size = 0.62, alpha = 0.8) +
@@ -953,17 +953,17 @@ plot.GeoLiftPower <- function(x,
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
-
-
+        
+        
         plot(PowerPlot_graph)
       }
-
+      
     } else {
-
+      
       for(dur in unique(PowerPlot$duration)){
-
+        
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
-
+        
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE)  +
           geom_line(color="gray80", size = 0.62, alpha = 0.8) +
@@ -972,15 +972,15 @@ plot.GeoLiftPower <- function(x,
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
-
-
+        
+        
         plot(PowerPlot_graph)
       }
-
+      
     }
-
+    
   }
-
+  
 }
 
 
@@ -1063,51 +1063,51 @@ NumberLocations <- function(data,
                             parallel = TRUE,
                             parallel_setup = "sequential",
                             import_augsynth_from = "library(augsynth)"){
-
+  
   if (parallel == TRUE){
     cl <- build_cluster(
       parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from)
   }
-
+  
   # Part 1: Treatment and pre-treatment periods
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)
   data$location <- tolower(data$location)
   locs <- unique(as.character(data$location))
-
+  
   if (treatment_periods/max_time > 0.8){
     message(paste0("Warning: Small pre-treatment period.
                    \nTthe treatment is larger that 80% of all available data."))
   }
-
+  
   #times <- trunc(quantile(data$time, probs = c(0.5, 0.75, 1), names = FALSE ))
-
+  
   results <- data.frame(matrix(ncol=5, nrow=0)) #NEWCHANGE: Add Imbalance
   colnames(results) <- c("location","pvalue", "n", "treatment_start", "ScaledL2Imbalance")
-
+  
   if (length(number_locations) == 0) {
     number_locations <- unique(round(quantile(c(1:length(unique(data$location))),
                                               probs = seq(0,0.5,0.05),
                                               type = 1,
                                               names = FALSE)))
   }
-
+  
   num_sim <- length(number_locations)
-
+  
   if(ProgressBar == TRUE) {
     pb <- progress::progress_bar$new(format = "  Running Simulations [:bar] :percent",
                                      total = num_sim,
                                      clear = FALSE,
                                      width= 60)
   }
-
+  
   for(n in number_locations){
     #for (t in times){
-
+    
     if(ProgressBar == TRUE){
       pb$tick()
     }
-
+    
     if (parallel == TRUE){
       a <- foreach(sim = 1:n_sim,
                    .combine=cbind,
@@ -1126,9 +1126,9 @@ NumberLocations <- function(data,
                        fixed_effects = fixed_effects,
                        model = model,
                        stat_func = stat_func)
-
+                     
                    }
-
+      
       for (i in 1:ncol(a)) {
         results <- rbind(results, data.frame(location = a[[1,i]],
                                              pvalue = as.numeric(a[[2,i]]),
@@ -1152,7 +1152,7 @@ NumberLocations <- function(data,
                                            fixed_effects = fixed_effects,
                                            model = model,
                                            stat_func = stat_func))
-
+        
         results <- rbind(results, data.frame(location = aux[1],
                                              pvalue = as.numeric(aux[2]),
                                              n = n,
@@ -1161,26 +1161,26 @@ NumberLocations <- function(data,
       }
     }
   }
-
+  
   if (parallel == TRUE){
     parallel::stopCluster(cl)
   }
-
+  
   if(plot == TRUE){
     results$pow <- 0
     results$pow[results$pvalue > alpha] <- 1
-
+    
     resultsM <- results %>% dplyr::group_by(n) %>%  dplyr::summarize(mean_pow = mean(pow), mean_L2ScaledImbalance = mean(ScaledL2Imbalance))
     resultsM <- tibble::add_row(resultsM, n = 0, mean_pow = 0, mean_L2ScaledImbalance = 1, .before = 1)
-
+    
     #print("Average Power By Number of Locations")
     #print(resultsM)
-
+    
     if(type == "pValue") {
-
+      
       print("Average Power By Number of Locations")
       print(resultsM)
-
+      
       powerplot <- ggplot(resultsM,aes(y = mean_pow,x = n)) +
         geom_line(color="indianred3", size = 0.95) +
         ylim(0,1) +
@@ -1189,7 +1189,7 @@ NumberLocations <- function(data,
         ylab("Average Power") +
         geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
         theme_minimal()
-
+      
       imbalanceplot <- ggplot(resultsM,aes(y = mean_L2ScaledImbalance,x = n)) +
         geom_line(color="steelblue4", size = 0.95) +
         ylim(0,1) +
@@ -1197,14 +1197,14 @@ NumberLocations <- function(data,
         xlab("Number of Locations") +
         ylab("Average Scaled L2 Imbalance") +
         theme_minimal()
-
+      
       gridExtra::grid.arrange(powerplot,imbalanceplot, nrow = 1)
-
+      
     } else if (type == "Imbalance") {
-
+      
       print("Average Scaled L2 Imbalance By Number of Locations")
       print(resultsM[,-2])
-
+      
       imbalanceplot <- ggplot(resultsM,aes(y = mean_L2ScaledImbalance,x = n)) +
         geom_line(color="steelblue4", size = 0.95) +
         ylim(0,1) +
@@ -1214,12 +1214,12 @@ NumberLocations <- function(data,
         theme_minimal()
       plot(imbalanceplot)
     }
-
-
+    
+    
   }
-
+  
   return(results)
-
+  
 }
 
 
@@ -1251,13 +1251,13 @@ MarketSelection <- function(data,
                             time_id = "time",
                             Y_id = "Y",
                             dtw = 0){
-
+  
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   data$location <- tolower(data$location)
   astime <- seq(as.Date("2000/1/1"), by = "day", length.out = max(data$time))
   data$astime <- astime[data$time]
-
-
+  
+  
   # Find the best matches based on DTW
   mm <- MarketMatching::best_matches( data = data,
                                       id_variable = "location",
@@ -1269,17 +1269,17 @@ MarketSelection <- function(data,
                                       start_match_period = min(data$astime),
                                       end_match_period = max(data$astime),
                                       matches = length(unique(data$location)) - 1)
-
+  
   # Create a matrix with each row being the raked best controls for each location
   best_controls <- mm$BestMatches %>% tidyr::pivot_wider(id_cols = location,
                                                          names_from = rank,
                                                          values_from = BestControl)
-
+  
   best_controls <- as.matrix(best_controls)
   colnames(best_controls) <- NULL
-
+  
   return(best_controls)
-
+  
 }
 
 
@@ -1354,11 +1354,11 @@ stochastic_market_selector <- function(
 #' using a one sided or a two sided test.
 #' \itemize{
 #'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e. 
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#' @param alternative_hypothesis A string indicating what is the alternative hypothesis being tested. Defaults to NULL.
+#' @param alternative_hypothesis A string indicating what is the alternative hypothesis being tested. Defaults to NULL. 
 #' \itemize{
 #'          \item{"negative":}{ H0: ES >= 0; HA: ES < 0.}
 #'          \item{"positive":}{ H0: ES <= 0; HA: ES > 0.}
@@ -1372,7 +1372,7 @@ type_of_test <- function(side_of_test="two_sided", alternative_hypothesis=NULL){
     stat_func <- function(x) sum(abs(x))
   } else if (side_of_test == "one_sided"){
     if (is.null(alternative_hypothesis)){
-      stop("If running a one sided test, please define alternative_hypotehsis parameter.
+      stop("If running a one sided test, please define alternative_hypotehsis parameter. 
   Either 'positive' or 'negative'")
     }
     if (tolower(alternative_hypothesis) == "negative"){
@@ -1483,44 +1483,44 @@ GeoLiftPower.search <- function(data,
                                 parallel = TRUE,
                                 parallel_setup = "sequential",
                                 import_augsynth_from = "library(augsynth)"){
-
+  
   if (parallel == TRUE){
     cl <- build_cluster(
       parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from)
   }
-
+  
   # Part 1: Treatment and pre-treatment periods
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)
   data$location <- tolower(data$location)
-
+  
   if (max(treatment_periods)/max_time > 0.8){
     message(paste0("Warning: Small pre-treatment period.
                    \nTthe treatment is larger that 80% of all available data."))
   }
-
+  
   results <- data.frame(matrix(ncol=5,nrow=0))
   colnames(results) <- c("location",
                          "pvalue",
                          "duration",
                          "treatment_start",
                          "ScaledL2Imbalance")
-
+  
   BestMarkets <- MarketSelection(data,
                                  location_id = "location",
                                  time_id = "time",
                                  Y_id = "Y",
                                  dtw = dtw)
-
+  
   if (horizon < 0){ #NEWCHANGE
     horizon = max(treatment_periods)
   }
-
+  
   # Aggregated Y Per Location
   AggYperLoc <- data %>%
     dplyr::group_by(location) %>%
     dplyr::summarize(Total_Y = sum(Y))
-
+  
   #NEWCHANGE: Progress Bar
   num_sim <- length(N) * length(treatment_periods) * nrow(BestMarkets)
   if(ProgressBar == TRUE) {
@@ -1529,7 +1529,7 @@ GeoLiftPower.search <- function(data,
                                      clear = FALSE,
                                      width= 60)
   }
-
+  
   for (n in N){
     BestMarkets_aux <- stochastic_market_selector(
       n,
@@ -1537,13 +1537,13 @@ GeoLiftPower.search <- function(data,
       run_stochastic_process=run_stochastic_process)
     for (test in 1:nrow(as.matrix(BestMarkets_aux))){ #iterate through lift %
       for (tp in treatment_periods){ #lifts
-
+        
         if(ProgressBar == TRUE){
           pb$tick()
         }
-
+        
         t_n <- max(data$time) - tp + 1 #Number of simulations without extrapolation (latest start time possible for #tp)
-
+        
         if (parallel == TRUE){
           a <- foreach(sim = 1:(t_n - horizon + 1), #NEWCHANGE: Horizon = earliest start time for simulations
                        .combine=cbind,
@@ -1562,9 +1562,9 @@ GeoLiftPower.search <- function(data,
                            fixed_effects = fixed_effects,
                            model = model,
                            stat_func = stat_func)
-
+                         
                        }
-
+          
           for (i in 1:ncol(a)) {
             results <- rbind(results, data.frame(location=a[[1,i]],
                                                  pvalue = as.numeric(a[[2,i]]),
@@ -1573,7 +1573,7 @@ GeoLiftPower.search <- function(data,
                                                  ScaledL2Imbalance = as.numeric(a[[7,i]]) ) )
           }
         } else{
-
+          
           for (sim in 1:(t_n - horizon + 1)){
             aux <- NULL
             aux <- suppressMessages(pvalueCalc(data = data,
@@ -1589,95 +1589,95 @@ GeoLiftPower.search <- function(data,
                                                fixed_effects = fixed_effects,
                                                model = model,
                                                stat_func = stat_func))
-
+            
             results <- rbind(results, data.frame(location=aux[1],
                                                  pvalue = as.numeric(aux[2]),
                                                  duration = as.numeric(aux[3]),
                                                  treatment_start = as.numeric(aux[5]),
                                                  ScaledL2Imbalance = as.numeric(aux[7]) ) )
-
+            
           }
         }
       }
     }
   }
-
+  
   if (parallel == TRUE){
     parallel::stopCluster(cl)
   }
-
+  
   # Sort Locations alphabetically
   results$location <- strsplit(stringr::str_replace_all(results$location, ", ", ","),split = ",")
   results$location <- lapply(results$location, sort)
   results$location <- lapply(results$location, function(x) paste(x, collapse = ", "))
   results$location <- unlist(results$location)
-
+  
   if(type == "pValue") {
-
+    
     results$pow <- 0
     results$pow[results$pvalue > alpha] <- 1
-
+    
     resultsM <- results %>%
       dplyr::group_by(location) %>%
       dplyr::summarize(mean_pow = mean(pow), mean_scaled_l2_imbalance = mean(ScaledL2Imbalance)) %>%
       #dplyr::arrange(dplyr::desc(mean_pow)) %>%
       dplyr::distinct()
-
+    
   } else if (type == "Imbalance") {
-
+    
     resultsM <- results %>%
       dplyr::group_by(location) %>%
       dplyr::summarize(mean_scaled_l2_imbalance = mean(ScaledL2Imbalance)) %>%
       #dplyr::arrange(mean_scaled_l2_imbalance) %>%
       dplyr::distinct()
-
+    
   }
-
+  
   # Add Percent of Y in test markets
   resultsM$ProportionTotal_Y <- 1
   resultsM$Locs <- strsplit(stringr::str_replace_all(resultsM$location, ", ", ","),split = ",")
-
+  
   for (row in 1:nrow(resultsM)) {
     resultsM$ProportionTotal_Y[row] <- as.numeric(AggYperLoc %>%
                                                     dplyr::filter (location %in% resultsM$Locs[[row]]) %>%
                                                     dplyr::summarize(total = sum(Total_Y))) /
       sum(AggYperLoc$Total_Y)
   }
-
+  
   # Sort Before Ranking
   if(type == "pValue") {
-
+    
     resultsM <- resultsM %>%
       dplyr::arrange(dplyr::desc(mean_pow),
                      mean_scaled_l2_imbalance,
                      dplyr::desc(ProportionTotal_Y))
-
+    
   } else if (type == "Imbalance") {
-
+    
     resultsM <- resultsM %>%
       dplyr::arrange(mean_scaled_l2_imbalance,
                      dplyr::desc(ProportionTotal_Y))
-
+    
   }
-
-
+  
+  
   #Remove the Locs column
   resultsM <- dplyr::select (resultsM, -c(Locs))
-
+  
   class(results) <- c("GeoLift.search", class(resultsM))
-
+  
   resultsM$rank <- 1:nrow(resultsM)
-
+  
   if (top_results > nrow(resultsM)){
     top_results = nrow(resultsM)
   }
-
+  
   print(paste0("Best ", top_results, " test markets:"))
   print(head(resultsM[,1], top_results))
-
-
+  
+  
   return(as.data.frame(resultsM))
-
+  
 }
 
 
@@ -1741,7 +1741,7 @@ GeoLiftPower.search <- function(data,
 #' using a one sided or a two sided test.
 #' \itemize{
 #'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e. 
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
@@ -1774,22 +1774,22 @@ GeoLiftPowerFinder <- function(data,
                                parallel_setup = "sequential",
                                side_of_test = "two_sided",
                                import_augsynth_from = "library(augsynth)"){
-
+  
   if (parallel == TRUE){
     cl <- build_cluster(
       parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from)
   }
-
+  
   # Part 1: Treatment and pre-treatment periods
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)
   data$location <- tolower(data$location)
-
+  
   if (max(treatment_periods)/max_time > 0.8){
     message(paste0("Warning: Small pre-treatment period.
                    \nTthe treatment is larger that 80% of all available data."))
   }
-
+  
   results <- data.frame(matrix(ncol=6,nrow=0))
   colnames(results) <- c("location",
                          "pvalue",
@@ -1797,19 +1797,19 @@ GeoLiftPowerFinder <- function(data,
                          "lift",
                          "treatment_start",
                          "ScaledL2Imbalance")
-
-
+  
+  
   BestMarkets <- MarketSelection(data,
                                  location_id = "location",
                                  time_id = "time",
                                  Y_id = "Y",
                                  dtw = dtw)
-
+  
   # Aggregated Y Per Location
   AggYperLoc <- data %>%
     dplyr::group_by(location) %>%
     dplyr::summarize(Total_Y = sum(Y))
-
+  
   #NEWCHANGE: Progress Bar
   num_sim <- length(N) * length(treatment_periods) * length(effect_size)
   if(ProgressBar == TRUE) {
@@ -1818,25 +1818,25 @@ GeoLiftPowerFinder <- function(data,
                                      clear = FALSE,
                                      width= 60)
   }
-
-
-
+  
+  
+  
   for (n in N){
     BestMarkets_aux <- stochastic_market_selector(
       n,
       BestMarkets,
       run_stochastic_process = run_stochastic_process)
     for (es in effect_size){ #iterate through lift %
-
-      stat_func <- type_of_test(side_of_test = side_of_test,
+      
+      stat_func <- type_of_test(side_of_test = side_of_test, 
                                 alternative_hypothesis = ifelse(es > 0, "positive", "negative"))
-
+      
       for (tp in treatment_periods){ #lifts
 
         if(ProgressBar == TRUE){
           pb$tick()
         }
-
+        
         if (parallel == TRUE){
           a <- foreach(test = 1:nrow(as.matrix(BestMarkets_aux)), #NEWCHANGE: Horizon = earliest start time for simulations
                        .combine=cbind,
@@ -1855,9 +1855,9 @@ GeoLiftPowerFinder <- function(data,
                            fixed_effects = fixed_effects,
                            model = model,
                            stat_func = stat_func)
-
+                         
                        }
-
+          
           for (i in 1:ncol(a)) {
             results <- rbind(results, data.frame(location = a[[1,i]],
                                                  pvalue = as.numeric(a[[2,i]]),
@@ -1883,7 +1883,7 @@ GeoLiftPowerFinder <- function(data,
               fixed_effects = fixed_effects,
               model = model,
               stat_func = stat_func))
-
+            
             results <- rbind(results, data.frame(location=aux[1],
                                                  pvalue = as.numeric(aux[2]),
                                                  duration = as.numeric(aux[3]),
@@ -1892,101 +1892,101 @@ GeoLiftPowerFinder <- function(data,
                                                  ScaledL2Imbalance = as.numeric(aux[7]) ) )
           }
         }
-
+        
       }
     }
   }
-
+  
   if (parallel == TRUE){
     parallel::stopCluster(cl)
   }
-
+  
   # Sort Locations alphabetically
   results$location <- strsplit(stringr::str_replace_all(results$location, ", ", ","),split = ",")
   results$location <- lapply(results$location, sort)
   results$location <- lapply(results$location, function(x) paste(x, collapse = ", "))
   results$location <- unlist(results$location)
-
+  
   results <- results %>%
     dplyr::mutate(significant = ifelse(pvalue < alpha, 1, 0)) %>%
     #dplyr::filter(significant > 0 & lift > 0) %>%
     dplyr::filter(significant > 0) %>%
     dplyr::distinct()
-
+  
   resultsM <- NULL
-
-
+  
+  
   for (locs in unique(results$location)){
     for(ts in treatment_periods) {
       resultsFindAux <- results %>% dplyr::filter(location  == locs & duration == ts)
-
+      
       if ( min(effect_size) < 0){
         resultsFindAux <- resultsFindAux %>% dplyr::filter(lift != 0)
         MDEAux <- suppressWarnings(max(resultsFindAux$lift))
         resultsFindAux <- resultsFindAux %>% dplyr::filter(lift == MDEAux)
-
+        
       } else {
         MDEAux <- suppressWarnings(min(resultsFindAux$lift))
         resultsFindAux <- resultsFindAux %>% dplyr::filter(lift == MDEAux)
       }
-
+      
       if (MDEAux != 0) { # Drop tests significant with ES = 0
         resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
       }
     }
   }
-
+  
   # Add Percent of Y in test markets
   resultsM$ProportionTotal_Y <- 1
   resultsM$Locs <- strsplit(stringr::str_replace_all(resultsM$location, ", ", ","),split = ",")
-
+  
   for (row in 1:nrow(resultsM)) {
     resultsM$ProportionTotal_Y[row] <- as.numeric(AggYperLoc %>%
                                                     dplyr::filter (location %in% resultsM$Locs[[row]]) %>%
                                                     dplyr::summarize(total = sum(Total_Y))) /
       sum(AggYperLoc$Total_Y)
   }
-
+  
   # Remove any duplicates
   resultsM <- resultsM %>% dplyr::group_by(location, duration) %>% dplyr::slice_min(order_by = pvalue, n = 1)
-
+  
   # Sort Before Ranking
-
+  
   resultsM <- resultsM %>%
     dplyr::arrange(pvalue,
                    ScaledL2Imbalance,
                    lift,
                    dplyr::desc(ProportionTotal_Y))
-
-
+  
+  
   #Remove the Locs column
   resultsM <- dplyr::select (resultsM, -c(Locs, treatment_start, significant))
-
+  
   class(results) <- c("GeoLift.search", class(resultsM))
-
+  
   resultsM$rank <- 1:nrow(resultsM)
-
+  
   if (top_results > nrow(resultsM)){
     top_results = nrow(resultsM)
   }
-
+  
   if (plot_best == TRUE){
     for(tp in treatment_periods){
       BestResults <- resultsM %>% dplyr::filter(duration == tp) %>%
         dplyr::arrange(rank)
-
+      
       bestmodels <- list()
       for (i in 1:4){
-
+        
         locs_aux <- unlist(strsplit(stringr::str_replace_all(BestResults$location[i], ", ", ","),split = ","))
-
+        
         data_lifted <- data
-
+        
         data_lifted$Y[data_lifted$location %in% locs_aux &
                         data_lifted$time >= max_time - tp + 1] <-
           data_lifted$Y[data_lifted$location %in% locs_aux &
                           data_lifted$time >= max_time - tp + 1]*(1+BestResults$lift[i])
-
+        
         bestmodels[[i]] <- GeoLift::GeoLift(Y_id = "Y",
                                             time_id = "time",
                                             location_id = "location",
@@ -1997,7 +1997,7 @@ GeoLiftPowerFinder <- function(data,
                                             model = model,
                                             fixed_effects = fixed_effects,
                                             print = FALSE)
-
+        
       }
       gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste("locations:", BestResults$location[1],
                                                                   "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
@@ -2018,12 +2018,12 @@ GeoLiftPowerFinder <- function(data,
                               ncol = 2)
     }
   }
-
+  
   #NEWCHANGE: Rename Lift to MDE
   resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = lift)
-
+  
   return(as.data.frame(resultsM))
-
+  
 }
 
 #' GeoLift Market Selection algorithm based on a Power Analysis.
@@ -2519,19 +2519,19 @@ GeoLift <- function(Y_id = "Y",
                     ConfidenceIntervals = FALSE,
                     stat_test = "Total",
                     print = TRUE){
-
+  
   # Rename variables to standard names used by GeoLift
   data <- data %>% dplyr::rename(time = time_id,
                                  Y = Y_id,
                                  location = location_id)
-
+  
   data$location <- tolower(data$location)
-
+  
   data_aux <- fn_treatment(data, locations = locations,
                            treatment_start_time,
                            treatment_end_time)
-
-
+  
+  
   if (length(X) == 0){
     fmla <- as.formula("Y ~ D")
   }
@@ -2539,10 +2539,10 @@ GeoLift <- function(Y_id = "Y",
     fmla <- as.formula(paste("Y ~ D |",
                              sapply(list(X),
                                     paste, collapse = "+")))
-
+    
   }
-
-
+  
+  
   # Optimizing model based on Scaled L2 Score
   if (model == "best" & length(locations) > 1){
     scaled_l2_none <- tryCatch(expr = {augsynth::augsynth(fmla, unit = location, time = time,
@@ -2572,7 +2572,7 @@ GeoLift <- function(Y_id = "Y",
                                error = function(e){
                                  1
                                })
-
+    
     if (round(scaled_l2_none, 3) > round(scaled_l2_gsyn, 3) & round(scaled_l2_ridge, 3) > round(scaled_l2_gsyn, 3)){
       model <- "GSYN"
     } else if(round(scaled_l2_none, 3) > round(scaled_l2_ridge, 3) & round(scaled_l2_gsyn, 3) > round(scaled_l2_ridge, 3)){
@@ -2580,7 +2580,7 @@ GeoLift <- function(Y_id = "Y",
     } else {
       model <- "None"
     }
-
+    
   } else if (model == "best" & length(locations) == 1) {
     scaled_l2_none <- augsynth::augsynth(fmla, unit = location, time = time,
                                          data = data_aux,
@@ -2600,7 +2600,7 @@ GeoLift <- function(Y_id = "Y",
       model <- "none"
     }
   }
-
+  
   #Single Augsynth
   augsyn <- augsynth::augsynth(fmla, unit = location, time = time,
                                data = data_aux,
@@ -2608,14 +2608,14 @@ GeoLift <- function(Y_id = "Y",
                                progfunc = model,
                                scm = T,
                                fixedeff = fixed_effects)
-
+  
   inference_df <- data.frame(matrix(ncol=5, nrow=0))
   colnames(inference_df) <- c("ATT",
                               "Perc.Lift",
                               "pvalue",
                               "Lower.Conf.Int",
                               "Upper.Conf.Int")
-
+  
   #NEWCHANGE: To avoid running the time-consuming summary process, create and store the object for re-use
   if (tolower(stat_test) == "total"){
     side_of_test <- "two_sided"
@@ -2626,27 +2626,27 @@ GeoLift <- function(Y_id = "Y",
   } else {
     stop("stat_test must be one of {'total', 'negative', 'positive'}.")
   }
-  stat_func <- type_of_test(side_of_test = side_of_test,
+  stat_func <- type_of_test(side_of_test = side_of_test, 
                             alternative_hypothesis = alternative_hypothesis)
-
+  
   sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = stat_func)
-
+  
   if(paste(augsyn$call)[1] == "single_augsynth"){
     mean <- sum_augsyn[['average_att']][['Estimate']] #Use summary object
     se <- sum_augsyn[['average_att']][['Std.Error']] #Use summary object
-
+    
     loc_id <- c(which(augsyn$data$trt == 1))
     locs_id <- as.data.frame(loc_id, nrow = length(loc_id))
     #locs_id$name <- unlist(locations) #OLD
     locs_id$name <- unlist(unique(data_aux$location)[c(which(augsyn$data$trt == 1))]) #NEWCHANGE: Make sure we keep order
-
+    
     y_obs <- c(augsyn$data$X[loc_id,], augsyn$data$y[loc_id,])
     y_hat <- predict(augsyn, att = FALSE)
     ATT <- predict(augsyn, att = TRUE)
     ATT_se <- sum_augsyn$att$Std.Error #Use summary object
-
+    
     pred_conversions <- predict(augsyn)[treatment_start_time:treatment_end_time] #NEWCHANGE: Store object to avoid re-processing
-
+    
     if (length(locations) == 1){
       lift <- (sum(augsyn$data$y[loc_id,]) - sum(pred_conversions)) /
         abs(sum(pred_conversions))
@@ -2655,17 +2655,17 @@ GeoLift <- function(Y_id = "Y",
                  sum(pred_conversions)) /
         abs(sum(pred_conversions))  #NEWCHANGE: Avoid errors with signs
     }
-
+    
     incremental <- sum(augsyn$data$y[loc_id,]) - (sum(pred_conversions) * length(loc_id))
-
+    
     inference_df <- inference_df %>% tibble::add_row(ATT = mean,
                                                      Perc.Lift = 100 * round(lift, 3),
                                                      pvalue = sum_augsyn$average_att$p_val, #pvalue(augsyn),
                                                      Lower.Conf.Int = sum_augsyn$average_att$lower_bound,
                                                      Upper.Conf.Int = sum_augsyn$average_att$upper_bound)
   }
-
-
+  
+  
   if(inference_df$pvalue < 0.05){
     significant <- "The results are significant at a 95% level."
   } else if(inference_df$pvalue < 0.10){
@@ -2675,7 +2675,7 @@ GeoLift <- function(Y_id = "Y",
   } else {
     significant <- "The results are not statistically significant."
   }
-
+  
   res <- list("results" = augsyn,
               "inference" = inference_df,
               "data" = data_aux,
@@ -2692,9 +2692,9 @@ GeoLift <- function(Y_id = "Y",
               "ConfidenceIntervals" = ConfidenceIntervals,
               "lower_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$lower_bound,
               "upper_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$upper_bound)
-
-
-
+  
+  
+  
   if (print == TRUE){
     message(paste0(
       paste0("\nGeoLift Output\n\n"),
@@ -2720,11 +2720,11 @@ GeoLift <- function(Y_id = "Y",
       sep="")
     )
   }
-
-
+  
+  
   class(res) <- c("GeoLift", class(res))
   return(res)
-
+  
 }
 
 
@@ -2759,15 +2759,15 @@ plot.GeoLift <- function(x,
                          notes = "",
                          conf.level = 0.9,
                          test_locs = FALSE, ...) {
-
-
+  
+  
   if (!inherits(x, 'GeoLift')) {
     stop('object must be class GeoLift')
   }
-
+  
   if (type == "TreatmentSchedule"){
     panelView(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
-
+    
   } else if (type == "ATT"){
     ATT.plot(GeoLift = x,
              conf.level = conf.level,
@@ -2775,18 +2775,18 @@ plot.GeoLift <- function(x,
              main = main,
              subtitle = subtitle,
              notes = notes, ...)
-
+    
   } else if (type == "Lift"){
     Lift.plot(GeoLift = x,
               outcome = outcome,
               main = main,
               subtitle = subtitle,
               notes = notes, ...)
-
+    
   } else {
     message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT")
   }
-
+  
 }
 
 
@@ -2812,7 +2812,7 @@ ATT.plot <- function(GeoLift,
                      main = "",
                      subtitle = "",
                      notes = "", ...) {
-
+  
   if(paste(GeoLift$results$call)[1] == "single_augsynth"){
     df <- as.data.frame(GeoLift$ATT)
     colnames(df) <- c("ATT")
@@ -2825,14 +2825,14 @@ ATT.plot <- function(GeoLift,
     df$diff_upper <- df$ATT
     df$diff_lower[df$ATT > 0] <- 0
     df$diff_upper[df$ATT < 0] <- 0
-
+    
     ymin <- min(min(df$lower), min(df$diff_lower))
     if (ymin < 0) {ymin <- 1.05*ymin
     } else {ymin <- 0.95 *ymin}
     ymax <- max(max(df$upper), max(df$diff_upper))
     if (ymax < 0) {ymax <- 0.95*ymax
     } else {ymax <- 1.05*ymax}
-
+    
     ggplot(df,aes(y = ATT,x = Time)) +
       geom_line(color="steelblue4", size = 0.95) +
       geom_vline(xintercept = GeoLift$TreatmentStart,
@@ -2849,9 +2849,9 @@ ATT.plot <- function(GeoLift,
       labs( title = paste(main),
             subtitle = paste(subtitle),
             caption = paste(notes))
-
+    
   }
-
+  
 }
 
 
@@ -2878,7 +2878,7 @@ Lift.plot <- function(GeoLift,
                       main = "",
                       subtitle = "",
                       notes = "", ...) {
-
+  
   if(paste(GeoLift$results$call)[1] == "single_augsynth"){
     #y_obs <- as.data.frame(GeoLift$y_obs)
     y_obs <- as.data.frame(colMeans(matrix(GeoLift$y_obs, nrow = nrow(GeoLift$test_id), ncol = GeoLift$TreatmentEnd))) * nrow(GeoLift$test_id) #NECHANGE: Aggregated Total instead of Average
@@ -2887,17 +2887,17 @@ Lift.plot <- function(GeoLift,
     y_hat <- as.data.frame(GeoLift$y_hat) * nrow(GeoLift$test_id) #NECHANGE: Aggregated Total instead of Average
     colnames(y_hat) <- c("Units")
     y_hat$Time <- 1:nrow(y_hat)
-
+    
     df <- y_obs %>%  dplyr::mutate(Type = 'Observed') %>%
       dplyr::bind_rows(y_hat %>% dplyr::mutate(Type = 'Estimated'))
-
+    
     ymin <- min(df$Units)
     if (ymin < 0) {ymin <- 1.05*ymin
     } else {ymin <- 0.95 *ymin}
     ymax <- max(df$Units)
     if (ymax < 0) {ymax <- 0.95*ymax
     } else {ymax <- 1.05*ymax}
-
+    
     ggplot(df,aes(y = Units,x = Time, group = Type, size=Type)) +
       geom_line(aes(linetype = Type, color = Type)) +
       geom_vline(xintercept = GeoLift$TreatmentStart,
@@ -2913,9 +2913,9 @@ Lift.plot <- function(GeoLift,
       labs( title = paste(main),
             subtitle = paste(subtitle),
             caption = paste(notes))
-
+    
   }
-
+  
 }
 
 
@@ -2958,13 +2958,13 @@ Lift.plot <- function(GeoLift,
 #'
 #' @export
 summary.GeoLift <- function(object, ...){
-
+  
   if (!inherits(object, 'GeoLift')) {
     stop('object must be class GeoLift')
   }
-
+  
   summ <- list()
-
+  
   if(paste(object$results$call)[1] == "single_augsynth"){
     summ$ATT_est <- object$inference$ATT
     summ$PercLift <- object$inference$Perc.Lift
@@ -2989,11 +2989,11 @@ summary.GeoLift <- function(object, ...){
     summ$factor <- ncol(object$results$data$y) * nrow(object$test_id)
     summ$progfunc <- object$results$progfunc
   }
-
+  
   class(summ) <- "summary.GeoLift"
-
+  
   return(summ)
-
+  
 }
 
 
@@ -3012,13 +3012,13 @@ summary.GeoLift <- function(object, ...){
 #'
 #' @export
 print.summary.GeoLift <- function(x, ...){
-
+  
   if (!inherits(x, 'summary.GeoLift')) {
     stop('object must be class summary.GeoLift')
   }
-
+  
   message("\nGeoLift Results Summary\n")
-
+  
   if(x$type == "single" & x$CI == FALSE){
     message(paste0(
       "##################################",
@@ -3030,7 +3030,7 @@ print.summary.GeoLift <- function(x, ...){
       "\n* P-value: ", round(x$pvalue,2),
       #"\n* 90% Confidence Interval: (", round(summ$LowerCI,3),  NEWCHANGE: Need to fix
       #", ", round(summ$UpperCI,3), ")",
-
+      
       "\n\n##################################",
       "\n#####   Balance Statistics   #####\n",
       "##################################\n",
@@ -3038,7 +3038,7 @@ print.summary.GeoLift <- function(x, ...){
       "\n* Scaled L2 Imbalance: ", round(x$L2ImbalanceScaled,4),
       "\n* Percent improvement from naive model: ", round(1 - x$L2ImbalanceScaled,4)*100,"%",
       "\n* Average Estimated Bias: ", round(x$bias,3),
-
+      
       "\n\n##################################",
       "\n#####     Model Weights      #####\n",
       "##################################\n",
@@ -3050,7 +3050,7 @@ print.summary.GeoLift <- function(x, ...){
       if(round(x$weights[row],4) != 0){
         message(paste0(" * ", dimnames(x$weights)[[1]][row], ": ",round(x$weights[row],4)))
       }
-
+      
     }
   }
   else if (x$type == "single" & x$CI == TRUE){
@@ -3063,7 +3063,7 @@ print.summary.GeoLift <- function(x, ...){
       "\n* Incremental ", paste(x$Y_id), ": ",round(x$incremental,0),
       "\n* P-value: ", round(x$pvalue,2),
       "\n* ", (1 - x$alpha) * 100, "% Confidence Interval: (", round(x$lower * x$factor,3),", ", round(x$upper * x$factor,3), ")",
-
+      
       "\n\n##################################",
       "\n#####   Balance Statistics   #####\n",
       "##################################\n",
@@ -3071,7 +3071,7 @@ print.summary.GeoLift <- function(x, ...){
       "\n* Scaled L2 Imbalance: ", round(x$L2ImbalanceScaled,4),
       "\n* Percent improvement from naive model: ", round(1 - x$L2ImbalanceScaled,4)*100,"%",
       "\n* Average Estimated Bias: ", round(x$bias,3),
-
+      
       "\n\n##################################",
       "\n#####     Model Weights      #####\n",
       "##################################\n",
@@ -3082,11 +3082,11 @@ print.summary.GeoLift <- function(x, ...){
       if(round(x$weights[row],4) != 0){
         message(paste0(" * ", dimnames(x$weights)[[1]][row], ": ",round(x$weights[row],4)))
       }
-
+      
     }
   }
-
-
+  
+  
 }
 
 

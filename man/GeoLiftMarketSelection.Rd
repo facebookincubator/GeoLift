@@ -7,7 +7,7 @@
 GeoLiftMarketSelection(
   data,
   treatment_periods,
-  N = 1,
+  N = c(),
   X = c(),
   Y_id = "Y",
   location_id = "location",
@@ -16,6 +16,7 @@ GeoLiftMarketSelection(
   lookback_window = -1,
   include_markets = c(),
   exclude_markets = c(),
+  holdout = c(),
   cpic = 1,
   budget = NULL,
   alpha = 0.1,
@@ -40,7 +41,8 @@ of the time period (starting at 1), and covariates.}
 
 \item{treatment_periods}{List of treatment periods to calculate power for.}
 
-\item{N}{List of number of test markets to calculate power for.}
+\item{N}{List of number of test markets to calculate power for. If left empty (default)
+it will populate the list of markets with the deciles of the total number of locations.}
 
 \item{X}{List of names of covariates.}
 
@@ -66,6 +68,10 @@ provided markets or locations.}
 
 \item{exclude_markets}{A list of markets or locations that will be removed from the
 analysis.}
+
+\item{holdout}{A vector with two values: the first one the smallest desirable
+holdout and the second the largest desirable holdout. If left empty (default)
+all market selections will be provided regardless of their size.}
 
 \item{cpic}{Number indicating the Cost Per Incremental Conversion.}
 

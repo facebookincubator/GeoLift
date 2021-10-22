@@ -2168,18 +2168,16 @@ GeoLiftMarketSelection <- function(data,
   }
 
   # Populate N if it's not provided
-  if (length(N) == 0 & length(include_markets) == 0) {
+  if (length(N) == 0) {
     N <- unique(round(quantile(c(1:length(unique(data$location))),
                                probs = seq(0,0.5,0.1),
                                type = 1,
                                names = FALSE)))
-  } else if (length(N) == 0 & length(include_markets) > 0){
-    N <- unique(round(quantile(c(1:length(unique(data$location))),
-                               probs = seq(0,0.5,0.1),
-                               type = 1,
-                               names = FALSE)))
-    #Keep only those equal or larger than included markets
-    N <- append(length(include_markets), N[length(include_markets) <= N])
+
+    if (length(include_markets) > 0){
+      #Keep only those equal or larger than included markets
+      N <- append(length(include_markets), N[length(include_markets) <= N])
+    }
   }
 
   # More include_markets than N

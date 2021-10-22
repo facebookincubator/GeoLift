@@ -35,14 +35,17 @@ GeoLiftMarketSelection(
 }
 \arguments{
 \item{data}{A data.frame containing the historical conversions by
-geographic unit, It requires a "locations" column with the geo name,
+geographic unit. It requires a "locations" column with the geo name,
 a "Y" column with the outcome data (units), a time column with the indicator
 of the time period (starting at 1), and covariates.}
 
 \item{treatment_periods}{List of treatment periods to calculate power for.}
 
 \item{N}{List of number of test markets to calculate power for. If left empty (default)
-it will populate the list of markets with the deciles of the total number of locations.}
+and if no locations are included through \code{include_locations}, it will populate
+the list of markets with the deciles of the total number of locations. If left empty
+and a set of markets is provided by \code{include_locations} only the deciles larger
+or equal than \code{length(include_locations)} will be used.}
 
 \item{X}{List of names of covariates.}
 

@@ -62,7 +62,7 @@ utils::globalVariables(
 #' the geographical units.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param date_id Name of the date variable (String).
@@ -257,7 +257,7 @@ GeoDataRead <- function(data,
 #' a plot of each location's time series.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param Y_id Name of the outcome variable (String).
@@ -308,7 +308,7 @@ GeoPlot <- function(data,
 #' than the ones we have for test locations.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param Y_id Name of the outcome variable (String).
@@ -394,7 +394,7 @@ TrimControls <- function(data,
 #' D = 1 for test locations in the test period and D = 0 otherwise.
 #'
 #' @param df A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param locations List of names of the test locations (String).
@@ -429,7 +429,7 @@ fn_treatment <- function(df,
 #' \code{pvalueCalc} calculates the p-value for a GeoLift object.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param sim Time simulation index.
@@ -616,7 +616,7 @@ build_cluster <- function(parallel_setup,
 #' for a pre-determined set of test locations.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param locations A semi-colon separated list of test geo locations.
@@ -784,8 +784,6 @@ GeoLiftPower <- function(data,
                          stat_func = stat_func)
 
                      }
-
-        #print(a)
 
         for (i in 1:ncol(a)) {
           results <- rbind(results, data.frame(location = a[[1,i]],
@@ -994,7 +992,7 @@ plot.GeoLiftPower <- function(x,
 #' number of test periods with unknown test locations.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param number_locations List of number of locations to test. If not specified,
@@ -1232,7 +1230,7 @@ NumberLocations <- function(data,
 #' on Dynamic Time Warping between the locations' time-series.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param location_id Name of the location variable (String).
@@ -1399,7 +1397,7 @@ type_of_test <- function(side_of_test="two_sided", alternative_hypothesis=NULL){
 #' test markets, number of test locations, and test duration.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param treatment_periods List of treatment periods to calculate power for.
@@ -1691,7 +1689,7 @@ GeoLiftPower.search <- function(data,
 #' test markets, number of test locations, and test duration.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param treatment_periods List of treatment periods to calculate power for.
@@ -2035,12 +2033,15 @@ GeoLiftPowerFinder <- function(data,
 #' GeoLift test based on a power analysis.
 #'
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param treatment_periods List of treatment periods to calculate power for.
 #' @param N List of number of test markets to calculate power for. If left empty (default)
-#' it will populate the list of markets with the deciles of the total number of locations.
+#' and if no locations are included through \code{include_locations}, it will populate
+#' the list of markets with the deciles of the total number of locations. If left empty
+#' and a set of markets is provided by \code{include_locations} only the deciles larger
+#' or equal than \code{length(include_locations)} will be used.
 #' @param X List of names of covariates.
 #' @param Y_id Name of the outcome variable (String).
 #' @param location_id Name of the location variable (String).
@@ -2167,11 +2168,18 @@ GeoLiftMarketSelection <- function(data,
   }
 
   # Populate N if it's not provided
-  if (length(N) == 0) {
+  if (length(N) == 0 & length(include_markets) == 0) {
     N <- unique(round(quantile(c(1:length(unique(data$location))),
                                probs = seq(0,0.5,0.1),
                                type = 1,
                                names = FALSE)))
+  } else if (length(N) == 0 & length(include_markets) > 0){
+    N <- unique(round(quantile(c(1:length(unique(data$location))),
+                               probs = seq(0,0.5,0.1),
+                               type = 1,
+                               names = FALSE)))
+    #Keep only those equal or larger than included markets
+    N <- append(length(include_markets), N[length(include_markets) <= N])
   }
 
   # More include_markets than N
@@ -2230,7 +2238,7 @@ GeoLiftMarketSelection <- function(data,
                          "cpic",
                          "ScaledL2Imbalance")
 
-  # Setting the lookback window to the smalles length of treatment if not provided.
+  # Setting the lookback window to the smallest length of treatment if not provided.
   if (lookback_window < 0){
     lookback_window <- min(treatment_periods)
   }
@@ -2299,7 +2307,7 @@ GeoLiftMarketSelection <- function(data,
         for(sim in 1:(lookback_window)){
 
           if (parallel == TRUE){
-            a <- foreach(test = 1:nrow(as.matrix(BestMarkets_aux)), #NEWCHANGE: Horizon = earliest start time for simulations
+            a <- foreach(test = 1:nrow(as.matrix(BestMarkets_aux)),
                          .combine=cbind,
                          .errorhandling = 'stop',
                          .verbose = FALSE) %dopar% {
@@ -2511,7 +2519,7 @@ GeoLiftMarketSelection <- function(data,
 #' @param location_id Name of the location variable (String).
 #' @param X List of names of covariates.
 #' @param data A data.frame containing the historical conversions by
-#' geographic unit, It requires a "locations" column with the geo name,
+#' geographic unit. It requires a "locations" column with the geo name,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param locations List of test locations.

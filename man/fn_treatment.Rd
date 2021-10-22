@@ -8,7 +8,7 @@ fn_treatment(df, locations, treatment_start_time, treatment_end_time)
 }
 \arguments{
 \item{df}{A data.frame containing the historical conversions by
-geographic unit, It requires a "locations" column with the geo name,
+geographic unit. It requires a "locations" column with the geo name,
 a "Y" column with the outcome data (units), a time column with the indicator
 of the time period (starting at 1), and covariates.}
 

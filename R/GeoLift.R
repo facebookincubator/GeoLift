@@ -2807,14 +2807,9 @@ GeoLift <- function(Y_id = "Y",
 #' incrementality on the outcome variable. If type is set to "ATT",
 #' the average ATT is plotted. If type is set to "Incrementality",
 #' daily incremental values are plotted.
-#' @param outcome String name of the outcome variable. By default "Units".
 #' @param treatment_end_date Character that represents a date in year-month=day format.
-#' @param main String for the title of the plot. Empty by default.
+#' @param title String for the title of the plot. Empty by default.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
-#' @param notes String to add notes to the plot. Empty by default.
-#' @param conf.level Confidence level. By defaul 0.9.
-#' @param test_locs Plot the average results by default. If set to
-#' TRUE, the ATT by test location is plotted.
 #' @param ... additional arguments
 #'
 #' @return
@@ -2823,13 +2818,10 @@ GeoLift <- function(Y_id = "Y",
 #' @export
 plot.GeoLift <- function(x,
                          type="Lift",
-                         outcome = "Units",
                          treatment_end_date = NULL,
-                         main = "",
+                         title = "",
                          subtitle = "",
-                         notes = "",
-                         conf.level = 0.9,
-                         test_locs = FALSE, ...) {
+                         ...) {
 
 
   if (!inherits(x, 'GeoLift')) {
@@ -2843,15 +2835,16 @@ plot.GeoLift <- function(x,
     absolute_value.plot(GeoLift = x,
                         treatment_end_date = treatment_end_date,
                         plot_type = type,
-                        title = main,
+                        title = title,
                         subtitle = subtitle,
                         ...)
 
   } else if (type == "Lift"){
     Lift.plot(GeoLift = x,
-              title = main,
+              treatment_end_date = treatment_end_date,
+              title = title,
               subtitle = subtitle,
-              notes = notes, ...)
+              ...)
   } else {
     message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT/Incrementality")
   }

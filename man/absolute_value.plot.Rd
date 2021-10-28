@@ -8,6 +8,7 @@ absolute_value.plot(
   GeoLift,
   plot_type = "ATT",
   treatment_end_date = NULL,
+  plot_start_date = NULL,
   title = "",
   subtitle = "",
   ...
@@ -18,7 +19,9 @@ absolute_value.plot(
 
 \item{plot_type}{Can be either ATT or Incrementality.  Defaults to ATT.}
 
-\item{treatment_end_date}{treatment_end_date Character that represents a date in year-month-day format.}
+\item{treatment_end_date}{Character that represents a date in year-month-day format.}
+
+\item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
 
 \item{title}{Character for the title of the plot. NULL by default.}
 

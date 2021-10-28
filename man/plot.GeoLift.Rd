@@ -9,6 +9,7 @@
   type = "Lift",
   outcome = "Units",
   treatment_end_date = NULL,
+  plot_start_date = NULL,
   main = "",
   subtitle = "",
   notes = "",
@@ -28,6 +29,8 @@ daily incremental values are plotted.}
 \item{outcome}{String name of the outcome variable. By default "Units".}
 
 \item{treatment_end_date}{Character that represents a date in year-month=day format.}
+
+\item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
 
 \item{main}{String for the title of the plot. Empty by default.}
 

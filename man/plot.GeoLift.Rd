@@ -8,6 +8,7 @@
   x,
   type = "Lift",
   outcome = "Units",
+  treatment_end_date = NULL,
   main = "",
   subtitle = "",
   notes = "",
@@ -25,6 +26,8 @@ the average ATT is plotted. If type is set to "Incrementality",
 daily incremental values are plotted.}
 
 \item{outcome}{String name of the outcome variable. By default "Units".}
+
+\item{treatment_end_date}{Character that represents a date in year-month=day format.}
 
 \item{main}{String for the title of the plot. Empty by default.}
 

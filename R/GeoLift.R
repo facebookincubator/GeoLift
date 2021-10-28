@@ -2820,8 +2820,8 @@ GeoLift <- function(Y_id = "Y",
 plot.GeoLift <- function(x,
                          type="Lift",
                          treatment_end_date = NULL,
-                         title = "",
                          plot_start_date = NULL,
+                         title = "",
                          subtitle = "",
                          ...) {
 

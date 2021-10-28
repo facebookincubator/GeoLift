@@ -8,8 +8,8 @@
   x,
   type = "Lift",
   treatment_end_date = NULL,
-  title = "",
   plot_start_date = NULL,
+  title = "",
   subtitle = "",
   ...
 )
@@ -24,9 +24,9 @@ daily incremental values are plotted.}
 
 \item{treatment_end_date}{Character that represents a date in year-month=day format.}
 
-\item{title}{String for the title of the plot. Empty by default.}
-
 \item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
+
+\item{title}{String for the title of the plot. Empty by default.}
 
 \item{subtitle}{String for the subtitle of the plot. Empty by default.}
 

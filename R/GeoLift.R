@@ -2845,6 +2845,7 @@ plot.GeoLift <- function(x,
   } else if (type == "Lift"){
     Lift.plot(GeoLift = x,
               treatment_end_date = treatment_end_date,
+              plot_start_date = plot_start_date,
               title = title,
               subtitle = subtitle,
               ...)
@@ -2863,6 +2864,7 @@ plot.GeoLift <- function(x,
 #'
 #' @param GeoLift GeoLift object.
 #' @param treatment_end_date Character that represents a date in year-month=day format.
+#' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param title String for the title of the plot. Empty by default.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
 #' @param ... additional arguments
@@ -2873,6 +2875,7 @@ plot.GeoLift <- function(x,
 #' @export
 Lift.plot <- function(GeoLift,
                       treatment_end_date = NULL,
+                      plot_start_date = NULL,
                       title = "Daily observations per test group",
                       subtitle = "",
                       ...) {
@@ -2907,6 +2910,14 @@ Lift.plot <- function(GeoLift,
       treatment_start = GeoLift$TreatmentStart,
       treatment_end = GeoLift$TreatmentEnd
     )
+  }
+  
+  if (!is.null(plot_start_date)){
+    if (is.null(treatment_end_date)){
+      stop("If you want to filter your dataset on a date, please specify treatment_end_date param so periods are converted to dates.")
+    } else {
+      df <- df[df$Time >= plot_start_date,]
+    }
   }
   
   colors <- c("Treatment" = "#52854C", "Control" = "#7030A0")

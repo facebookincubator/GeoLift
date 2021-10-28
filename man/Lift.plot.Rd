@@ -7,6 +7,7 @@
 Lift.plot(
   GeoLift,
   treatment_end_date = NULL,
+  plot_start_date = NULL,
   title = "Daily observations per test group",
   subtitle = "",
   ...
@@ -16,6 +17,8 @@ Lift.plot(
 \item{GeoLift}{GeoLift object.}
 
 \item{treatment_end_date}{Character that represents a date in year-month=day format.}
+
+\item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
 
 \item{title}{String for the title of the plot. Empty by default.}
 

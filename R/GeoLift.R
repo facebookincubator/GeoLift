@@ -2808,6 +2808,7 @@ GeoLift <- function(Y_id = "Y",
 #' the average ATT is plotted. If type is set to "Incrementality",
 #' daily incremental values are plotted.
 #' @param outcome String name of the outcome variable. By default "Units".
+#' @param treatment_end_date Character that represents a date in year-month=day format.
 #' @param main String for the title of the plot. Empty by default.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
 #' @param notes String to add notes to the plot. Empty by default.
@@ -2823,6 +2824,7 @@ GeoLift <- function(Y_id = "Y",
 plot.GeoLift <- function(x,
                          type="Lift",
                          outcome = "Units",
+                         treatment_end_date = NULL,
                          main = "",
                          subtitle = "",
                          notes = "",
@@ -2839,6 +2841,7 @@ plot.GeoLift <- function(x,
 
   } else if (type %in% c("ATT", "Incrementality")){
     absolute_value.plot(GeoLift = x,
+                        treatment_end_date = treatment_end_date,
                         plot_type = type,
                         title = main,
                         subtitle = subtitle,

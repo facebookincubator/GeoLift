@@ -2809,6 +2809,8 @@ GeoLift <- function(Y_id = "Y",
 #' daily incremental values are plotted.
 #' @param treatment_end_date Character that represents a date in year-month=day format.
 #' @param title String for the title of the plot. Empty by default.
+#' @param plot_start_date Character that represents initial date of plot in year-month-day format.
+
 #' @param subtitle String for the subtitle of the plot. Empty by default.
 #' @param ... additional arguments
 #'
@@ -2819,6 +2821,8 @@ GeoLift <- function(Y_id = "Y",
 plot.GeoLift <- function(x,
                          type="Lift",
                          treatment_end_date = NULL,
+
+                         plot_start_date = NULL,
                          title = "",
                          subtitle = "",
                          ...) {
@@ -2834,6 +2838,7 @@ plot.GeoLift <- function(x,
   } else if (type %in% c("ATT", "Incrementality")){
     absolute_value.plot(GeoLift = x,
                         treatment_end_date = treatment_end_date,
+                        plot_start_date = plot_start_date,
                         plot_type = type,
                         title = title,
                         subtitle = subtitle,
@@ -2972,7 +2977,8 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date){
 #'
 #' @param GeoLift GeoLift object.
 #' @param plot_type Can be either ATT or Incrementality.  Defaults to ATT.
-#' @param treatment_end_date treatment_end_date Character that represents a date in year-month-day format.
+#' @param treatment_end_date Character that represents a date in year-month-day format.
+#' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param title Character for the title of the plot. NULL by default.
 #' @param subtitle Character for the subtitle of the plot. NULL by default.
 #' @param ... additional arguments
@@ -2985,6 +2991,7 @@ absolute_value.plot <- function(
   GeoLift,
   plot_type = "ATT",
   treatment_end_date = NULL,
+  plot_start_date = NULL,
   title = "",
   subtitle = "",
   ...){
@@ -3024,6 +3031,13 @@ absolute_value.plot <- function(
       treatment_start = GeoLift$TreatmentStart,
       treatment_end = GeoLift$TreatmentEnd
     )
+  }
+  if (!is.null(plot_start_date)){
+    if (is.null(treatment_end_date)){
+      stop("If you want to filter your dataset on a date, please specify treatment_end_date param so periods are converted to dates.")
+    } else {
+      df <- df[df$Time >= plot_start_date,]
+    }
   }
   
   ggplot(df, aes(x = Time, y = Estimate)) +

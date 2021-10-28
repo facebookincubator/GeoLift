@@ -3066,6 +3066,164 @@ absolute_value.plot <- function(
 }
 
 
+#' Calculate cumulative lift
+#' 
+#' @description 
+#' This method will calculate the cumulative lift with each passing day.
+#' 
+#' @param data DataFrame that GeoLfit will use to determine a result.
+#' Should be the output of \code{GeoDataRead}.
+#' @param treatment_locations Vector of locations where the treatment was applied.
+#' @param treatment_start_period Integer representing period where test started.
+#' @param treatment_end_period Integer representing period where test finished.
+#' @param Y_id Name of the outcome variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param time_id Name of the time variable (String).
+#' 
+#' @return
+#' A dataframe that holds the accumulated lift effect throughout the entire treatment period.
+#' 
+#' @export
+cumulative_lift <- function(
+  data,
+  treatment_locations,
+  treatment_start_period,
+  treatment_end_period,
+  location_id = "location",
+  time_id = "time",
+  Y_id = "Y"
+){
+  max_test_period <- treatment_start_period + 1
+  cumulative_list <- list()
+  message("Starting to run iterations of GeoLift to capture cumulative effect.")
+  while (max_test_period <= treatment_end_period){
+    if (max_test_period %% 5== 0){
+      message(paste0(
+        "Currently missing ", treatment_end_period - max_test_period, " iterations."))
+    }
+    filtered_data <- data[data$time <= max_test_period, ]
+    
+    gl_output <- suppressMessages(GeoLift(
+      data = data,
+      locations = treatment_locations,
+      treatment_start_time = treatment_start_period,
+      treatment_end_time = max_test_period,
+      location_id = location_id,
+      time_id = time_id,
+      Y_id = Y_id,
+      ConfidenceIntervals = TRUE))
+    
+    att <- gl_output$summary$average_att$Estimate
+    att_lb <- gl_output$lower_bound
+    att_ub <- gl_output$upper_bound
+    
+    incremental_factor <- length(treatment_locations) * (max_test_period - treatment_start_period)
+    
+    cumulative_list[[max_test_period - treatment_start_period]] <- list(
+      Time = max_test_period,
+      att = att,
+      att_lb = att_lb,
+      att_ub = att_ub,
+      incremental = att * incremental_factor,
+      incremental_lb = att_lb * incremental_factor,
+      incremental_ub = att_ub * incremental_factor
+    )
+    max_test_period <- max_test_period + 1
+  }
+  cumulative_lift_df <- do.call(rbind.data.frame, cumulative_list)
+  
+  rest_of_df <- data.frame(
+    Time = 1:(min(cumulative_lift_df$Time)-1),
+    att = 0,
+    att_lb = 0,
+    att_ub = 0,
+    incremental = 0,
+    incremental_lb = 0,
+    incremental_ub = 0
+  )
+  
+  cumulative_lift_df <- rbind(rest_of_df, cumulative_lift_df)
+  
+  return(cumulative_lift_df)
+}
+
+#' Plot the accumulated lift effect.
+#' 
+#' @description 
+#' Plot the accumulated lift effect.
+#' 
+#' @param data DataFrame that GeoLfit will use to determine a result.
+#' Should be the output of \code{GeoDataRead}.
+#' @param treatment_locations Vector of locations where the treatment was applied.
+#' @param treatment_start_period Integer representing period where test started.
+#' @param treatment_end_period Integer representing period where test finished.
+#' @param Y_id Name of the outcome variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param treatment_end_date Character that represents a date in year-month-day format.
+#' @param plot_start_date Character that represents initial date of plot in year-month-day format.
+#' @param title Character for the title of the plot. NULL by default.
+#' @param subtitle Character for the subtitle of the plot. NULL by default.
+#' @param ... additional arguments
+#' 
+#' @return 
+#' A ggplot object that shows the accumulated lift per time period.
+#' 
+#' @export
+cumulative_value.plot <- function(data,
+                                  treatment_locations,
+                                  treatment_start_period,
+                                  treatment_end_period,
+                                  location_id = "location",
+                                  time_id = "time",
+                                  Y_id = "Y",
+                                  treatment_end_date = NULL,
+                                  plot_start_date = NULL,
+                                  title = "Accumulated incremental value",
+                                  subtitle = "",
+                                  ...){
+  incremental <- incremental_lb <- incremental_ub <- NULL
+  cumulative_lift_df <- cumulative_lift(
+    data = data,
+    treatment_locations = treatment_locations,
+    treatment_start_period = treatment_start_period,
+    treatment_end_period = treatment_end_period,
+    location_id = location_id,
+    time_id = time_id,
+    Y_id = Y_id)
+  
+  if (!is.null(treatment_end_date)){
+    cumulative_lift_df$Time <- as.Date(seq(
+      as.Date(treatment_end_date) - treatment_end_period + 1, 
+      as.Date(treatment_end_date), 
+      by="day"))
+    treatment_start_period <- cumulative_lift_df$Time[treatment_start_period]
+  } else {
+    warning(
+      "You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.")
+  }
+  if (!is.null(plot_start_date)){
+    if (is.null(treatment_end_date)){
+      stop("If you want to filter your dataset on a date, please specify treatment_end_date param so periods are converted to dates.")
+    } else {
+      cumulative_lift_df <- cumulative_lift_df[cumulative_lift_df$Time >= plot_start_date,]
+    }
+  }
+  ggplot(cumulative_lift_df, 
+         aes(x=Time, y=incremental, group=1)) + 
+    geom_line(linetype="dashed", color="#373472") + 
+    geom_ribbon(aes(ymin=incremental_lb, ymax=incremental_ub), alpha=0.2, fill="#4B4196") +
+    theme_minimal() +
+    labs(y = "Incremental values",
+         x = "Date",
+         title = title,
+         subtitle = subtitle) +
+    theme(text = element_text(size=20), 
+          plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5)) +
+    geom_vline(xintercept=treatment_start_period, linetype="dashed", alpha=0.3)
+}
+
 #' Summary method for GeoLift.
 #'
 #' @description

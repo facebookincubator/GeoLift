@@ -2805,7 +2805,8 @@ GeoLift <- function(Y_id = "Y",
 #' @param x GeoLift object.
 #' @param type Type of plot. By default "Lift" which plots the
 #' incrementality on the outcome variable. If type is set to "ATT",
-#' the average ATT is plotted.
+#' the average ATT is plotted. If type is set to "Incrementality",
+#' daily incremental values are plotted.
 #' @param outcome String name of the outcome variable. By default "Units".
 #' @param main String for the title of the plot. Empty by default.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
@@ -2836,13 +2837,12 @@ plot.GeoLift <- function(x,
   if (type == "TreatmentSchedule"){
     panelView(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
 
-  } else if (type == "ATT"){
-    ATT.plot(GeoLift = x,
-             conf.level = conf.level,
-             outcome = outcome,
-             main = main,
-             subtitle = subtitle,
-             notes = notes, ...)
+  } else if (type %in% c("ATT", "Incrementality")){
+    absolute_value.plot(GeoLift = x,
+                        plot_type = type,
+                        title = main,
+                        subtitle = subtitle,
+                        ...)
 
   } else if (type == "Lift"){
     Lift.plot(GeoLift = x,
@@ -2850,79 +2850,11 @@ plot.GeoLift <- function(x,
               main = main,
               subtitle = subtitle,
               notes = notes, ...)
-  } else if (type == "Incremental"){
-    incremental.plot(GeoLift = x)
   } else {
-    message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT/Incremental")
+    message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT/Incrementality")
   }
 
 }
-
-
-#' Average ATT plot function for GeoLift.
-#'
-#' @description
-#'
-#' Average ATT plot function GeoLift.
-#'
-#' @param GeoLift GeoLift object.
-#' @param outcome Name of the outcome variable. By default "Units".
-#' @param main String for the title of the plot. Empty by default.
-#' @param subtitle String for the subtitle of the plot. Empty by default.
-#' @param notes String to add notes to the plot. Empty by default.
-#' @param ... additional arguments
-#'
-#' @return
-#' ATT plot for GeoLift.
-#'
-#' @export
-ATT.plot <- function(GeoLift,
-                     outcome = "Units",
-                     main = "",
-                     subtitle = "",
-                     notes = "", ...) {
-
-  if(paste(GeoLift$results$call)[1] == "single_augsynth"){
-    df <- as.data.frame(GeoLift$ATT)
-    colnames(df) <- c("ATT")
-    df$Time <- 1:nrow(df)
-    df$lower <- GeoLift$summary$att$lower_bound
-    df$upper <- GeoLift$summary$att$upper_bound
-    df$lower[1:(GeoLift$TreatmentStart-1)] <- 0
-    df$upper[1:(GeoLift$TreatmentStart-1)] <- 0
-    df$diff_lower <- df$ATT
-    df$diff_upper <- df$ATT
-    df$diff_lower[df$ATT > 0] <- 0
-    df$diff_upper[df$ATT < 0] <- 0
-
-    ymin <- min(min(df$lower), min(df$diff_lower))
-    if (ymin < 0) {ymin <- 1.05*ymin
-    } else {ymin <- 0.95 *ymin}
-    ymax <- max(max(df$upper), max(df$diff_upper))
-    if (ymax < 0) {ymax <- 0.95*ymax
-    } else {ymax <- 1.05*ymax}
-
-    ggplot(df,aes(y = ATT,x = Time)) +
-      geom_line(color="steelblue4", size = 0.95) +
-      geom_vline(xintercept = GeoLift$TreatmentStart,
-                 linetype="dashed", size=0.8, color = "grey35") +
-      geom_hline(yintercept = 0, linetype="dashed", size=0.8, color = "indianred3") +
-      annotate("rect", xmin = GeoLift$TreatmentStart,
-               ymin = ymin, xmax= GeoLift$TreatmentEnd,
-               ymax = ymax, alpha=0.15) +
-      geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
-      geom_ribbon(aes(ymin = diff_lower, ymax = diff_upper),
-                  alpha = 0.2, fill = "wheat3") +
-      theme_minimal() +
-      ylab("Average ATT") +
-      labs( title = paste(main),
-            subtitle = paste(subtitle),
-            caption = paste(notes))
-
-  }
-
-}
-
 
 
 #' Aggregate Lift plot function for GeoLift.
@@ -3024,33 +2956,55 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date){
 }
 
 
-#' Daily Incrementality plot function for GeoLift output.
+#' Daily Incrementality or ATT plot function for GeoLift output.
 #'
 #' @description
 #'
-#' \code{incremental_plot} returns chart for daily incrementality using GeoLift output.
+#' \code{absolute_value.plot} returns chart for daily absolute values using GeoLift output.
 #'
 #' @param GeoLift GeoLift object.
+#' @param plot_type Can be either ATT or Incrementality.  Defaults to ATT.
 #' @param treatment_end_date treatment_end_date Character that represents a date in year-month-day format.
-#' @param main_title Character for the title of the plot. "Daily incremental value" by default.
-#' @param subtitle Character for the subtitle of the plot. "GeoLift analysis" by default.
+#' @param title Character for the title of the plot. NULL by default.
+#' @param subtitle Character for the subtitle of the plot. NULL by default.
 #' @param ... additional arguments
 #'
 #' @return
-#' Daily Incremental plot.
+#' Daily Incremental or ATT plot.
 #'
 #' @export
-incremental.plot <- function(GeoLift,
-                             treatment_end_date = NULL,
-                             main_title="Daily incremental value",
-                             subtitle = "GeoLift analysis",
-                             ...) {
-  incremental <- incremental_lb <- incremental_ub <- NULL
+absolute_value.plot <- function(
+  GeoLift,
+  plot_type = "ATT",
+  treatment_end_date = NULL,
+  title = "",
+  subtitle = "",
+  ...){
+  Estimate <- lower_bound <- upper_bound <- NULL
   df <- GeoLift$summary$att
-  q_treatment_locations <- length(GeoLift$test_id$name)
-  df$incremental <- df$Estimate * q_treatment_locations
-  df$incremental_lb <- df$lower_bound * q_treatment_locations
-  df$incremental_ub <- df$upper_bound * q_treatment_locations
+  df <- df[, c("Time", "Estimate", "lower_bound", "upper_bound")]
+  
+  if (tolower(plot_type) == "incrementality"){
+    q_treatment_locations <- length(GeoLift$test_id$name)
+    df$Estimate <- df$Estimate * q_treatment_locations
+    df$lower_bound <- df$lower_bound * q_treatment_locations
+    df$upper_bound <- df$upper_bound * q_treatment_locations
+    ylab <- "Incremental values"
+    if (nchar(title) == 0){
+      title <- "Daily incremental value"
+    }
+    if (nchar(subtitle) == 0){
+      subtitle <- "GeoLift Analysis"
+    }
+  } else if (tolower(plot_type) == "att"){
+    ylab <- "Average ATT"
+    if (nchar(title) == 0){
+      title <- "Average effect on the treated"
+    }
+    if (nchar(subtitle) == 0){
+      subtitle <- "Average effect per day per location in treatment"
+    }
+  } else {stop("Please specify which plot type you would like: ATT or Incrementality.")}
   
   if (!is.null(treatment_end_date)){
     plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date)
@@ -3064,20 +3018,20 @@ incremental.plot <- function(GeoLift,
     )
   }
   
-  ggplot(df, aes(x=Time, y=incremental, group=1)) + 
-    geom_line(linetype="dashed", color="#373472") + 
-    geom_ribbon(aes(ymin=incremental_lb, ymax=incremental_ub), alpha=0.2, fill="#4B4196") +
+  ggplot(df, aes(x = Time, y = Estimate)) +
+    geom_line(linetype="dashed", color="#373472", size=0.75) +
+    geom_vline(xintercept=plot_dates$treatment_start, linetype="dashed", alpha=0.3) +
+    geom_hline(yintercept=0, alpha=0.5) +
+    geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha=0.2, fill="#4B4196") +
     theme_minimal() +
-    labs(y = "Incremental values",
+    labs(y = ylab,
          x="Periods",
-         title=main_title,
+         title=title,
          subtitle=subtitle) +
     theme(
       text = element_text(size=20), 
       plot.title = element_text(hjust = 0.5),
-      plot.subtitle = element_text(hjust = 0.5)) +
-    geom_vline(xintercept=plot_dates$treatment_start, linetype="dashed", alpha=0.3) +
-    geom_hline(yintercept=0, alpha=0.5)
+      plot.subtitle = element_text(hjust = 0.5))
 }
 
 

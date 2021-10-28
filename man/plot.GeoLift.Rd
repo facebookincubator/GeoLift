@@ -21,7 +21,8 @@
 
 \item{type}{Type of plot. By default "Lift" which plots the
 incrementality on the outcome variable. If type is set to "ATT",
-the average ATT is plotted.}
+the average ATT is plotted. If type is set to "Incrementality",
+daily incremental values are plotted.}
 
 \item{outcome}{String name of the outcome variable. By default "Units".}
 

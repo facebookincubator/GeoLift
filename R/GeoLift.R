@@ -2850,9 +2850,10 @@ plot.GeoLift <- function(x,
               main = main,
               subtitle = subtitle,
               notes = notes, ...)
-
+  } else if (type == "Incremental"){
+    incremental.plot(GeoLift = x)
   } else {
-    message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT")
+    message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT/Incremental")
   }
 
 }
@@ -2986,6 +2987,98 @@ Lift.plot <- function(GeoLift,
 
 }
 
+
+
+#' Link dates to GeoLift time periods.
+#'
+#' @description
+#'
+#' Link dates to GeoLift time periods.
+#'
+#' @param GeoLift GeoLift object.
+#' @param treatment_end_date Character that represents a date in year-month=day format.
+#'
+#' @return
+#' List that contains:
+#'          \itemize{
+#'          \item{"date_vector":}{ Vector of dates, going from first pre test time to end of test.}
+#'          \item{"treatment_start":}{ start date of study.}
+#'          \item{"treatment_end":}{ End date of study.}
+#'         }
+#'
+#' @export
+get_date_from_test_periods <- function(GeoLift, treatment_end_date){
+  treatment_end_period <- GeoLift$TreatmentEnd
+  treatment_start_period <- GeoLift$TreatmentStart
+  date_vector <- seq(
+    as.Date(treatment_end_date) - treatment_end_period + 1, 
+    as.Date(treatment_end_date), 
+    by="day")
+  treatment_start_date <- date_vector[treatment_start_period]
+  
+  return(list(
+    date_vector = as.Date(date_vector), 
+    treatment_start = as.Date(treatment_start_date),
+    treatment_end = as.Date(treatment_end_date))
+  )
+}
+
+
+#' Daily Incrementality plot function for GeoLift output.
+#'
+#' @description
+#'
+#' \code{incremental_plot} returns chart for daily incrementality using GeoLift output.
+#'
+#' @param GeoLift GeoLift object.
+#' @param treatment_end_date treatment_end_date Character that represents a date in year-month-day format.
+#' @param main_title Character for the title of the plot. "Daily incremental value" by default.
+#' @param subtitle Character for the subtitle of the plot. "GeoLift analysis" by default.
+#' @param ... additional arguments
+#'
+#' @return
+#' Daily Incremental plot.
+#'
+#' @export
+incremental.plot <- function(GeoLift,
+                             treatment_end_date = NULL,
+                             main_title="Daily incremental value",
+                             subtitle = "GeoLift analysis",
+                             ...) {
+  incremental <- incremental_lb <- incremental_ub <- NULL
+  df <- GeoLift$summary$att
+  q_treatment_locations <- length(GeoLift$test_id$name)
+  df$incremental <- df$Estimate * q_treatment_locations
+  df$incremental_lb <- df$lower_bound * q_treatment_locations
+  df$incremental_ub <- df$upper_bound * q_treatment_locations
+  
+  if (!is.null(treatment_end_date)){
+    plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date)
+    df$Time <- plot_dates$date_vector
+  } else {
+    warning(
+      "You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.")
+    plot_dates <- list(
+      treatment_start = GeoLift$TreatmentStart,
+      treatment_end = GeoLift$TreatmentEnd
+    )
+  }
+  
+  ggplot(df, aes(x=Time, y=incremental, group=1)) + 
+    geom_line(linetype="dashed", color="#373472") + 
+    geom_ribbon(aes(ymin=incremental_lb, ymax=incremental_ub), alpha=0.2, fill="#4B4196") +
+    theme_minimal() +
+    labs(y = "Incremental values",
+         x="Periods",
+         title=main_title,
+         subtitle=subtitle) +
+    theme(
+      text = element_text(size=20), 
+      plot.title = element_text(hjust = 0.5),
+      plot.subtitle = element_text(hjust = 0.5)) +
+    geom_vline(xintercept=plot_dates$treatment_start, linetype="dashed", alpha=0.3) +
+    geom_hline(yintercept=0, alpha=0.5)
+}
 
 
 #' Summary method for GeoLift.

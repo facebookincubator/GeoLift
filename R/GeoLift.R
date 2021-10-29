@@ -3018,7 +3018,7 @@ absolute_value.plot <- function(
     plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date)
     df$Time <- plot_dates$date_vector
   } else {
-    warning(
+    message(
       "You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.")
     plot_dates <- list(
       treatment_start = GeoLift$TreatmentStart,

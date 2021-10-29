@@ -2864,6 +2864,8 @@ plot.GeoLift <- function(x,
 #'
 #' @param GeoLift GeoLift object.
 #' @param treatment_end_date Character that represents a date in year-month=day format.
+#' @param frequency Character that represents periodicity of time stamps. Can be either
+#' weekly or daily. Defaults to daily.
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param title String for the title of the plot. Empty by default.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
@@ -2875,8 +2877,9 @@ plot.GeoLift <- function(x,
 #' @export
 Lift.plot <- function(GeoLift,
                       treatment_end_date = NULL,
+                      frequency = "daily",
                       plot_start_date = NULL,
-                      title = "Daily observations per test group",
+                      title = "Observations per Timestamp and Test Group",
                       subtitle = "",
                       ...) {
   c_obs <- c_obs_lower_bound <- c_obs_upper_bound <- t_obs <- NULL
@@ -2901,7 +2904,7 @@ Lift.plot <- function(GeoLift,
   )
   
   if (!is.null(treatment_end_date)){
-    plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date)
+    plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency=frequency)
     df$Time <- plot_dates$date_vector
   } else {
     warning(

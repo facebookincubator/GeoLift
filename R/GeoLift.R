@@ -3187,6 +3187,8 @@ cumulative_lift <- function(
 #' @param location_id Name of the location variable (String).
 #' @param time_id Name of the time variable (String).
 #' @param treatment_end_date Character that represents a date in year-month-day format.
+#' @param frequency Character that represents periodicity of time stamps. Can be either
+#' weekly or daily. Defaults to daily.
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param title Character for the title of the plot. NULL by default.
 #' @param subtitle Character for the subtitle of the plot. NULL by default.
@@ -3204,8 +3206,9 @@ cumulative_value.plot <- function(data,
                                   time_id = "time",
                                   Y_id = "Y",
                                   treatment_end_date = NULL,
+                                  frequency = "daily",
                                   plot_start_date = NULL,
-                                  title = "Accumulated incremental value",
+                                  title = "",
                                   subtitle = "",
                                   ...){
   incremental <- incremental_lb <- incremental_ub <- NULL
@@ -3218,15 +3221,19 @@ cumulative_value.plot <- function(data,
     time_id = time_id,
     Y_id = Y_id)
   
+  if (nchar(title) == 0){
+    title <- "Accumulated Incremental Value"
+  }
+  GeoLift <- list(TreatmentEnd = treatment_end_period, TreatmentStart = treatment_start_period)
   if (!is.null(treatment_end_date)){
-    cumulative_lift_df$Time <- as.Date(seq(
-      as.Date(treatment_end_date) - treatment_end_period + 1, 
-      as.Date(treatment_end_date), 
-      by="day"))
-    treatment_start_period <- cumulative_lift_df$Time[treatment_start_period]
+    plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency = frequency)
+    cumulative_lift_df$Time <- plot_dates$date_vector
   } else {
-    warning(
+    message(
       "You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.")
+    plot_dates <- list(
+      treatment_start = GeoLift$TreatmentStart,
+      treatment_end = GeoLift$TreatmentEnd)
   }
   if (!is.null(plot_start_date)){
     if (is.null(treatment_end_date)){
@@ -3240,14 +3247,14 @@ cumulative_value.plot <- function(data,
     geom_line(linetype="dashed", color="#373472") + 
     geom_ribbon(aes(ymin=incremental_lb, ymax=incremental_ub), alpha=0.2, fill="#4B4196") +
     theme_minimal() +
-    labs(y = "Incremental values",
+    labs(y = "Incremental Values",
          x = "Date",
          title = title,
          subtitle = subtitle) +
     theme(text = element_text(size=20), 
           plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5)) +
-    geom_vline(xintercept=treatment_start_period, linetype="dashed", alpha=0.3)
+    geom_vline(xintercept=plot_dates$treatment_start, linetype="dashed", alpha=0.3)
 }
 
 #' Summary method for GeoLift.

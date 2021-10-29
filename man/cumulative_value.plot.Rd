@@ -13,8 +13,9 @@ cumulative_value.plot(
   time_id = "time",
   Y_id = "Y",
   treatment_end_date = NULL,
+  frequency = "daily",
   plot_start_date = NULL,
-  title = "Accumulated incremental value",
+  title = "",
   subtitle = "",
   ...
 )
@@ -36,6 +37,9 @@ Should be the output of \code{GeoDataRead}.}
 \item{Y_id}{Name of the outcome variable (String).}
 
 \item{treatment_end_date}{Character that represents a date in year-month-day format.}
+
+\item{frequency}{Character that represents periodicity of time stamps. Can be either
+weekly or daily. Defaults to daily.}
 
 \item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
 

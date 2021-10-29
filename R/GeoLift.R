@@ -2879,7 +2879,7 @@ Lift.plot <- function(GeoLift,
                       treatment_end_date = NULL,
                       frequency = "daily",
                       plot_start_date = NULL,
-                      title = "Observations per Timestamp and Test Group",
+                      title = "",
                       subtitle = "",
                       ...) {
   c_obs <- c_obs_lower_bound <- c_obs_upper_bound <- t_obs <- NULL
@@ -2921,6 +2921,10 @@ Lift.plot <- function(GeoLift,
     } else {
       df <- df[df$Time >= plot_start_date,]
     }
+  }
+  
+  if (nchar(title) == 0){
+    title <- "Observations per Timestamp and Test Group"
   }
   
   colors <- c("Treatment" = "#52854C", "Control" = "#7030A0")

@@ -4,12 +4,15 @@
 \alias{get_date_from_test_periods}
 \title{Link dates to GeoLift time periods.}
 \usage{
-get_date_from_test_periods(GeoLift, treatment_end_date)
+get_date_from_test_periods(GeoLift, treatment_end_date, frequency = "daily")
 }
 \arguments{
 \item{GeoLift}{GeoLift object.}
 
 \item{treatment_end_date}{Character that represents a date in year-month=day format.}
+
+\item{frequency}{Character that represents periodicity of time stamps. Can be either
+weekly or daily. Defaults to daily.}
 }
 \value{
 List that contains:

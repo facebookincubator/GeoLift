@@ -2999,7 +2999,7 @@ absolute_value.plot <- function(
     df$upper_bound <- df$upper_bound * q_treatment_locations
     ylab <- "Incremental values"
     if (nchar(title) == 0){
-      title <- "Daily incremental value"
+      title <- "Daily Incremental Value"
     }
     if (nchar(subtitle) == 0){
       subtitle <- "GeoLift Analysis"
@@ -3007,10 +3007,10 @@ absolute_value.plot <- function(
   } else if (tolower(plot_type) == "att"){
     ylab <- "Average ATT"
     if (nchar(title) == 0){
-      title <- "Average effect on the treated"
+      title <- "Average Effect on the Treated"
     }
     if (nchar(subtitle) == 0){
-      subtitle <- "Average effect per day per location in treatment"
+      subtitle <- "Average Effect per Day per Location in Treatment"
     }
   } else {stop("Please specify which plot type you would like: ATT or Incrementality.")}
   

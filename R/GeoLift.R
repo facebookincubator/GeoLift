@@ -2855,6 +2855,52 @@ plot.GeoLift <- function(x,
 
 }
 
+#' Link dates to GeoLift time periods.
+#'
+#' @description
+#'
+#' Link dates to GeoLift time periods.
+#'
+#' @param GeoLift GeoLift object.
+#' @param treatment_end_date Character that represents a date in year-month=day format.
+#' @param frequency Character that represents periodicity of time stamps. Can be either
+#' weekly or daily. Defaults to daily.
+#'
+#' @return
+#' List that contains:
+#'          \itemize{
+#'          \item{"date_vector":}{ Vector of dates, going from first pre test time to end of test.}
+#'          \item{"treatment_start":}{ start date of study.}
+#'          \item{"treatment_end":}{ End date of study.}
+#'         }
+#'
+#' @export
+get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency="daily"){
+  treatment_end_period <- GeoLift$TreatmentEnd
+  treatment_start_period <- GeoLift$TreatmentStart
+  if (tolower(frequency) == "daily"){
+    date_vector <- seq(
+      as.Date(treatment_end_date) - treatment_end_period + 1, 
+      as.Date(treatment_end_date), 
+      by="day")
+  } else if (tolower(frequency) == "weekly"){
+    date_vector <- seq(
+      as.Date(treatment_end_date) - treatment_end_period * 7 + 7, 
+      as.Date(treatment_end_date), 
+      by="week")
+  } else {
+    stop("If converting time periods to dates, specify frequency param. Can be 'daily' or 'weekly'.")
+  }
+  
+  treatment_start_date <- date_vector[treatment_start_period]
+  
+  return(list(
+    date_vector = as.Date(date_vector), 
+    treatment_start = as.Date(treatment_start_date),
+    treatment_end = as.Date(treatment_end_date))
+  )
+}
+
 
 #' Aggregate Lift plot function for GeoLift.
 #'
@@ -2907,7 +2953,7 @@ Lift.plot <- function(GeoLift,
     plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency=frequency)
     df$Time <- plot_dates$date_vector
   } else {
-    warning(
+    message(
       "You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.")
     plot_dates <- list(
       treatment_start = GeoLift$TreatmentStart,
@@ -2947,53 +2993,6 @@ Lift.plot <- function(GeoLift,
           plot.subtitle = element_text(hjust = 0.5)) +
     geom_vline(xintercept=plot_dates$treatment_start, linetype="dashed", alpha=0.3) +
     scale_color_manual(values = colors)
-}
-
-
-#' Link dates to GeoLift time periods.
-#'
-#' @description
-#'
-#' Link dates to GeoLift time periods.
-#'
-#' @param GeoLift GeoLift object.
-#' @param treatment_end_date Character that represents a date in year-month=day format.
-#' @param frequency Character that represents periodicity of time stamps. Can be either
-#' weekly or daily. Defaults to daily.
-#'
-#' @return
-#' List that contains:
-#'          \itemize{
-#'          \item{"date_vector":}{ Vector of dates, going from first pre test time to end of test.}
-#'          \item{"treatment_start":}{ start date of study.}
-#'          \item{"treatment_end":}{ End date of study.}
-#'         }
-#'
-#' @export
-get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency="daily"){
-  treatment_end_period <- GeoLift$TreatmentEnd
-  treatment_start_period <- GeoLift$TreatmentStart
-  if (tolower(frequency) == "daily"){
-    date_vector <- seq(
-      as.Date(treatment_end_date) - treatment_end_period + 1, 
-      as.Date(treatment_end_date), 
-      by="day")
-  } else if (tolower(frequency) == "weekly"){
-    date_vector <- seq(
-      as.Date(treatment_end_date) - treatment_end_period * 7 + 7, 
-      as.Date(treatment_end_date), 
-      by="week")
-  } else {
-    stop("If converting time periods to dates, specify frequency param. Can be 'daily' or 'weekly'.")
-  }
-  
-  treatment_start_date <- date_vector[treatment_start_period]
-  
-  return(list(
-    date_vector = as.Date(date_vector), 
-    treatment_start = as.Date(treatment_start_date),
-    treatment_end = as.Date(treatment_end_date))
-  )
 }
 
 

@@ -8,6 +8,7 @@
   x,
   type = "Lift",
   treatment_end_date = NULL,
+  frequency = "daily",
   plot_start_date = NULL,
   title = "",
   subtitle = "",
@@ -23,6 +24,9 @@ the average ATT is plotted. If type is set to "Incrementality",
 daily incremental values are plotted.}
 
 \item{treatment_end_date}{Character that represents a date in year-month=day format.}
+
+\item{frequency}{Character that represents periodicity of time stamps. Can be either
+weekly or daily. Defaults to daily.}
 
 \item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
 

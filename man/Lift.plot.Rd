@@ -6,23 +6,27 @@
 \usage{
 Lift.plot(
   GeoLift,
-  outcome = "Units",
-  main = "",
+  treatment_end_date = NULL,
+  frequency = "daily",
+  plot_start_date = NULL,
+  title = "",
   subtitle = "",
-  notes = "",
   ...
 )
 }
 \arguments{
 \item{GeoLift}{GeoLift object.}
 
-\item{outcome}{String for the name of the outcome variable. By default "Units".}
+\item{treatment_end_date}{Character that represents a date in year-month=day format.}
 
-\item{main}{String for the title of the plot. Empty by default.}
+\item{frequency}{Character that represents periodicity of time stamps. Can be either
+weekly or daily. Defaults to daily.}
+
+\item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
+
+\item{title}{String for the title of the plot. Empty by default.}
 
 \item{subtitle}{String for the subtitle of the plot. Empty by default.}
-
-\item{notes}{String to add notes to the plot. Empty by default.}
 
 \item{...}{additional arguments}
 }

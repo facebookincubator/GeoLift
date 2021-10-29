@@ -7,14 +7,11 @@
 \method{plot}{GeoLift}(
   x,
   type = "Lift",
-  outcome = "Units",
   treatment_end_date = NULL,
+  frequency = "daily",
   plot_start_date = NULL,
-  main = "",
+  title = "",
   subtitle = "",
-  notes = "",
-  conf.level = 0.9,
-  test_locs = FALSE,
   ...
 )
 }
@@ -26,22 +23,16 @@ incrementality on the outcome variable. If type is set to "ATT",
 the average ATT is plotted. If type is set to "Incrementality",
 daily incremental values are plotted.}
 
-\item{outcome}{String name of the outcome variable. By default "Units".}
-
 \item{treatment_end_date}{Character that represents a date in year-month=day format.}
+
+\item{frequency}{Character that represents periodicity of time stamps. Can be either
+weekly or daily. Defaults to daily.}
 
 \item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
 
-\item{main}{String for the title of the plot. Empty by default.}
+\item{title}{String for the title of the plot. Empty by default.}
 
 \item{subtitle}{String for the subtitle of the plot. Empty by default.}
-
-\item{notes}{String to add notes to the plot. Empty by default.}
-
-\item{conf.level}{Confidence level. By defaul 0.9.}
-
-\item{test_locs}{Plot the average results by default. If set to
-TRUE, the ATT by test location is plotted.}
 
 \item{...}{additional arguments}
 }

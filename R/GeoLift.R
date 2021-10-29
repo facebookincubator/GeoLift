@@ -2808,6 +2808,8 @@ GeoLift <- function(Y_id = "Y",
 #' the average ATT is plotted. If type is set to "Incrementality",
 #' daily incremental values are plotted.
 #' @param treatment_end_date Character that represents a date in year-month=day format.
+#' @param frequency Character that represents periodicity of time stamps. Can be either
+#' weekly or daily. Defaults to daily.
 #' @param title String for the title of the plot. Empty by default.
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
@@ -2820,31 +2822,34 @@ GeoLift <- function(Y_id = "Y",
 plot.GeoLift <- function(x,
                          type="Lift",
                          treatment_end_date = NULL,
+                         frequency = "daily",
                          plot_start_date = NULL,
                          title = "",
                          subtitle = "",
                          ...) {
-
-
+  
+  
   if (!inherits(x, 'GeoLift')) {
     stop('object must be class GeoLift')
   }
-
+  
   if (type == "TreatmentSchedule"){
     panelView(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
-
-  } else if (type %in% c("ATT", "Incrementality")){
+    
+  } else if (tolower(type) %in% c("att", "incrementality")){
     absolute_value.plot(GeoLift = x,
                         treatment_end_date = treatment_end_date,
+                        frequency = frequency,
                         plot_start_date = plot_start_date,
                         plot_type = type,
                         title = title,
                         subtitle = subtitle,
                         ...)
-
-  } else if (type == "Lift"){
+    
+  } else if (tolower(type) == "lift"){
     Lift.plot(GeoLift = x,
               treatment_end_date = treatment_end_date,
+              frequency = frequency,
               plot_start_date = plot_start_date,
               title = title,
               subtitle = subtitle,
@@ -2852,7 +2857,7 @@ plot.GeoLift <- function(x,
   } else {
     message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT/Incrementality")
   }
-
+  
 }
 
 #' Link dates to GeoLift time periods.

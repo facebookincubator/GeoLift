@@ -207,7 +207,7 @@ GeoDataRead <- function(data,
   data <- data %>% dplyr::left_join(TimePeriods, by = "time")
   data$time <- data$ID
 
-  data <- subset(data, select = -c(date_unix, ID))
+  data <- subset(data, select = -c(ID))
 
   #Remove revenue with zeroes
   #data <- filter(data, Y > 0)

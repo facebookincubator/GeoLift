@@ -71,6 +71,8 @@ utils::globalVariables(
 #' @param format Format of the dates in the data frame.
 #' @param X List of names of the covariates.
 #' @param summary Display a summary of the data-reading process. FALSE by default.
+#' @param keep_unix_time A logic flag indicating whether to keep a column with
+#' each event's unix time.
 #'
 #' @return
 #' A data frame for GeoLift inference and power calculations.
@@ -82,7 +84,8 @@ GeoDataRead <- function(data,
                         Y_id = "units",
                         format = "mm/dd/yyyy",
                         X = c(),
-                        summary = FALSE) {
+                        summary = FALSE,
+                        keep_unix_time = FALSE) {
 
   format <- tolower(format)
 
@@ -207,7 +210,12 @@ GeoDataRead <- function(data,
   data <- data %>% dplyr::left_join(TimePeriods, by = "time")
   data$time <- data$ID
 
-  data <- subset(data, select = -c(date_unix, ID))
+  if (keep_unix_time == FALSE){
+    data <- subset(data, select = -c(date_unix, ID))
+  } else {
+    data <- subset(data, select = -c(ID))
+  }
+
 
   #Remove revenue with zeroes
   #data <- filter(data, Y > 0)
@@ -227,10 +235,19 @@ GeoDataRead <- function(data,
 
   # Aggregate Outcomes by time and location
   data_raw <- data
-  data <- data_raw %>% dplyr::group_by(location, time) %>% dplyr::summarize(Y = sum(Y))
-  for (var in X){
-    data_aux <- data_raw %>% dplyr::group_by(location, time) %>% dplyr::summarize(!!var := sum(!!sym(var)))
-    data <- data %>% dplyr::left_join(data_aux, by = c("location", "time"))
+
+  if(keep_unix_time == FALSE){
+    data <- data_raw %>% dplyr::group_by(location, time) %>% dplyr::summarize(Y = sum(Y))
+    for (var in X){
+      data_aux <- data_raw %>% dplyr::group_by(location, time) %>% dplyr::summarize(!!var := sum(!!sym(var)))
+      data <- data %>% dplyr::left_join(data_aux, by = c("location", "time"))
+    }
+  } else {
+    data <- data_raw %>% dplyr::group_by(location, time, date_unix) %>% dplyr::summarize(Y = sum(Y))
+    for (var in X){
+      data_aux <- data_raw %>% dplyr::group_by(location, time, date_unix) %>% dplyr::summarize(!!var := sum(!!sym(var)))
+      data <- data %>% dplyr::left_join(data_aux, by = c("location", "time", "date_unix"))
+    }
   }
 
   # Print summary of Data Reading
@@ -2827,15 +2844,15 @@ plot.GeoLift <- function(x,
                          title = "",
                          subtitle = "",
                          ...) {
-  
-  
+
+
   if (!inherits(x, 'GeoLift')) {
     stop('object must be class GeoLift')
   }
-  
+
   if (type == "TreatmentSchedule"){
     panelView(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
-    
+
   } else if (tolower(type) %in% c("att", "incrementality")){
     absolute_value.plot(GeoLift = x,
                         treatment_end_date = treatment_end_date,
@@ -2845,7 +2862,7 @@ plot.GeoLift <- function(x,
                         title = title,
                         subtitle = subtitle,
                         ...)
-    
+
   } else if (tolower(type) == "lift"){
     Lift.plot(GeoLift = x,
               treatment_end_date = treatment_end_date,
@@ -2857,7 +2874,7 @@ plot.GeoLift <- function(x,
   } else {
     message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT/Incrementality")
   }
-  
+
 }
 
 #' Link dates to GeoLift time periods.
@@ -2885,22 +2902,22 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency="d
   treatment_start_period <- GeoLift$TreatmentStart
   if (tolower(frequency) == "daily"){
     date_vector <- seq(
-      as.Date(treatment_end_date) - treatment_end_period + 1, 
-      as.Date(treatment_end_date), 
+      as.Date(treatment_end_date) - treatment_end_period + 1,
+      as.Date(treatment_end_date),
       by="day")
   } else if (tolower(frequency) == "weekly"){
     date_vector <- seq(
-      as.Date(treatment_end_date) - treatment_end_period * 7 + 7, 
-      as.Date(treatment_end_date), 
+      as.Date(treatment_end_date) - treatment_end_period * 7 + 7,
+      as.Date(treatment_end_date),
       by="week")
   } else {
     stop("If converting time periods to dates, specify frequency param. Can be 'daily' or 'weekly'.")
   }
-  
+
   treatment_start_date <- date_vector[treatment_start_period]
-  
+
   return(list(
-    date_vector = as.Date(date_vector), 
+    date_vector = as.Date(date_vector),
     treatment_start = as.Date(treatment_start_date),
     treatment_end = as.Date(treatment_end_date))
   )
@@ -2937,14 +2954,14 @@ Lift.plot <- function(GeoLift,
   treatment_obs <- as.data.frame(
     colMeans(
       matrix(
-        GeoLift$y_obs, 
-        nrow = nrow(GeoLift$test_id), 
+        GeoLift$y_obs,
+        nrow = nrow(GeoLift$test_id),
         ncol = GeoLift$TreatmentEnd
       )
     )
   ) * nrow(GeoLift$test_id)
   colnames(treatment_obs) <- c("t_obs")
-  
+
   q_treatment_locations <- length(GeoLift$test_id$name)
   df <- data.frame(
     t_obs = treatment_obs$t_obs,
@@ -2953,7 +2970,7 @@ Lift.plot <- function(GeoLift,
     c_obs_upper_bound = treatment_obs$t_obs - GeoLift$summary$att$lower_bound * q_treatment_locations,
     Time = 1:length(treatment_obs$t_obs)
   )
-  
+
   if (!is.null(treatment_end_date)){
     plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency=frequency)
     df$Time <- plot_dates$date_vector
@@ -2965,7 +2982,7 @@ Lift.plot <- function(GeoLift,
       treatment_end = GeoLift$TreatmentEnd
     )
   }
-  
+
   if (!is.null(plot_start_date)){
     if (is.null(treatment_end_date)){
       stop("If you want to filter your dataset on a date, please specify treatment_end_date param so periods are converted to dates.")
@@ -2973,13 +2990,13 @@ Lift.plot <- function(GeoLift,
       df <- df[df$Time >= plot_start_date,]
     }
   }
-  
+
   if (nchar(title) == 0){
     title <- "Observations per Timestamp and Test Group"
   }
-  
+
   colors <- c("Treatment" = "#52854C", "Control" = "#7030A0")
-  
+
   ggplot(df, aes(x=Time)) +
     geom_line(
       aes(y=c_obs, color="Control"),
@@ -2993,7 +3010,7 @@ Lift.plot <- function(GeoLift,
          title = title,
          subtitle = subtitle,
          color="Test group") +
-    theme(text = element_text(size=20), 
+    theme(text = element_text(size=20),
           plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5)) +
     geom_vline(xintercept=plot_dates$treatment_start, linetype="dashed", alpha=0.3) +
@@ -3033,7 +3050,7 @@ absolute_value.plot <- function(
   Estimate <- lower_bound <- upper_bound <- NULL
   df <- GeoLift$summary$att
   df <- df[, c("Time", "Estimate", "lower_bound", "upper_bound")]
-  
+
   if (tolower(plot_type) == "incrementality"){
     q_treatment_locations <- length(GeoLift$test_id$name)
     df$Estimate <- df$Estimate * q_treatment_locations
@@ -3055,7 +3072,7 @@ absolute_value.plot <- function(
       subtitle <- "Average Effect per Timestamp per Location in Treatment"
     }
   } else {stop("Please specify which plot type you would like: ATT or Incrementality.")}
-  
+
   if (!is.null(treatment_end_date)){
     plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency = frequency)
     df$Time <- plot_dates$date_vector
@@ -3074,7 +3091,7 @@ absolute_value.plot <- function(
       df <- df[df$Time >= plot_start_date,]
     }
   }
-  
+
   ggplot(df, aes(x = Time, y = Estimate)) +
     geom_line(linetype="dashed", color="#373472", size=0.75) +
     geom_vline(xintercept=plot_dates$treatment_start, linetype="dashed", alpha=0.3) +
@@ -3086,17 +3103,17 @@ absolute_value.plot <- function(
          title=title,
          subtitle=subtitle) +
     theme(
-      text = element_text(size=20), 
+      text = element_text(size=20),
       plot.title = element_text(hjust = 0.5),
       plot.subtitle = element_text(hjust = 0.5))
 }
 
 
 #' Calculate cumulative lift
-#' 
-#' @description 
+#'
+#' @description
 #' This method will calculate the cumulative lift with each passing day.
-#' 
+#'
 #' @param data DataFrame that GeoLfit will use to determine a result.
 #' Should be the output of \code{GeoDataRead}.
 #' @param treatment_locations Vector of locations where the treatment was applied.
@@ -3105,10 +3122,10 @@ absolute_value.plot <- function(
 #' @param Y_id Name of the outcome variable (String).
 #' @param location_id Name of the location variable (String).
 #' @param time_id Name of the time variable (String).
-#' 
+#'
 #' @return
 #' A dataframe that holds the accumulated lift effect throughout the entire treatment period.
-#' 
+#'
 #' @export
 cumulative_lift <- function(
   data,
@@ -3128,7 +3145,7 @@ cumulative_lift <- function(
         "Currently missing ", treatment_end_period - max_test_period, " iterations."))
     }
     filtered_data <- data[data$time <= max_test_period, ]
-    
+
     gl_output <- suppressMessages(GeoLift(
       data = data,
       locations = treatment_locations,
@@ -3138,13 +3155,13 @@ cumulative_lift <- function(
       time_id = time_id,
       Y_id = Y_id,
       ConfidenceIntervals = TRUE))
-    
+
     att <- gl_output$summary$average_att$Estimate
     att_lb <- gl_output$lower_bound
     att_ub <- gl_output$upper_bound
-    
+
     incremental_factor <- length(treatment_locations) * (max_test_period - treatment_start_period)
-    
+
     cumulative_list[[max_test_period - treatment_start_period]] <- list(
       Time = max_test_period,
       att = att,
@@ -3157,7 +3174,7 @@ cumulative_lift <- function(
     max_test_period <- max_test_period + 1
   }
   cumulative_lift_df <- do.call(rbind.data.frame, cumulative_list)
-  
+
   rest_of_df <- data.frame(
     Time = 1:(min(cumulative_lift_df$Time)-1),
     att = 0,
@@ -3167,17 +3184,17 @@ cumulative_lift <- function(
     incremental_lb = 0,
     incremental_ub = 0
   )
-  
+
   cumulative_lift_df <- rbind(rest_of_df, cumulative_lift_df)
-  
+
   return(cumulative_lift_df)
 }
 
 #' Plot the accumulated lift effect.
-#' 
-#' @description 
+#'
+#' @description
 #' Plot the accumulated lift effect.
-#' 
+#'
 #' @param data DataFrame that GeoLfit will use to determine a result.
 #' Should be the output of \code{GeoDataRead}.
 #' @param treatment_locations Vector of locations where the treatment was applied.
@@ -3193,10 +3210,10 @@ cumulative_lift <- function(
 #' @param title Character for the title of the plot. NULL by default.
 #' @param subtitle Character for the subtitle of the plot. NULL by default.
 #' @param ... additional arguments
-#' 
-#' @return 
+#'
+#' @return
 #' A ggplot object that shows the accumulated lift per time period.
-#' 
+#'
 #' @export
 cumulative_value.plot <- function(data,
                                   treatment_locations,
@@ -3220,7 +3237,7 @@ cumulative_value.plot <- function(data,
     location_id = location_id,
     time_id = time_id,
     Y_id = Y_id)
-  
+
   if (nchar(title) == 0){
     title <- "Accumulated Incremental Value"
   }
@@ -3242,16 +3259,16 @@ cumulative_value.plot <- function(data,
       cumulative_lift_df <- cumulative_lift_df[cumulative_lift_df$Time >= plot_start_date,]
     }
   }
-  ggplot(cumulative_lift_df, 
-         aes(x=Time, y=incremental, group=1)) + 
-    geom_line(linetype="dashed", color="#373472") + 
+  ggplot(cumulative_lift_df,
+         aes(x=Time, y=incremental, group=1)) +
+    geom_line(linetype="dashed", color="#373472") +
     geom_ribbon(aes(ymin=incremental_lb, ymax=incremental_ub), alpha=0.2, fill="#4B4196") +
     theme_minimal() +
     labs(y = "Incremental Values",
          x = "Date",
          title = title,
          subtitle = subtitle) +
-    theme(text = element_text(size=20), 
+    theme(text = element_text(size=20),
           plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5)) +
     geom_vline(xintercept=plot_dates$treatment_start, linetype="dashed", alpha=0.3)

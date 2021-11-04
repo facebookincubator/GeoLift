@@ -19,7 +19,7 @@ import styles from './styles.module.css';
 const features = [
   {
     title: 'Omni-Channel Efficiency with Hudsons Bay Company',
-    imageUrl: 'https://external.fmex11-1.fna.fbcdn.net/safe_image.php?d=AQFjquuBqfvq1Of9&url=https%3A%2F%2Flookaside.fbsbx.com%2Felementpath%2Fmedia%2F%3Fmedia_id%3D166438408504332%26version%3D1631554000&_nc_eui2=AeHHUZGWrSGlEkNzxALwQ2keyNAnOYS1j0rI0Cc5hLWPSgbeXktw9n7LIWPx9qtPPi8&_nc_oe=6ecba&_nc_sid=62ba52&ccb=3-5&gt=1&_nc_hash=AQEECDL_eSX4Egkf',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Hudson%27s_Bay_Company_Official_Logo_2013.svg/1280px-Hudson%27s_Bay_Company_Official_Logo_2013.svg.png',
     description: (
       <>
         Using GeoLift, Hudson’s Bay was able to measure lift in online and in-store sales
@@ -33,7 +33,7 @@ const features = [
   },
   {
     title: 'Omni-Channel Measurement for Scotiabank',
-    imageUrl: 'https://scontent.xx.fbcdn.net/v/t1.6435-1/p100x100/68609517_2434401649968958_7382717244708487168_n.png?_nc_cat=1&ccb=1-5&_nc_sid=dbb9e7&_nc_eui2=AeEwsl7pDmqqQ5-xwricpZ4vpVCZKap5z9WlUJkpqnnP1e5ksjdNwaHe6UHLlbo_uNY&_nc_ohc=zs8YnsN9T_sAX-vOSQd&_nc_ht=scontent.xx&oh=0762a6d60f2500a6b9949fb34dc53260&oe=617D9EE8',
+    imageUrl: 'https://i.pinimg.com/originals/3f/9c/83/3f9c8390a12bf2b96c7055169e77f333.png',
     description: (
       <>
         Scotiabank Mexico was able to measure for the first time the omni-channel

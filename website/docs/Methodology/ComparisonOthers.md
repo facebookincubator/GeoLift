@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Comparison to other Methodologies
 
-Below is a quick summary of some of the most popular geo testing algorithms currently used in the market. We have kept it at a very high-level intentionally. A more thorough comparison of GeoLift to other pseudo-experimental approaches can be found [here](https://fb.workplace.com/groups/geolift/permalink/792753078134296/).
+Below is a quick summary of some of the most popular geo testing algorithms currently used in the market. We have kept it at a very high-level intentionally. A more thorough comparison of GeoLift to other pseudo-experimental approaches will be added soon.
 
 1. **Differences-in-differences:** This is the most popular and easiest approach to run an inference for a geo test. Not recommended usually unless the predicted effect size is really large. DID has fallen out of use mainly due to its reliance on the parallel trends assumption, which rarely happens in actual experiments.
 2. **CausalImpact (by Google)**: Uses a Bayesian time-series modeling technique to predict the counterfactual. It’s especially useful when strong prior knowledge is available or when the KPI metric isn’t available and modelling has to be done on a proxy.

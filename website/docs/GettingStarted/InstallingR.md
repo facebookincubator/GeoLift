@@ -31,7 +31,7 @@ devtools::install_github("ebenmichael/augsynth")
 Finally, we can install the `GeoLift` package with the following command:
 
 ```
-devtools::install_github("facebookincubator/GeoLift/")
+devtools::install_github("facebookincubator/GeoLift")
 ```
 
 ---

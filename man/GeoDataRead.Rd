@@ -11,7 +11,8 @@ GeoDataRead(
   Y_id = "units",
   format = "mm/dd/yyyy",
   X = c(),
-  summary = FALSE
+  summary = FALSE,
+  keep_unix_time = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,9 @@ of the time period (starting at 1), and covariates.}
 \item{X}{List of names of the covariates.}
 
 \item{summary}{Display a summary of the data-reading process. FALSE by default.}
+
+\item{keep_unix_time}{A logic flag indicating whether to keep a column with
+each event's unix time.}
 }
 \value{
 A data frame for GeoLift inference and power calculations.

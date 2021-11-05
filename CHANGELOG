@@ -1,3 +1,12 @@
+GeoLift v2.1.8 (Release date: 2021-11-05)
+=========================================
+
+Changes:
+
+* Fixed budget filter for inverse/negative Lift in GeoLiftMarketSelection().
+* Changed the logic of small pre-treatment warnings in all power calcs. We now recommend having 4x pre-treatment to treatment periods.
+* Added the keep_unix_time parameter to GeoDataRead() to keep dates in the data.frame.
+
 GeoLift v2.1.7 (Release date: 2021-10-29)
 =========================================
 

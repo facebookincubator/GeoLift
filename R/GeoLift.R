@@ -743,7 +743,7 @@ GeoLiftPower <- function(data,
 
   # Small Pre-treatment Periods
   if (max_time/max(treatment_periods) < 4){
-    message(paste0("Warning: Small pre-treatment period!.
+    message(paste0("Caution: Small pre-treatment period!.
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
@@ -1094,7 +1094,7 @@ NumberLocations <- function(data,
 
   # Small Pre-treatment Periods
   if (max_time/max(treatment_periods) < 4){
-    message(paste0("Warning: Small pre-treatment period!.
+    message(paste0("Caution: Small pre-treatment period!.
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
@@ -1514,7 +1514,7 @@ GeoLiftPower.search <- function(data,
 
   # Small Pre-treatment Periods
   if (max_time/max(treatment_periods) < 4){
-    message(paste0("Warning: Small pre-treatment period!.
+    message(paste0("Caution: Small pre-treatment period!.
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
@@ -1806,7 +1806,7 @@ GeoLiftPowerFinder <- function(data,
 
   # Small Pre-treatment Periods
   if (max_time/max(treatment_periods) < 4){
-    message(paste0("Warning: Small pre-treatment period!.
+    message(paste0("Caution: Small pre-treatment period!.
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
@@ -2184,7 +2184,7 @@ GeoLiftMarketSelection <- function(data,
 
   # Small Pre-treatment Periods
   if (max_time/max(treatment_periods) < 4){
-    message(paste0("Warning: Small pre-treatment period!.
+    message(paste0("Caution: Small pre-treatment period!.
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
@@ -2494,7 +2494,7 @@ GeoLiftMarketSelection <- function(data,
 
   # Step 11 - Remove tests out of budget (if aplicable)
   if (!is.null(budget)){
-    resultsM <- resultsM %>% dplyr::filter(budget > Investment)
+    resultsM <- resultsM %>% dplyr::filter(abs(budget) > Investment)
   }
 
   # Step 12: Holdout Size

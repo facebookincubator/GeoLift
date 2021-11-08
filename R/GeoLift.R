@@ -741,9 +741,10 @@ GeoLiftPower <- function(data,
   max_time <- max(data$time)
   data$location <- tolower(data$location)
 
-  if (max(treatment_periods)/max_time > 0.8){
-    message(paste0("Warning: Small pre-treatment period.
-                   \nTthe treatment is larger that 80% of all available data."))
+  # Small Pre-treatment Periods
+  if (max_time/max(treatment_periods) < 4){
+    message(paste0("Caution: Small pre-treatment period!.
+                   \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
   results <- data.frame(matrix(ncol=8,nrow=0))
@@ -1091,9 +1092,10 @@ NumberLocations <- function(data,
   data$location <- tolower(data$location)
   locs <- unique(as.character(data$location))
 
-  if (treatment_periods/max_time > 0.8){
-    message(paste0("Warning: Small pre-treatment period.
-                   \nTthe treatment is larger that 80% of all available data."))
+  # Small Pre-treatment Periods
+  if (max_time/max(treatment_periods) < 4){
+    message(paste0("Caution: Small pre-treatment period!.
+                   \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
   #times <- trunc(quantile(data$time, probs = c(0.5, 0.75, 1), names = FALSE ))
@@ -1510,9 +1512,10 @@ GeoLiftPower.search <- function(data,
   max_time <- max(data$time)
   data$location <- tolower(data$location)
 
-  if (max(treatment_periods)/max_time > 0.8){
-    message(paste0("Warning: Small pre-treatment period.
-                   \nTthe treatment is larger that 80% of all available data."))
+  # Small Pre-treatment Periods
+  if (max_time/max(treatment_periods) < 4){
+    message(paste0("Caution: Small pre-treatment period!.
+                   \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
   results <- data.frame(matrix(ncol=5,nrow=0))
@@ -1801,9 +1804,10 @@ GeoLiftPowerFinder <- function(data,
   max_time <- max(data$time)
   data$location <- tolower(data$location)
 
-  if (max(treatment_periods)/max_time > 0.8){
-    message(paste0("Warning: Small pre-treatment period.
-                   \nTthe treatment is larger that 80% of all available data."))
+  # Small Pre-treatment Periods
+  if (max_time/max(treatment_periods) < 4){
+    message(paste0("Caution: Small pre-treatment period!.
+                   \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
   results <- data.frame(matrix(ncol=6,nrow=0))
@@ -2179,9 +2183,9 @@ GeoLiftMarketSelection <- function(data,
   # Data Checks
 
   # Small Pre-treatment Periods
-  if (max(treatment_periods)/max_time > 0.8){
-    message(paste0("Warning: Small pre-treatment period.
-                   \nTthe treatment is larger that 80% of all available data."))
+  if (max_time/max(treatment_periods) < 4){
+    message(paste0("Caution: Small pre-treatment period!.
+                   \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
   # Populate N if it's not provided
@@ -2482,15 +2486,15 @@ GeoLiftMarketSelection <- function(data,
                             Average_MDE = lift,
                             Power = power)
 
-  # Step 10 - Remove tests out of budget (if aplicable)
-  if (!is.null(budget)){
-    resultsM <- resultsM %>% dplyr::filter(budget > Investment)
-  }
-
-  # Step 11: Adjust signs if Negative Lift
+  # Step 10: Adjust signs if Negative Lift
   if (min(effect_size) < 0){
     resultsM$Investment <- -1*resultsM$Investment
     results$Investment <- -1*results$Investment
+  }
+
+  # Step 11 - Remove tests out of budget (if aplicable)
+  if (!is.null(budget)){
+    resultsM <- resultsM %>% dplyr::filter(abs(budget) > abs(Investment))
   }
 
   # Step 12: Holdout Size

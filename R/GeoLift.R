@@ -2494,7 +2494,7 @@ GeoLiftMarketSelection <- function(data,
 
   # Step 11 - Remove tests out of budget (if aplicable)
   if (!is.null(budget)){
-    resultsM <- resultsM %>% dplyr::filter(abs(budget) > Investment)
+    resultsM <- resultsM %>% dplyr::filter(abs(budget) > abs(Investment))
   }
 
   # Step 12: Holdout Size

@@ -12,6 +12,7 @@ absolute_value.plot(
   plot_start_date = NULL,
   title = "",
   subtitle = "",
+  notes = "",
   ...
 )
 }
@@ -30,6 +31,8 @@ weekly or daily. Defaults to daily.}
 \item{title}{Character for the title of the plot. NULL by default.}
 
 \item{subtitle}{Character for the subtitle of the plot. NULL by default.}
+
+\item{notes}{String to add notes to the plot. Empty by default.}
 
 \item{...}{additional arguments}
 }

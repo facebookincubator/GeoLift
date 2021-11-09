@@ -12,6 +12,7 @@
   plot_start_date = NULL,
   title = "",
   subtitle = "",
+  notes = "",
   ...
 )
 }
@@ -33,6 +34,8 @@ weekly or daily. Defaults to daily.}
 \item{title}{String for the title of the plot. Empty by default.}
 
 \item{subtitle}{String for the subtitle of the plot. Empty by default.}
+
+\item{notes}{String to add notes to the plot. Empty by default.}
 
 \item{...}{additional arguments}
 }

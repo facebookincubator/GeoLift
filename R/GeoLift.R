@@ -2834,6 +2834,7 @@ GeoLift <- function(Y_id = "Y",
 #' @param title String for the title of the plot. Empty by default.
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
+#' @param notes String to add notes to the plot. Empty by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -2847,6 +2848,7 @@ plot.GeoLift <- function(x,
                          plot_start_date = NULL,
                          title = "",
                          subtitle = "",
+                         notes = "",
                          ...) {
 
 
@@ -2865,6 +2867,7 @@ plot.GeoLift <- function(x,
                         plot_type = type,
                         title = title,
                         subtitle = subtitle,
+                        notes = notes,
                         ...)
 
   } else if (tolower(type) == "lift"){
@@ -2874,6 +2877,7 @@ plot.GeoLift <- function(x,
               plot_start_date = plot_start_date,
               title = title,
               subtitle = subtitle,
+              notes = notes,
               ...)
   } else {
     message("Error: Please select a correct plot type: TreatmentSchedule/Lift/ATT/Incrementality")
@@ -2941,6 +2945,7 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency="d
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param title String for the title of the plot. Empty by default.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
+#' @param notes String to add notes to the plot. Empty by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -2953,6 +2958,7 @@ Lift.plot <- function(GeoLift,
                       plot_start_date = NULL,
                       title = "",
                       subtitle = "",
+                      notes = "",
                       ...) {
   c_obs <- c_obs_lower_bound <- c_obs_upper_bound <- t_obs <- NULL
   treatment_obs <- as.data.frame(
@@ -3013,6 +3019,7 @@ Lift.plot <- function(GeoLift,
          x = "Periods",
          title = title,
          subtitle = subtitle,
+         caption = notes,
          color="Test group") +
     theme(text = element_text(size=20),
           plot.title = element_text(hjust = 0.5),
@@ -3036,6 +3043,7 @@ Lift.plot <- function(GeoLift,
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param title Character for the title of the plot. NULL by default.
 #' @param subtitle Character for the subtitle of the plot. NULL by default.
+#' @param notes String to add notes to the plot. Empty by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -3050,6 +3058,7 @@ absolute_value.plot <- function(
   plot_start_date = NULL,
   title = "",
   subtitle = "",
+  notes = "",
   ...){
   Estimate <- lower_bound <- upper_bound <- NULL
   df <- GeoLift$summary$att
@@ -3103,9 +3112,10 @@ absolute_value.plot <- function(
     geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha=0.2, fill="#4B4196") +
     theme_minimal() +
     labs(y = ylab,
-         x="Periods",
-         title=title,
-         subtitle=subtitle) +
+         x = "Periods",
+         title = title,
+         subtitle = subtitle,
+         caption = notes) +
     theme(
       text = element_text(size=20),
       plot.title = element_text(hjust = 0.5),
@@ -3213,6 +3223,7 @@ cumulative_lift <- function(
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param title Character for the title of the plot. NULL by default.
 #' @param subtitle Character for the subtitle of the plot. NULL by default.
+#' @param notes String to add notes to the plot. Empty by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -3231,6 +3242,7 @@ cumulative_value.plot <- function(data,
                                   plot_start_date = NULL,
                                   title = "",
                                   subtitle = "",
+                                  notes = "",
                                   ...){
   incremental <- incremental_lb <- incremental_ub <- NULL
   cumulative_lift_df <- cumulative_lift(
@@ -3271,7 +3283,8 @@ cumulative_value.plot <- function(data,
     labs(y = "Incremental Values",
          x = "Date",
          title = title,
-         subtitle = subtitle) +
+         subtitle = subtitle,
+         caption = notes) +
     theme(text = element_text(size=20),
           plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5)) +

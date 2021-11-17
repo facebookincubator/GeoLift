@@ -3352,10 +3352,10 @@ summary.GeoLift <- function(object, ...){
     summ$Y_id <- object$Y_id
     summ$incremental <- object$incremental
     summ$bias <- mean(object$summary$bias_est)
-    summ$weights <- matrix(
-      c(dimnames(object$results$weights)[[1]], object$results$weights), 
-      nrow=nrow(object$results$weights), 
-      ncol=2)
+    summ$weights <- data.frame(
+      location = dimnames(object$results$weights)[[1]],
+      weight = unname(object$results$weights[,1])
+    )
     summ$CI <- object$ConfidenceIntervals
     summ$alpha <- object$summary$alpha
     summ$lower <- object$lower_bound
@@ -3421,8 +3421,8 @@ print.summary.GeoLift <- function(x, ...){
     )
     )
     for (row in 1:nrow(x$weights)){
-      if (round(as.double(x$weights[,2][row]), 4) != 0){
-        message(paste0(" * ", x$weights[,1][row], ": ", x$weights[, 2][row]))
+      if (abs(round(as.double(x$weights$weight[row]), 4)) >= 0.0001){
+        message(paste0(" * ", x$weights$location[row], ": ", x$weights$weight[row]))
       }
 
     }
@@ -3453,8 +3453,8 @@ print.summary.GeoLift <- function(x, ...){
     )
     )
     for (row in 1:nrow(x$weights)){
-      if (round(as.double(x$weights[,2][row]), 4) != 0){
-        message(paste0(" * ", x$weights[,1][row], ": ", x$weights[, 2][row]))
+      if (abs(round(as.double(x$weights$weight[row]), 4)) >= 0.0001){
+        message(paste0(" * ", x$weights$location[row], ": ", x$weights$weight[row]))
       }
       
     }

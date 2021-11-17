@@ -45,11 +45,16 @@ const features = [
     ),
   },
   {
-    title: '',
-    imageUrl: '',
+    title: 'Building Brand and Sales with Super Coffee',
+    imageUrl: 'https://scontent.fmex11-1.fna.fbcdn.net/v/t1.6435-1/p100x100/146475455_3695451970571166_7309961661612546269_n.png?_nc_cat=105&ccb=1-5&_nc_sid=dbb9e7&_nc_eui2=AeG9H3ydn7q54QvS6IsuGgB7NEmGhia1Teo0SYaGJrVN6oOiRbUV_8TDSBfl_ngJ_Bk&_nc_ohc=bGs-EXUgaOAAX-PiICp&_nc_ht=scontent.fmex11-1.fna&oh=3d09c99325629e374294277c187c7a73&oe=61BA2B3A',
     description: (
       <>
-
+        The enhanced coffee company ran Facebook video and photo ads to boost brand
+        awareness and used a GeoLift study to measure in-store sales, revealing an
+        11.9% in-store sales lift.
+        <a href="hhttps://www.facebook.com/business/success/super-coffee">
+        -  Learn More.
+        </a>
       </>
     ),
   },

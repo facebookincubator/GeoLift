@@ -484,101 +484,109 @@ fn_treatment <- function(df,
 #'
 #' @export
 pvalueCalc <- function(data,
-                       sim, #Iterator: Sim number
-                       max_time, #test end
-                       tp, #treatment periods
-                       es, #effect size
-                       locations, #test locations to try out
-                       cpic,
-                       X,
-                       type = "pValue",
-                       normalize = FALSE,
-                       fixed_effects = FALSE,
-                       stat_func = stat_func,
-                       model = "none") {
-
+                          sim,
+                          max_time,
+                          tp,
+                          es,
+                          locations,
+                          cpic,
+                          X,
+                          type = "pValue",
+                          normalize = FALSE,
+                          fixed_effects = FALSE,
+                          stat_func = stat_func,
+                          model = "none") {
+  
   treatment_start_time <- max_time - tp - sim + 2
   treatment_end_time <- treatment_start_time + tp - 1
   pre_test_duration <- treatment_start_time - 1
   pre_treatment_start_time <- 1
-
+  
   if (normalize == TRUE){ # NEWCHANGE: Normalize by the sd
     factor <- sd(as.matrix(data$Y))
     data$Y <- data$Y/factor
   }
-
+  
   data_aux <- fn_treatment(data, locations=locations,
                            treatment_start_time,
                            treatment_end_time)
-
+  
   data_aux$Y_inc <- data_aux$Y
   data_aux$Y_inc[data_aux$D==1] <- data_aux$Y_inc[data_aux$D==1]*(1+es)
-
-
+  
+  
   if (length(X) == 0){
-    PowerCalc <- augsynth::augsynth(Y_inc ~ D,
-                                    unit = location,
-                                    time = time,
-                                    data = data_aux,
-                                    t_int = treatment_start_time,
-                                    progfunc = model,
-                                    scm = T,
-                                    fixedeff = fixed_effects)
+    ascm_obj <- augsynth::augsynth(Y_inc ~ D,
+                                   unit = location,
+                                   time = time,
+                                   data = data_aux,
+                                   t_int = treatment_start_time,
+                                   progfunc = model,
+                                   scm = T,
+                                   fixedeff = fixed_effects)
+    
   }
   else if (length(X) > 0){
     fmla <- as.formula(paste("Y_inc ~ D |",
                              sapply(list(X),
                                     paste, collapse = "+")))
-
-    PowerCalc <- augsynth::augsynth(fmla,
-                                    unit = location,
-                                    time = time,
-                                    data = data_aux,
-                                    t_int = treatment_start_time,
-                                    progfunc = "GSYN",
-                                    scm = T,
-                                    fixedeff = fixed_effects)
+    
+    ascm_obj <- augsynth::augsynth(fmla,
+                                   unit = location,
+                                   time = time,
+                                   data = data_aux,
+                                   t_int = treatment_start_time,
+                                   progfunc = "GSYN",
+                                   scm = T,
+                                   fixedeff = fixed_effects)
   }
-
-
+  
+  att_estimator <- as.double(stringr::str_split(capture.output(ascm_obj)[6], ": ")[[1]][2])
+  pred_conversions <- predict(ascm_obj)[treatment_start_time:treatment_end_time]
+  lift_percent <- att_estimator * tp * length(locations) / sum(pred_conversions)
+  
+  
   #NEWCHANGES: Option for quick imbalance-based calcs or p-value
   if (type == "pValue") {
-    #pVal <- summary(PowerCalc)$average_att$p_val
-
-    wide_data <- PowerCalc$data
+    #pVal <- summary(ascm_obj)$average_att$p_val
+    
+    wide_data <- ascm_obj$data
     new_wide_data <- wide_data
     new_wide_data$X <- cbind(wide_data$X, wide_data$y)
     new_wide_data$y <- matrix(1, nrow = nrow(wide_data$X), ncol = 1)
     pVal <- augsynth:::compute_permute_pval(wide_data = new_wide_data,
-                                            ascm = PowerCalc,
+                                            ascm = ascm_obj,
                                             h0 = 0,
                                             post_length = ncol(wide_data$y),
                                             type = "iid",
                                             q = 1,
                                             ns = 1000,
                                             stat_func = stat_func)
-    ScaledL2Imbalance <-  PowerCalc$scaled_l2_imbalance
+    ScaledL2Imbalance <-  ascm_obj$scaled_l2_imbalance
   }
   else if (type == "Imbalance") {
     pVal <- NA
-    ScaledL2Imbalance <- PowerCalc$scaled_l2_imbalance
+    ScaledL2Imbalance <- ascm_obj$scaled_l2_imbalance
   }
   else {
     message(paste0("ERROR: Please input a valid type: pValue or Imbalance."))
     pVal <- NA
     ScaledL2Imbalance <- NA
   }
-
+  
   investment <- cpic*sum(data_aux$Y[data_aux$D==1])*(es)
-
+  
   return (
-    c(paste(locations, collapse=", "),
-      pVal,
-      tp,
-      es,
-      treatment_start_time,
-      investment,
-      ScaledL2Imbalance)
+    list(
+      locations = c(paste(locations, collapse=", ")),
+      pvalue = pVal,
+      treatment_periods = tp,
+      effect_size = es,
+      treatment_start_time = treatment_start_time,
+      investment = investment,
+      scaled_l2_imbalance = ScaledL2Imbalance,
+      att_estimator = att_estimator,
+      lift_percent = lift_percent)
   )
 }
 

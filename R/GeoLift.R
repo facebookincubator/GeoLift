@@ -3422,7 +3422,7 @@ print.summary.GeoLift <- function(x, ...){
     )
     for (row in 1:nrow(x$weights)){
       if (abs(round(as.double(x$weights$weight[row]), 4)) >= 0.0001){
-        message(paste0(" * ", x$weights$location[row], ": ", x$weights$weight[row]))
+        message(paste0(" * ", x$weights$location[row], ": ", round(x$weights$weight[row], 4)))
       }
 
     }
@@ -3454,7 +3454,7 @@ print.summary.GeoLift <- function(x, ...){
     )
     for (row in 1:nrow(x$weights)){
       if (abs(round(as.double(x$weights$weight[row]), 4)) >= 0.0001){
-        message(paste0(" * ", x$weights$location[row], ": ", x$weights$weight[row]))
+        message(paste0(" * ", x$weights$location[row], ": ", round(x$weights$weight[row], 4)))
       }
       
     }

@@ -378,7 +378,7 @@ showed in the first column. For instance, these results show that the
 most similar city to Atlanta is Chicago followed by Las Vegas and
 Cleveland.
 
-#### What about the Minum Detectable Effect?
+#### What about the Minimum Detectable Effect?
 
 Even though `GeoLiftPower.search` showed us which combination of test
 and control markets were able to consistently obtain well-powered

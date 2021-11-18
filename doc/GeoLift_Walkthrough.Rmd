@@ -141,7 +141,7 @@ MarketSelection(GeoTestData_PreTest, location_id = "location", time_id = "time",
 
 The results show a matrix of similarities, where columns 2 onward represents an ordered list of the most similar location to the one showed in the first column. For instance, these results show that the most similar city to Atlanta is Chicago followed by Las Vegas and Cleveland.
 
-#### What about the Minum Detectable Effect?
+#### What about the Minimum Detectable Effect?
 
 Even though `GeoLiftPower.search` showed us which combination of test and control markets were able to consistently obtain well-powered results in a Synthetic Control test, it doesn't tell us what is the Lift we would need to obtain that powerful test. That's why we recommend to supplement the results of `GeoLiftPower.search` with the simulations run by the function `GeoLiftPowerFinder`. More specifically, while the former analyzes the stability of the time-series and ability of a SCM to replicate the results, the latter explores the Minimum Detectable Effect that a combination of test and control locations would provide. 
 

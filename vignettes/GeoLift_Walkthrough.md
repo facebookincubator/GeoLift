@@ -5,14 +5,14 @@ GeoLift\_Walkthrough
 
 ## Installation
 
-You can install `GeoLift` from GitHub using the `devtools` package.
+You can install `GeoLift` from GitHub using the `remotes` package.
 
 ``` r
-## Install devtools if noy already installed
-install.packages("devtools", repos='http://cran.us.r-project.org')
+## Install remotes if noy already installed
+install.packages("remotes", repos='http://cran.us.r-project.org')
 ## Install augsynth & GeoLift from GitHub
-devtools::install_github("ebenmichael/augsynth")
-devtools::install_github("ArturoEsquerra/GeoLift")
+remotes::install_github("ebenmichael/augsynth")
+remotes::install_github("facebookincubator/GeoLift")
 ```
 
 ``` r

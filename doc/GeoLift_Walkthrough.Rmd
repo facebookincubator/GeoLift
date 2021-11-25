@@ -28,7 +28,7 @@ You can install `GeoLift` from GitHub using the `devtools` package.
 ## Install devtools if noy already installed
 install.packages("devtools", repos='http://cran.us.r-project.org')
 ## Install GeoLift from github
-devtools::install_github("ArturoEsquerra/GeoLift")
+devtools::install_github("facebookincubator/GeoLift")
 ```
 
 ```{r libraries, results="hide", warning=F, message=F}

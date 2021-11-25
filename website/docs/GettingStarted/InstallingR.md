@@ -16,22 +16,22 @@ If you have questions about R like how to download and install the software, or 
 
 ## 2. Installing the GeoLift Package
 
-Since GeoLift is currently only available on GitHub, the `devtools` package is a pre-requisite to install it. If you haven't installed this package yet, first run:
+Since GeoLift is currently only available on GitHub, the `remotes` package is a pre-requisite to install it. If you haven't installed this package yet, first run:
 
 ```
-install.packages("devtools", repos='http://cran.us.r-project.org')
+install.packages("remotes", repos='http://cran.us.r-project.org')
 ```
 
 Moreover, GeoLift relies on an implementation of Augmented Synthetic Control Models which can be found in the `augsynth` package, which is also hosted on GitHub. It is important to install it before moving on to GeoLift.
 
 ```
-devtools::install_github("ebenmichael/augsynth")
+remotes::install_github("ebenmichael/augsynth")
 ```
 
 Finally, we can install the `GeoLift` package with the following command:
 
 ```
-devtools::install_github("facebookincubator/GeoLift")
+remotes::install_github("facebookincubator/GeoLift")
 ```
 
 ---

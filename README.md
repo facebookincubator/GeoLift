@@ -14,17 +14,17 @@ GeoLift requires or works with:
 - R version 4.0.0 or newer.
 
 ## Installing GeoLift
-To install the package, first make sure that `devtools` and `augsynth` are installed.
+To install the package, first make sure that `remotes` and `augsynth` are installed.
 
 ```
-install.packages("devtools", repos='http://cran.us.r-project.org')
-devtools::install_github("ebenmichael/augsynth")
+install.packages("remotes", repos='http://cran.us.r-project.org')
+remotes::install_github("ebenmichael/augsynth")
 ```
 
 Then, install the package from GitHub:
 
 ```
-devtools::install_github("facebookincubator/GeoLift")
+remotes::install_github("facebookincubator/GeoLift")
 ```
 
 ## Contacts

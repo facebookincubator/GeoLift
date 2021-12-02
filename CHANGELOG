@@ -1,3 +1,10 @@
+GeoLift v2.1.9 (Release date: 2021-11-17)
+=========================================
+
+Changes:
+
+* Row names from weight matrix were location names. Now they are another column within the matrix.
+
 GeoLift v2.1.8 (Release date: 2021-11-05)
 =========================================
 

@@ -2782,7 +2782,10 @@ GeoLift <- function(Y_id = "Y",
               "lower_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$lower_bound,
               "upper_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$upper_bound)
 
-
+  res$results$weights <- data.frame(
+    location = dimnames(res$results$weights)[[1]],
+    weight = unname(res$results$weights[,1])
+  )
 
   if (print == TRUE){
     message(paste0(
@@ -3352,10 +3355,7 @@ summary.GeoLift <- function(object, ...){
     summ$Y_id <- object$Y_id
     summ$incremental <- object$incremental
     summ$bias <- mean(object$summary$bias_est)
-    summ$weights <- data.frame(
-      location = dimnames(object$results$weights)[[1]],
-      weight = unname(object$results$weights[,1])
-    )
+    summ$weights <- object$results$weights
     summ$CI <- object$ConfidenceIntervals
     summ$alpha <- object$summary$alpha
     summ$lower <- object$lower_bound

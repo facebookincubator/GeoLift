@@ -13,10 +13,10 @@ knitr::opts_chunk$set(
 )
 
 ## ----install, results="hide", message=F, eval=F-------------------------------
-#  ## Install devtools if noy already installed
-#  install.packages("devtools", repos='http://cran.us.r-project.org')
+#  ## Install remotes if noy already installed
+#  install.packages("remotes", repos='http://cran.us.r-project.org')
 #  ## Install GeoLift from github
-#  devtools::install_github("ArturoEsquerra/GeoLift")
+#  remotes::install_github("facebookincubator/GeoLift")
 
 ## ----libraries, results="hide", warning=F, message=F--------------------------
 library(augsynth)

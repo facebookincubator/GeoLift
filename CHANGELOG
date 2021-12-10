@@ -1,3 +1,18 @@
+GeoLift v2.1.10 (Release date: 2021-12-03)
+=========================================
+
+Changes:
+
+* Updated documentation files to match new repository
+* Changed devtools for remotes as recommended install method
+
+GeoLift v2.1.9 (Release date: 2021-11-17)
+=========================================
+
+Changes:
+
+* Row names from weight matrix were location names. Now they are another column within the matrix.
+
 GeoLift v2.1.8 (Release date: 2021-11-05)
 =========================================
 

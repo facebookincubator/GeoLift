@@ -2790,7 +2790,10 @@ GeoLift <- function(Y_id = "Y",
               "lower_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$lower_bound,
               "upper_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$upper_bound)
 
-
+  res$results$weights <- data.frame(
+    location = dimnames(res$results$weights)[[1]],
+    weight = unname(res$results$weights[,1])
+  )
 
   if (print == TRUE){
     message(paste0(
@@ -3425,9 +3428,9 @@ print.summary.GeoLift <- function(x, ...){
       "\n* Model Weights:"
     )
     )
-    for (row in 1:length(x$weights)){
-      if(round(x$weights[row],4) != 0){
-        message(paste0(" * ", dimnames(x$weights)[[1]][row], ": ",round(x$weights[row],4)))
+    for (row in 1:nrow(x$weights)){
+      if (abs(round(as.double(x$weights$weight[row]), 4)) >= 0.0001){
+        message(paste0(" * ", x$weights$location[row], ": ", round(x$weights$weight[row], 4)))
       }
 
     }
@@ -3457,11 +3460,11 @@ print.summary.GeoLift <- function(x, ...){
       "\n* Model Weights:"
     )
     )
-    for (row in 1:length(x$weights)){
-      if(round(x$weights[row],4) != 0){
-        message(paste0(" * ", dimnames(x$weights)[[1]][row], ": ",round(x$weights[row],4)))
+    for (row in 1:nrow(x$weights)){
+      if (abs(round(as.double(x$weights$weight[row]), 4)) >= 0.0001){
+        message(paste0(" * ", x$weights$location[row], ": ", round(x$weights$weight[row], 4)))
       }
-
+      
     }
   }
 

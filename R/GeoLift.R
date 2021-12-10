@@ -1985,7 +1985,7 @@ GeoLiftPowerFinder <- function(data,
   # Sort Before Ranking
 
   abs_lift_in_zero <- true_lift <- NULL
-  resultsM$abs_lift_in_zero <- abs(resultsM$detected_lift - resultsM$true_lift)
+  resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$true_lift), 3)
   resultsM <- resultsM %>%
     dplyr::arrange(true_lift, abs_lift_in_zero, ScaledL2Imbalance)
 

@@ -1333,7 +1333,7 @@ stochastic_market_selector <- function(
   run_stochastic_process = FALSE
 ){
   if (!run_stochastic_process){
-    #message("Deterministic setup with ", treatment_size, " locations in treatment.")
+    message("Deterministic setup with ", treatment_size, " locations in treatment.")
     return(similarity_matrix[, 1:treatment_size])
   } else {
     message("Random setup with ", treatment_size, " locations in treatment.")
@@ -1842,10 +1842,29 @@ GeoLiftPowerFinder <- function(data,
 
 
   for (n in N){
-    BestMarkets_aux <- stochastic_market_selector(
-      n,
-      BestMarkets,
-      run_stochastic_process = run_stochastic_process)
+    BestMarkets_aux <- tryCatch(
+      {
+        stochastic_market_selector(
+          n,
+          BestMarkets,
+          run_stochastic_process = run_stochastic_process)
+      }, 
+      error=function(error_condition) {
+        message(error_condition)
+        error_condition
+        
+      }
+    )
+    if(inherits(BestMarkets_aux, "error")){
+      message('Too many markets in Treatment. Returning result up to now.')
+      if (exists("results")){
+        return(results)
+      } else {
+        return(NULL)
+      }
+      
+    }
+      
     for (es in effect_size){ #iterate through lift %
 
       stat_func <- type_of_test(side_of_test = side_of_test,

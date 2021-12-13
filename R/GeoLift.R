@@ -1858,7 +1858,7 @@ GeoLiftPowerFinder <- function(data,
     if(inherits(BestMarkets_aux, "error")){
       message('Too many markets in Treatment. Returning result up to now.')
       if (exists("results")){
-        return(results)
+        break
       } else {
         return(NULL)
       }

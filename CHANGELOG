@@ -1,3 +1,10 @@
+GeoLift v2.2.0 (Release date: 2021-12-15)
+=========================================
+
+Changes:
+
+* Included lift detected in zero into ranking function for GeoLiftPowerFinder.
+
 GeoLift v2.1.10 (Release date: 2021-12-03)
 =========================================
 

@@ -1986,16 +1986,28 @@ GeoLiftPowerFinder <- function(data,
 
   abs_lift_in_zero <- true_lift <- NULL
   resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$true_lift), 3)
-  resultsM <- resultsM %>%
-    dplyr::arrange(true_lift, abs_lift_in_zero, ScaledL2Imbalance)
-
-
-  #Remove the Locs column
-  resultsM <- dplyr::select (resultsM, -c(Locs, treatment_start, significant))
+  
+  resultsM <- as.data.frame(resultsM) %>%
+    dplyr::mutate(
+      rank_mde = dense_rank(true_lift),
+      rank_pvalue = dense_rank(pvalue),
+      rank_abszero = dense_rank(abs_lift_in_zero))
+  
+  resultsM$rank <- rank(
+    rowMeans(resultsM[,c("rank_mde", "rank_pvalue", "rank_abszero")]), 
+    ties.method = "min")
+  
+  resultsM <- resultsM %>% 
+    dplyr::mutate(
+      rank_mde = NULL,
+      rank_pvalue = NULL,
+      rank_abszero = NULL,
+      Locs = NULL,
+      treatment_start = NULL,
+      significant = NULL) %>%
+    dplyr::arrange(rank)
 
   class(results) <- c("GeoLift.search", class(resultsM))
-
-  resultsM$rank <- 1:nrow(resultsM)
 
   if (top_results > nrow(resultsM)){
     top_results = nrow(resultsM)

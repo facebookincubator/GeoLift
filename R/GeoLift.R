@@ -2065,7 +2065,7 @@ GeoLiftPowerFinder <- function(data,
   #NEWCHANGE: Rename Lift to MDE
   resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = true_lift)
 
-  return(as.data.frame(resultsM))
+  return(resultsM)
 
 }
 

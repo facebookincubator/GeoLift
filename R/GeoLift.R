@@ -1989,7 +1989,7 @@ GeoLiftPowerFinder <- function(data,
   
   resultsM <- as.data.frame(resultsM) %>%
     dplyr::mutate(
-      rank_mde = dplyr::dense_rank(true_lift),
+      rank_mde = dplyr::dense_rank(abs(true_lift)),
       rank_pvalue = dplyr::dense_rank(pvalue),
       rank_abszero = dplyr::dense_rank(abs_lift_in_zero))
   

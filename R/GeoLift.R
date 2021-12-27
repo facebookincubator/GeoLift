@@ -1849,7 +1849,7 @@ GeoLiftPowerFinder <- function(data,
   }
 
 
-
+  message("Finding the best markets for your experiment.")
   for (n in N){
     BestMarkets_aux <- stochastic_market_selector(
       n,
@@ -2014,6 +2014,7 @@ GeoLiftPowerFinder <- function(data,
   }
 
   if (plot_best == TRUE){
+    message("Calculating GeoLifts to plot top results.")
     for(tp in treatment_periods){
       BestResults <- resultsM %>% dplyr::filter(duration == tp) %>%
         dplyr::arrange(rank)
@@ -2030,7 +2031,7 @@ GeoLiftPowerFinder <- function(data,
           data_lifted$Y[data_lifted$location %in% locs_aux &
                           data_lifted$time >= max_time - tp + 1]*(1+BestResults$true_lift[i])
 
-        bestmodels[[i]] <- GeoLift::GeoLift(Y_id = "Y",
+        bestmodels[[i]] <- suppressMessages(GeoLift::GeoLift(Y_id = "Y",
                                             time_id = "time",
                                             location_id = "location",
                                             data = data_lifted,
@@ -2039,10 +2040,10 @@ GeoLiftPowerFinder <- function(data,
                                             treatment_end_time = max_time,
                                             model = model,
                                             fixed_effects = fixed_effects,
-                                            print = FALSE)
+                                            print = FALSE))
 
       }
-      gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste("locations:", BestResults$location[1],
+      suppressMessages(gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste("locations:", BestResults$location[1],
                                                                   "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
                                                                   BestResults$true_lift[1],
                                                                   "\n Proportion Total Y: ", 100*round(BestResults$ProportionTotal_Y[1],3),"%")),
@@ -2058,7 +2059,7 @@ GeoLiftPowerFinder <- function(data,
                                                                   "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
                                                                   BestResults$true_lift[4],
                                                                   "\n Proportion Total Y: ", 100*round(BestResults$ProportionTotal_Y[4],3),"%")),
-                              ncol = 2)
+                              ncol = 2))
     }
   }
 

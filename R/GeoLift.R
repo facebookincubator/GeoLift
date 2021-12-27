@@ -1945,28 +1945,10 @@ GeoLiftPowerFinder <- function(data,
     dplyr::filter(significant > 0) %>%
     dplyr::distinct()
 
-  resultsM <- NULL
-
-
-  for (locs in unique(results$location)){
-    for(ts in treatment_periods) {
-      resultsFindAux <- results %>% dplyr::filter(location  == locs & duration == ts)
-
-      if ( min(resultsFindAux$true_lift) < 0){
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(true_lift != 0)
-        MDEAux <- suppressWarnings(max(resultsFindAux$true_lift))
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(true_lift == MDEAux)
-
-      } else {
-        MDEAux <- suppressWarnings(min(resultsFindAux$true_lift))
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(true_lift == MDEAux)
-      }
-
-      if (MDEAux != 0) { # Drop tests significant with ES = 0
-        resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
-      }
-    }
-  }
+  resultsM <- results %>%
+    dplyr::filter(true_lift != 0) %>%
+    dplyr::group_by(location, duration) %>%
+    dplyr::slice(which.min(abs(true_lift)))
 
   # Add Percent of Y in test markets
   resultsM$ProportionTotal_Y <- 1

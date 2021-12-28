@@ -14,7 +14,7 @@ limit_test_markets(
 \item{similarity_matrix}{Matrix that sorts each location in terms
 of descending correlation.}
 
-\item{treatment_sizes}{Vector of number of test markets to calculate 
+\item{treatment_sizes}{Vector of number of test markets to calculate
 power for.}
 
 \item{run_stochastic_process}{A logic flag indicating whether to select test

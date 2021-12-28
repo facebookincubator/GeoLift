@@ -1407,6 +1407,53 @@ type_of_test <- function(side_of_test="two_sided", alternative_hypothesis=NULL){
 }
 
 
+#' Limit the amount of test market potential elements.
+#'
+#' @description
+#'
+#' \code{limit_test_markets} determines if the user would like
+#' to find combinations of treatments that is higher than half
+#' the total amount of locations available while running a random
+#' assignment of locations. If this is the case, it will cap the
+#' treatment sizes at half the total amount of locations.
+#'
+#' @param similarity_matrix Matrix that sorts each location in terms
+#' of descending correlation.
+#' @param treatment_sizes Vector of number of test markets to calculate 
+#' power for.
+
+#' @param run_stochastic_process A logic flag indicating whether to select test
+#' markets through random sampling of the the similarity matrix. Given that
+#' interpolation biases may be relevant if the synthetic control matches
+#' the characteristics of the test unit by averaging away large discrepancies
+#' between the characteristics of the test and the units in the synthetic controls,
+#' it is recommended to only use random sampling after making sure all units are
+#' similar. Set to FALSE by default.
+#'
+#' @return
+#' Returns the limited number of treatment sizes if required. If the condition
+#' is not met, it returns the original treatment sizes.
+#'
+#' @export
+limit_test_markets <- function(
+  similarity_matrix,
+  treatment_sizes,
+  run_stochastic_process = FALSE){
+  if (
+    run_stochastic_process == TRUE & 
+    max(treatment_sizes) > 0.5*ncol(similarity_matrix)){
+    message(
+      "Maximum number of test markets ", 
+      max(treatment_sizes), 
+      " is greater than half the total number of test markets ", 
+      0.5 * ncol(similarity_matrix), 
+      ". Limiting number of test markets to less or equal than half total locations.")
+    treatment_sizes <- treatment_sizes[treatment_sizes <= 0.5 * ncol(similarity_matrix)]
+  }
+  return(treatment_sizes)
+}
+
+
 #' Power calculations for unknown test market locations, number of
 #' test markets, and test duration.
 #'
@@ -1530,6 +1577,8 @@ GeoLiftPower.search <- function(data,
                                  time_id = "time",
                                  Y_id = "Y",
                                  dtw = dtw)
+  
+  N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
 
   if (horizon < 0){ #NEWCHANGE
     horizon = max(treatment_periods)
@@ -1825,6 +1874,8 @@ GeoLiftPowerFinder <- function(data,
                                  Y_id = "Y",
                                  dtw = dtw)
 
+  N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
+  
   # Aggregated Y Per Location
   AggYperLoc <- data %>%
     dplyr::group_by(location) %>%
@@ -1839,31 +1890,12 @@ GeoLiftPowerFinder <- function(data,
                                      width= 60)
   }
 
-
-
+  
   for (n in N){
-    BestMarkets_aux <- tryCatch(
-      {
-        stochastic_market_selector(
-          n,
-          BestMarkets,
-          run_stochastic_process = run_stochastic_process)
-      }, 
-      error=function(error_condition) {
-        message(error_condition)
-        error_condition
-        
-      }
-    )
-    if(inherits(BestMarkets_aux, "error")){
-      message('Too many markets in Treatment. Returning result up to now.')
-      if (exists("results")){
-        break
-      } else {
-        return(NULL)
-      }
-      
-    }
+    BestMarkets_aux <- stochastic_market_selector(
+      n,
+      BestMarkets,
+      run_stochastic_process = run_stochastic_process)
       
     for (es in effect_size){ #iterate through lift %
 
@@ -2292,6 +2324,8 @@ GeoLiftMarketSelection <- function(data,
                                  Y_id = "Y",
                                  dtw = dtw)
 
+  N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
+  
   # Aggregated Y Per Location
   AggYperLoc <- data %>%
     dplyr::group_by(location) %>%

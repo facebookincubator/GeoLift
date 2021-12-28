@@ -1,3 +1,10 @@
+GeoLift v2.2.1 (Release date: 2021-12-30)
+=========================================
+
+Changes:
+
+* Limiting potential test markets to half the amount of available test markets.
+
 GeoLift v2.2.0 (Release date: 2021-12-15)
 =========================================
 

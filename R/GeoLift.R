@@ -506,7 +506,7 @@ pvalueCalc <- function(data,
     factor <- sd(as.matrix(data$Y))
     data$Y <- data$Y/factor
   }
-
+  
   data_aux <- fn_treatment(data, locations=locations,
                            treatment_start_time,
                            treatment_end_time)
@@ -514,54 +514,60 @@ pvalueCalc <- function(data,
   data_aux$Y_inc <- data_aux$Y
   data_aux$Y_inc[data_aux$D==1] <- data_aux$Y_inc[data_aux$D==1]*(1+es)
 
-
   if (length(X) == 0){
-    PowerCalc <- augsynth::augsynth(Y_inc ~ D,
-                                    unit = location,
-                                    time = time,
-                                    data = data_aux,
-                                    t_int = treatment_start_time,
-                                    progfunc = model,
-                                    scm = T,
-                                    fixedeff = fixed_effects)
+    ascm_obj <- augsynth::augsynth(Y_inc ~ D,
+                                   unit = location,
+                                   time = time,
+                                   data = data_aux,
+                                   t_int = treatment_start_time,
+                                   progfunc = model,
+                                   scm = T,
+                                   fixedeff = fixed_effects)
+    
   }
   else if (length(X) > 0){
     fmla <- as.formula(paste("Y_inc ~ D |",
                              sapply(list(X),
                                     paste, collapse = "+")))
 
-    PowerCalc <- augsynth::augsynth(fmla,
-                                    unit = location,
-                                    time = time,
-                                    data = data_aux,
-                                    t_int = treatment_start_time,
-                                    progfunc = "GSYN",
-                                    scm = T,
-                                    fixedeff = fixed_effects)
+    ascm_obj <- augsynth::augsynth(fmla,
+                                   unit = location,
+                                   time = time,
+                                   data = data_aux,
+                                   t_int = treatment_start_time,
+                                   progfunc = "GSYN",
+                                   scm = T,
+                                   fixedeff = fixed_effects)
   }
 
+  ave_treatment_convs <- sum(ascm_obj$data$y[which(ascm_obj$data$trt == 1), ]) / sum(ascm_obj$data$trt == 1) 
+  ave_pred_control_convs <- predict(ascm_obj)[treatment_start_time:treatment_end_time]
+  ave_incremental_convs <- ave_treatment_convs - sum(ave_pred_control_convs)
+
+  att_estimator <- ave_incremental_convs / tp
+  lift_estimator <- ave_incremental_convs / sum(ave_pred_control_convs)
 
   #NEWCHANGES: Option for quick imbalance-based calcs or p-value
   if (type == "pValue") {
-    #pVal <- summary(PowerCalc)$average_att$p_val
-
-    wide_data <- PowerCalc$data
+    #pVal <- summary(ascm_obj)$average_att$p_val
+    
+    wide_data <- ascm_obj$data
     new_wide_data <- wide_data
     new_wide_data$X <- cbind(wide_data$X, wide_data$y)
     new_wide_data$y <- matrix(1, nrow = nrow(wide_data$X), ncol = 1)
     pVal <- augsynth:::compute_permute_pval(wide_data = new_wide_data,
-                                            ascm = PowerCalc,
+                                            ascm = ascm_obj,
                                             h0 = 0,
                                             post_length = ncol(wide_data$y),
                                             type = "iid",
                                             q = 1,
                                             ns = 1000,
                                             stat_func = stat_func)
-    ScaledL2Imbalance <-  PowerCalc$scaled_l2_imbalance
+    ScaledL2Imbalance <-  ascm_obj$scaled_l2_imbalance
   }
   else if (type == "Imbalance") {
     pVal <- NA
-    ScaledL2Imbalance <- PowerCalc$scaled_l2_imbalance
+    ScaledL2Imbalance <- ascm_obj$scaled_l2_imbalance
   }
   else {
     message(paste0("ERROR: Please input a valid type: pValue or Imbalance."))
@@ -572,13 +578,16 @@ pvalueCalc <- function(data,
   investment <- cpic*sum(data_aux$Y[data_aux$D==1])*(es)
 
   return (
-    c(paste(locations, collapse=", "),
-      pVal,
-      tp,
-      es,
-      treatment_start_time,
-      investment,
-      ScaledL2Imbalance)
+    list(
+      locations = c(paste(locations, collapse=", ")),
+      pvalue = pVal,
+      treatment_periods = tp,
+      effect_size = es,
+      treatment_start_time = treatment_start_time,
+      investment = investment,
+      scaled_l2_imbalance = ScaledL2Imbalance,
+      att_estimator = att_estimator,
+      lift_estimator = lift_estimator)
   )
 }
 
@@ -1890,7 +1899,8 @@ GeoLiftPowerFinder <- function(data,
                                      width= 60)
   }
 
-  
+  message("Finding the best markets for your experiment.")
+
   for (n in N){
     BestMarkets_aux <- stochastic_market_selector(
       n,
@@ -1909,38 +1919,40 @@ GeoLiftPowerFinder <- function(data,
         }
 
         if (parallel == TRUE){
-          a <- foreach(test = 1:nrow(as.matrix(BestMarkets_aux)), #NEWCHANGE: Horizon = earliest start time for simulations
-                       .combine=cbind,
-                       .errorhandling = 'stop') %dopar% {
-                         pvalueCalc(
-                           data = data,
-                           sim = 1,
-                           max_time = max_time,
-                           tp = tp,
-                           es = es,
-                           locations = as.list(as.matrix(BestMarkets_aux)[test,]),
-                           cpic = 0,
-                           X,
-                           type = "pValue",
-                           normalize = normalize,
-                           fixed_effects = fixed_effects,
-                           model = model,
-                           stat_func = stat_func)
+          simulation_results <- foreach(test = 1:nrow(as.matrix(BestMarkets_aux)), #NEWCHANGE: Horizon = earliest start time for simulations
+                                        .combine=cbind,
+                                        .errorhandling = 'stop') %dopar% {
+                                          pvalueCalc(
+                                            data = data,
+                                            sim = 1,
+                                            max_time = max_time,
+                                            tp = tp,
+                                            es = es,
+                                            locations = as.list(as.matrix(BestMarkets_aux)[test,]),
+                                            cpic = 0,
+                                            X,
+                                            type = "pValue",
+                                            normalize = normalize,
+                                            fixed_effects = fixed_effects,
+                                            model = model,
+                                            stat_func = stat_func)
 
-                       }
+                                        }
 
-          for (i in 1:ncol(a)) {
-            results <- rbind(results, data.frame(location = a[[1,i]],
-                                                 pvalue = as.numeric(a[[2,i]]),
-                                                 duration = as.numeric(a[[3,i]]),
-                                                 lift = as.numeric(a[[4,i]]),
-                                                 treatment_start = as.numeric(a[[5,i]]),
-                                                 ScaledL2Imbalance = as.numeric(a[[7,i]]) ) )
+          for (i in 1:ncol(simulation_results)) {
+            results <- rbind(results, data.frame(location = simulation_results[[1,i]],
+                                                 pvalue = as.numeric(simulation_results[[2,i]]),
+                                                 duration = as.numeric(simulation_results[[3,i]]),
+                                                 true_lift = as.numeric(simulation_results[[4,i]]),
+                                                 treatment_start = as.numeric(simulation_results[[5,i]]),
+                                                 ScaledL2Imbalance = as.numeric(simulation_results[[7,i]]),
+                                                 att_estimator = as.numeric(simulation_results[[8, i]]),
+                                                 detected_lift = as.numeric(simulation_results[[9, i]]) ) )
           }
         } else{
           for (test in 1:nrow(as.matrix(BestMarkets_aux))) {
-            aux <- NULL
-            aux <- suppressMessages(pvalueCalc(
+            simulation_results <- NULL
+            simulation_results <- suppressMessages(pvalueCalc(
               data = data,
               sim = 1,
               max_time = max_time,
@@ -1955,15 +1967,17 @@ GeoLiftPowerFinder <- function(data,
               model = model,
               stat_func = stat_func))
 
-            results <- rbind(results, data.frame(location=aux[1],
-                                                 pvalue = as.numeric(aux[2]),
-                                                 duration = as.numeric(aux[3]),
-                                                 lift = as.numeric(aux[4]),
-                                                 treatment_start = as.numeric(aux[5]),
-                                                 ScaledL2Imbalance = as.numeric(aux[7]) ) )
+            results <- rbind(results, data.frame(location=simulation_results[1],
+                                                 pvalue = as.numeric(simulation_results[2]),
+                                                 duration = as.numeric(simulation_results[3]),
+                                                 true_lift = as.numeric(simulation_results[4]),
+                                                 treatment_start = as.numeric(simulation_results[5]),
+                                                 ScaledL2Imbalance = as.numeric(simulation_results[7]),
+                                                 att_estimator = as.numeric(simulation_results[8]),
+                                                 detected_lift = as.numeric(simulation_results[9]) ) )
           }
         }
-
+        
       }
     }
   }
@@ -1980,32 +1994,13 @@ GeoLiftPowerFinder <- function(data,
 
   results <- results %>%
     dplyr::mutate(significant = ifelse(pvalue < alpha, 1, 0)) %>%
-    #dplyr::filter(significant > 0 & lift > 0) %>%
     dplyr::filter(significant > 0) %>%
     dplyr::distinct()
 
-  resultsM <- NULL
-
-
-  for (locs in unique(results$location)){
-    for(ts in treatment_periods) {
-      resultsFindAux <- results %>% dplyr::filter(location  == locs & duration == ts)
-
-      if ( min(effect_size) < 0){
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift != 0)
-        MDEAux <- suppressWarnings(max(resultsFindAux$lift))
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift == MDEAux)
-
-      } else {
-        MDEAux <- suppressWarnings(min(resultsFindAux$lift))
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift == MDEAux)
-      }
-
-      if (MDEAux != 0) { # Drop tests significant with ES = 0
-        resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
-      }
-    }
-  }
+  resultsM <- results %>%
+    dplyr::filter(true_lift != 0) %>%
+    dplyr::group_by(location, duration) %>%
+    dplyr::slice(which.min(abs(true_lift)))
 
   # Add Percent of Y in test markets
   resultsM$ProportionTotal_Y <- 1
@@ -2023,25 +2018,37 @@ GeoLiftPowerFinder <- function(data,
 
   # Sort Before Ranking
 
-  resultsM <- resultsM %>%
-    dplyr::arrange(pvalue,
-                   ScaledL2Imbalance,
-                   lift,
-                   dplyr::desc(ProportionTotal_Y))
-
-
-  #Remove the Locs column
-  resultsM <- dplyr::select (resultsM, -c(Locs, treatment_start, significant))
+  abs_lift_in_zero <- true_lift <- NULL
+  resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$true_lift), 3)
+  
+  resultsM <- as.data.frame(resultsM) %>%
+    dplyr::mutate(
+      rank_mde = dplyr::dense_rank(abs(true_lift)),
+      rank_pvalue = dplyr::dense_rank(pvalue),
+      rank_abszero = dplyr::dense_rank(abs_lift_in_zero))
+  
+  resultsM$rank <- rank(
+    rowMeans(resultsM[,c("rank_mde", "rank_pvalue", "rank_abszero")]), 
+    ties.method = "min")
+  
+  resultsM <- resultsM %>% 
+    dplyr::mutate(
+      rank_mde = NULL,
+      rank_pvalue = NULL,
+      rank_abszero = NULL,
+      Locs = NULL,
+      treatment_start = NULL,
+      significant = NULL) %>%
+    dplyr::arrange(rank)
 
   class(results) <- c("GeoLift.search", class(resultsM))
-
-  resultsM$rank <- 1:nrow(resultsM)
 
   if (top_results > nrow(resultsM)){
     top_results = nrow(resultsM)
   }
 
   if (plot_best == TRUE){
+    message("Calculating GeoLifts to plot top results.")
     for(tp in treatment_periods){
       BestResults <- resultsM %>% dplyr::filter(duration == tp) %>%
         dplyr::arrange(rank)
@@ -2056,9 +2063,9 @@ GeoLiftPowerFinder <- function(data,
         data_lifted$Y[data_lifted$location %in% locs_aux &
                         data_lifted$time >= max_time - tp + 1] <-
           data_lifted$Y[data_lifted$location %in% locs_aux &
-                          data_lifted$time >= max_time - tp + 1]*(1+BestResults$lift[i])
+                          data_lifted$time >= max_time - tp + 1]*(1+BestResults$true_lift[i])
 
-        bestmodels[[i]] <- GeoLift::GeoLift(Y_id = "Y",
+        bestmodels[[i]] <- suppressMessages(GeoLift::GeoLift(Y_id = "Y",
                                             time_id = "time",
                                             location_id = "location",
                                             data = data_lifted,
@@ -2067,33 +2074,33 @@ GeoLiftPowerFinder <- function(data,
                                             treatment_end_time = max_time,
                                             model = model,
                                             fixed_effects = fixed_effects,
-                                            print = FALSE)
+                                            print = FALSE))
 
       }
-      gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste("locations:", BestResults$location[1],
+      suppressMessages(gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste("locations:", BestResults$location[1],
                                                                   "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-                                                                  BestResults$lift[1],
+                                                                  BestResults$true_lift[1],
                                                                   "\n Proportion Total Y: ", 100*round(BestResults$ProportionTotal_Y[1],3),"%")),
                               plot(bestmodels[[2]], notes = paste("locations:", BestResults$location[2],
                                                                   "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-                                                                  BestResults$lift[2],
+                                                                  BestResults$true_lift[2],
                                                                   "\n Proportion Total Y: ", 100*round(BestResults$ProportionTotal_Y[2],3),"%")),
                               plot(bestmodels[[3]], notes = paste("locations:", BestResults$location[3],
                                                                   "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-                                                                  BestResults$lift[3],
+                                                                  BestResults$true_lift[3],
                                                                   "\n Proportion Total Y: ", 100*round(BestResults$ProportionTotal_Y[3],3),"%")),
                               plot(bestmodels[[4]], notes = paste("locations:", BestResults$location[4],
                                                                   "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-                                                                  BestResults$lift[4],
+                                                                  BestResults$true_lift[4],
                                                                   "\n Proportion Total Y: ", 100*round(BestResults$ProportionTotal_Y[4],3),"%")),
-                              ncol = 2)
+                              ncol = 2))
     }
   }
 
   #NEWCHANGE: Rename Lift to MDE
-  resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = lift)
+  resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = true_lift)
 
-  return(as.data.frame(resultsM))
+  return(resultsM)
 
 }
 

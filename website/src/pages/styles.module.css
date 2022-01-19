@@ -36,9 +36,31 @@
   align-items: center;
   padding: 2rem 0;
   width: 100%;
+  background-color: var(--ifm-color-emphasis-100);
+}
+
+.footerfeatures {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
 }
 
 .featureImage {
   height: 200px;
   width: 200px;
+}
+
+.descriptionSection {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  font-size: 2.5rem;
+}
+
+.descriptionSectionText {
+  justify-content:left ;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.175rem;
 }

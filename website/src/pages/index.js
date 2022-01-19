@@ -108,8 +108,7 @@ export default function Home() {
           <div className={styles.buttons}>
             <Link
               className={clsx(
-                'button button--outline button--secondary button--lg',
-                styles.getStarted,
+                'button button--secondary button--lg'
               )}
               to={useBaseUrl('docs/intro')}>
               Get Started
@@ -118,6 +117,33 @@ export default function Home() {
         </div>
       </header>
       <main>
+
+      <div className="padding-vert--xl">
+          <div className="container">
+            <div className="row">
+              <div className={clsx('col col--6', styles.descriptionSection)}>
+                <h2>Robust Geo-Experiments to Measure True Value</h2>
+                <p className={styles.descriptionSectionText}>Changes to the ads ecosystem
+                have made measuring the true value of marketing more challenging than before.
+                Fortunately, geo-experiments remain one of the best ways to quantify ad
+                effectiveness through lift, which we at Meta consider to be the gold standard
+                of measurement. That's why we've developed GeoLift, an open-source tool that
+                makes it easy to design and run robust geo-experiments! </p>
+              </div>
+              <div className="col col--6">
+                <iframe
+                  width="100%"
+                  height="400"
+                  src="https://www.youtube.com/embed/ogLGvNOpCmg"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {features && features.length > 0 && (
           <section className={styles.features}>
             <div className="container">
@@ -135,7 +161,7 @@ export default function Home() {
           </section>
         )}
          {featuresIntro && featuresIntro.length > 0 && (
-          <section className={styles.features}>
+          <section className={styles.footerfeatures}>
             <div className="container">
               <div className="row">
                 {featuresIntro.map(({title, imageUrl, description}) => (

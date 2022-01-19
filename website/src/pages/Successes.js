@@ -38,7 +38,7 @@ const features = [
       <>
         Scotiabank Mexico was able to measure for the first time the omni-channel
         incremental impact that their Facebook campaigns had on bank account openings.
-        <a href="https://www.facebook.com/business/success/2-scotiabank-mexico">
+        <a href="https://www.facebook.com/business/success/2-scotiabank-mexico?locale=es_LA">
         -  Learn More.
         </a>
       </>
@@ -46,13 +46,13 @@ const features = [
   },
   {
     title: 'Building Brand and Sales with Super Coffee',
-    imageUrl: 'https://scontent.fmex11-1.fna.fbcdn.net/v/t1.6435-1/p100x100/146475455_3695451970571166_7309961661612546269_n.png?_nc_cat=105&ccb=1-5&_nc_sid=dbb9e7&_nc_eui2=AeG9H3ydn7q54QvS6IsuGgB7NEmGhia1Teo0SYaGJrVN6oOiRbUV_8TDSBfl_ngJ_Bk&_nc_ohc=bGs-EXUgaOAAX-PiICp&_nc_ht=scontent.fmex11-1.fna&oh=3d09c99325629e374294277c187c7a73&oe=61BA2B3A',
+    imageUrl: 'https://scontent-sjc3-1.xx.fbcdn.net/v/t1.6435-1/p100x100/146475455_3695451970571166_7309961661612546269_n.png?_nc_cat=1&ccb=1-5&_nc_sid=dbb9e7&_nc_eui2=AeG9H3ydn7q54QvS6IsuGgB7NEmGhia1Teo0SYaGJrVN6oOiRbUV_8TDSBfl_ngJ_Bk&_nc_ohc=BpLZQJlItyMAX_1SBrH&_nc_ht=scontent-sjc3-1.xx&oh=00_AT82-Y89yQdvuf7oMv3GIv8IplH2fjRFGyGI021pPfhS7w&oe=620D39BA',
     description: (
       <>
         The enhanced coffee company ran Facebook video and photo ads to boost brand
         awareness and used a GeoLift study to measure in-store sales, revealing an
         11.9% in-store sales lift.
-        <a href="hhttps://www.facebook.com/business/success/super-coffee">
+        <a href="https://www.facebook.com/business/success/super-coffee">
         -  Learn More.
         </a>
       </>

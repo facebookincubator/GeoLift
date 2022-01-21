@@ -11,7 +11,7 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 (module.exports = {
   title: 'GeoLift',
-  tagline: 'The solution to calculate Lift at a geo-level',
+  tagline: 'The Open Source solution from Meta to calculate Lift at a geo-level.',
   url: 'https://facebookincubator.github.io/',
   baseUrl: '/GeoLift/',
   onBrokenLinks: 'throw',
@@ -101,6 +101,10 @@
               {
                 label: 'Facebook',
                 href: 'https://www.facebook.com/groups/fbgeolift',
+              },
+              {
+                label: 'YouTube',
+                href: 'https://www.youtube.com/channel/UCzkuhQFBCHz9TxzUXlNUINg',
               }
             ],
           },

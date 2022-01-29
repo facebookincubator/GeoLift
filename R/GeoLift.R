@@ -2,54 +2,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-# Suppress 'no visible binding for global variable' warnings
-utils::globalVariables(
-  c(
-    "ATT",
-    "Time",
-    "lower",
-    "upper",
-    "diff_lower",
-    "diff_upper",
-    "conf_level",
-    "conf.level",
-    "date_unix",
-    "ID",
-    "time",
-    "Y",
-    "Level",
-    "sim",
-    "mean_p",
-    "Units",
-    "Type",
-    "BestControl",
-    "pow",
-    "duration",
-    "investment",
-    "Level",
-    "location",
-    "ScaledL2Imbalance",
-    "mean_pow",
-    "mean_scaled_l2_imbalance",
-    "mean_L2ScaledImbalance",
-    "ProportionTotal_Y",
-    "Total_Y",
-    "Locs",
-    "AvgCost",
-    "main",
-    "test",
-    "significant",
-    "lift",
-    "treatment_start",
-    "summ",
-    "pvalue",
-    "effect_size",
-    "AvgScaledL2Imbalance",
-    "Investment",
-    "Holdout"
-  )
-)
-
 
 #' Data reading function for GeoLift.
 #'
@@ -3646,29 +3598,3 @@ print.summary.GeoLift <- function(x, ...) {
     }
   }
 }
-
-
-#' GeoLift
-#'
-#' @description A package implementing the Augmented Synthetic Controls Method
-#' @docType package
-#' @name GeoLift-package
-#' @importFrom magrittr "%>%"
-#' @import augsynth
-#' @import gsynth
-#' @import panelView
-#' @import doParallel
-#' @import foreach
-#' @import ggrepel
-#' @import MarketMatching
-#' @import stringr
-#' @import directlabels
-#' @import ggplot2
-#' @import tibble
-#' @import tidyr
-#' @import parallel
-#' @import graphics
-#' @import stats
-#' @import utils
-#' @import rlang
-NULL

@@ -2,7 +2,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-# Includes function plot.GeoLift, Lift.plot, absolute_value.plot, 
+# Includes function plot.GeoLift, Lift.plot, absolute_value.plot,
 # cumulative_value.plot.
 
 
@@ -42,7 +42,7 @@ plot.GeoLift <- function(x,
   if (!inherits(x, "GeoLift")) {
     stop("object must be class GeoLift")
   }
-  
+
   if (type == "TreatmentSchedule") {
     panelView(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
   } else if (tolower(type) %in% c("att", "incrementality")) {
@@ -112,7 +112,7 @@ Lift.plot <- function(GeoLift,
     )
   ) * nrow(GeoLift$test_id)
   colnames(treatment_obs) <- c("t_obs")
-  
+
   q_treatment_locations <- length(GeoLift$test_id$name)
   df <- data.frame(
     t_obs = treatment_obs$t_obs,
@@ -121,7 +121,7 @@ Lift.plot <- function(GeoLift,
     c_obs_upper_bound = treatment_obs$t_obs - GeoLift$summary$att$lower_bound * q_treatment_locations,
     Time = 1:length(treatment_obs$t_obs)
   )
-  
+
   if (!is.null(treatment_end_date)) {
     plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency = frequency)
     df$Time <- plot_dates$date_vector
@@ -134,7 +134,7 @@ Lift.plot <- function(GeoLift,
       treatment_end = GeoLift$TreatmentEnd
     )
   }
-  
+
   if (!is.null(plot_start_date)) {
     if (is.null(treatment_end_date)) {
       stop("If you want to filter your dataset on a date, please specify treatment_end_date param so periods are converted to dates.")
@@ -142,13 +142,13 @@ Lift.plot <- function(GeoLift,
       df <- df[df$Time >= plot_start_date, ]
     }
   }
-  
+
   if (nchar(title) == 0) {
     title <- "Observations per Timestamp and Test Group"
   }
-  
+
   colors <- c("Treatment" = "#52854C", "Control" = "#7030A0")
-  
+
   ggplot(df, aes(x = Time)) +
     geom_line(
       aes(y = c_obs, color = "Control"),
@@ -209,7 +209,7 @@ absolute_value.plot <- function(GeoLift,
                                 ...) {
   df <- GeoLift$summary$att
   df <- df[, c("Time", "Estimate", "lower_bound", "upper_bound")]
-  
+
   if (tolower(plot_type) == "incrementality") {
     q_treatment_locations <- length(GeoLift$test_id$name)
     df$Estimate <- df$Estimate * q_treatment_locations
@@ -233,7 +233,7 @@ absolute_value.plot <- function(GeoLift,
   } else {
     stop("Please specify which plot type you would like: ATT or Incrementality.")
   }
-  
+
   if (!is.null(treatment_end_date)) {
     plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency = frequency)
     df$Time <- plot_dates$date_vector
@@ -253,7 +253,7 @@ absolute_value.plot <- function(GeoLift,
       df <- df[df$Time >= plot_start_date, ]
     }
   }
-  
+
   ggplot(df, aes(x = Time, y = Estimate)) +
     geom_line(linetype = "dashed", color = "#373472", size = 0.75) +
     geom_vline(xintercept = plot_dates$treatment_start, linetype = "dashed", alpha = 0.3) +
@@ -324,7 +324,7 @@ cumulative_value.plot <- function(data,
     time_id = time_id,
     Y_id = Y_id
   )
-  
+
   if (nchar(title) == 0) {
     title <- "Accumulated Incremental Value"
   }

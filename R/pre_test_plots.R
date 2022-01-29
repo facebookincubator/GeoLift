@@ -35,7 +35,7 @@ GeoPlot <- function(data,
   } else {
     size_vline <- 0.8
   }
-  
+
   p <- ggplot(data, aes(y = !!sym(Y_id), x = !!sym(time_id), colour = !!sym(location_id), label = !!sym(location_id))) +
     geom_line(show.legend = FALSE) +
     geom_vline(xintercept = treatment_start, linetype = "dashed", size = size_vline, color = "grey35") +
@@ -43,7 +43,7 @@ GeoPlot <- function(data,
     xlim(1, 1.15 * (max(data[[time_id]]))) +
     ylab("") +
     theme_minimal()
-  
+
   print(p)
 }
 
@@ -74,35 +74,35 @@ plot.GeoLiftPower <- function(x,
   if (!inherits(x, "GeoLiftPower")) {
     stop("object must be class GeoLiftPower")
   }
-  
+
   treatment_periods <- unique(x$duration)
   lift <- unique(x$lift)
-  
+
   # NewChange: Standardize Plots
   PowerPlot <- x %>%
     dplyr::group_by(duration, lift) %>%
     # dplyr::mutate(power = 1 - pvalue) %>%
     # dplyr::summarise(power = mean(power))
     dplyr::summarise(power = mean(pow))
-  
+
   spending <- x %>%
     dplyr::group_by(duration, lift) %>%
     dplyr::summarize(inv = mean(investment))
-  
+
   if (table == TRUE) {
     print(as.data.frame(PowerPlot))
   }
-  
+
   if (actual_values == FALSE) {
     if (sum(spending$inv > 0)) {
       for (dur in unique(PowerPlot$duration)) {
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
-        
+
         CostPerLift <- as.numeric(x %>%
-                                    dplyr::filter(duration == dur, lift > 0) %>%
-                                    dplyr::mutate(AvgCost = investment / lift) %>%
-                                    dplyr::summarise(mean(AvgCost)))
-        
+          dplyr::filter(duration == dur, lift > 0) %>%
+          dplyr::mutate(AvgCost = investment / lift) %>%
+          dplyr::summarise(mean(AvgCost)))
+
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE) +
           scale_x_continuous(sec.axis = sec_axis(~ . * CostPerLift, name = "Estimated Investment")) +
@@ -111,13 +111,13 @@ plot.GeoLiftPower <- function(x,
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
-        
+
         plot(PowerPlot_graph)
       }
     } else {
       for (dur in unique(PowerPlot$duration)) {
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
-        
+
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE) +
           ylim(0, 1) +
@@ -125,7 +125,7 @@ plot.GeoLiftPower <- function(x,
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
-        
+
         plot(PowerPlot_graph)
       }
     }
@@ -133,12 +133,12 @@ plot.GeoLiftPower <- function(x,
     if (sum(spending$inv > 0)) {
       for (dur in unique(PowerPlot$duration)) {
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
-        
+
         CostPerLift <- as.numeric(x %>%
-                                    dplyr::filter(duration == dur, lift > 0) %>%
-                                    dplyr::mutate(AvgCost = investment / lift) %>%
-                                    dplyr::summarise(mean(AvgCost)))
-        
+          dplyr::filter(duration == dur, lift > 0) %>%
+          dplyr::mutate(AvgCost = investment / lift) %>%
+          dplyr::summarise(mean(AvgCost)))
+
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE) +
           geom_line(color = "gray80", size = 0.62, alpha = 0.8) +
@@ -148,13 +148,13 @@ plot.GeoLiftPower <- function(x,
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
-        
+
         plot(PowerPlot_graph)
       }
     } else {
       for (dur in unique(PowerPlot$duration)) {
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
-        
+
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE) +
           geom_line(color = "gray80", size = 0.62, alpha = 0.8) +
@@ -163,7 +163,7 @@ plot.GeoLiftPower <- function(x,
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
-        
+
         plot(PowerPlot_graph)
       }
     }

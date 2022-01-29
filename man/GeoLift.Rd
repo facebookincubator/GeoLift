@@ -100,8 +100,8 @@ GeoLift object that contains:
 \description{
 \code{GeoLift} performs inference for a geo-test.
 
-GeoLift is an end-to-end geo-experimental methodology based on 
-Synthetic Control Methods used to measure the true incremental effect (Lift) 
+GeoLift is an end-to-end geo-experimental methodology based on
+Synthetic Control Methods used to measure the true incremental effect (Lift)
 of an ad campaign.
 }
 \author{

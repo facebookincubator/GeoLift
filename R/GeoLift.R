@@ -2814,9 +2814,9 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency = 
   } else {
     stop("If converting time periods to dates, specify frequency param. Can be 'daily' or 'weekly'.")
   }
-  
+
   treatment_start_date <- date_vector[treatment_start_period]
-  
+
   return(list(
     date_vector = as.Date(date_vector),
     treatment_start = as.Date(treatment_start_date),
@@ -2860,7 +2860,7 @@ cumulative_lift <- function(data,
       ))
     }
     filtered_data <- data[data$time <= max_test_period, ]
-    
+
     gl_output <- suppressMessages(GeoLift(
       data = data,
       locations = treatment_locations,
@@ -2871,13 +2871,13 @@ cumulative_lift <- function(data,
       Y_id = Y_id,
       ConfidenceIntervals = TRUE
     ))
-    
+
     att <- gl_output$summary$average_att$Estimate
     att_lb <- gl_output$lower_bound
     att_ub <- gl_output$upper_bound
-    
+
     incremental_factor <- length(treatment_locations) * (max_test_period - treatment_start_period)
-    
+
     cumulative_list[[max_test_period - treatment_start_period]] <- list(
       Time = max_test_period,
       att = att,
@@ -2890,7 +2890,7 @@ cumulative_lift <- function(data,
     max_test_period <- max_test_period + 1
   }
   cumulative_lift_df <- do.call(rbind.data.frame, cumulative_list)
-  
+
   rest_of_df <- data.frame(
     Time = 1:(min(cumulative_lift_df$Time) - 1),
     att = 0,
@@ -2900,9 +2900,9 @@ cumulative_lift <- function(data,
     incremental_lb = 0,
     incremental_ub = 0
   )
-  
+
   cumulative_lift_df <- rbind(rest_of_df, cumulative_lift_df)
-  
+
   return(cumulative_lift_df)
 }
 

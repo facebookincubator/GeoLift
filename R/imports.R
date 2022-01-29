@@ -4,7 +4,9 @@
 
 #' GeoLift
 #'
-#' @description A package implementing the Augmented Synthetic Controls Method.
+#' @description GeoLift is an end-to-end geo-experimental methodology based on 
+#' Synthetic Control Methods used to measure the true incremental effect (Lift) 
+#' of an ad campaign.
 #' @docType package
 #' @name GeoLift
 #' @importFrom magrittr "%>%"

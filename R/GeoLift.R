@@ -1935,7 +1935,6 @@ GeoLiftPowerFinder <- function(data,
           }
         } else {
           for (test in 1:nrow(as.matrix(BestMarkets_aux))) {
-            simulation_results <- NULL
             simulation_results <- suppressMessages(pvalueCalc(
               data = data,
               sim = 1,
@@ -2006,7 +2005,6 @@ GeoLiftPowerFinder <- function(data,
 
   # Sort Before Ranking
 
-  abs_lift_in_zero <- true_lift <- NULL
   resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$true_lift), 3)
 
   resultsM <- as.data.frame(resultsM) %>%
@@ -2371,7 +2369,6 @@ GeoLiftMarketSelection <- function(data,
 
     # Force included markets into the selection
     if (length(include_markets) > 0) {
-      temp_Markets <- NULL
       for (row in 1:nrow(BestMarkets_aux)) {
         if (all(include_markets %in% BestMarkets_aux[row, ])) {
           temp_Markets <- rbind(temp_Markets, BestMarkets_aux[row, ])
@@ -2514,7 +2511,6 @@ GeoLiftMarketSelection <- function(data,
     )
 
   # Step 4 - Find the MDE that achieved power
-  resultsM <- NULL
 
   for (locs in unique(results$location)) {
     for (ts in treatment_periods) { # for(ts in treatment_periods)
@@ -3091,7 +3087,6 @@ Lift.plot <- function(GeoLift,
                       subtitle = "",
                       notes = "",
                       ...) {
-  c_obs <- c_obs_lower_bound <- c_obs_upper_bound <- t_obs <- NULL
   treatment_obs <- as.data.frame(
     colMeans(
       matrix(
@@ -3197,7 +3192,6 @@ absolute_value.plot <- function(GeoLift,
                                 subtitle = "",
                                 notes = "",
                                 ...) {
-  Estimate <- lower_bound <- upper_bound <- NULL
   df <- GeoLift$summary$att
   df <- df[, c("Time", "Estimate", "lower_bound", "upper_bound")]
 
@@ -3387,7 +3381,6 @@ cumulative_value.plot <- function(data,
                                   subtitle = "",
                                   notes = "",
                                   ...) {
-  incremental <- incremental_lb <- incremental_ub <- NULL
   cumulative_lift_df <- cumulative_lift(
     data = data,
     treatment_locations = treatment_locations,

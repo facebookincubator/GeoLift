@@ -4,9 +4,9 @@
 
 #' GeoLift
 #'
-#' @description A package implementing the Augmented Synthetic Controls Method
+#' @description A package implementing the Augmented Synthetic Controls Method.
 #' @docType package
-#' @name GeoLift-package
+#' @name GeoLift
 #' @importFrom magrittr "%>%"
 #' @import augsynth
 #' @import gsynth
@@ -29,12 +29,61 @@
 
 # Suppress 'no visible binding for global variable' warnings
 utils::globalVariables(
-  c("ATT", "AvgCost", "AvgScaledL2Imbalance", "BestControl", "conf_level",
-    "conf.level", "date_unix", "diff_lower", "diff_upper", "duration",
-    "effect_size", "Holdout", "ID", "investment", "Investment", "Level",
-    "Level", "lift", "location", "Locs", "lower", "main",
-    "mean_L2ScaledImbalance", "mean_p", "mean_pow", "mean_scaled_l2_imbalance",
-    "pow", "ProportionTotal_Y", "pvalue", "ScaledL2Imbalance", "significant",
-    "sim", "summ", "test", "time", "Time", "Total_Y", "treatment_start", "Type",
-    "Units", "upper", "Y")
+  c("abs_lift_in_zero", 
+    "ATT", 
+    "AvgCost", 
+    "AvgScaledL2Imbalance", 
+    "BestControl", 
+    "c_obs", 
+    "c_obs_lower_bound", 
+    "c_obs_upper_bound", 
+    "conf_level", 
+    "conf.level", 
+    "date_unix", 
+    "diff_lower", 
+    "diff_upper", 
+    "duration", 
+    "effect_size", 
+    "Estimate", 
+    "Holdout", 
+    "ID", 
+    "incremental", 
+    "incremental_lb", 
+    "incremental_ub", 
+    "investment", 
+    "Investment", 
+    "Level", 
+    "Level", 
+    "lift", 
+    "location", 
+    "Locs", 
+    "lower", 
+    "lower_bound", 
+    "main", 
+    "mean_L2ScaledImbalance", 
+    "mean_p", 
+    "mean_pow", 
+    "mean_scaled_l2_imbalance", 
+    "pow", 
+    "ProportionTotal_Y", 
+    "pvalue", 
+    "resultsM", 
+    "ScaledL2Imbalance", 
+    "significant", 
+    "sim", 
+    "simulation_results", 
+    "summ", 
+    "t_obs", 
+    "temp_Markets", 
+    "test", 
+    "time", 
+    "Time", 
+    "Total_Y", 
+    "treatment_start", 
+    "true_lift", 
+    "Type", 
+    "Units", 
+    "upper", 
+    "upper_bound", 
+    "Y")
 )

@@ -330,7 +330,6 @@ pvalueCalc <- function(data,
     )
   )
 }
->>>>>>> bac9d43927a89123c08e27f1f91b9584db333f33
 
 
 #' GeoLift Market Selection algorithm based on a Power Analysis.

@@ -46,7 +46,11 @@ utils::globalVariables(
     "effect_size",
     "AvgScaledL2Imbalance",
     "Investment",
-    "Holdout"
+    "Holdout",
+    "EffectSize",
+    "att_estimator",
+    "detected_lift",
+    "AvgDetectedLift"
   )
 )
 
@@ -933,7 +937,7 @@ plot.GeoLiftPower <- function(x,
     dplyr::group_by(duration, lift) %>%
     # dplyr::mutate(power = 1 - pvalue) %>%
     # dplyr::summarise(power = mean(power))
-    dplyr::summarise(power = mean(pow))
+    dplyr::summarise(power = mean(pow), investment = mean(investment))
 
   spending <- x %>%
     dplyr::group_by(duration, lift) %>%
@@ -954,7 +958,7 @@ plot.GeoLiftPower <- function(x,
           dplyr::summarise(mean(AvgCost)))
 
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
-          geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE) +
+          geom_smooth(formula = y ~ x, color = "#52854C", method = "loess", se = FALSE) +
           scale_x_continuous(sec.axis = sec_axis(~ . * CostPerLift, name = "Estimated Investment")) +
           ylim(0, 1) +
           geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
@@ -969,7 +973,7 @@ plot.GeoLiftPower <- function(x,
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
 
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
-          geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE) +
+          geom_smooth(formula = y ~ x, color = "#52854C", method = "loess", se = FALSE) +
           ylim(0, 1) +
           geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
@@ -990,11 +994,12 @@ plot.GeoLiftPower <- function(x,
           dplyr::summarise(mean(AvgCost)))
 
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
-          geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE) +
-          geom_line(color = "gray80", size = 0.62, alpha = 0.8) +
+          geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
+          geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
           scale_x_continuous(sec.axis = sec_axis(~ . * CostPerLift, name = "Estimated Investment")) +
           ylim(0, 1) +
           geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
+          scale_colour_manual(name="Power Curve", values=c("gray80", "#52854C")) +
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
@@ -1006,10 +1011,11 @@ plot.GeoLiftPower <- function(x,
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
 
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
-          geom_smooth(formula = y ~ x, color = "indianred3", method = "loess", se = FALSE) +
-          geom_line(color = "gray80", size = 0.62, alpha = 0.8) +
+          geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
+          geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
           ylim(0, 1) +
           geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
+          scale_colour_manual(name="Power Curve", values=c("gray80", "#52854C")) +
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
@@ -1354,10 +1360,10 @@ stochastic_market_selector <- function(treatment_size,
                                        similarity_matrix,
                                        run_stochastic_process = FALSE) {
   if (!run_stochastic_process) {
-    message("Deterministic setup with ", treatment_size, " locations in treatment.")
+    message("\nDeterministic setup with ", treatment_size, " locations in treatment.")
     return(similarity_matrix[, 1:treatment_size])
   } else {
-    message("Random setup with ", treatment_size, " locations in treatment.")
+    message("\nRandom setup with ", treatment_size, " locations in treatment.")
     if (treatment_size > 0.5 * ncol(similarity_matrix)) {
       stop(paste0(
         "Treatment size (",
@@ -2663,11 +2669,11 @@ GeoLiftMarketSelection <- function(data,
   return(list(BestMarkets = as.data.frame(resultsM), PowerCurves = as.data.frame(results)))
 }
 
-#' GeoLift Market Selection algorithm based on a Power Analysis.
+#' GeoLift Market Finder algorithm based on a Power Analysis.
 #'
 #' @description
 #'
-#' \code{GeoLiftMarketSelectionTest} provides a ranking of test markets  for a
+#' \code{GeoLiftMarketFinder} provides a ranking of test markets  for a
 #' GeoLift test based on a power analysis.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -2690,8 +2696,8 @@ GeoLiftMarketSelection <- function(data,
 #' zero.
 #' @param lookback_window A number indicating how far in time the simulations
 #' for the power analysis should go. For instance, a value equal to 5 will simulate
-#' power for the last five possible tests. By default lookback_window = -1 which
-#' will set the window to the smallest provided test \code{min(treatment_periods)}.
+#' power for the last five possible tests. By default lookback_window = 1 which
+#' will only execute the most recent test based on the data.
 #' @param include_markets A list of markets or locations that should be part of the
 #' test group. Make sure to specify an N as large or larger than the number of
 #' provided markets or locations.
@@ -2723,8 +2729,8 @@ GeoLiftMarketSelection <- function(data,
 #' on this metric while dtw = 0 (default) relies on correlations only.
 #' @param ProgressBar A logic flag indicating whether to display a progress bar
 #' to track progress. Set to FALSE by default.
-#' @param plot_best A logic flag indicating whether to plot the best 4 tests for
-#' each treatment length. Set to FALSE by default.
+#' @param print A logic flag indicating whether to print the top results. Set to
+#' TRUE by default.
 #' @param run_stochastic_process A logic flag indicating whether to select test
 #' markets through random sampling of the the similarity matrix. Given that
 #' interpolation biases may be relevant if the synthetic control matches
@@ -2748,16 +2754,18 @@ GeoLiftMarketSelection <- function(data,
 #' should be imported from to send to the nodes.
 #'
 #' @return
-#' A list with two Data Frames. \itemize{
+#' A list with three Data Frames. \itemize{
 #'          \item{"BestMarkets":}{Data Frame with a ranking of the best markets
 #'          based on power, Scaled L2 Imbalance, Minimum Detectable Effect, and
 #'          proportion of total KPI in the test markets.}
 #'          \item{"PowerCurves":}{Data Frame with the resulting power curves for
-#'          each recommended market}
+#'          each recommended market.}
+#'          \item{"parameters;"}{List of parameters to plot the results.
+#'          Includes the data set, model, fixed-effects, and CPIC parameters.}
 #' }
 #'
 #' @export
-GeoLiftMarketSelectionTest <- function(data,
+GeoLiftMarketFinder <- function(data,
                                    treatment_periods,
                                    N = c(),
                                    X = c(),
@@ -2777,7 +2785,7 @@ GeoLiftMarketSelectionTest <- function(data,
                                    fixed_effects = TRUE,
                                    dtw = 0,
                                    ProgressBar = FALSE,
-                                   plot_best = FALSE,
+                                   print = TRUE,
                                    run_stochastic_process = FALSE,
                                    parallel = TRUE,
                                    parallel_setup = "sequential",
@@ -3105,7 +3113,7 @@ GeoLiftMarketSelectionTest <- function(data,
 
   # Step 5 - Add Percent of Y in test markets
   # Step 5.1 - Create the overall prop
-  AggYperLoc <- GeoTestData_PreTest %>% # data %>%
+  AggYperLoc <- data %>%
     dplyr::group_by(location) %>%
     dplyr::summarize(Total_Y = sum(Y))
 
@@ -3192,11 +3200,155 @@ GeoLiftMarketSelectionTest <- function(data,
           the input parameters")
   }
 
-  class(results) <- c("GeoLift.MarketSelection", class(resultsM))
+  # Re-order columns
+  resultsM <- resultsM[ , c(13,1,2,3,4,5,6,7,8,9,10,12,11)]
 
-  return(list(BestMarkets = as.data.frame(resultsM), PowerCurves = as.data.frame(results)))
+  # Print top Results
+  if(print) {
+    print(head(resultsM))
+  }
+
+  # Save Parameters for plotting
+  params = list(data = data,
+                model = model,
+                fixed_effects = fixed_effects,
+                cpic = cpic)
+
+  output <- list(BestMarkets = as.data.frame(resultsM),
+                 PowerCurves = as.data.frame(results),
+                 parameters = params)
+
+  class(output) <- c("GeoLiftMarketFinder", class(output))
+  return(output)
 }
 
+#' Printing method for GeoLiftMarketFinder.
+#'
+#' @description
+#'
+#' Printing method for \code{GeoLiftMarketFinder}. The function will print
+#' the best markets when called.
+#'
+#' @param x GeoLiftMarketFinder object.
+#' @param ... Optional arguments.
+#'
+#' @return
+#' A data frame.
+#'
+#' @export
+print.GeoLiftMarketFinder <- function(x, ...){
+
+  if (!inherits(x, "GeoLiftMarketFinder")) {
+    stop("object must be class GeoLiftMarketFinder")
+  }
+
+  print(x$BestMarkets)
+
+}
+
+
+
+
+#' Plotting function for GeoLiftMarketFinder.
+#'
+#' @description
+#'
+#' Plotting function for \code{GeoLiftMarketFinder}. This function plots the
+#' latest possible test given the data and duration as well as the power curve
+#' across historical simulations.
+#'
+#' @param x A GeoLiftMarketFinder object.
+#' @param market_ID Numeric value indicating the market to be plotted. This
+#' value should reflect a valid ID from the BestMarkets data frame of the
+#' \code{GeoLiftMarketSelection} output.
+#' @param print_summary Logic flag indicating whether to print model metrics
+#' from the latest possible test. Set to TRUE by default.
+#' @param ... additional arguments
+#'
+#' @return
+#' GeoLiftMarketSelection plot.
+#'
+#' @export
+plot.GeoLiftMarketFinder <- function(x,
+                          market_ID = 0,
+                          print_summary = TRUE,
+                          ...) {
+
+  if (!inherits(x, "GeoLiftMarketFinder")) {
+    stop("object must be class GeoLiftMarketFinder")
+  }
+
+  #Will plot the lift plot with the MDE and the power curve
+  if (!(market_ID %in% x$BestMarkets$ID)){
+    stop("Please enter a valid ID.")
+  }
+
+  Market <- x$BestMarkets %>% dplyr::filter(ID == market_ID)
+
+  locs_aux <- unlist(strsplit(stringr::str_replace_all(Market$location, ", ", ","), split = ","))
+  max_time <- max(x$parameters$data$time)
+
+  PowerPlot <- as.data.frame(x$PowerCurves %>% dplyr::filter(duration == Market$duration,
+                                                             location == Market$location))
+
+  CostPerLift <- as.numeric(PowerPlot %>%
+                              dplyr::filter(EffectSize > 0) %>%
+                              dplyr::mutate(AvgCost = Investment / EffectSize) %>%
+                              dplyr::summarise(mean(AvgCost)))
+
+  data_lifted <- x$parameters$data
+  data_lifted$Y[data_lifted$location %in% locs_aux &
+                  data_lifted$time >= max_time - Market$duration + 1] <-
+    data_lifted$Y[data_lifted$location %in% locs_aux &
+                    data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
+
+
+  lifted <- suppressMessages(GeoLift::GeoLift(
+    Y_id = "Y",
+    time_id = "time",
+    location_id = "location",
+    data = data_lifted,
+    locations = locs_aux,
+    treatment_start_time = max_time - Market$duration + 1,
+    treatment_end_time = max_time,
+    model = x$parameters$model,
+    fixed_effects = x$parameters$fixed_effects,
+    print = TRUE
+  ))
+
+  if (print_summary){
+    print(summary(lifted))
+  }
+
+  PowerPlot_graph <- ggplot(PowerPlot, aes(x = EffectSize, y = power)) +
+    geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
+    geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
+    scale_x_continuous(sec.axis = sec_axis(~ . * CostPerLift, name = "Estimated Investment")) +
+    ylim(0, 1) +
+    geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
+    scale_colour_manual(name="Power Curve", values=c("gray80", "#52854C")) +
+    labs( x = "Effect Size", y = "Power") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5))
+
+  suppressMessages(gridExtra::grid.arrange(
+    plot(lifted, notes = paste(
+      # "Locations:", Market$location,
+      # "\n Rank:", Market$rank,
+      # "\n Treatment Periods:", Market$duration,
+      # "\n Effect Size: ", Market$EffectSize
+    )),
+    PowerPlot_graph,
+    ncol = 1,
+    nrow = 2,
+    bottom = paste(
+      "Rank:", Market$rank,
+      "\n Locations:", Market$location,
+      "\n Treatment Periods:", Market$duration,
+      "\n Effect Size: ", Market$EffectSize
+    )))
+
+}
 
 #' GeoLift inference calculation.
 #'

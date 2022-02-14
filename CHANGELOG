@@ -1,3 +1,17 @@
+GeoLift v2.3 (Release date: TBD)
+=========================================
+
+Changes:
+
+* Simplified Power Analysis through a single function: GeoLiftMarketFinder().
+* To aid in MMM calibrations we included the ability to calculate correlations
+between test markets and the aggregate of all locations.
+* Added investment to the GeoLiftPower output object.
+* Revamped the GeoLiftPowerPlot and added legends to the plot.
+* Updated the NumberLocations() plot.
+* Fixed issues with GeoLift() caused when the input of the locations parameter
+had special characters.
+
 GeoLift v2.2.2 (Release date: 2021-02-04)
 =========================================
 

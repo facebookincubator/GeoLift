@@ -96,6 +96,7 @@ GeoLift <- function(Y_id = "Y",
   )
 
   data$location <- tolower(data$location)
+  locations <- tolower(locations)
 
   data_aux <- fn_treatment(data,
     locations = locations,

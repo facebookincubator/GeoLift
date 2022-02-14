@@ -9,7 +9,9 @@ GeoPlot(
   Y_id = "Y",
   time_id = "time",
   location_id = "location",
-  treatment_start = 0
+  treatment_start = 0,
+  KPI_id = "",
+  notes = ""
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ of the time period (starting at 1), and covariates.}
 \item{location_id}{Name of the location variable (String).}
 
 \item{treatment_start}{Treatment start (Default = 0).}
+
+\item{KPI_id}{Outcome variable.}
+
+\item{notes}{Additional notes.}
 }
 \value{
 A plot of each location's time series.

@@ -184,3 +184,125 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency = 
     treatment_end = as.Date(treatment_end_date)
   ))
 }
+
+#' Calculate the total and test market's aggregated KPI by time and location.
+#'
+#' @description
+#'
+#' Append the aggregated KPI values for the test market and all markets to the
+#' \code{GeoDataRead} object.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param locs list of test locations. If none are provided, only the aggregated
+#' KPI (total) will be calculated and appended. Set to NULL by default.
+#'
+#' @return
+#' A data frame with additional values for the test regions (combined_test)
+#' and total KPI (total).
+#'
+#' @export
+AppendAgg <- function(data, locs = NULL){
+
+  aux <- data %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(Y = sum(Y))
+  aux$location <- "total"
+  aux <- dplyr::bind_rows(data, aux)
+
+  if(all(tolower(locs) %in% tolower(unique(data$location)))){
+    auxCombo <- data %>%
+      dplyr::filter(location %in% locs) %>%
+      dplyr::group_by(time) %>%
+      dplyr::summarise(Y = sum(Y))
+    auxCombo$location <- "combined_test"
+    aux <- dplyr::bind_rows(aux, auxCombo)
+  } else{
+    message("Please specify a valid vector of location names.")
+    return(NULL)
+  }
+
+  return(aux)
+
+}
+
+#' Auxiliary function to calculate correlations between input markets.
+#'
+#' @description
+#'
+#' Auxiliary function to calculate correlations between input markets.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param location_id Name of the location variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param Y_id Name of the outcome variable (String).
+#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
+#' on this metric while dtw = 0 (default) relies on correlations only.
+#' @param markets List of markets to use in the calculation of the correlations.
+#'
+#' @return
+#' MarketMatching object.
+#'
+#' @export
+MarketCorrelations <- function(data,
+                               location_id = "location",
+                               time_id = "time",
+                               Y_id = "Y",
+                               dtw = 0,
+                               markets = NULL) {
+  data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
+  data$location <- tolower(data$location)
+  astime <- seq(as.Date("2000/1/1"), by = "day", length.out = max(data$time))
+  data$astime <- astime[data$time]
+
+  # Find the best matches based on DTW
+  mm <- MarketMatching::best_matches(
+    data = data,
+    id_variable = "location",
+    date_variable = "astime",
+    matching_variable = "Y",
+    parallel = TRUE,
+    warping_limit = 1,
+    dtw_emphasis = dtw,
+    start_match_period = min(data$astime),
+    end_match_period = max(data$astime),
+    markets_to_be_matched = markets,
+    matches = length(unique(data$location)) - 1
+  )
+
+  return(mm)
+
+}
+
+#' Calculate correlations between input markets.
+#'
+#' @description
+#'
+#' Calculate correlations between input markets
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param locs List of markets to use in the calculation of the correlations.
+#'
+#' @return
+#' Correlation coefficient.
+#'
+#' @export
+GetCorrel <- function(data, locs = c()){
+
+  if(!(all(tolower(locs) %in% tolower(unique(data$location))))){
+    warning("Please specify a valid set of test locations.")
+  }
+
+  data_aux <- AppendAgg(data, locs = locs)
+
+  Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("total", "combined_test"),])
+  return(Correl$BestMatches$Correlation[[1]])
+}

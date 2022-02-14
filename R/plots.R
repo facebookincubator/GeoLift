@@ -544,15 +544,15 @@ cumulative_value.plot <- function(data,
 }
 
 
-#' Plotting function for GeoLiftMarketFinder.
+#' Plotting function for GeoLiftMarketSelection
 #'
 #' @description
 #'
-#' Plotting function for \code{GeoLiftMarketFinder}. This function plots the
+#' Plotting function for \code{GeoLiftMarketSelection}. This function plots the
 #' latest possible test given the data and duration as well as the power curve
 #' across historical simulations.
 #'
-#' @param x A GeoLiftMarketFinder object.
+#' @param x A GeoLiftMarketSelection object.
 #' @param market_ID Numeric value indicating the market to be plotted. This
 #' value should reflect a valid ID from the BestMarkets data frame of the
 #' \code{GeoLiftMarketSelection} output.
@@ -564,13 +564,13 @@ cumulative_value.plot <- function(data,
 #' GeoLiftMarketSelection plot.
 #'
 #' @export
-plot.GeoLiftMarketFinder <- function(x,
+plot.GeoLiftMarketSelection <- function(x,
                                      market_ID = 0,
                                      print_summary = TRUE,
                                      ...) {
 
-  if (!inherits(x, "GeoLiftMarketFinder")) {
-    stop("object must be class GeoLiftMarketFinder")
+  if (!inherits(x, "GeoLiftMarketSelection")) {
+    stop("object must be class GeoLiftMarketSelection")
   }
 
   #Will plot the lift plot with the MDE and the power curve

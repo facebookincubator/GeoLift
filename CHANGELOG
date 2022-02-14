@@ -3,7 +3,7 @@ GeoLift v2.3 (Release date: TBD)
 
 Changes:
 
-* Simplified Power Analysis through a single function: GeoLiftMarketFinder().
+* Simplified Power Analysis through a single function: GeoLiftMarketSelection().
 * To aid in MMM calibrations we included the ability to calculate correlations
 between test markets and the aggregate of all locations.
 * Added investment to the GeoLiftPower output object.

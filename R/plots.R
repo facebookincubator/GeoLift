@@ -45,7 +45,7 @@ GeoPlot <- function(data,
     geom_line(show.legend = FALSE) +
     geom_vline(xintercept = treatment_start, linetype = "dashed", size = size_vline, color = "grey35") +
     geom_dl(aes(label = !!sym(location_id)), method = list(dl.combine("last.points"), cex = 0.8)) +
-    xlim(1, 1.15 * (max(data[[time_id]]))) +
+    xlim(0, 1.15 * (max(data[[time_id]]))) +
     #ylab("") +
     labs(y = KPI_id, caption = notes)  +
     theme_minimal()
@@ -664,13 +664,19 @@ plot.GeoLiftMarketSelection <- function(x,
 #' the KPI metric (standardized by the largest historical value). Set to FALSE
 #' by default to plot the observed KPI levels.
 #' @param KPI_id Outcome variable.
+#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
+#' on this metric while dtw = 0 (default) relies on correlations only.
 #'
 #' @return
 #' A plot of the historical values of the test market and the aggregation of
-#' all markets.
+#' all control markets.
 #'
 #' @export
-plotCorrels <- function(data, locs = c(), scaled = TRUE, KPI_id = ""){
+plotCorrels <- function(data,
+                        locs = c(),
+                        scaled = TRUE,
+                        KPI_id = "",
+                        dtw = 0){
 
   if(!(all(tolower(locs) %in% tolower(unique(data$location))))){
     warning("Please specify a valid set of test locations.")
@@ -678,26 +684,22 @@ plotCorrels <- function(data, locs = c(), scaled = TRUE, KPI_id = ""){
   }
 
   data_aux <- AppendAgg(data, locs = locs)
-  correl <- GetCorrel(data, locs = locs)
+  correl <- GetCorrel(data, locs = locs, dtw = dtw)
 
   if(scaled == TRUE){
-    data_aux <- data_aux %>%
-      dplyr::filter(location %in% locs)
-    newdf$Yscaled <- 0
-    newdf$Yscaled[newdf$location == "total"] <- newdf$Y[newdf$location == "total"] / max(newdf[newdf$location == "total",]$Y)
-    newdf$Yscaled[newdf$location == "combined_test"] <- newdf$Y[newdf$location == "combined_test"] / max(newdf[newdf$location == "combined_test",]$Y)
+    data_aux$Yscaled <- 0
+    data_aux$Yscaled[data_aux$location == "control_markets"] <- data_aux$Y[data_aux$location == "control_markets"] / max(data_aux[data_aux$location == "control_markets",]$Y)
+    data_aux$Yscaled[data_aux$location == "test_markets"] <- data_aux$Y[data_aux$location == "test_markets"] / max(data_aux[data_aux$location == "test_markets",]$Y)
 
-    GeoPlot(newdf,
+    GeoPlot(data_aux,
             Y_id = "Yscaled",
             time_id = "time",
             location_id = "location",
             KPI_id = KPI_id,
             notes = paste0("Correlation: ", round(correl, 4)))
   } else{
-    data_aux <- data_aux %>%
-      dplyr::filter(location %in% locs)
 
-    GeoPlot(newdf,
+    GeoPlot(data_aux,
             Y_id = "Y",
             time_id = "time",
             location_id = "location",

@@ -206,25 +206,37 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency = 
 #' @export
 AppendAgg <- function(data, locs = NULL){
 
-  aux <- data %>%
-    dplyr::group_by(time) %>%
-    dplyr::summarise(Y = sum(Y))
-  aux$location <- "total"
-  aux <- dplyr::bind_rows(data, aux)
+  if(is.null(locs)){
+    aux <- data %>%
+      dplyr::group_by(time) %>%
+      dplyr::summarise(Y = sum(Y))
+    aux$location <- "control_markets"
+    aux <- dplyr::bind_rows(data, aux)
+  } else if(!(all(tolower(locs) %in% tolower(unique(data$location))))){
+    message("Please specify a valid vector of location names.")
+    return(NULL)
+  } else{
+    aux <- data %>%
+      dplyr::filter(!(location %in% locs)) %>%
+      dplyr::group_by(time) %>%
+      dplyr::summarise(Y = sum(Y))
+    aux$location <- "control_markets"
+  }
+
 
   if(all(tolower(locs) %in% tolower(unique(data$location)))){
     auxCombo <- data %>%
       dplyr::filter(location %in% locs) %>%
       dplyr::group_by(time) %>%
       dplyr::summarise(Y = sum(Y))
-    auxCombo$location <- "combined_test"
+    auxCombo$location <- "test_markets"
     aux <- dplyr::bind_rows(aux, auxCombo)
   } else{
     message("Please specify a valid vector of location names.")
     return(NULL)
   }
 
-  return(aux)
+  return(as.data.frame(aux))
 
 }
 
@@ -290,12 +302,14 @@ MarketCorrelations <- function(data,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param locs List of markets to use in the calculation of the correlations.
+#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
+#' on this metric while dtw = 0 (default) relies on correlations only.
 #'
 #' @return
 #' Correlation coefficient.
 #'
 #' @export
-GetCorrel <- function(data, locs = c()){
+GetCorrel <- function(data, locs = c(), dtw = 0){
 
   if(!(all(tolower(locs) %in% tolower(unique(data$location))))){
     warning("Please specify a valid set of test locations.")
@@ -303,6 +317,6 @@ GetCorrel <- function(data, locs = c()){
 
   data_aux <- AppendAgg(data, locs = locs)
 
-  Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("total", "combined_test"),])
+  Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("control_markets", "test_markets"),], dtw = dtw)
   return(Correl$BestMatches$Correlation[[1]])
 }

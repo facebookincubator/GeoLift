@@ -11,6 +11,7 @@ between test markets and the aggregate of all locations.
 * Updated the NumberLocations() plot.
 * Fixed issues with GeoLift() caused when the input of the locations parameter
 had special characters.
+* Fixed issue with the range of the x axis of GeoPlot() to avoid receiving the warning message: Removed 1 rows containing missing values (geom_vline).
 
 GeoLift v2.2.2 (Release date: 2021-02-04)
 =========================================

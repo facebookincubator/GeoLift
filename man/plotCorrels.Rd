@@ -5,7 +5,7 @@
 \title{Plotting function for historical correlations between the test market's
 and total markets KPI.}
 \usage{
-plotCorrels(data, locs = c(), scaled = TRUE, KPI_id = "")
+plotCorrels(data, locs = c(), scaled = TRUE, KPI_id = "", dtw = 0)
 }
 \arguments{
 \item{data}{A data.frame containing the historical conversions by
@@ -20,10 +20,13 @@ the KPI metric (standardized by the largest historical value). Set to FALSE
 by default to plot the observed KPI levels.}
 
 \item{KPI_id}{Outcome variable.}
+
+\item{dtw}{Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
+on this metric while dtw = 0 (default) relies on correlations only.}
 }
 \value{
 A plot of the historical values of the test market and the aggregation of
-all markets.
+all control markets.
 }
 \description{
 \code{plotCorrels} takes a data frame used for GeoLift to generate

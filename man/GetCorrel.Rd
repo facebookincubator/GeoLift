@@ -4,7 +4,7 @@
 \alias{GetCorrel}
 \title{Calculate correlations between input markets.}
 \usage{
-GetCorrel(data, locs = c())
+GetCorrel(data, locs = c(), dtw = 0)
 }
 \arguments{
 \item{data}{A data.frame containing the historical conversions by
@@ -13,6 +13,9 @@ a "Y" column with the outcome data (units), a time column with the indicator
 of the time period (starting at 1), and covariates.}
 
 \item{locs}{List of markets to use in the calculation of the correlations.}
+
+\item{dtw}{Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
+on this metric while dtw = 0 (default) relies on correlations only.}
 }
 \value{
 Correlation coefficient.

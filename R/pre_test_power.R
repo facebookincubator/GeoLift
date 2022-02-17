@@ -1515,15 +1515,16 @@ GeoLiftPower <- function(data,
 #' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
 #' Only input sequences that are entirely positive or negative and that include
 #' zero.
-#' @param lookback_window A number indicating how far in time the simulations
+#' @param lookback_window A number indicating how far back in time the simulations
 #' for the power analysis should go. For instance, a value equal to 5 will simulate
 #' power for the last five possible tests. By default lookback_window = 1 which
 #' will only execute the most recent test based on the data.
 #' @param include_markets A list of markets or locations that should be part of the
 #' test group. Make sure to specify an N as large or larger than the number of
-#' provided markets or locations.
-#' @param exclude_markets A list of markets or locations that will be removed from the
-#' analysis.
+#' provided markets or locations. Empty list by default.
+#' @param exclude_markets A list of markets or locations that won't be considered
+#' for the test market selection, but will remain in the pool of controls. Empty
+#' list by default.
 #' @param holdout A vector with two values: the first one the smallest desirable
 #' holdout and the second the largest desirable holdout. If left empty (default)
 #' all market selections will be provided regardless of their size.
@@ -1549,8 +1550,8 @@ GeoLiftPower <- function(data,
 #' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
 #' on this metric while dtw = 0 (default) relies on correlations only.
 #' @param Correlations A logic flag indicating whether an additional column with
-#' the correlations between the test regions and total markets will be included
-#' in the final output. Set to FALSE by default.
+#' the correlations between the test regions and total control markets will be
+#' included in the final output. Set to FALSE by default.
 #' @param ProgressBar A logic flag indicating whether to display a progress bar
 #' to track progress. Set to FALSE by default.
 #' @param print A logic flag indicating whether to print the top results. Set to
@@ -1725,9 +1726,9 @@ GeoLiftMarketSelection <- function(data,
   }
 
   # Exclude markets input by user by filter them out from the uploaded file data
-  if (length(exclude_markets) > 0) {
-    data <- data[!(data$location %in% exclude_markets), ]
-  }
+  # if (length(exclude_markets) > 0) {
+  #   data <- data[!(data$location %in% exclude_markets), ]
+  # }
 
   BestMarkets <- MarketSelection(data,
                                  location_id = "location",
@@ -1777,6 +1778,20 @@ GeoLiftMarketSelection <- function(data,
     if (is.null(BestMarkets_aux)) {
       next
     }
+
+    # Exclude markets  defined at exclude_markets from possible test
+    if(length(exclude_markets) > 0){
+      locs_to_drop <- c()
+      for(row in 1:nrow(BestMarkets_aux)){
+        if (any(exclude_markets %in% BestMarkets_aux[row,])){
+          locs_to_drop <- append(locs_to_drop,row)
+        }
+      }
+      if(length(locs_to_drop) > 0){
+        BestMarkets_aux <- BestMarkets_aux[-locs_to_drop,]
+      }
+    }
+
 
     for (es in effect_size) { # iterate through lift %
 

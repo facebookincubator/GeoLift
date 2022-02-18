@@ -1,8 +1,7 @@
 ---
 title: "GeoLift Walkthrough"
 output: 
-    md_document:
-    variant: markdown_github
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{GeoLift_Walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,7 +14,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.width = 10, 
   fig.height = 8, 
-  fig.align = "center"
+  fig.align = "center",
+  warning = FALSE
 )
 ```
 
@@ -163,8 +163,8 @@ The key parameters needed to run this function are:
 
 Continuing with the example and in order to explore the function's capabilities let's assume we have two restrictions: Chicago must be part of the test markets and we have up to \$100,000 to run the test. We can include these constraints into `GeoLiftMarketSelection()` with the `include_markets` and `budget` parameters and proceed with the market selection. Moreover, after observing that the historical KPI values in `GeoPlot()` have been stable across time we will proceed with a model with Fixed Effects. Finally, given a CPIC = \$7.50 obtained from a previous Lift test, a range between two to five test markets, and a duration between 10 and 15 days we obtain:
 
-```{r GeoLiftMarketSelection}
-MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
+```{r GeoLiftMarketSelection }
+MarketSelections <- suppressWarnings(GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           treatment_periods = c(10,15),
                                           N = c(2,3,4,5),
                                           Y_id = "Y",
@@ -179,7 +179,7 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           budget = 100000,
                                           alpha = 0.1,
                                           Correlations = TRUE,
-                                          fixed_effects = TRUE)
+                                          fixed_effects = TRUE))
 ```
 
 The results of the power analysis and market selection provide us with several key metrics that we can use to select our test market. These metrics are:

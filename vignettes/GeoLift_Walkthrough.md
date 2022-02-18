@@ -127,7 +127,7 @@ anomalies before moving on to the data analysis.
             time_id = "time",
             location_id = "location")
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/plotting-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/plotting-1.png" style="display: block; margin: auto;" />
 
 In this case we see a similar pattern that’s shared across all
 locations. These structural similarities between regions are the key to
@@ -360,11 +360,11 @@ duration between 10 and 15 days we obtain:
     #> 5  5                         chicago, houston, portland       10       0.10
     #> 6  6 chicago, cincinnati, houston, nashville, san diego       15       0.05
     #>   Power AvgScaledL2Imbalance Investment   AvgATT Average_MDE ProportionTotal_Y
-    #> 1     1            0.1971864   74118.38 159.3627  0.04829912        0.07576405
+    #> 1     1            0.1971864   74118.38 159.3627  0.04829913        0.07576405
     #> 2     1            0.1738778   64563.75 290.0071  0.10117316        0.03306537
-    #> 3     1            0.1966996   99027.75 316.6204  0.09552879        0.07576405
+    #> 3     1            0.1966996   99027.75 316.6203  0.09552878        0.07576405
     #> 4     1            0.1682310   43646.25 300.9401  0.10378013        0.03306537
-    #> 5     1            0.2305628   75389.25 350.3142  0.10502968        0.05797087
+    #> 5     1            0.2305628   75389.25 350.3141  0.10502968        0.05797087
     #> 6     1            0.2699167   95755.50 146.7975  0.04282215        0.09801138
     #>   abs_lift_in_zero   Holdout rank correlation
     #> 1            0.002 0.9242359    2   0.9144814
@@ -447,14 +447,14 @@ simulations.
     plot(MarketSelections, market_ID = 1, print_summary = FALSE)
     #> Warning: Removed 39 rows containing missing values (geom_smooth).
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/GeoLiftMarketSelection Plots-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection Plots-1.png" style="display: block; margin: auto;" />
 
 
     # Plot for chicago, portland for a 15 day test
     plot(MarketSelections, market_ID = 2, print_summary = FALSE)
     #> Warning: Removed 39 rows containing missing values (geom_smooth).
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/GeoLiftMarketSelection Plots-2.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection Plots-2.png" style="display: block; margin: auto;" />
 
 While both market selections perform excellent on all metrics, we will
 move further with the latter since it allows us to run a successful test
@@ -507,7 +507,7 @@ this market selection.
     #>  * san diego: 0.0394
     #> Warning: Removed 39 rows containing missing values (geom_smooth).
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/GeoLiftMarketSelection Plot for chicago, portland-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection Plot for chicago, portland-1.png" style="display: block; margin: auto;" />
 
 ### Analyzing the Test Results
 
@@ -568,7 +568,7 @@ the test.
             location_id = "location",
             treatment_start = 91)
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/plottingTest-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/plottingTest-1.png" style="display: block; margin: auto;" />
 
 #### GeoLift Inference
 
@@ -701,7 +701,7 @@ Baton Rouge.
     plot(GeoTest, type = "Lift")
     #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/plot_Lift-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/plot_Lift-1.png" style="display: block; margin: auto;" />
 
 Plotting the results is a great way to assess the model’s fit and how
 effective the campaign was. Taking a close look at the pre-treatment
@@ -719,7 +719,7 @@ provides strong evidence of a successful campaign.
     plot(GeoTest, type = "ATT")
     #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/plot_ATT-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/plot_ATT-1.png" style="display: block; margin: auto;" />
 
 Looking at the Average Estimated Treatment Effect’s plot can also be
 extremely useful. The ATT metric shows us the magnitude of the Average
@@ -774,7 +774,7 @@ decide which is the best approach by setting the model parameter to
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 1.2% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 0.7% chance of observing an effect this large or larger assuming treatment effect is zero.
 
     summary(GeoTestBest)
     #> 
@@ -841,12 +841,12 @@ decide which is the best approach by setting the model parameter to
     plot(GeoTestBest, type = "Lift")
     #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/GeoLiftBest-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftBest-1.png" style="display: block; margin: auto;" />
 
     plot(GeoTestBest, type = "ATT")
     #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 
-<img src="/private/var/folders/cs/p058mf_j4wzfn76_l200mqn00000gn/T/Rtmp3Pvldj/preview-1323c156cbc9.dir/GeoLift_Walkthrough_files/figure-markdown_strict/GeoLiftBest-2.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftBest-2.png" style="display: block; margin: auto;" />
 
 The new results augment the GeoLift model with a Ridge prognostic
 function which improves the model fit as seen in the new L2 Imbalance

@@ -321,7 +321,7 @@ with Fixed Effects. Finally, given a CPIC = $7.50 obtained from a
 previous Lift test, a range between two to five test markets, and a
 duration between 10 and 15 days we obtain:
 
-    MarketSelections <- suppressWarnings(GeoLiftMarketSelection(data = GeoTestData_PreTest,
+    MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                               treatment_periods = c(10,15),
                                               N = c(2,3,4,5),
                                               Y_id = "Y",
@@ -336,7 +336,7 @@ duration between 10 and 15 days we obtain:
                                               budget = 100000,
                                               alpha = 0.1,
                                               Correlations = TRUE,
-                                              fixed_effects = TRUE))
+                                              fixed_effects = TRUE)
     #> Setting up cluster.
     #> Importing functions into cluster.
     #> Attempting to load the environment 'package:dplyr'

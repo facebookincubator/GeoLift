@@ -34,5 +34,7 @@ Should be the output of \code{GeoDataRead}.}
 A dataframe that holds the accumulated lift effect throughout the entire treatment period.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 This method will calculate the cumulative lift with each passing day.
 }

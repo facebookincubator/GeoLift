@@ -56,5 +56,7 @@ weekly or daily. Defaults to daily.}
 A ggplot object that shows the accumulated lift per time period.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Plot the accumulated lift effect.
 }

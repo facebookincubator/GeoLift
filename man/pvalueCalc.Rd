@@ -60,15 +60,15 @@ Control Method. Set to Generalized Synthetic Controls "none" by default.}
 }
 \value{
 List that contains:
-         \itemize{
-         \item{"location":}{ Test locations.}
-         \item{"pvalue":}{ P Value.}
-         \item{"tp":}{ Time period index.}
-         \item{"es":}{ Effect Size used for the simulation.}
-         \item{"treatment_start_time":}{ Treatment start time for the simulation}
-         \item{"investment":}{ Estimated Investment}
-         \item{"ScaledL2Imbalance":}{ Scaled L2 Imbalance metric}
-        }
+\itemize{
+\item{"location":}{ Test locations.}
+\item{"pvalue":}{ P Value.}
+\item{"tp":}{ Time period index.}
+\item{"es":}{ Effect Size used for the simulation.}
+\item{"treatment_start_time":}{ Treatment start time for the simulation}
+\item{"investment":}{ Estimated Investment}
+\item{"ScaledL2Imbalance":}{ Scaled L2 Imbalance metric}
+}
 }
 \description{
 \code{pvalueCalc} calculates the p-value for a GeoLift object.

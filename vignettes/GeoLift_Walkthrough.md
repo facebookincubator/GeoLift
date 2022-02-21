@@ -15,7 +15,7 @@ effect that these strategies provide, analysts are able to understand,
 analyze, and optimize their cross-channel strategies through data and
 science.
 
-### What is Geo Experimentation
+### What is Geo Experimentation?
 
 There are many ways to measure Lift and Geo Experimentation is one that
 has been rapidly gaining popularity. In general, Geo Experimentation
@@ -51,13 +51,7 @@ repository](https://github.com/facebookincubator/GeoLift/) using the
     remotes::install_github("ebenmichael/augsynth")
     remotes::install_github("facebookincubator/GeoLift")
 
-    library(augsynth)
-    library(gsynth)
     library(GeoLift)
-    library(dplyr)
-    library(doParallel)
-    library(foreach)
-    library(MarketMatching)
 
 III: GeoLift Example
 --------------------
@@ -66,7 +60,7 @@ III: GeoLift Example
 
 To show an end-to-end implementation of GeoLift we will use simulated
 data of 40 US cities across 90 days to: design a test, select test
-markets, run power calculations,, and finally calculate the Lift caused
+markets, run power calculations, and finally calculate the Lift caused
 by the campaign. As with every GeoLift test, we start analyzing pre-test
 historical information. We will use the data included in the `GeoLift`
 package.
@@ -235,13 +229,12 @@ The key parameters needed to run this function are:
     this lists matches with the data.
 
 -   `holdout`: A vector with two values: the first one the smallest
-    desirable holdout and the second the largest desirable holdout. By
-    holdout we mean the percent of the total market that will be placed
-    into the control group and will not see our ad campaign. In our
-    example, will specify that we’re looking for a large holdout and
-    will therefore set `holdout = c(0.5, 1)`. If this parameter is left
-    empty, all market selections will be analyzed regardless of their
-    size.
+    desirable holdout and the second the largest desirable holdout. The
+    holdout represents the share of conversions from markets that will
+    not see our ad campaign. In our example, will specify that we’re OK
+    with a large holdout and will therefore set `holdout = c(0.5, 1)`.
+    If this parameter is left empty, all market selections will be
+    analyzed regardless of their size.
 
 -   `cpic`: Value indicating the Cost Per Incremental Conversion, that
     is, on average how much do we typically need to spend to bring one
@@ -268,7 +261,7 @@ The key parameters needed to run this function are:
     The most common values used are: `model = "None"` (default) which
     won’t augment the ASCM and `model = "Ridge"`. More information on
     this parameter is given in the **Inference** section of this
-    walkthrough,
+    walkthrough.
 
 -   `fixed_effects`: A logic flag indicating whether to include unit
     Fixed Effects (FE) in the model. Fixed effects are an additional
@@ -313,10 +306,9 @@ The key parameters needed to run this function are:
     -   `side_of_test = "two_sided"`: The test statistic is the sum of
         all treatment effects, i.e. sum(abs(x)). Defualt.
     -   `side_of_test = "one_sided"`: One-sided test against positive or
-        negaative effects i.e. If the effect being applied is negative,
-        then defaults to -sum(x). H0: ES &gt;= 0; HA: ES &lt; 0. If the
-        effect being applied is positive, then defaults to sum(x). H0:
-        ES &lt;= 0; HA: ES &gt; 0.
+        negative effects i.e. If the effect being applied is negative,
+        then defaults to -sum(x). If the effect being applied is
+        positive, then defaults to sum(x).
 
 Continuing with the example and in order to explore the function’s
 capabilities let’s assume we have two restrictions: Chicago must be part
@@ -329,7 +321,7 @@ with Fixed Effects. Finally, given a CPIC = $7.50 obtained from a
 previous Lift test, a range between two to five test markets, and a
 duration between 10 and 15 days we obtain:
 
-    MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
+    MarketSelections <- suppressWarnings(GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                               treatment_periods = c(10,15),
                                               N = c(2,3,4,5),
                                               Y_id = "Y",
@@ -344,9 +336,18 @@ duration between 10 and 15 days we obtain:
                                               budget = 100000,
                                               alpha = 0.1,
                                               Correlations = TRUE,
-                                              fixed_effects = TRUE)
+                                              fixed_effects = TRUE))
     #> Setting up cluster.
     #> Importing functions into cluster.
+    #> Attempting to load the environment 'package:dplyr'
+    #> 
+    #> Attaching package: 'dplyr'
+    #> The following objects are masked from 'package:stats':
+    #> 
+    #>     filter, lag
+    #> The following objects are masked from 'package:base':
+    #> 
+    #>     intersect, setdiff, setequal, union
     #> Attempting to load the environment 'package:tidyr'
     #> Deterministic setup with 2 locations in treatment.
     #> Deterministic setup with 3 locations in treatment.
@@ -397,12 +398,14 @@ metrics are:
 -   **Power**: The row’s average power across all simulations at the
     specified `Effect Size`.
 
--   **AvgScaledL2Imbalance**: The Scaled L2 Imbalance metric, which is a
+-   **AvgScaledL2Imbalance**: The Scaled L2 Imbalance metric is a
     goodness of fit metric between 0 and 1 that represents how well the
     model is predicting the pre-treatment observed values through the
     Synthetic Control. Scaled L2 Imbalance values of 0 show a perfect
-    match of pre-treatment values and values of 1 show a very inaccurate
-    prediction.
+    match of pre-treatment values. Scaled L2 Imbalance values of 1 show
+    that the Synthetic Control algorithm is not adding much value beyond
+    what you could accomplish with a simple average of control locations
+    (naive model).
 
 -   **Investment**: The average investment needed to obtain a
     well-powered test given a CPIC.
@@ -445,16 +448,14 @@ simulations.
 
     # Plot for chicago, cincinnati, houston, portland for a 15 day test
     plot(MarketSelections, market_ID = 1, print_summary = FALSE)
-    #> Warning: Removed 39 rows containing missing values (geom_smooth).
 
-<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection Plots-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection_Plots-1.png" style="display: block; margin: auto;" />
 
 
     # Plot for chicago, portland for a 15 day test
     plot(MarketSelections, market_ID = 2, print_summary = FALSE)
-    #> Warning: Removed 39 rows containing missing values (geom_smooth).
 
-<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection Plots-2.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;" />
 
 While both market selections perform excellent on all metrics, we will
 move further with the latter since it allows us to run a successful test
@@ -505,9 +506,8 @@ this market selection.
     #>  * new york: 0.0216
     #>  * reno: 0.0113
     #>  * san diego: 0.0394
-    #> Warning: Removed 39 rows containing missing values (geom_smooth).
 
-<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection Plot for chicago, portland-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection_Plot2-1.png" style="display: block; margin: auto;" />
 
 ### Analyzing the Test Results
 
@@ -604,7 +604,7 @@ parameters respectively.
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 1.1% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 1% chance of observing an effect this large or larger assuming treatment effect is zero.
 
 The results show that the campaigns led to a 5.4% lift in units sold
 corresponding to 4667 incremental units for this 15-day test. Moreover,
@@ -774,7 +774,7 @@ decide which is the best approach by setting the model parameter to
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 0.7% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 1.3% chance of observing an effect this large or larger assuming treatment effect is zero.
 
     summary(GeoTestBest)
     #> 

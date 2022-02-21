@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 ### What is Lift?
 Lift is a scientific measurement technique which allows users to accurately understand and compare the value of their strategies. Lift, which is grounded on experimental design, is typically used to measure the true or _causal_ effect that an ad campaign had on business metrics such as Sales, App Installs, or Leads. By estimating the _incremental_ effect that these strategies provide, analysts are able to understand, analyze, and optimize their cross-channel strategies through data and science. 
 
-### What is Geo Experimentation
+### What is Geo Experimentation?
 There are many ways to measure Lift and Geo Experimentation is one that has been rapidly gaining popularity. In general, Geo Experimentation refers to any test where the treatment is administered at the geo-level. In practice, this often means that ad campaigns are geo-targeted in such a way that the test regions are eligible to see ads while the control ones aren't. Geo Experimental methods use this information to calculate the true value that this strategy had on your audience. Moreover, since they rely on aggregated data they're privacy-safe, can work across channels, and are very robust against signal-loss.
 
 ### Why GeoLift?
@@ -45,19 +45,13 @@ remotes::install_github("facebookincubator/GeoLift")
 ```
 
 ```{r libraries, results="hide", warning=F, message=F}
-library(augsynth)
-library(gsynth)
 library(GeoLift)
-library(dplyr)
-library(doParallel)
-library(foreach)
-library(MarketMatching)
 ```
 
 ## III: GeoLift Example
 
 ### Data
-To show an end-to-end implementation of GeoLift we will use simulated data of 40 US cities across 90 days to: design a test, select test markets, run power calculations,, and finally calculate the Lift caused by the campaign. As with every GeoLift test, we start analyzing pre-test historical information. We will use the data included in the `GeoLift` package.
+To show an end-to-end implementation of GeoLift we will use simulated data of 40 US cities across 90 days to: design a test, select test markets, run power calculations, and finally calculate the Lift caused by the campaign. As with every GeoLift test, we start analyzing pre-test historical information. We will use the data included in the `GeoLift` package.
 
 ```{r load_data, results="hide", warning=F, message=F}
 data(GeoLift_PreTest)
@@ -137,7 +131,7 @@ The key parameters needed to run this function are:
 
 * `exclude_markets`: A list of markets or locations that won't be considered for the test market selection, but will remain in the pool of controls. In our example, we will set `exclude_markets = c("honolulu")` to make sure that only cities in the continental US will be part of the test group. As with `include_locations`, always make sure the spelling of locations in this lists matches with the data.
 
-* `holdout`: A vector with two values: the first one the smallest desirable holdout and the second the largest desirable holdout. By holdout we mean the percent of the total market that will be placed into the control group and will not see our ad campaign. In our example, will specify that we're looking for a large holdout and will therefore set `holdout = c(0.5, 1)`. If this parameter is left empty, all market selections will be analyzed regardless of their size.
+* `holdout`: A vector with two values: the first one the smallest desirable holdout and the second the largest desirable holdout.  The holdout represents the share of conversions from markets that will not see our ad campaign. In our example, will specify that we're OK with a large holdout and will therefore set `holdout = c(0.5, 1)`. If this parameter is left empty, all market selections will be analyzed regardless of their size.
 
 * `cpic`: Value indicating the Cost Per Incremental Conversion, that is, on average how much do we typically need to spend to bring one incremental conversion. CPIC estimates can typically be obtained from Marketing Mix Models, Conversion Lifts, and previous experiments/geo-experiments. This value is key to get a good estimate of the budget that we will need to run a well-powered test. If there is no reliable information about the Cost Per Incremental Conversion, the default will be set to `cpic = 1`, in which case, the investment results will output the incremental units needed for a successful test.
 
@@ -145,7 +139,7 @@ The key parameters needed to run this function are:
 
 * `alpha`: This parameter controls the significance Level that will be used by our model. By default `alpha = 0.1` which is equivalent to a 90% confidence level.
 
-* `model`: A string that indicates the outcome model used to augment the Augmented Synthetic Control Method. Augmentation through a prognostic function can improve fit and reduce L2 imbalance metrics. The most common values used are: `model = "None"` (default) which won't augment the ASCM and `model = "Ridge"`. More information on this parameter is given in the **Inference** section of this walkthrough,
+* `model`: A string that indicates the outcome model used to augment the Augmented Synthetic Control Method. Augmentation through a prognostic function can improve fit and reduce L2 imbalance metrics. The most common values used are: `model = "None"` (default) which won't augment the ASCM and `model = "Ridge"`. More information on this parameter is given in the **Inference** section of this walkthrough.
 
 * `fixed_effects`: A logic flag indicating whether to include unit Fixed Effects (FE) in the model. Fixed effects are an additional parameter that we can include into our models which represents a non-random component in our data. More specifically, in our model the FE represents the “level” of each region’s time-series across the data. By adding the FE we effectively remove this level - this allows our model to focus on explaining the variations from that level rather than the full value of Y. This is helpful when the series are stable across time. However, if the series isn’t stable (it has large spikes/valleys, has a clear trend, etc.), then it can actually be a detriment to our model. By default, this parameter is set to `fixed_effects = TRUE`. A close inspection of `GeoPlot`'s output combined with knowledge of the data is key to specify this parameter. In our example, we will set `fixed_effects = TRUE` given that we can observe a stable behavior of sales across our markets in the historical data.
 
@@ -159,11 +153,11 @@ The key parameters needed to run this function are:
 
 * `side_of_test`: A string indicating whether confidence will be determined using a one sided or a two sided test. These are the following valid values for this parameter:
   + `side_of_test = "two_sided"`: The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.
-  + `side_of_test = "one_sided"`: One-sided test against positive or negaative effects i.e. If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0. If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.
+  + `side_of_test = "one_sided"`: One-sided test against positive or negative effects i.e. If the effect being applied is negative, then defaults to -sum(x). If the effect being applied is positive, then defaults to sum(x).
 
 Continuing with the example and in order to explore the function's capabilities let's assume we have two restrictions: Chicago must be part of the test markets and we have up to \$100,000 to run the test. We can include these constraints into `GeoLiftMarketSelection()` with the `include_markets` and `budget` parameters and proceed with the market selection. Moreover, after observing that the historical KPI values in `GeoPlot()` have been stable across time we will proceed with a model with Fixed Effects. Finally, given a CPIC = \$7.50 obtained from a previous Lift test, a range between two to five test markets, and a duration between 10 and 15 days we obtain:
 
-```{r GeoLiftMarketSelection }
+```{r GeoLiftMarketSelection}
 MarketSelections <- suppressWarnings(GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           treatment_periods = c(10,15),
                                           N = c(2,3,4,5),
@@ -194,7 +188,7 @@ The results of the power analysis and market selection provide us with several k
 
 * **Power**: The row's average power across all simulations at the specified `Effect Size`.
 
-* **AvgScaledL2Imbalance**: The Scaled L2 Imbalance metric, which is a goodness of fit metric between 0 and 1 that represents how well the model is predicting the pre-treatment observed values through the Synthetic Control. Scaled L2 Imbalance values of 0 show a perfect match of pre-treatment values and values of 1 show a very inaccurate prediction.
+* **AvgScaledL2Imbalance**: The Scaled L2 Imbalance metric is a goodness of fit metric between 0 and 1 that represents how well the model is predicting the pre-treatment observed values through the Synthetic Control. Scaled L2 Imbalance values of 0 show a perfect match of pre-treatment values. Scaled L2 Imbalance values of 1 show that the Synthetic Control algorithm is not adding much value beyond what you could accomplish with a simple average of control locations (naive model).
 
 * **Investment**: The average investment needed to obtain a well-powered test given a CPIC.
 
@@ -212,7 +206,7 @@ The results of the power analysis and market selection provide us with several k
 
 The results in `MarketSelection` show that the test markets with the best ranks are: `(chicago, cincinnati, houston, portland)` and `(chicago, portland)`, both tied at rank 2. We can `plot()` both of these results to inspect them further. This plot will show how the results of the `GeoLift()` model would look like with the latest possible test period as well as the test's power curve across all simulations.
 
-```{r GeoLiftMarketSelection Plots}
+```{r GeoLiftMarketSelection_Plots}
 # Plot for chicago, cincinnati, houston, portland for a 15 day test
 plot(MarketSelections, market_ID = 1, print_summary = FALSE)
 
@@ -223,7 +217,7 @@ plot(MarketSelections, market_ID = 2, print_summary = FALSE)
 
 While both market selections perform excellent on all metrics, we will move further with the latter since it allows us to run a successful test with a smaller budget. Finally, changing the `print_summary` parameter of `plot()` to `TRUE` can provide us with additional information about this market selection.
 
-```{r GeoLiftMarketSelection Plot for chicago, portland}
+```{r GeoLiftMarketSelection_Plot2}
 
 # Plot for chicago, portland for a 15 day test
 plot(MarketSelections, market_ID = 2, print_summary = TRUE)

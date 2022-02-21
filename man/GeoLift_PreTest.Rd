@@ -7,9 +7,9 @@
 \format{
 A data frame with historical information to run GeoLift power calculations:
 \describe{
-   \item{date}{Date in yyyy-mm-dd format}
-   \item{location}{Name of the city}
-   \item{Y}{Number of conversions}
+\item{date}{Date in yyyy-mm-dd format}
+\item{location}{Name of the city}
+\item{Y}{Number of conversions}
 }
 }
 \usage{

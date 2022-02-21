@@ -16,11 +16,11 @@ weekly or daily. Defaults to daily.}
 }
 \value{
 List that contains:
-         \itemize{
-         \item{"date_vector":}{ Vector of dates, going from first pre test time to end of test.}
-         \item{"treatment_start":}{ start date of study.}
-         \item{"treatment_end":}{ End date of study.}
-        }
+\itemize{
+\item{"date_vector":}{ Vector of dates, going from first pre test time to end of test.}
+\item{"treatment_start":}{ start date of study.}
+\item{"treatment_end":}{ End date of study.}
+}
 }
 \description{
 Link dates to GeoLift time periods.

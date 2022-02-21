@@ -10,7 +10,7 @@
 #'
 #' @description
 #'
-#' \code{fn_treatment} generates the treatment variable D, where
+#' `fn_treatment` generates the treatment variable D, where
 #' D = 1 for test locations in the test period and D = 0 otherwise.
 #'
 #' @param df A data.frame containing the historical conversions by
@@ -93,7 +93,7 @@ build_cluster <- function(parallel_setup,
 #'
 #' @description
 #'
-#' \code{limit_test_markets} determines if the user would like
+#' `limit_test_markets` determines if the user would like
 #' to find combinations of treatments that is higher than half
 #' the total amount of locations available while running a random
 #' assignment of locations. If this is the case, it will cap the
@@ -190,7 +190,7 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency = 
 #' @description
 #'
 #' Append the aggregated KPI values for the test market and all markets to the
-#' \code{GeoDataRead} object.
+#' `GeoDataRead` object.
 #'
 #' @param data A data.frame containing the historical conversions by
 #' geographic unit. It requires a "locations" column with the geo name,

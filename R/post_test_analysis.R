@@ -10,7 +10,7 @@
 #'
 #' @description
 #'
-#' \code{GeoLift} performs inference for a geo-test.
+#' `GeoLift` performs inference for a geo-test.
 #'
 #' @param Y_id Name of the outcome variable (String).
 #' @param time_id Name of the time variable (String).
@@ -340,10 +340,12 @@ GeoLift <- function(Y_id = "Y",
 #' Calculate cumulative lift
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' This method will calculate the cumulative lift with each passing day.
 #'
 #' @param data DataFrame that GeoLfit will use to determine a result.
-#' Should be the output of \code{GeoDataRead}.
+#' Should be the output of `GeoDataRead`.
 #' @param treatment_locations Vector of locations where the treatment was applied.
 #' @param treatment_start_period Integer representing period where test started.
 #' @param treatment_end_period Integer representing period where test finished.

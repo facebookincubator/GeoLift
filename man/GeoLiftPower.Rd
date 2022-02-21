@@ -79,13 +79,13 @@ default is FALSE.}
 Synthetic Control Method. Augmentation through a prognostic function can improve
 fit and reduce L2 imbalance metrics.
 \itemize{
-         \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
-         \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
-                          for smaller panels (less than 40 locations and 100 time-stamps.))}
-         \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
-                         to improve fit for larger panels (more than 40 locations and 100
-                         time-stamps. }
-         }}
+\item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+\item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+for smaller panels (less than 40 locations and 100 time-stamps.))}
+\item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+to improve fit for larger panels (more than 40 locations and 100
+time-stamps. }
+}}
 
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
 effects in the model. Set to TRUE by default.}
@@ -102,27 +102,27 @@ Set to "sequential" by default.}
 \item{side_of_test}{A string indicating whether confidence will be determined
 using a one sided or a two sided test.
 \itemize{
-         \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-         \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
-         If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
-         If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
-         }}
+\item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+\item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+}}
 
 \item{import_augsynth_from}{Points to where the augsynth package
 should be imported from to send to the nodes.}
 }
 \value{
 GeoLiftPower object that contains:
-     \itemize{
-         \item{"location":}{ Test units of the simulation}
-         \item{"pvalue":}{ P Value for each simulation}
-         \item{"duration":}{ Duration of the simulation}
-         \item{"effect_size":}{ Effect Size used for the simulation}
-         \item{"treatment_start":}{ Treatment start time for the simulation}
-         \item{"investment":}{ Estimated Investment}
-         \item{"cpipc":}{ Cost Per Incremental Conversion}
-         \item{"ScaledL2Imbalance":}{ Scaled L2 Imbalance metric}
-     }
+\itemize{
+\item{"location":}{ Test units of the simulation}
+\item{"pvalue":}{ P Value for each simulation}
+\item{"duration":}{ Duration of the simulation}
+\item{"effect_size":}{ Effect Size used for the simulation}
+\item{"treatment_start":}{ Treatment start time for the simulation}
+\item{"investment":}{ Estimated Investment}
+\item{"cpipc":}{ Cost Per Incremental Conversion}
+\item{"ScaledL2Imbalance":}{ Scaled L2 Imbalance metric}
+}
 }
 \description{
 This function runs power calculations for input historical geo data

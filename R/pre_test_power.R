@@ -11,7 +11,7 @@
 #'
 #' @description
 #'
-#' \code{MarketSelection} helps calculate the best markets based
+#' `MarketSelection` helps calculate the best markets based
 #' on Dynamic Time Warping between the locations' time-series.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -72,10 +72,10 @@ MarketSelection <- function(data,
 #'
 #' @description
 #'
-#' \code{build_stochastic_matrix} selects the markets to be tested
-#' by randomly sampling from the \code{similarity_matrix}.
+#' `build_stochastic_matrix` selects the markets to be tested
+#' by randomly sampling from the `similarity_matrix`.
 #' It gets groups of 2 elements and samples one of them. It repeats
-#' this process until the \code{treatment_size} is equal to the sample.
+#' this process until the `treatment_size` is equal to the sample.
 #'
 #' @param treatment_size Is the amount of location units within the
 #' treatment group.
@@ -132,7 +132,7 @@ stochastic_market_selector <- function(treatment_size,
 #'
 #' @description
 #'
-#' \code{type_of_test} returns stat_func being used for GeoLiftPower;
+#' `type_of_test` returns stat_func being used for GeoLiftPower;
 #' GeoLiftPowerFinder & GeoLift.
 #'
 #' @param side_of_test A string indicating whether confidence will be determined
@@ -179,7 +179,7 @@ type_of_test <- function(side_of_test = "two_sided", alternative_hypothesis = NU
 #'
 #' @description
 #'
-#' \code{pvalueCalc} calculates the p-value for a GeoLift object.
+#' `pvalueCalc` calculates the p-value for a GeoLift object.
 #'
 #' @param data A data.frame containing the historical conversions by
 #' geographic unit. It requires a "locations" column with the geo name,
@@ -336,8 +336,14 @@ pvalueCalc <- function(data,
 #' test markets, and test duration.
 #'
 #' @description
+#' `r lifecycle::badge("superseded")`
 #'
-#' \code{GeoLiftPowerFinder} provides power calculations for unknown
+#' Development on `GeoLiftPowerFinder()` is complete.
+#' We recommend switching to `GeoLiftMarketSelection()`
+#' for new code, which is easier to use, more featureful,
+#' and still under active development.
+#'
+#' `GeoLiftPowerFinder` provides power calculations for unknown
 #' test markets, number of test locations, and test duration.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -708,8 +714,14 @@ GeoLiftPowerFinder <- function(data,
 #' test markets, and test duration.
 #'
 #' @description
+#' `r lifecycle::badge("superseded")`
 #'
-#' \code{GeoLiftPower.search} provides power calculations for unknown
+#' Development on `GeoLiftPower.search()` is complete.
+#' We recommend switching to `GeoLiftMarketSelection()`
+#' for new code, which is easier to use, more featureful,
+#' and still under active development.
+#'
+#' `GeoLiftPower.search` provides power calculations for unknown
 #' test markets, number of test locations, and test duration.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -1008,8 +1020,14 @@ GeoLiftPower.search <- function(data,
 #' with unknown test locations.
 #'
 #' @description
+#' `r lifecycle::badge("superseded")`
 #'
-#' \code{NumberLocations} calculates power to determine the
+#' Development on `NumberLocations()` is complete.
+#' We recommend switching to `GeoLiftMarketSelection()`
+#' for new code, which is easier to use, more featureful,
+#' and still under active development.#'
+#'
+#' `NumberLocations` calculates power to determine the
 #' number of test periods with unknown test locations.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -1494,7 +1512,7 @@ GeoLiftPower <- function(data,
 #'
 #' @description
 #'
-#' \code{GeoLiftMarketSelection} provides a ranking of test markets  for a
+#' `GeoLiftMarketSelection` provides a ranking of test markets  for a
 #' GeoLift test based on a power analysis.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -1503,10 +1521,10 @@ GeoLiftPower <- function(data,
 #' of the time period (starting at 1), and covariates.
 #' @param treatment_periods List of treatment periods to calculate power for.
 #' @param N List of number of test markets to calculate power for. If left empty (default)
-#' and if no locations are included through \code{include_locations}, it will populate
+#' and if no locations are included through `include_locations`, it will populate
 #' the list of markets with the deciles of the total number of locations. If left empty
-#' and a set of markets is provided by \code{include_locations} only the deciles larger
-#' or equal than \code{length(include_locations)} will be used.
+#' and a set of markets is provided by `include_locations` only the deciles larger
+#' or equal than `length(include_locations)` will be used.
 #' @param X List of names of covariates.
 #' @param Y_id Name of the outcome variable (String).
 #' @param location_id Name of the location variable (String).
@@ -2074,7 +2092,7 @@ GeoLiftMarketSelection <- function(data,
 #'
 #' @description
 #'
-#' Printing method for \code{GeoLiftMarketSelection}. The function will print
+#' Printing method for `GeoLiftMarketSelection`. The function will print
 #' the best markets when called.
 #'
 #' @param x GeoLiftMarketSelection object.

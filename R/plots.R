@@ -10,7 +10,7 @@
 #'
 #' @description
 #'
-#' \code{GeoPlot} takes a data frame used for GeoLift to generate
+#' `GeoPlot` takes a data frame used for GeoLift to generate
 #' a plot of each location's time series.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -58,7 +58,7 @@ GeoPlot <- function(data,
 #'
 #' @description
 #'
-#' Plotting function for \code{GeoLiftPower}. The function smooths the power curve
+#' Plotting function for `GeoLiftPower`. The function smooths the power curve
 #' for ease of interpretation.
 #'
 #' @param x GeoLiftPower object.
@@ -354,7 +354,7 @@ Lift.plot <- function(GeoLift,
 #'
 #' @description
 #'
-#' \code{absolute_value.plot} returns chart for daily absolute values using GeoLift output.
+#' `absolute_value.plot` returns chart for daily absolute values using GeoLift output.
 #'
 #' @param GeoLift GeoLift object.
 #' @param plot_type Can be either ATT or Incrementality.  Defaults to ATT.
@@ -451,10 +451,12 @@ absolute_value.plot <- function(GeoLift,
 #' Plot the accumulated lift effect.
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' Plot the accumulated lift effect.
 #'
 #' @param data DataFrame that GeoLfit will use to determine a result.
-#' Should be the output of \code{GeoDataRead}.
+#' Should be the output of `GeoDataRead`.
 #' @param treatment_locations Vector of locations where the treatment was applied.
 #' @param treatment_start_period Integer representing period where test started.
 #' @param treatment_end_period Integer representing period where test finished.
@@ -548,14 +550,14 @@ cumulative_value.plot <- function(data,
 #'
 #' @description
 #'
-#' Plotting function for \code{GeoLiftMarketSelection}. This function plots the
+#' Plotting function for `GeoLiftMarketSelection`. This function plots the
 #' latest possible test given the data and duration as well as the power curve
 #' across historical simulations.
 #'
 #' @param x A GeoLiftMarketSelection object.
 #' @param market_ID Numeric value indicating the market to be plotted. This
 #' value should reflect a valid ID from the BestMarkets data frame of the
-#' \code{GeoLiftMarketSelection} output.
+#' `GeoLiftMarketSelection` output.
 #' @param print_summary Logic flag indicating whether to print model metrics
 #' from the latest possible test. Set to TRUE by default.
 #' @param ... additional arguments
@@ -651,7 +653,7 @@ plot.GeoLiftMarketSelection <- function(x,
 #'
 #' @description
 #'
-#' \code{plotCorrels} takes a data frame used for GeoLift to generate
+#' `plotCorrels` takes a data frame used for GeoLift to generate
 #' a plot that show historical similarities in KPI levels between the
 #' test markets and the aggregation of all locations (total).
 #'

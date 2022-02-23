@@ -225,6 +225,25 @@ plot(MarketSelections, market_ID = 2, print_summary = TRUE)
 
 ```
 
+#### **Note:** Given that we are not using the complete pre-treatment data to calculate the weights in our power analysis simulations, the ones displayed by the plotting function above are not the _final_ values. However, you can easily obtain them with the `GetWeights()` function.
+
+```{r GetWeights}
+
+weights <- GetWeights(Y_id = "Y",
+                      location_id = "location",
+                      time_id = "time",
+                      data = GeoTestData_PreTest,
+                      locations = c("chicago", "portland"),
+                      pretreatment_end_time = 90,
+                      fixed_effects = TRUE)
+
+# Top weights
+head(dplyr::arrange(weights, desc(weight)))
+
+```
+
+
+
 ### Analyzing the Test Results
 
 Based on the results of the Power Calculations, a test is set-up in which a \$65,000 and 15-day marketing campaign was executed in the cities of Chicago and Portland while the rest of the locations were put on holdout. Following the completion from this marketing campaign, we receive sales data that reflects these results. This new data-set contains the same format and information as the pre-test one but crucially includes results for the duration of the campaign. Depending on the vertical and product, adding a post-campaign cooldown period might be useful. 

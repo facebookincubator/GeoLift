@@ -516,6 +516,28 @@ this market selection.
 
 <img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection_Plot2-1.png" style="display: block; margin: auto;" />
 
+#### **Note:** Given that we are not using the complete pre-treatment data to calculate the weights in our power analysis simulations, the ones displayed by the plotting function above are not the *final* values. However, you can easily obtain them with the `GetWeights()` function.
+
+
+    weights <- GetWeights(Y_id = "Y",
+                          location_id = "location",
+                          time_id = "time",
+                          data = GeoTestData_PreTest,
+                          locations = c("chicago", "portland"),
+                          pretreatment_end_time = 90,
+                          fixed_effects = TRUE)
+    #> One outcome and one treatment time found. Running single_augsynth.
+
+    # Top weights
+    head(dplyr::arrange(weights, desc(weight)))
+    #>      location     weight
+    #> 1  cincinnati 0.22717797
+    #> 2       miami 0.20276981
+    #> 3 baton rouge 0.13353743
+    #> 4 minneapolis 0.08997973
+    #> 5      dallas 0.07392298
+    #> 6   nashville 0.06853184
+
 ### Analyzing the Test Results
 
 Based on the results of the Power Calculations, a test is set-up in

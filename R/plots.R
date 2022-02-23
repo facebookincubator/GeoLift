@@ -560,6 +560,9 @@ cumulative_value.plot <- function(data,
 #' `GeoLiftMarketSelection` output.
 #' @param print_summary Logic flag indicating whether to print model metrics
 #' from the latest possible test. Set to TRUE by default.
+#' @param breaks_x_axis Numeric value indicating the number of breaks in the
+#' x-axis of the power plot. You may get slightly more or fewer breaks that
+#' requested based on `breaks_pretty()`. Set to 10 by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -569,6 +572,7 @@ cumulative_value.plot <- function(data,
 plot.GeoLiftMarketSelection <- function(x,
                                      market_ID = 0,
                                      print_summary = TRUE,
+                                     breaks_x_axis = 10,
                                      ...) {
 
   if (!inherits(x, "GeoLiftMarketSelection")) {
@@ -589,8 +593,8 @@ plot.GeoLiftMarketSelection <- function(x,
                                                              location == Market$location))
 
   CostPerLift <- as.numeric(PowerPlot %>%
-                              dplyr::filter(EffectSize > 0) %>%
-                              dplyr::mutate(AvgCost = Investment / EffectSize) %>%
+                              dplyr::filter(EffectSize != 0) %>%
+                              dplyr::mutate(AvgCost = Investment / abs(EffectSize)) %>%
                               dplyr::summarise(mean(AvgCost)))
 
   data_lifted <- x$parameters$data
@@ -614,13 +618,30 @@ plot.GeoLiftMarketSelection <- function(x,
   ))
 
   if (print_summary){
+    # message(paste0(
+    #   "##################################",
+    #   "\n#####   GeoLift Simulation   #####\n",
+    #   "##################################\n",
+    #   "\n** Simulating a ",
+    #   100*round(Market$EffectSize,2),
+    #   "% Effect Size **" ))
+    message(paste0(
+      "##################################",
+      "\n#####   GeoLift Simulation   #####\n",
+      "####  Simulating: ",
+      100*round(Market$EffectSize,2),
+      "% Lift  ####\n",
+      "##################################"))
     print(summary(lifted))
   }
 
   PowerPlot_graph <- ggplot(PowerPlot, aes(x = EffectSize, y = power)) +
     geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
     geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
-    scale_x_continuous(sec.axis = sec_axis(~ . * CostPerLift, name = "Estimated Investment")) +
+    scale_x_continuous(sec.axis = sec_axis( ~ . * CostPerLift ,
+                                            breaks = scales::pretty_breaks(n = breaks_x_axis),
+                                            name = "Estimated Investment"),
+                       breaks = scales::pretty_breaks(n = breaks_x_axis)) +
     ylim(0, 1) +
     geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
     scale_colour_manual(name="Power Curve", values=c("gray80", "#52854C")) +

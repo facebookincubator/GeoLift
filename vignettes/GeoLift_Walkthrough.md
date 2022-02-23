@@ -349,9 +349,13 @@ duration between 10 and 15 days we obtain:
     #> 
     #>     intersect, setdiff, setequal, union
     #> Attempting to load the environment 'package:tidyr'
+    #> 
     #> Deterministic setup with 2 locations in treatment.
+    #> 
     #> Deterministic setup with 3 locations in treatment.
+    #> 
     #> Deterministic setup with 4 locations in treatment.
+    #> 
     #> Deterministic setup with 5 locations in treatment.
     #>   ID                                           location duration EffectSize
     #> 1  1             chicago, cincinnati, houston, portland       15       0.05
@@ -363,17 +367,17 @@ duration between 10 and 15 days we obtain:
     #>   Power AvgScaledL2Imbalance Investment   AvgATT Average_MDE ProportionTotal_Y
     #> 1     1            0.1971864   74118.38 159.3627  0.04829913        0.07576405
     #> 2     1            0.1738778   64563.75 290.0071  0.10117316        0.03306537
-    #> 3     1            0.1966996   99027.75 316.6203  0.09552878        0.07576405
+    #> 3     1            0.1966996   99027.75 316.6204  0.09552879        0.07576405
     #> 4     1            0.1682310   43646.25 300.9401  0.10378013        0.03306537
-    #> 5     1            0.2305628   75389.25 350.3141  0.10502968        0.05797087
+    #> 5     1            0.2305628   75389.25 350.3142  0.10502968        0.05797087
     #> 6     1            0.2699167   95755.50 146.7975  0.04282215        0.09801138
     #>   abs_lift_in_zero   Holdout rank correlation
-    #> 1            0.002 0.9242359    2   0.9144814
-    #> 2            0.001 0.9669346    2   0.9321104
-    #> 3            0.004 0.9242359    9   0.9144814
-    #> 4            0.004 0.9669346    9   0.9321104
-    #> 5            0.005 0.9420291   11   0.9139549
-    #> 6            0.007 0.9019886   13   0.8992280
+    #> 1            0.002 0.9242359    1   0.9144814
+    #> 2            0.001 0.9669346    1   0.9321104
+    #> 3            0.004 0.9242359    3   0.9144814
+    #> 4            0.004 0.9669346    3   0.9321104
+    #> 5            0.005 0.9420291    5   0.9139549
+    #> 6            0.007 0.9019886    6   0.8992280
 
 The results of the power analysis and market selection provide us with
 several key metrics that we can use to select our test market. These
@@ -435,8 +439,7 @@ metrics are:
 -   **rank**: Ranking variable that summarizes the EffectSize, Power,
     AvgScaledL2Imbalance, Average\_MDE, and abs\_lift\_in\_zero to help
     you select the best combination of test markets. The ranking
-    variable allows for ties and can have some jumps in its values when
-    additional constraints such as budget and holdout are provided.
+    variable allows for ties.
 
 The results in `MarketSelection` show that the test markets with the
 best ranks are: `(chicago, cincinnati, houston, portland)` and
@@ -466,6 +469,10 @@ this market selection.
 
     # Plot for chicago, portland for a 15 day test
     plot(MarketSelections, market_ID = 2, print_summary = TRUE)
+    #> ##################################
+    #> #####   GeoLift Simulation   #####
+    #> ####  Simulating: 10% Lift  ####
+    #> ##################################
     #> 
     #> GeoLift Results Summary
     #> ##################################
@@ -604,7 +611,7 @@ parameters respectively.
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 1% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 0.6% chance of observing an effect this large or larger assuming treatment effect is zero.
 
 The results show that the campaigns led to a 5.4% lift in units sold
 corresponding to 4667 incremental units for this 15-day test. Moreover,
@@ -774,7 +781,7 @@ decide which is the best approach by setting the model parameter to
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 1.3% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 1.4% chance of observing an effect this large or larger assuming treatment effect is zero.
 
     summary(GeoTestBest)
     #> 

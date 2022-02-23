@@ -320,3 +320,107 @@ GetCorrel <- function(data, locs = c(), dtw = 0){
   Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("control_markets", "test_markets"),], dtw = dtw)
   return(Correl$BestMatches$Correlation[[1]])
 }
+
+#' Function to obtain the synthetic control weights.
+#'
+#' @description
+#'
+#' `GetWeights` returns the synthetic control weights as a data frame
+#' for a given test set-up.
+#'
+#' @param Y_id Name of the outcome variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param X List of names of covariates.
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param locations List of test locations.
+#' @param pretreatment_end_time Time index of the last pre-treatment period.
+#' @param model A string indicating the outcome model used to augment the Augmented
+#' Synthetic Control Method. Augmentation through a prognostic function can improve
+#' fit and reduce L2 imbalance metrics.
+#' \itemize{
+#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
+#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+#'                          to improve fit for larger panels (more than 40 locations and 100
+#'                          time-stamps. }
+#'          \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
+#'          }
+#' @param fixed_effects A logic flag indicating whether to include unit fixed
+#' effects in the model. Set to TRUE by default.
+#'
+#' @return
+#' Data frame with the locations and weights.
+#'
+#' @export
+GetWeights <- function(Y_id = "Y",
+                       time_id = "time",
+                       location_id = "location",
+                       X = c(),
+                       data,
+                       locations,
+                       pretreatment_end_time,
+                       model = "none",
+                       fixed_effects = TRUE) {
+
+  # Rename variables to standard names used by GeoLift
+  data <- data %>% dplyr::rename(
+    time = time_id,
+    Y = Y_id,
+    location = location_id
+  )
+
+  data$location <- tolower(data$location)
+  locations <- tolower(locations)
+
+  # Add filler rows if all time-stamps will be used for weight calculation
+  if(pretreatment_end_time == max(data$time)){
+    aux_rows <- data[data$time == max(data$time),]
+    aux_rows$time <- aux_rows$time + 1
+    data <- data %>% dplyr::add_row(aux_rows)
+    treatment_start_time <- max(data$time)
+    treatment_end_time <- max(data$time)
+  } else{
+    treatment_start_time <- pretreatment_end_time + 1
+    treatment_end_time <- max(data$time)
+  }
+
+  data_aux <- fn_treatment(data,
+                           locations = locations,
+                           treatment_start_time,
+                           treatment_end_time
+  )
+
+  if (length(X) == 0) {
+    fmla <- as.formula("Y ~ D")
+  } else if (length(X) > 0) {
+    fmla <- as.formula(paste(
+      "Y ~ D |",
+      sapply(list(X),
+             paste,
+             collapse = "+"
+      )
+    ))
+  }
+
+  # Single Augsynth
+  augsyn <- augsynth::augsynth(fmla,
+                               unit = location, time = time,
+                               data = data_aux,
+                               t_int = treatment_start_time,
+                               progfunc = model,
+                               scm = T,
+                               fixedeff = fixed_effects
+  )
+
+  results <- data.frame(
+    location = dimnames(augsyn$weights)[[1]],
+    weight = unname(augsyn$weights[, 1])
+  )
+
+  return(results)
+}

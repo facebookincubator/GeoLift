@@ -1,4 +1,4 @@
-GeoLift v2.3 (Release date: TBD)
+GeoLift v2.3 (Release date: 2022-02-23)
 =========================================
 
 Changes:
@@ -13,6 +13,7 @@ between test markets and the aggregate of all locations.
 had special characters.
 * Fixed issue with the range of the x axis of GeoPlot() to avoid receiving the warning message: Removed 1 rows containing missing values (geom_vline).
 * NumberLocations(), GeoLiftPowerFinder(), and GeoLiftPower.search() are now superseeded by GeoLiftMarketSelection().We recommend the latter for all power analyses.
+* New function GetWeights() returns a dataframe with the weights of the synthetic control model for a given test set-up.
 
 GeoLift v2.2.2 (Release date: 2021-02-04)
 =========================================

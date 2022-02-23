@@ -98,10 +98,10 @@ stochastic_market_selector <- function(treatment_size,
                                        similarity_matrix,
                                        run_stochastic_process = FALSE) {
   if (!run_stochastic_process) {
-    message("Deterministic setup with ", treatment_size, " locations in treatment.")
+    message("\nDeterministic setup with ", treatment_size, " locations in treatment.")
     return(similarity_matrix[, 1:treatment_size])
   } else {
-    message("Random setup with ", treatment_size, " locations in treatment.")
+    message("\nRandom setup with ", treatment_size, " locations in treatment.")
     if (treatment_size > 0.5 * ncol(similarity_matrix)) {
       stop(paste0(
         "Treatment size (",
@@ -2029,9 +2029,11 @@ GeoLiftMarketSelection <- function(data,
     results$Investment <- -1 * results$Investment
   }
 
-  # Step 11 - Remove tests out of budget (if aplicable)
+  # Step 11 - Remove tests out of budget (if applicable)
   if (!is.null(budget)) {
     resultsM <- resultsM %>% dplyr::filter(abs(budget) > abs(Investment))
+    # Re-rank
+    resultsM$rank <- rank(resultsM$rank,ties.method = "min")
   }
 
   # Step 12: Holdout Size
@@ -2047,6 +2049,8 @@ GeoLiftMarketSelection <- function(data,
       holdout[1] <= Holdout,
       holdout[2] >= Holdout
     )
+    # Re-rank
+    resultsM$rank <- rank(resultsM$rank,ties.method = "min")
   }
 
   # Step 14 - Create ID

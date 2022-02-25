@@ -1609,32 +1609,32 @@ GeoLiftPower <- function(data,
 #'
 #' @export
 GeoLiftMarketSelection <- function(data,
-                                treatment_periods,
-                                N = c(),
-                                X = c(),
-                                Y_id = "Y",
-                                location_id = "location",
-                                time_id = "time",
-                                effect_size = seq(0, 0.25, 0.05),
-                                lookback_window = 1,
-                                include_markets = c(),
-                                exclude_markets = c(),
-                                holdout = c(),
-                                cpic = 1,
-                                budget = NULL,
-                                alpha = 0.1,
-                                normalize = FALSE,
-                                model = "none",
-                                fixed_effects = TRUE,
-                                dtw = 0,
-                                Correlations = FALSE,
-                                ProgressBar = FALSE,
-                                print = TRUE,
-                                run_stochastic_process = FALSE,
-                                parallel = TRUE,
-                                parallel_setup = "sequential",
-                                side_of_test = "two_sided",
-                                import_augsynth_from = "library(augsynth)") {
+                                   treatment_periods,
+                                   N = c(),
+                                   X = c(),
+                                   Y_id = "Y",
+                                   location_id = "location",
+                                   time_id = "time",
+                                   effect_size = seq(0, 0.25, 0.05),
+                                   lookback_window = 1,
+                                   include_markets = c(),
+                                   exclude_markets = c(),
+                                   holdout = c(),
+                                   cpic = 1,
+                                   budget = NULL,
+                                   alpha = 0.1,
+                                   normalize = FALSE,
+                                   model = "none",
+                                   fixed_effects = TRUE,
+                                   dtw = 0,
+                                   Correlations = FALSE,
+                                   ProgressBar = FALSE,
+                                   print = TRUE,
+                                   run_stochastic_process = FALSE,
+                                   parallel = TRUE,
+                                   parallel_setup = "sequential",
+                                   side_of_test = "two_sided",
+                                   import_augsynth_from = "library(augsynth)") {
   if (parallel == TRUE) {
     cl <- build_cluster(
       parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
@@ -1659,9 +1659,9 @@ GeoLiftMarketSelection <- function(data,
   # Populate N if it's not provided
   if (length(N) == 0) {
     N <- unique(round(quantile(c(1:length(unique(data$location))),
-                               probs = seq(0, 0.5, 0.1),
-                               type = 1,
-                               names = FALSE
+      probs = seq(0, 0.5, 0.1),
+      type = 1,
+      names = FALSE
     )))
 
     if (length(include_markets) > 0) {
@@ -1749,10 +1749,10 @@ GeoLiftMarketSelection <- function(data,
   # }
 
   BestMarkets <- MarketSelection(data,
-                                 location_id = "location",
-                                 time_id = "time",
-                                 Y_id = "Y",
-                                 dtw = dtw
+    location_id = "location",
+    time_id = "time",
+    Y_id = "Y",
+    dtw = dtw
   )
 
   N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
@@ -1798,15 +1798,15 @@ GeoLiftMarketSelection <- function(data,
     }
 
     # Exclude markets  defined at exclude_markets from possible test
-    if(length(exclude_markets) > 0){
+    if (length(exclude_markets) > 0) {
       locs_to_drop <- c()
-      for(row in 1:nrow(BestMarkets_aux)){
-        if (any(exclude_markets %in% BestMarkets_aux[row,])){
-          locs_to_drop <- append(locs_to_drop,row)
+      for (row in 1:nrow(BestMarkets_aux)) {
+        if (any(exclude_markets %in% BestMarkets_aux[row, ])) {
+          locs_to_drop <- append(locs_to_drop, row)
         }
       }
-      if(length(locs_to_drop) > 0){
-        BestMarkets_aux <- BestMarkets_aux[-locs_to_drop,]
+      if (length(locs_to_drop) > 0) {
+        BestMarkets_aux <- BestMarkets_aux[-locs_to_drop, ]
       }
     }
 
@@ -1981,8 +1981,8 @@ GeoLiftMarketSelection <- function(data,
 
   for (row in 1:nrow(resultsM)) {
     resultsM$ProportionTotal_Y[row] <- as.numeric(AggYperLoc %>%
-                                                    dplyr::filter(location %in% resultsM$Locs[[row]]) %>%
-                                                    dplyr::summarize(total = sum(Total_Y))) /
+      dplyr::filter(location %in% resultsM$Locs[[row]]) %>%
+      dplyr::summarize(total = sum(Total_Y))) /
       sum(AggYperLoc$Total_Y)
   }
 
@@ -1992,7 +1992,7 @@ GeoLiftMarketSelection <- function(data,
     dplyr::slice_max(order_by = power, n = 1)
 
   # Step 7 - Create Rank variable - Adding New Ranking System
-  abs_lift_in_zero <- true_lift <- NULL #might change to es
+  abs_lift_in_zero <- true_lift <- NULL # might change to es
   resultsM$abs_lift_in_zero <- round(abs(resultsM$AvgDetectedLift - resultsM$EffectSize), 3)
 
   resultsM <- as.data.frame(resultsM) %>%
@@ -2019,8 +2019,8 @@ GeoLiftMarketSelection <- function(data,
 
   # Step 9 - Rename columns
   resultsM <- dplyr::rename(resultsM,
-                            Average_MDE = AvgDetectedLift, #Average_MDE = lift
-                            Power = power
+    Average_MDE = AvgDetectedLift, # Average_MDE = lift
+    Power = power
   )
 
   # Step 10: Adjust signs if Negative Lift
@@ -2033,7 +2033,7 @@ GeoLiftMarketSelection <- function(data,
   if (!is.null(budget)) {
     resultsM <- resultsM %>% dplyr::filter(abs(budget) > abs(Investment))
     # Re-rank
-    resultsM$rank <- rank(resultsM$rank,ties.method = "min")
+    resultsM$rank <- rank(resultsM$rank, ties.method = "min")
   }
 
   # Step 12: Holdout Size
@@ -2050,7 +2050,7 @@ GeoLiftMarketSelection <- function(data,
       holdout[2] >= Holdout
     )
     # Re-rank
-    resultsM$rank <- rank(resultsM$rank,ties.method = "min")
+    resultsM$rank <- rank(resultsM$rank, ties.method = "min")
   }
 
   # Step 14 - Create ID
@@ -2063,30 +2063,34 @@ GeoLiftMarketSelection <- function(data,
   }
 
   # Re-order columns
-  resultsM <- resultsM[ , c(13,1,2,3,4,5,6,7,8,9,10,12,11)]
+  resultsM <- resultsM[, c(13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 11)]
 
   # Add correlations to total
-  if(Correlations){
+  if (Correlations) {
     resultsM$correlation <- 0
-    for (row in 1:nrow(resultsM)){
+    for (row in 1:nrow(resultsM)) {
       resultsM$correlation[row] <- GetCorrel(data, locs = unlist(strsplit(stringr::str_replace_all(resultsM$location[row], ", ", ","), split = ",")))
     }
   }
 
   # Print top Results
-  if(print) {
+  if (print) {
     print(head(resultsM))
   }
 
   # Save Parameters for plotting
-  params = list(data = data,
-                model = model,
-                fixed_effects = fixed_effects,
-                cpic = cpic)
+  params <- list(
+    data = data,
+    model = model,
+    fixed_effects = fixed_effects,
+    cpic = cpic
+  )
 
-  output <- list(BestMarkets = as.data.frame(resultsM),
-                 PowerCurves = as.data.frame(results),
-                 parameters = params)
+  output <- list(
+    BestMarkets = as.data.frame(resultsM),
+    PowerCurves = as.data.frame(results),
+    parameters = params
+  )
 
   class(output) <- c("GeoLiftMarketSelection", class(output))
   return(output)
@@ -2106,12 +2110,10 @@ GeoLiftMarketSelection <- function(data,
 #' A data frame.
 #'
 #' @export
-print.GeoLiftMarketSelection <- function(x, ...){
-
+print.GeoLiftMarketSelection <- function(x, ...) {
   if (!inherits(x, "GeoLiftMarketSelection")) {
     stop("object must be class GeoLiftMarketSelection")
   }
 
   print(x$BestMarkets)
-
 }

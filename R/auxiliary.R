@@ -204,18 +204,17 @@ get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency = 
 #' and total KPI (total).
 #'
 #' @export
-AppendAgg <- function(data, locs = NULL){
-
-  if(is.null(locs)){
+AppendAgg <- function(data, locs = NULL) {
+  if (is.null(locs)) {
     aux <- data %>%
       dplyr::group_by(time) %>%
       dplyr::summarise(Y = sum(Y))
     aux$location <- "control_markets"
     aux <- dplyr::bind_rows(data, aux)
-  } else if(!(all(tolower(locs) %in% tolower(unique(data$location))))){
+  } else if (!(all(tolower(locs) %in% tolower(unique(data$location))))) {
     message("Please specify a valid vector of location names.")
     return(NULL)
-  } else{
+  } else {
     aux <- data %>%
       dplyr::filter(!(location %in% locs)) %>%
       dplyr::group_by(time) %>%
@@ -224,20 +223,19 @@ AppendAgg <- function(data, locs = NULL){
   }
 
 
-  if(all(tolower(locs) %in% tolower(unique(data$location)))){
+  if (all(tolower(locs) %in% tolower(unique(data$location)))) {
     auxCombo <- data %>%
       dplyr::filter(location %in% locs) %>%
       dplyr::group_by(time) %>%
       dplyr::summarise(Y = sum(Y))
     auxCombo$location <- "test_markets"
     aux <- dplyr::bind_rows(aux, auxCombo)
-  } else{
+  } else {
     message("Please specify a valid vector of location names.")
     return(NULL)
   }
 
   return(as.data.frame(aux))
-
 }
 
 #' Auxiliary function to calculate correlations between input markets.
@@ -288,7 +286,6 @@ MarketCorrelations <- function(data,
   )
 
   return(mm)
-
 }
 
 #' Calculate correlations between input markets.
@@ -309,15 +306,14 @@ MarketCorrelations <- function(data,
 #' Correlation coefficient.
 #'
 #' @export
-GetCorrel <- function(data, locs = c(), dtw = 0){
-
-  if(!(all(tolower(locs) %in% tolower(unique(data$location))))){
+GetCorrel <- function(data, locs = c(), dtw = 0) {
+  if (!(all(tolower(locs) %in% tolower(unique(data$location))))) {
     warning("Please specify a valid set of test locations.")
   }
 
   data_aux <- AppendAgg(data, locs = locs)
 
-  Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("control_markets", "test_markets"),], dtw = dtw)
+  Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("control_markets", "test_markets"), ], dtw = dtw)
   return(Correl$BestMatches$Correlation[[1]])
 }
 
@@ -378,21 +374,21 @@ GetWeights <- function(Y_id = "Y",
   locations <- tolower(locations)
 
   # Add filler rows if all time-stamps will be used for weight calculation
-  if(pretreatment_end_time == max(data$time)){
-    aux_rows <- data[data$time == max(data$time),]
+  if (pretreatment_end_time == max(data$time)) {
+    aux_rows <- data[data$time == max(data$time), ]
     aux_rows$time <- aux_rows$time + 1
     data <- data %>% dplyr::add_row(aux_rows)
     treatment_start_time <- max(data$time)
     treatment_end_time <- max(data$time)
-  } else{
+  } else {
     treatment_start_time <- pretreatment_end_time + 1
     treatment_end_time <- max(data$time)
   }
 
   data_aux <- fn_treatment(data,
-                           locations = locations,
-                           treatment_start_time,
-                           treatment_end_time
+    locations = locations,
+    treatment_start_time,
+    treatment_end_time
   )
 
   if (length(X) == 0) {
@@ -401,20 +397,20 @@ GetWeights <- function(Y_id = "Y",
     fmla <- as.formula(paste(
       "Y ~ D |",
       sapply(list(X),
-             paste,
-             collapse = "+"
+        paste,
+        collapse = "+"
       )
     ))
   }
 
   # Single Augsynth
   augsyn <- augsynth::augsynth(fmla,
-                               unit = location, time = time,
-                               data = data_aux,
-                               t_int = treatment_start_time,
-                               progfunc = model,
-                               scm = T,
-                               fixedeff = fixed_effects
+    unit = location, time = time,
+    data = data_aux,
+    t_int = treatment_start_time,
+    progfunc = model,
+    scm = T,
+    fixedeff = fixed_effects
   )
 
   results <- data.frame(

@@ -46,8 +46,8 @@ GeoPlot <- function(data,
     geom_vline(xintercept = treatment_start, linetype = "dashed", size = size_vline, color = "grey35") +
     geom_dl(aes(label = !!sym(location_id)), method = list(dl.combine("last.points"), cex = 0.8)) +
     xlim(0, 1.15 * (max(data[[time_id]]))) +
-    #ylab("") +
-    labs(y = KPI_id, caption = notes)  +
+    # ylab("") +
+    labs(y = KPI_id, caption = notes) +
     theme_minimal()
 
   print(p)
@@ -105,9 +105,9 @@ plot.GeoLiftPower <- function(x,
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
 
         CostPerLift <- as.numeric(x %>%
-                                    dplyr::filter(duration == dur, lift > 0) %>%
-                                    dplyr::mutate(AvgCost = investment / lift) %>%
-                                    dplyr::summarise(mean(AvgCost)))
+          dplyr::filter(duration == dur, lift > 0) %>%
+          dplyr::mutate(AvgCost = investment / lift) %>%
+          dplyr::summarise(mean(AvgCost)))
 
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, color = "#52854C", method = "loess", se = FALSE) +
@@ -141,9 +141,9 @@ plot.GeoLiftPower <- function(x,
         PowerPlot_aux <- as.data.frame(PowerPlot %>% dplyr::filter(duration == dur))
 
         CostPerLift <- as.numeric(x %>%
-                                    dplyr::filter(duration == dur, lift > 0) %>%
-                                    dplyr::mutate(AvgCost = investment / lift) %>%
-                                    dplyr::summarise(mean(AvgCost)))
+          dplyr::filter(duration == dur, lift > 0) %>%
+          dplyr::mutate(AvgCost = investment / lift) %>%
+          dplyr::summarise(mean(AvgCost)))
 
         PowerPlot_graph <- ggplot(PowerPlot_aux, aes(x = lift, y = power)) +
           geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
@@ -151,7 +151,7 @@ plot.GeoLiftPower <- function(x,
           scale_x_continuous(sec.axis = sec_axis(~ . * CostPerLift, name = "Estimated Investment")) +
           ylim(0, 1) +
           geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
-          scale_colour_manual(name="Power Curve", values=c("gray80", "#52854C")) +
+          scale_colour_manual(name = "Power Curve", values = c("gray80", "#52854C")) +
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
@@ -167,7 +167,7 @@ plot.GeoLiftPower <- function(x,
           geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
           ylim(0, 1) +
           geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
-          scale_colour_manual(name="Power Curve", values=c("gray80", "#52854C")) +
+          scale_colour_manual(name = "Power Curve", values = c("gray80", "#52854C")) +
           labs(title = paste0("Treatment Periods: ", dur), x = "Effect Size", y = "Power") +
           theme_minimal() +
           theme(plot.title = element_text(hjust = 0.5))
@@ -570,17 +570,16 @@ cumulative_value.plot <- function(data,
 #'
 #' @export
 plot.GeoLiftMarketSelection <- function(x,
-                                     market_ID = 0,
-                                     print_summary = TRUE,
-                                     breaks_x_axis = 10,
-                                     ...) {
-
+                                        market_ID = 0,
+                                        print_summary = TRUE,
+                                        breaks_x_axis = 10,
+                                        ...) {
   if (!inherits(x, "GeoLiftMarketSelection")) {
     stop("object must be class GeoLiftMarketSelection")
   }
 
-  #Will plot the lift plot with the MDE and the power curve
-  if (!(market_ID %in% x$BestMarkets$ID)){
+  # Will plot the lift plot with the MDE and the power curve
+  if (!(market_ID %in% x$BestMarkets$ID)) {
     stop("Please enter a valid ID.")
   }
 
@@ -589,19 +588,21 @@ plot.GeoLiftMarketSelection <- function(x,
   locs_aux <- unlist(strsplit(stringr::str_replace_all(Market$location, ", ", ","), split = ","))
   max_time <- max(x$parameters$data$time)
 
-  PowerPlot <- as.data.frame(x$PowerCurves %>% dplyr::filter(duration == Market$duration,
-                                                             location == Market$location))
+  PowerPlot <- as.data.frame(x$PowerCurves %>% dplyr::filter(
+    duration == Market$duration,
+    location == Market$location
+  ))
 
   CostPerLift <- as.numeric(PowerPlot %>%
-                              dplyr::filter(EffectSize != 0) %>%
-                              dplyr::mutate(AvgCost = Investment / abs(EffectSize)) %>%
-                              dplyr::summarise(mean(AvgCost)))
+    dplyr::filter(EffectSize != 0) %>%
+    dplyr::mutate(AvgCost = Investment / abs(EffectSize)) %>%
+    dplyr::summarise(mean(AvgCost)))
 
   data_lifted <- x$parameters$data
   data_lifted$Y[data_lifted$location %in% locs_aux &
-                  data_lifted$time >= max_time - Market$duration + 1] <-
+    data_lifted$time >= max_time - Market$duration + 1] <-
     data_lifted$Y[data_lifted$location %in% locs_aux &
-                    data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
+      data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
 
 
   lifted <- suppressMessages(GeoLift::GeoLift(
@@ -617,7 +618,7 @@ plot.GeoLiftMarketSelection <- function(x,
     print = TRUE
   ))
 
-  if (print_summary){
+  if (print_summary) {
     # message(paste0(
     #   "##################################",
     #   "\n#####   GeoLift Simulation   #####\n",
@@ -629,23 +630,27 @@ plot.GeoLiftMarketSelection <- function(x,
       "##################################",
       "\n#####   GeoLift Simulation   #####\n",
       "####  Simulating: ",
-      100*round(Market$EffectSize,2),
+      100 * round(Market$EffectSize, 2),
       "% Lift  ####\n",
-      "##################################"))
+      "##################################"
+    ))
     print(summary(lifted))
   }
 
   PowerPlot_graph <- ggplot(PowerPlot, aes(x = EffectSize, y = power)) +
     geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
     geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
-    scale_x_continuous(sec.axis = sec_axis( ~ . * CostPerLift ,
-                                            breaks = scales::pretty_breaks(n = breaks_x_axis),
-                                            name = "Estimated Investment"),
-                       breaks = scales::pretty_breaks(n = breaks_x_axis)) +
+    scale_x_continuous(
+      sec.axis = sec_axis(~ . * CostPerLift,
+        breaks = scales::pretty_breaks(n = breaks_x_axis),
+        name = "Estimated Investment"
+      ),
+      breaks = scales::pretty_breaks(n = breaks_x_axis)
+    ) +
     ylim(0, 1) +
     geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
-    scale_colour_manual(name="Power Curve", values=c("gray80", "#52854C")) +
-    labs( x = "Effect Size", y = "Power") +
+    scale_colour_manual(name = "Power Curve", values = c("gray80", "#52854C")) +
+    labs(x = "Effect Size", y = "Power") +
     theme_minimal() +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -664,8 +669,8 @@ plot.GeoLiftMarketSelection <- function(x,
       "\n Locations:", Market$location,
       "\n Treatment Periods:", Market$duration,
       "\n Effect Size: ", Market$EffectSize
-    )))
-
+    )
+  ))
 }
 
 
@@ -699,9 +704,8 @@ plotCorrels <- function(data,
                         locs = c(),
                         scaled = TRUE,
                         KPI_id = "",
-                        dtw = 0){
-
-  if(!(all(tolower(locs) %in% tolower(unique(data$location))))){
+                        dtw = 0) {
+  if (!(all(tolower(locs) %in% tolower(unique(data$location))))) {
     warning("Please specify a valid set of test locations.")
     return(NULL)
   }
@@ -709,25 +713,25 @@ plotCorrels <- function(data,
   data_aux <- AppendAgg(data, locs = locs)
   correl <- GetCorrel(data, locs = locs, dtw = dtw)
 
-  if(scaled == TRUE){
+  if (scaled == TRUE) {
     data_aux$Yscaled <- 0
-    data_aux$Yscaled[data_aux$location == "control_markets"] <- data_aux$Y[data_aux$location == "control_markets"] / max(data_aux[data_aux$location == "control_markets",]$Y)
-    data_aux$Yscaled[data_aux$location == "test_markets"] <- data_aux$Y[data_aux$location == "test_markets"] / max(data_aux[data_aux$location == "test_markets",]$Y)
+    data_aux$Yscaled[data_aux$location == "control_markets"] <- data_aux$Y[data_aux$location == "control_markets"] / max(data_aux[data_aux$location == "control_markets", ]$Y)
+    data_aux$Yscaled[data_aux$location == "test_markets"] <- data_aux$Y[data_aux$location == "test_markets"] / max(data_aux[data_aux$location == "test_markets", ]$Y)
 
     GeoPlot(data_aux,
-            Y_id = "Yscaled",
-            time_id = "time",
-            location_id = "location",
-            KPI_id = KPI_id,
-            notes = paste0("Correlation: ", round(correl, 4)))
-  } else{
-
+      Y_id = "Yscaled",
+      time_id = "time",
+      location_id = "location",
+      KPI_id = KPI_id,
+      notes = paste0("Correlation: ", round(correl, 4))
+    )
+  } else {
     GeoPlot(data_aux,
-            Y_id = "Y",
-            time_id = "time",
-            location_id = "location",
-            KPI_id = KPI_id,
-            notes = paste0("Correlation: ", round(correl, 4)))
-
+      Y_id = "Y",
+      time_id = "time",
+      location_id = "location",
+      KPI_id = KPI_id,
+      notes = paste0("Correlation: ", round(correl, 4))
+    )
   }
 }

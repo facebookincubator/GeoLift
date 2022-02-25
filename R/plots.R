@@ -717,21 +717,16 @@ plotCorrels <- function(data,
     data_aux$Yscaled <- 0
     data_aux$Yscaled[data_aux$location == "control_markets"] <- data_aux$Y[data_aux$location == "control_markets"] / max(data_aux[data_aux$location == "control_markets", ]$Y)
     data_aux$Yscaled[data_aux$location == "test_markets"] <- data_aux$Y[data_aux$location == "test_markets"] / max(data_aux[data_aux$location == "test_markets", ]$Y)
-
-    GeoPlot(data_aux,
-      Y_id = "Yscaled",
-      time_id = "time",
-      location_id = "location",
-      KPI_id = KPI_id,
-      notes = paste0("Correlation: ", round(correl, 4))
-    )
+    Y_id <- "Yscaled"
   } else {
-    GeoPlot(data_aux,
-      Y_id = "Y",
-      time_id = "time",
-      location_id = "location",
-      KPI_id = KPI_id,
-      notes = paste0("Correlation: ", round(correl, 4))
-    )
+    Y_id <- "Y"
   }
+
+  GeoPlot(data_aux,
+    Y_id = Y_id,
+    time_id = "time",
+    location_id = "location",
+    KPI_id = KPI_id,
+    notes = paste0("Correlation: ", round(correl, 4))
+  )
 }

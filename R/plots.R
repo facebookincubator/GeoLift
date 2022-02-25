@@ -65,7 +65,7 @@ GeoPlot <- function(data,
 #' @param power Power level. By default 0.8.
 #' @param table Plot the table of power estimates. TRUE by default.
 #' @param actual_values Logic flag indicating whether to include in the plot
-#' the actual values in addition to the smoothed values.
+#' the actual values in addition to the smoothed values. TRUE by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -75,7 +75,7 @@ GeoPlot <- function(data,
 plot.GeoLiftPower <- function(x,
                               power = 0.8,
                               table = TRUE,
-                              actual_values = FALSE,
+                              actual_values = TRUE,
                               ...) {
   if (!inherits(x, "GeoLiftPower")) {
     stop("object must be class GeoLiftPower")

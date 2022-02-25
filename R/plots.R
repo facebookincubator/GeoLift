@@ -705,11 +705,6 @@ plotCorrels <- function(data,
                         scaled = TRUE,
                         KPI_id = "",
                         dtw = 0) {
-  if (!(all(tolower(locs) %in% tolower(unique(data$location))))) {
-    warning("Please specify a valid set of test locations.")
-    return(NULL)
-  }
-
   data_aux <- AppendAgg(data, locs = locs)
   correl <- GetCorrel(data, locs = locs, dtw = dtw)
 

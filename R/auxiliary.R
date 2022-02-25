@@ -208,31 +208,22 @@ AppendAgg <- function(data, locs = NULL) {
   if (is.null(locs)) {
     aux <- data %>%
       dplyr::group_by(time) %>%
-      dplyr::summarise(Y = sum(Y))
-    aux$location <- "control_markets"
+      dplyr::summarise(Y = sum(Y), .groups = "drop") %>%
+      dplyr::mutate(location = "control_markets")
     aux <- dplyr::bind_rows(data, aux)
   } else if (!(all(tolower(locs) %in% tolower(unique(data$location))))) {
-    message("Please specify a valid vector of location names.")
-    return(NULL)
+    stop("Please specify a valid vector of location names.")
   } else {
     aux <- data %>%
-      dplyr::filter(!(location %in% locs)) %>%
-      dplyr::group_by(time) %>%
-      dplyr::summarise(Y = sum(Y))
-    aux$location <- "control_markets"
-  }
-
-
-  if (all(tolower(locs) %in% tolower(unique(data$location)))) {
-    auxCombo <- data %>%
-      dplyr::filter(location %in% locs) %>%
-      dplyr::group_by(time) %>%
-      dplyr::summarise(Y = sum(Y))
-    auxCombo$location <- "test_markets"
-    aux <- dplyr::bind_rows(aux, auxCombo)
-  } else {
-    message("Please specify a valid vector of location names.")
-    return(NULL)
+      dplyr::mutate(
+        location = ifelse(
+          !(location %in% locs),
+          "control_markets",
+          "test_markets"
+        )
+      ) %>%
+      dplyr::group_by(location, time) %>%
+      dplyr::summarise(Y = sum(Y), .groups = "drop")
   }
 
   return(as.data.frame(aux))

@@ -298,10 +298,6 @@ MarketCorrelations <- function(data,
 #'
 #' @export
 GetCorrel <- function(data, locs = c(), dtw = 0) {
-  if (!(all(tolower(locs) %in% tolower(unique(data$location))))) {
-    warning("Please specify a valid set of test locations.")
-  }
-
   data_aux <- AppendAgg(data, locs = locs)
 
   Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("control_markets", "test_markets"), ], dtw = dtw)

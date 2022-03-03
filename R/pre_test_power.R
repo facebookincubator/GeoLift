@@ -2020,10 +2020,16 @@ GeoLiftMarketSelection <- function(data,
   )
 
   # Step 10: Adjust signs if Negative Lift
-  if (min(effect_size) < 0) {
-    resultsM$Investment <- -1 * resultsM$Investment
-    results$Investment <- -1 * results$Investment
-  }
+  resultsM$Investment <- ifelse(
+    resultsM$EffectSize < 0,
+    -1 * resultsM$Investment,
+    resultsM$Investment
+  )
+  results$Investment <- ifelse(
+    results$EffectSize < 0,
+    -1 * results$Investment,
+    results$Investment
+  )
 
   # Step 11 - Remove tests out of budget (if applicable)
   if (!is.null(budget)) {

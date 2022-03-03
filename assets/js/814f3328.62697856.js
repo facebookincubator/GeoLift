@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[535],{5641:function(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"A Brief Review of Geo Measurement Approaches","permalink":"/GeoLift/blog/geo-measurement-review"},{"title":"Welcome","permalink":"/GeoLift/blog/welcome"}]}')}}]);

@@ -11,7 +11,7 @@
 #'
 #' @description
 #'
-#' \code{MarketSelection} helps calculate the best markets based
+#' `MarketSelection` helps calculate the best markets based
 #' on Dynamic Time Warping between the locations' time-series.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -72,10 +72,10 @@ MarketSelection <- function(data,
 #'
 #' @description
 #'
-#' \code{build_stochastic_matrix} selects the markets to be tested
-#' by randomly sampling from the \code{similarity_matrix}.
+#' `build_stochastic_matrix` selects the markets to be tested
+#' by randomly sampling from the `similarity_matrix`.
 #' It gets groups of 2 elements and samples one of them. It repeats
-#' this process until the \code{treatment_size} is equal to the sample.
+#' this process until the `treatment_size` is equal to the sample.
 #'
 #' @param treatment_size Is the amount of location units within the
 #' treatment group.
@@ -98,10 +98,10 @@ stochastic_market_selector <- function(treatment_size,
                                        similarity_matrix,
                                        run_stochastic_process = FALSE) {
   if (!run_stochastic_process) {
-    message("Deterministic setup with ", treatment_size, " locations in treatment.")
+    message("\nDeterministic setup with ", treatment_size, " locations in treatment.")
     return(similarity_matrix[, 1:treatment_size])
   } else {
-    message("Random setup with ", treatment_size, " locations in treatment.")
+    message("\nRandom setup with ", treatment_size, " locations in treatment.")
     if (treatment_size > 0.5 * ncol(similarity_matrix)) {
       stop(paste0(
         "Treatment size (",
@@ -132,7 +132,7 @@ stochastic_market_selector <- function(treatment_size,
 #'
 #' @description
 #'
-#' \code{type_of_test} returns stat_func being used for GeoLiftPower;
+#' `type_of_test` returns stat_func being used for GeoLiftPower;
 #' GeoLiftPowerFinder & GeoLift.
 #'
 #' @param side_of_test A string indicating whether confidence will be determined
@@ -179,7 +179,7 @@ type_of_test <- function(side_of_test = "two_sided", alternative_hypothesis = NU
 #'
 #' @description
 #'
-#' \code{pvalueCalc} calculates the p-value for a GeoLift object.
+#' `pvalueCalc` calculates the p-value for a GeoLift object.
 #'
 #' @param data A data.frame containing the historical conversions by
 #' geographic unit. It requires a "locations" column with the geo name,
@@ -332,521 +332,18 @@ pvalueCalc <- function(data,
 }
 
 
-#' GeoLift Market Selection algorithm based on a Power Analysis.
-#'
-#' @description
-#'
-#' \code{GeoLiftMarketSelection} provides a ranking of test markets  for a
-#' GeoLift test based on a power analysis.
-#'
-#' @param data A data.frame containing the historical conversions by
-#' geographic unit. It requires a "locations" column with the geo name,
-#' a "Y" column with the outcome data (units), a time column with the indicator
-#' of the time period (starting at 1), and covariates.
-#' @param treatment_periods List of treatment periods to calculate power for.
-#' @param N List of number of test markets to calculate power for. If left empty (default)
-#' and if no locations are included through \code{include_locations}, it will populate
-#' the list of markets with the deciles of the total number of locations. If left empty
-#' and a set of markets is provided by \code{include_locations} only the deciles larger
-#' or equal than \code{length(include_locations)} will be used.
-#' @param X List of names of covariates.
-#' @param Y_id Name of the outcome variable (String).
-#' @param location_id Name of the location variable (String).
-#' @param time_id Name of the time variable (String).
-#' @param effect_size A vector of effect sizes to test by default a
-#' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
-#' Only input sequences that are entirely positive or negative and that include
-#' zero.
-#' @param lookback_window A number indicating how far in time the simulations
-#' for the power analysis should go. For instance, a value equal to 5 will simulate
-#' power for the last five possible tests. By default lookback_window = -1 which
-#' will set the window to the smallest provided test \code{min(treatment_periods)}.
-#' @param include_markets A list of markets or locations that should be part of the
-#' test group. Make sure to specify an N as large or larger than the number of
-#' provided markets or locations.
-#' @param exclude_markets A list of markets or locations that will be removed from the
-#' analysis.
-#' @param holdout A vector with two values: the first one the smallest desirable
-#' holdout and the second the largest desirable holdout. If left empty (default)
-#' all market selections will be provided regardless of their size.
-#' @param cpic Number indicating the Cost Per Incremental Conversion.
-#' @param budget Number indicating the maximum budget available for a GeoLift test.
-#' @param alpha Significance Level. By default 0.1.
-#' @param normalize A logic flag indicating whether to scale the outcome which is
-#' useful to accelerate computing speed when the magnitude of the data is large. The
-#' default is FALSE.
-#' @param model A string indicating the outcome model used to augment the Augmented
-#' Synthetic Control Method. Augmentation through a prognostic function can improve
-#' fit and reduce L2 imbalance metrics.
-#' \itemize{
-#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
-#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
-#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
-#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
-#'                          to improve fit for larger panels (more than 40 locations and 100
-#'                          time-stamps. }
-#'          }
-#' @param fixed_effects A logic flag indicating whether to include unit fixed
-#' effects in the model. Set to TRUE by default.
-#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
-#' on this metric while dtw = 0 (default) relies on correlations only.
-#' @param ProgressBar A logic flag indicating whether to display a progress bar
-#' to track progress. Set to FALSE by default.
-#' @param plot_best A logic flag indicating whether to plot the best 4 tests for
-#' each treatment length. Set to FALSE by default.
-#' @param run_stochastic_process A logic flag indicating whether to select test
-#' markets through random sampling of the the similarity matrix. Given that
-#' interpolation biases may be relevant if the synthetic control matches
-#' the characteristics of the test unit by averaging away large discrepancies
-#' between the characteristics of the test and the units in the synthetic controls,
-#' it is recommended to only use random sampling after making sure all units are
-#' similar. This parameter is set by default to FALSE.
-#' @param parallel A logic flag indicating whether to use parallel computing to
-#' speed up calculations. Set to TRUE by default.
-#' @param parallel_setup A string indicating parallel workers set-up.
-#' Set to "sequential" by default.
-#' @param side_of_test A string indicating whether confidence will be determined
-#' using a one sided or a two sided test.
-#' \itemize{
-#'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
-#'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
-#'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
-#'          }
-#' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes.
-#'
-#' @return
-#' A list with two Data Frames. \itemize{
-#'          \item{"BestMarkets":}{Data Frame with a ranking of the best markets
-#'          based on power, Scaled L2 Imbalance, Minimum Detectable Effect, and
-#'          proportion of total KPI in the test markets.}
-#'          \item{"PowerCurves":}{Data Frame with the resulting power curves for
-#'          each recommended market}
-#' }
-#'
-#' @export
-GeoLiftMarketSelection <- function(data,
-                                   treatment_periods,
-                                   N = c(),
-                                   X = c(),
-                                   Y_id = "Y",
-                                   location_id = "location",
-                                   time_id = "time",
-                                   effect_size = seq(0, 0.25, 0.05),
-                                   lookback_window = -1,
-                                   include_markets = c(),
-                                   exclude_markets = c(),
-                                   holdout = c(),
-                                   cpic = 1,
-                                   budget = NULL,
-                                   alpha = 0.1,
-                                   normalize = FALSE,
-                                   model = "none",
-                                   fixed_effects = TRUE,
-                                   dtw = 0,
-                                   ProgressBar = FALSE,
-                                   plot_best = FALSE,
-                                   run_stochastic_process = FALSE,
-                                   parallel = TRUE,
-                                   parallel_setup = "sequential",
-                                   side_of_test = "two_sided",
-                                   import_augsynth_from = "library(augsynth)") {
-  if (parallel == TRUE) {
-    cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
-    )
-  }
-
-  # Part 1: Treatment and pre-treatment periods
-  data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
-  max_time <- max(data$time)
-  data$location <- tolower(data$location)
-  include_markets <- tolower(include_markets)
-  exclude_markets <- tolower(exclude_markets)
-
-  # Data Checks
-
-  # Small Pre-treatment Periods
-  if (max_time / max(treatment_periods) < 4) {
-    message(paste0("Caution: Small pre-treatment period!.
-                   \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
-  }
-
-  # Populate N if it's not provided
-  if (length(N) == 0) {
-    N <- unique(round(quantile(c(1:length(unique(data$location))),
-      probs = seq(0, 0.5, 0.1),
-      type = 1,
-      names = FALSE
-    )))
-
-    if (length(include_markets) > 0) {
-      # Keep only those equal or larger than included markets
-      N <- append(length(include_markets), N[length(include_markets) <= N])
-    }
-  }
-
-  # More include_markets than N
-  if (length(include_markets) > 0 & min(N) < length(include_markets)) {
-    message(paste0(
-      "Error: More forced markets than total test ones.",
-      " Consider increasing the values of N."
-    ))
-    return(NULL)
-  }
-
-  # Check that the provided markets exist in the data.
-  if (!all(tolower(include_markets) %in% tolower(unique(data$location)))) {
-    message(paste0(
-      "Error: One or more markets in include_markets were not",
-      " found in the data. Check the provided list and try again."
-    ))
-    return(NULL)
-  }
-
-  # Check that the provided markets exist in the data.
-  if (!all(tolower(exclude_markets) %in% tolower(unique(data$location)))) {
-    message(paste0(
-      "Error: One or more markets in exclude_markets were not",
-      " found in the data. Check the provided list and try again."
-    ))
-    return(NULL)
-  }
-
-  # Make sure all simulated effect sizes have the same sign.
-  if (min(effect_size < 0 & max(effect_size) > 0)) {
-    message(paste0(
-      "Error: The specified simulated effect sizes are not all of the same ",
-      " sign. \nTry again with a vector of all positive or negative effects",
-      " sizes that includes zero."
-    ))
-    return(NULL)
-  }
-
-  #  Check the holdout parameter
-  if (length(holdout) > 1) {
-    if (length(holdout) > 2) {
-      message("Error: Too many arguments in holdout. Provide the min and max holdout sizes.")
-      return(NULL)
-    } else if (holdout[1] >= holdout[2]) {
-      message("Error: The first argument in holdout should be strictly smaller than the second.")
-      return(NULL)
-    } else if (min(holdout) < 0 | max(holdout > 1)) {
-      message("Error: Please specify valid values for holdouts (values from 0 to 1)")
-      return(NULL)
-    }
-  } else if (length(holdout) == 1) {
-    message("Error: Too few arguments in holdout. Provide the min and max holdout sizes.")
-    return(NULL)
-  }
-
-  results <- data.frame(matrix(ncol = 8, nrow = 0))
-  colnames(results) <- c(
-    "location",
-    "pvalue",
-    "duration",
-    "lift",
-    "treatment_start",
-    "investment",
-    "cpic",
-    "ScaledL2Imbalance"
-  )
-
-  # Setting the lookback window to the smallest length of treatment if not provided.
-  if (lookback_window < 0) {
-    lookback_window <- min(treatment_periods)
-  }
-
-  # Exclude markets input by user by filter them out from the uploaded file data
-  if (length(exclude_markets) > 0) {
-    data <- data[!(data$location %in% exclude_markets), ]
-  }
-
-  BestMarkets <- MarketSelection(data,
-    location_id = "location",
-    time_id = "time",
-    Y_id = "Y",
-    dtw = dtw
-  )
-
-  N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
-
-  # Aggregated Y Per Location
-  AggYperLoc <- data %>%
-    dplyr::group_by(location) %>%
-    dplyr::summarize(Total_Y = sum(Y))
-
-  # NEWCHANGE: Progress Bar
-  num_sim <- length(N) * length(treatment_periods) * length(effect_size)
-  if (ProgressBar == TRUE) {
-    pb <- progress::progress_bar$new(
-      format = "  Running Simulations [:bar] :percent",
-      total = num_sim,
-      clear = FALSE,
-      width = 60
-    )
-  }
-
-
-  for (n in N) {
-    BestMarkets_aux <- stochastic_market_selector(
-      n,
-      BestMarkets,
-      run_stochastic_process = run_stochastic_process
-    )
-
-    # Force included markets into the selection
-    if (length(include_markets) > 0) {
-      for (row in 1:nrow(BestMarkets_aux)) {
-        if (all(include_markets %in% BestMarkets_aux[row, ])) {
-          temp_Markets <- rbind(temp_Markets, BestMarkets_aux[row, ])
-        }
-      }
-      BestMarkets_aux <- temp_Markets
-    }
-
-    # Skip iteration if no Markets are feasible
-    if (is.null(BestMarkets_aux)) {
-      next
-    }
-
-    for (es in effect_size) { # iterate through lift %
-
-      stat_func <- type_of_test(
-        side_of_test = side_of_test,
-        alternative_hypothesis = ifelse(es > 0, "positive", "negative")
-      )
-
-      for (tp in treatment_periods) { # lifts
-
-        if (ProgressBar == TRUE) {
-          pb$tick()
-        }
-
-        t_n <- max(data$time) - tp + 1 # Number of simulations without extrapolation (latest start time possible for #tp)
-
-        for (sim in 1:(lookback_window)) {
-          if (parallel == TRUE) {
-            a <- foreach(
-              test = 1:nrow(as.matrix(BestMarkets_aux)),
-              .combine = cbind,
-              .errorhandling = "stop",
-              .verbose = FALSE
-            ) %dopar% {
-              suppressMessages(pvalueCalc(
-                data = data,
-                sim = sim,
-                max_time = max_time,
-                tp = tp,
-                es = es,
-                locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-                cpic = cpic,
-                X,
-                type = "pValue",
-                normalize = normalize,
-                fixed_effects = fixed_effects,
-                model = model,
-                stat_func = stat_func
-              ))
-            }
-
-
-            if (!is.null(dim(a))) {
-              for (i in 1:ncol(a)) {
-                results <- rbind(results, data.frame(
-                  location = a[[1, i]],
-                  pvalue = as.numeric(a[[2, i]]),
-                  duration = as.numeric(a[[3, i]]),
-                  lift = as.numeric(a[[4, i]]),
-                  treatment_start = as.numeric(a[[5, i]]),
-                  investment = as.numeric(a[[6, i]]),
-                  cpic = cpic,
-                  ScaledL2Imbalance = as.numeric(a[[7, i]])
-                ))
-              }
-            } else if (length(a) > 0) {
-              results <- rbind(results, data.frame(
-                location = a[1],
-                pvalue = as.numeric(a[2]),
-                duration = as.numeric(a[3]),
-                lift = as.numeric(a[4]),
-                treatment_start = as.numeric(a[5]),
-                investment = as.numeric(a[6]),
-                cpic = cpic,
-                ScaledL2Imbalance = as.numeric(a[7])
-              ))
-            }
-          } else {
-            for (test in 1:nrow(as.matrix(BestMarkets_aux))) {
-              aux <- NULL
-              aux <- suppressMessages(pvalueCalc(
-                data = data,
-                sim = sim,
-                max_time = max_time,
-                tp = tp,
-                es = es,
-                locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-                cpic = cpic,
-                X,
-                type = "pValue",
-                normalize = normalize,
-                fixed_effects = fixed_effects,
-                model = model,
-                stat_func = stat_func
-              ))
-
-
-              results <- rbind(results, data.frame(
-                location = aux[1],
-                pvalue = as.numeric(aux[2]),
-                duration = as.numeric(aux[3]),
-                lift = as.numeric(aux[4]),
-                treatment_start = as.numeric(aux[5]),
-                investment = as.numeric(aux[6]),
-                cpic = cpic,
-                ScaledL2Imbalance = as.numeric(aux[7])
-              ))
-            }
-          }
-        }
-      } # tp
-    }
-  }
-
-  if (parallel == TRUE) {
-    parallel::stopCluster(cl)
-  }
-
-  # Step 1 - Sort
-  results$location <- strsplit(stringr::str_replace_all(results$location, ", ", ","), split = ",")
-  results$location <- lapply(results$location, sort)
-  results$location <- lapply(results$location, function(x) paste(x, collapse = ", "))
-  results$location <- unlist(results$location)
-
-  # Step 2 - Compute Significant
-  results <- results %>%
-    dplyr::mutate(pow = ifelse(pvalue < 0.1, 1, 0)) %>%
-    #   dplyr::filter(significant > 0) %>%
-    dplyr::distinct()
-
-  # Step 3 - Compute average Metrics
-  results <- results %>%
-    dplyr::group_by(location, duration, lift) %>%
-    dplyr::summarise(
-      power = mean(pow),
-      AvgScaledL2Imbalance = mean(ScaledL2Imbalance),
-      Investment = mean(investment), .groups = "keep"
-    )
-
-  # Step 4 - Find the MDE that achieved power
-
-  for (locs in unique(results$location)) {
-    for (ts in treatment_periods) { # for(ts in treatment_periods)
-      resultsFindAux <- results %>% dplyr::filter(location == locs & duration == ts & power > 0.8)
-
-      if (min(effect_size) < 0) { # if ( min(effect_size) < 0){
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift != 0)
-        MDEAux <- suppressWarnings(max(resultsFindAux$lift))
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift == MDEAux)
-      } else {
-        MDEAux <- suppressWarnings(min(resultsFindAux$lift))
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(lift == MDEAux)
-      }
-
-      if (MDEAux != 0) { # Drop tests significant with ES = 0
-        resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
-      }
-    }
-  }
-
-  # Step 5 - Add Percent of Y in test markets
-  # Step 5.1 - Create the overall prop
-  AggYperLoc <- data %>% # data %>%
-    dplyr::group_by(location) %>%
-    dplyr::summarize(Total_Y = sum(Y))
-
-  # Step 5.2 - Attach to Table
-  resultsM$ProportionTotal_Y <- 1
-  resultsM$Locs <- strsplit(stringr::str_replace_all(resultsM$location, ", ", ","), split = ",")
-
-  for (row in 1:nrow(resultsM)) {
-    resultsM$ProportionTotal_Y[row] <- as.numeric(AggYperLoc %>%
-      dplyr::filter(location %in% resultsM$Locs[[row]]) %>%
-      dplyr::summarize(total = sum(Total_Y))) /
-      sum(AggYperLoc$Total_Y)
-  }
-
-  # Step 6 - Remove any duplicates
-  resultsM <- resultsM %>%
-    dplyr::group_by(location, duration) %>%
-    dplyr::slice_max(order_by = power, n = 1)
-
-  # Step 7 - Sort Before Ranking
-  resultsM <- resultsM %>%
-    dplyr::arrange(
-      dplyr::desc(power),
-      AvgScaledL2Imbalance,
-      lift,
-      dplyr::desc(ProportionTotal_Y)
-    )
-
-  # Step 8 - Remove the Locs column
-  resultsM <- dplyr::select(resultsM, -c(Locs))
-
-  # Step 9 - Rename columns
-  resultsM <- dplyr::rename(resultsM,
-    Average_MDE = lift,
-    Power = power
-  )
-
-  # Step 10: Adjust signs if Negative Lift
-  if (min(effect_size) < 0) {
-    resultsM$Investment <- -1 * resultsM$Investment
-    results$Investment <- -1 * results$Investment
-  }
-
-  # Step 11 - Remove tests out of budget (if aplicable)
-  if (!is.null(budget)) {
-    resultsM <- resultsM %>% dplyr::filter(abs(budget) > abs(Investment))
-  }
-
-  # Step 12: Holdout Size
-  if (min(effect_size) < 0) {
-    resultsM$Holdout <- resultsM$ProportionTotal_Y
-  } else {
-    resultsM$Holdout <- 1 - resultsM$ProportionTotal_Y
-  }
-
-  # Step 13: Test Size
-  if (length(holdout) > 0) {
-    resultsM <- resultsM %>% dplyr::filter(
-      holdout[1] <= Holdout,
-      holdout[2] >= Holdout
-    )
-  }
-
-  # Step 14 - Create Ranking
-  # Make sure there are viable options
-  if (nrow(resultsM) > 0) {
-    resultsM$rank <- 1:nrow(resultsM)
-  } else {
-    message("\nWarning: No markets meet the criteria you provided. Consider modifying
-            the input parameters")
-  }
-
-  class(results) <- c("GeoLift.MarketSelection", class(resultsM))
-
-  return(list(BestMarkets = as.data.frame(resultsM), PowerCurves = as.data.frame(results)))
-}
-
-
 #' Power calculations for unknown test market locations, number of
 #' test markets, and test duration.
 #'
 #' @description
+#' `r lifecycle::badge("superseded")`
 #'
-#' \code{GeoLiftPowerFinder} provides power calculations for unknown
+#' Development on `GeoLiftPowerFinder()` is complete.
+#' We recommend switching to `GeoLiftMarketSelection()`
+#' for new code, which is easier to use, more featureful,
+#' and still under active development.
+#'
+#' `GeoLiftPowerFinder` provides power calculations for unknown
 #' test markets, number of test locations, and test duration.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -1217,8 +714,14 @@ GeoLiftPowerFinder <- function(data,
 #' test markets, and test duration.
 #'
 #' @description
+#' `r lifecycle::badge("superseded")`
 #'
-#' \code{GeoLiftPower.search} provides power calculations for unknown
+#' Development on `GeoLiftPower.search()` is complete.
+#' We recommend switching to `GeoLiftMarketSelection()`
+#' for new code, which is easier to use, more featureful,
+#' and still under active development.
+#'
+#' `GeoLiftPower.search` provides power calculations for unknown
 #' test markets, number of test locations, and test duration.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -1517,8 +1020,14 @@ GeoLiftPower.search <- function(data,
 #' with unknown test locations.
 #'
 #' @description
+#' `r lifecycle::badge("superseded")`
 #'
-#' \code{NumberLocations} calculates power to determine the
+#' Development on `NumberLocations()` is complete.
+#' We recommend switching to `GeoLiftMarketSelection()`
+#' for new code, which is easier to use, more featureful,
+#' and still under active development.#'
+#'
+#' `NumberLocations` calculates power to determine the
 #' number of test periods with unknown test locations.
 #'
 #' @param data A data.frame containing the historical conversions by
@@ -1719,7 +1228,7 @@ NumberLocations <- function(data,
       print(resultsM)
 
       powerplot <- ggplot(resultsM, aes(y = mean_pow, x = n)) +
-        geom_line(color = "indianred3", size = 0.95) +
+        geom_line(color = "#52854C", size = 0.95) +
         ylim(0, 1) +
         ggtitle("Average Power By Number of Locations") +
         xlab("Number of Locations") +
@@ -1728,7 +1237,7 @@ NumberLocations <- function(data,
         theme_minimal()
 
       imbalanceplot <- ggplot(resultsM, aes(y = mean_L2ScaledImbalance, x = n)) +
-        geom_line(color = "steelblue4", size = 0.95) +
+        geom_line(color = "#7030A0", size = 0.95) +
         ylim(0, 1) +
         ggtitle("Average Scaled L2 Imbalance By Number of Locations") +
         xlab("Number of Locations") +
@@ -1741,7 +1250,7 @@ NumberLocations <- function(data,
       print(resultsM[, -2])
 
       imbalanceplot <- ggplot(resultsM, aes(y = mean_L2ScaledImbalance, x = n)) +
-        geom_line(color = "steelblue4", size = 0.95) +
+        geom_line(color = "#7030A0", size = 0.95) +
         ylim(0, 1) +
         ggtitle("Average Scaled L2 Imbalance By Number of Locations") +
         xlab("Number of Locations") +
@@ -1996,4 +1505,615 @@ GeoLiftPower <- function(data,
   results$pow[results$pvalue < alpha] <- 1
 
   return(results)
+}
+
+
+#' GeoLift Market Selection algorithm based on a Power Analysis.
+#'
+#' @description
+#'
+#' `GeoLiftMarketSelection` provides a ranking of test markets  for a
+#' GeoLift test based on a power analysis.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param treatment_periods List of treatment periods to calculate power for.
+#' @param N List of number of test markets to calculate power for. If left empty (default)
+#' and if no locations are included through `include_locations`, it will populate
+#' the list of markets with the deciles of the total number of locations. If left empty
+#' and a set of markets is provided by `include_locations` only the deciles larger
+#' or equal than `length(include_locations)` will be used.
+#' @param X List of names of covariates.
+#' @param Y_id Name of the outcome variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param effect_size A vector of effect sizes to test by default a
+#' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
+#' Only input sequences that are entirely positive or negative and that include
+#' zero.
+#' @param lookback_window A number indicating how far back in time the simulations
+#' for the power analysis should go. For instance, a value equal to 5 will simulate
+#' power for the last five possible tests. By default lookback_window = 1 which
+#' will only execute the most recent test based on the data.
+#' @param include_markets A list of markets or locations that should be part of the
+#' test group. Make sure to specify an N as large or larger than the number of
+#' provided markets or locations. Empty list by default.
+#' @param exclude_markets A list of markets or locations that won't be considered
+#' for the test market selection, but will remain in the pool of controls. Empty
+#' list by default.
+#' @param holdout A vector with two values: the first one the smallest desirable
+#' holdout and the second the largest desirable holdout. If left empty (default)
+#' all market selections will be provided regardless of their size.
+#' @param cpic Number indicating the Cost Per Incremental Conversion.
+#' @param budget Number indicating the maximum budget available for a GeoLift test.
+#' @param alpha Significance Level. By default 0.1.
+#' @param normalize A logic flag indicating whether to scale the outcome which is
+#' useful to accelerate computing speed when the magnitude of the data is large. The
+#' default is FALSE.
+#' @param model A string indicating the outcome model used to augment the Augmented
+#' Synthetic Control Method. Augmentation through a prognostic function can improve
+#' fit and reduce L2 imbalance metrics.
+#' \itemize{
+#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
+#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+#'                          to improve fit for larger panels (more than 40 locations and 100
+#'                          time-stamps. }
+#'          }
+#' @param fixed_effects A logic flag indicating whether to include unit fixed
+#' effects in the model. Set to TRUE by default.
+#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
+#' on this metric while dtw = 0 (default) relies on correlations only.
+#' @param Correlations A logic flag indicating whether an additional column with
+#' the correlations between the test regions and total control markets will be
+#' included in the final output. Set to FALSE by default.
+#' @param ProgressBar A logic flag indicating whether to display a progress bar
+#' to track progress. Set to FALSE by default.
+#' @param print A logic flag indicating whether to print the top results. Set to
+#' TRUE by default.
+#' @param run_stochastic_process A logic flag indicating whether to select test
+#' markets through random sampling of the the similarity matrix. Given that
+#' interpolation biases may be relevant if the synthetic control matches
+#' the characteristics of the test unit by averaging away large discrepancies
+#' between the characteristics of the test and the units in the synthetic controls,
+#' it is recommended to only use random sampling after making sure all units are
+#' similar. This parameter is set by default to FALSE.
+#' @param parallel A logic flag indicating whether to use parallel computing to
+#' speed up calculations. Set to TRUE by default.
+#' @param parallel_setup A string indicating parallel workers set-up.
+#' Set to "sequential" by default.
+#' @param side_of_test A string indicating whether confidence will be determined
+#' using a one sided or a two sided test.
+#' \itemize{
+#'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+#'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+#'          }
+#' @param import_augsynth_from Points to where the augsynth package
+#' should be imported from to send to the nodes.
+#'
+#' @return
+#' A list with three Data Frames. \itemize{
+#'          \item{"BestMarkets":}{Data Frame with a ranking of the best markets
+#'          based on power, Scaled L2 Imbalance, Minimum Detectable Effect, and
+#'          proportion of total KPI in the test markets.}
+#'          \item{"PowerCurves":}{Data Frame with the resulting power curves for
+#'          each recommended market.}
+#'          \item{"parameters;"}{List of parameters to plot the results.
+#'          Includes the data set, model, fixed-effects, and CPIC parameters.}
+#' }
+#'
+#' @export
+GeoLiftMarketSelection <- function(data,
+                                   treatment_periods,
+                                   N = c(),
+                                   X = c(),
+                                   Y_id = "Y",
+                                   location_id = "location",
+                                   time_id = "time",
+                                   effect_size = seq(0, 0.25, 0.05),
+                                   lookback_window = 1,
+                                   include_markets = c(),
+                                   exclude_markets = c(),
+                                   holdout = c(),
+                                   cpic = 1,
+                                   budget = NULL,
+                                   alpha = 0.1,
+                                   normalize = FALSE,
+                                   model = "none",
+                                   fixed_effects = TRUE,
+                                   dtw = 0,
+                                   Correlations = FALSE,
+                                   ProgressBar = FALSE,
+                                   print = TRUE,
+                                   run_stochastic_process = FALSE,
+                                   parallel = TRUE,
+                                   parallel_setup = "sequential",
+                                   side_of_test = "two_sided",
+                                   import_augsynth_from = "library(augsynth)") {
+  if (parallel == TRUE) {
+    cl <- build_cluster(
+      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
+    )
+  }
+
+  # Part 1: Treatment and pre-treatment periods
+  data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
+  max_time <- max(data$time)
+  data$location <- tolower(data$location)
+  include_markets <- tolower(include_markets)
+  exclude_markets <- tolower(exclude_markets)
+
+  # Data Checks
+
+  # Small Pre-treatment Periods
+  if (max_time / max(treatment_periods) < 4) {
+    message(paste0("Caution: Small pre-treatment period!.
+                   \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
+  }
+
+  # Populate N if it's not provided
+  if (length(N) == 0) {
+    N <- unique(round(quantile(c(1:length(unique(data$location))),
+      probs = seq(0, 0.5, 0.1),
+      type = 1,
+      names = FALSE
+    )))
+
+    if (length(include_markets) > 0) {
+      # Keep only those equal or larger than included markets
+      N <- append(length(include_markets), N[length(include_markets) <= N])
+    }
+  }
+
+  # More include_markets than N
+  if (length(include_markets) > 0 & min(N) < length(include_markets)) {
+    message(paste0(
+      "Error: More forced markets than total test ones.",
+      " Consider increasing the values of N."
+    ))
+    return(NULL)
+  }
+
+  # Check that the provided markets exist in the data.
+  if (!all(tolower(include_markets) %in% tolower(unique(data$location)))) {
+    message(paste0(
+      "Error: One or more markets in include_markets were not",
+      " found in the data. Check the provided list and try again."
+    ))
+    return(NULL)
+  }
+
+  # Check that the provided markets exist in the data.
+  if (!all(tolower(exclude_markets) %in% tolower(unique(data$location)))) {
+    message(paste0(
+      "Error: One or more markets in exclude_markets were not",
+      " found in the data. Check the provided list and try again."
+    ))
+    return(NULL)
+  }
+
+  # Make sure all simulated effect sizes have the same sign.
+  if (min(effect_size < 0 & max(effect_size) > 0)) {
+    message(paste0(
+      "Error: The specified simulated effect sizes are not all of the same ",
+      " sign. \nTry again with a vector of all positive or negative effects",
+      " sizes that includes zero."
+    ))
+    return(NULL)
+  }
+
+  #  Check the holdout parameter
+  if (length(holdout) > 1) {
+    if (length(holdout) > 2) {
+      message("Error: Too many arguments in holdout. Provide the min and max holdout sizes.")
+      return(NULL)
+    } else if (holdout[1] >= holdout[2]) {
+      message("Error: The first argument in holdout should be strictly smaller than the second.")
+      return(NULL)
+    } else if (min(holdout) < 0 | max(holdout > 1)) {
+      message("Error: Please specify valid values for holdouts (values from 0 to 1)")
+      return(NULL)
+    }
+  } else if (length(holdout) == 1) {
+    message("Error: Too few arguments in holdout. Provide the min and max holdout sizes.")
+    return(NULL)
+  }
+
+  results <- data.frame(matrix(ncol = 10, nrow = 0))
+  colnames(results) <- c(
+    "location",
+    "pvalue",
+    "duration",
+    "EffectSize",
+    "treatment_start",
+    "investment",
+    "cpic",
+    "ScaledL2Imbalance",
+    "att_estimator",
+    "detected_lift"
+  )
+
+  # Setting the lookback window to the smallest length of treatment if not provided.
+  if (lookback_window <= 0) {
+    lookback_window <- 1
+  }
+
+  # Exclude markets input by user by filter them out from the uploaded file data
+  # if (length(exclude_markets) > 0) {
+  #   data <- data[!(data$location %in% exclude_markets), ]
+  # }
+
+  BestMarkets <- MarketSelection(data,
+    location_id = "location",
+    time_id = "time",
+    Y_id = "Y",
+    dtw = dtw
+  )
+
+  N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
+
+  # Aggregated Y Per Location
+  AggYperLoc <- data %>%
+    dplyr::group_by(location) %>%
+    dplyr::summarize(Total_Y = sum(Y))
+
+  # NEWCHANGE: Progress Bar
+  num_sim <- length(N) * length(treatment_periods) * length(effect_size)
+  if (ProgressBar == TRUE) {
+    pb <- progress::progress_bar$new(
+      format = "  Running Simulations [:bar] :percent",
+      total = num_sim,
+      clear = FALSE,
+      width = 60
+    )
+  }
+
+
+  for (n in N) {
+    BestMarkets_aux <- stochastic_market_selector(
+      n,
+      BestMarkets,
+      run_stochastic_process = run_stochastic_process
+    )
+
+    # Force included markets into the selection
+    if (length(include_markets) > 0) {
+      temp_Markets <- NULL
+      for (row in 1:nrow(BestMarkets_aux)) {
+        if (all(include_markets %in% BestMarkets_aux[row, ])) {
+          temp_Markets <- rbind(temp_Markets, BestMarkets_aux[row, ])
+        }
+      }
+      BestMarkets_aux <- temp_Markets
+    }
+
+    # Skip iteration if no Markets are feasible
+    if (is.null(BestMarkets_aux)) {
+      next
+    }
+
+    # Exclude markets  defined at exclude_markets from possible test
+    if (length(exclude_markets) > 0) {
+      locs_to_drop <- c()
+      for (row in 1:nrow(BestMarkets_aux)) {
+        if (any(exclude_markets %in% BestMarkets_aux[row, ])) {
+          locs_to_drop <- append(locs_to_drop, row)
+        }
+      }
+      if (length(locs_to_drop) > 0) {
+        BestMarkets_aux <- BestMarkets_aux[-locs_to_drop, ]
+      }
+    }
+
+
+    for (es in effect_size) { # iterate through lift %
+
+      stat_func <- type_of_test(
+        side_of_test = side_of_test,
+        alternative_hypothesis = ifelse(es > 0, "positive", "negative")
+      )
+
+      for (tp in treatment_periods) { # lifts
+
+        if (ProgressBar == TRUE) {
+          pb$tick()
+        }
+
+        t_n <- max(data$time) - tp + 1 # Number of simulations without extrapolation (latest start time possible for #tp)
+
+        for (sim in 1:(lookback_window)) {
+          if (parallel == TRUE) {
+            simulation_results <- foreach(
+              test = 1:nrow(as.matrix(BestMarkets_aux)),
+              .combine = cbind,
+              .errorhandling = "stop",
+              .verbose = FALSE
+            ) %dopar% {
+              suppressMessages(pvalueCalc(
+                data = data,
+                sim = sim,
+                max_time = max_time,
+                tp = tp,
+                es = es,
+                locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
+                cpic = cpic,
+                X,
+                type = "pValue",
+                normalize = normalize,
+                fixed_effects = fixed_effects,
+                model = model,
+                stat_func = stat_func
+              ))
+            }
+
+
+            if (!is.null(dim(simulation_results))) {
+              for (i in 1:ncol(simulation_results)) {
+                results <- rbind(results, data.frame(
+                  location = simulation_results[[1, i]],
+                  pvalue = as.numeric(simulation_results[[2, i]]),
+                  duration = as.numeric(simulation_results[[3, i]]),
+                  EffectSize = as.numeric(simulation_results[[4, i]]),
+                  treatment_start = as.numeric(simulation_results[[5, i]]),
+                  investment = as.numeric(simulation_results[[6, i]]),
+                  cpic = cpic,
+                  ScaledL2Imbalance = as.numeric(simulation_results[[7, i]]),
+                  att_estimator = as.numeric(simulation_results[[8, i]]),
+                  detected_lift = as.numeric(simulation_results[[9, i]])
+                ))
+              }
+            } else if (length(simulation_results) > 0) {
+              results <- rbind(results, data.frame(
+                location = simulation_results[1],
+                pvalue = as.numeric(simulation_results[2]),
+                duration = as.numeric(simulation_results[3]),
+                EffectSize = as.numeric(simulation_results[4]),
+                treatment_start = as.numeric(simulation_results[5]),
+                investment = as.numeric(simulation_results[6]),
+                cpic = cpic,
+                ScaledL2Imbalance = as.numeric(simulation_results[7]),
+                att_estimator = as.numeric(simulation_results[8]),
+                detected_lift = as.numeric(simulation_results[9])
+              ))
+            }
+          } else {
+            for (test in 1:nrow(as.matrix(BestMarkets_aux))) {
+              simulation_results <- NULL
+              simulation_results <- suppressMessages(pvalueCalc(
+                data = data,
+                sim = sim,
+                max_time = max_time,
+                tp = tp,
+                es = es,
+                locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
+                cpic = cpic,
+                X,
+                type = "pValue",
+                normalize = normalize,
+                fixed_effects = fixed_effects,
+                model = model,
+                stat_func = stat_func
+              ))
+
+
+              results <- rbind(results, data.frame(
+                location = simulation_results[1],
+                pvalue = as.numeric(simulation_results[2]),
+                duration = as.numeric(simulation_results[3]),
+                EffectSize = as.numeric(simulation_results[4]),
+                treatment_start = as.numeric(simulation_results[5]),
+                investment = as.numeric(simulation_results[6]),
+                cpic = cpic,
+                ScaledL2Imbalance = as.numeric(simulation_results[7]),
+                att_estimator = as.numeric(simulation_results[8]),
+                detected_lift = as.numeric(simulation_results[9])
+              ))
+            }
+          }
+        }
+      } # tp
+    }
+  }
+
+  if (parallel == TRUE) {
+    parallel::stopCluster(cl)
+  }
+
+  # Step 1 - Sort Locations Alphabetically
+  results$location <- strsplit(stringr::str_replace_all(results$location, ", ", ","), split = ",")
+  results$location <- lapply(results$location, sort)
+  results$location <- lapply(results$location, function(x) paste(x, collapse = ", "))
+  results$location <- unlist(results$location)
+
+  # Step 2 - Compute Significant & Remove Duplicates
+  results <- results %>%
+    dplyr::mutate(significant = ifelse(pvalue < 0.1, 1, 0)) %>%
+    #   dplyr::filter(significant > 0) %>%
+    dplyr::distinct()
+
+  # Step 3 - Compute average Metrics
+  results <- results %>%
+    dplyr::group_by(location, duration, EffectSize) %>%
+    dplyr::summarise(
+      power = mean(significant),
+      AvgScaledL2Imbalance = mean(ScaledL2Imbalance),
+      Investment = mean(investment),
+      AvgATT = mean(att_estimator),
+      AvgDetectedLift = mean(detected_lift), .groups = "keep"
+    )
+
+  # Step 4 - Find the MDE that achieved power
+  resultsM <- NULL
+
+  for (locs in unique(results$location)) {
+    for (ts in treatment_periods) { # for(ts in treatment_periods)
+      resultsFindAux <- results %>% dplyr::filter(location == locs & duration == ts & power > 0.8)
+
+      if (min(effect_size) < 0) { # if ( min(effect_size) < 0){
+        resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize != 0)
+        MDEAux <- suppressWarnings(max(resultsFindAux$EffectSize))
+        resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
+      } else {
+        MDEAux <- suppressWarnings(min(resultsFindAux$EffectSize))
+        resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
+      }
+
+      if (MDEAux != 0) { # Drop tests significant with ES = 0
+        resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
+      }
+    }
+  }
+
+  # Step 5 - Add Percent of Y in test markets
+  # Step 5.1 - Create the overall prop
+  AggYperLoc <- data %>%
+    dplyr::group_by(location) %>%
+    dplyr::summarize(Total_Y = sum(Y))
+
+  # Step 5.2 - Attach to Table
+  resultsM$ProportionTotal_Y <- 1
+  resultsM$Locs <- strsplit(stringr::str_replace_all(resultsM$location, ", ", ","), split = ",")
+
+  for (row in 1:nrow(resultsM)) {
+    resultsM$ProportionTotal_Y[row] <- as.numeric(AggYperLoc %>%
+      dplyr::filter(location %in% resultsM$Locs[[row]]) %>%
+      dplyr::summarize(total = sum(Total_Y))) /
+      sum(AggYperLoc$Total_Y)
+  }
+
+  # Step 6 - Remove any duplicates
+  resultsM <- resultsM %>%
+    dplyr::group_by(location, duration) %>%
+    dplyr::slice_max(order_by = power, n = 1)
+
+  # Step 7 - Create Rank variable - Adding New Ranking System
+  abs_lift_in_zero <- true_lift <- NULL # might change to es
+  resultsM$abs_lift_in_zero <- round(abs(resultsM$AvgDetectedLift - resultsM$EffectSize), 3)
+
+  resultsM <- as.data.frame(resultsM) %>%
+    dplyr::mutate(
+      rank_mde = dplyr::dense_rank(abs(EffectSize)),
+      rank_pvalue = dplyr::dense_rank(power),
+      rank_abszero = dplyr::dense_rank(abs_lift_in_zero)
+    )
+
+  resultsM$rank <- rank(
+    rowMeans(resultsM[, c("rank_mde", "rank_pvalue", "rank_abszero")]),
+    ties.method = "min"
+  )
+
+  # Step 8 - Remove unused columns and sort by rank
+  resultsM <- resultsM %>%
+    dplyr::mutate(
+      rank_mde = NULL,
+      rank_pvalue = NULL,
+      rank_abszero = NULL,
+      Locs = NULL
+    ) %>%
+    dplyr::arrange(rank)
+
+  # Step 9 - Rename columns
+  resultsM <- dplyr::rename(resultsM,
+    Average_MDE = AvgDetectedLift, # Average_MDE = lift
+    Power = power
+  )
+
+  # Step 10: Adjust signs if Negative Lift
+  if (min(effect_size) < 0) {
+    resultsM$Investment <- -1 * resultsM$Investment
+    results$Investment <- -1 * results$Investment
+  }
+
+  # Step 11 - Remove tests out of budget (if applicable)
+  if (!is.null(budget)) {
+    resultsM <- resultsM %>% dplyr::filter(abs(budget) > abs(Investment))
+    # Re-rank
+    resultsM$rank <- rank(resultsM$rank, ties.method = "min")
+  }
+
+  # Step 12: Holdout Size
+  if (min(effect_size) < 0) {
+    resultsM$Holdout <- resultsM$ProportionTotal_Y
+  } else {
+    resultsM$Holdout <- 1 - resultsM$ProportionTotal_Y
+  }
+
+  # Step 13: Test Size
+  if (length(holdout) > 0) {
+    resultsM <- resultsM %>% dplyr::filter(
+      holdout[1] <= Holdout,
+      holdout[2] >= Holdout
+    )
+    # Re-rank
+    resultsM$rank <- rank(resultsM$rank, ties.method = "min")
+  }
+
+  # Step 14 - Create ID
+  # Make sure there are viable options
+  if (nrow(resultsM) > 0) {
+    resultsM$ID <- 1:nrow(resultsM)
+  } else {
+    message("\nWarning: No markets meet the criteria you provided. Consider modifying
+          the input parameters")
+  }
+
+  # Re-order columns
+  resultsM <- resultsM[, c(13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 11)]
+
+  # Add correlations to total
+  if (Correlations) {
+    resultsM$correlation <- 0
+    for (row in 1:nrow(resultsM)) {
+      resultsM$correlation[row] <- GetCorrel(data, locs = unlist(strsplit(stringr::str_replace_all(resultsM$location[row], ", ", ","), split = ",")))
+    }
+  }
+
+  # Print top Results
+  if (print) {
+    print(head(resultsM))
+  }
+
+  # Save Parameters for plotting
+  params <- list(
+    data = data,
+    model = model,
+    fixed_effects = fixed_effects,
+    cpic = cpic
+  )
+
+  output <- list(
+    BestMarkets = as.data.frame(resultsM),
+    PowerCurves = as.data.frame(results),
+    parameters = params
+  )
+
+  class(output) <- c("GeoLiftMarketSelection", class(output))
+  return(output)
+}
+
+#' Printing method for GeoLiftMarketSelection
+#'
+#' @description
+#'
+#' Printing method for `GeoLiftMarketSelection`. The function will print
+#' the best markets when called.
+#'
+#' @param x GeoLiftMarketSelection object.
+#' @param ... Optional arguments.
+#'
+#' @return
+#' A data frame.
+#'
+#' @export
+print.GeoLiftMarketSelection <- function(x, ...) {
+  if (!inherits(x, "GeoLiftMarketSelection")) {
+    stop("object must be class GeoLiftMarketSelection")
+  }
+
+  print(x$BestMarkets)
 }

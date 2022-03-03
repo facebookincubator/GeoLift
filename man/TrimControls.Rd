@@ -39,6 +39,8 @@ as controls.}
 A data frame with reduced control locations.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 As the number of controls for a Geo test increases, the model
 complexity grows as does the algorithm's run-time. However,
 there are diminishing marginal returns in adding too many control

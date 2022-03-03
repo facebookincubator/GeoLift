@@ -63,13 +63,13 @@ default is FALSE.}
 Synthetic Control Method. Augmentation through a prognostic function can improve
 fit and reduce L2 imbalance metrics.
 \itemize{
-         \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
-         \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
-                          for smaller panels (less than 40 locations and 100 time-stamps.))}
-         \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
-                         to improve fit for larger panels (more than 40 locations and 100
-                         time-stamps. }
-         }}
+\item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+\item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+for smaller panels (less than 40 locations and 100 time-stamps.))}
+\item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+to improve fit for larger panels (more than 40 locations and 100
+time-stamps. }
+}}
 
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
 effects in the model. Set to TRUE by default.}
@@ -100,11 +100,11 @@ Set to "sequential" by default.}
 \item{side_of_test}{A string indicating whether confidence will be determined
 using a one sided or a two sided test.
 \itemize{
-         \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-         \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
-         If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
-         If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
-         }}
+\item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+\item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+}}
 
 \item{import_augsynth_from}{Points to where the augsynth package
 should be imported from to send to the nodes.}
@@ -114,6 +114,13 @@ Data frame with the ordered list of best locations and their
 average power.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+
+Development on \code{GeoLiftPowerFinder()} is complete.
+We recommend switching to \code{GeoLiftMarketSelection()}
+for new code, which is easier to use, more featureful,
+and still under active development.
+
 \code{GeoLiftPowerFinder} provides power calculations for unknown
 test markets, number of test locations, and test duration.
 }

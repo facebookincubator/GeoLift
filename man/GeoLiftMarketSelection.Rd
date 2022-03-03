@@ -13,7 +13,7 @@ GeoLiftMarketSelection(
   location_id = "location",
   time_id = "time",
   effect_size = seq(0, 0.25, 0.05),
-  lookback_window = -1,
+  lookback_window = 1,
   include_markets = c(),
   exclude_markets = c(),
   holdout = c(),
@@ -24,8 +24,9 @@ GeoLiftMarketSelection(
   model = "none",
   fixed_effects = TRUE,
   dtw = 0,
+  Correlations = FALSE,
   ProgressBar = FALSE,
-  plot_best = FALSE,
+  print = TRUE,
   run_stochastic_process = FALSE,
   parallel = TRUE,
   parallel_setup = "sequential",
@@ -60,17 +61,18 @@ sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
 Only input sequences that are entirely positive or negative and that include
 zero.}
 
-\item{lookback_window}{A number indicating how far in time the simulations
+\item{lookback_window}{A number indicating how far back in time the simulations
 for the power analysis should go. For instance, a value equal to 5 will simulate
-power for the last five possible tests. By default lookback_window = -1 which
-will set the window to the smallest provided test \code{min(treatment_periods)}.}
+power for the last five possible tests. By default lookback_window = 1 which
+will only execute the most recent test based on the data.}
 
 \item{include_markets}{A list of markets or locations that should be part of the
 test group. Make sure to specify an N as large or larger than the number of
-provided markets or locations.}
+provided markets or locations. Empty list by default.}
 
-\item{exclude_markets}{A list of markets or locations that will be removed from the
-analysis.}
+\item{exclude_markets}{A list of markets or locations that won't be considered
+for the test market selection, but will remain in the pool of controls. Empty
+list by default.}
 
 \item{holdout}{A vector with two values: the first one the smallest desirable
 holdout and the second the largest desirable holdout. If left empty (default)
@@ -90,13 +92,13 @@ default is FALSE.}
 Synthetic Control Method. Augmentation through a prognostic function can improve
 fit and reduce L2 imbalance metrics.
 \itemize{
-         \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
-         \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
-                          for smaller panels (less than 40 locations and 100 time-stamps.))}
-         \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
-                         to improve fit for larger panels (more than 40 locations and 100
-                         time-stamps. }
-         }}
+\item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+\item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+for smaller panels (less than 40 locations and 100 time-stamps.))}
+\item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+to improve fit for larger panels (more than 40 locations and 100
+time-stamps. }
+}}
 
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
 effects in the model. Set to TRUE by default.}
@@ -104,11 +106,15 @@ effects in the model. Set to TRUE by default.}
 \item{dtw}{Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
 on this metric while dtw = 0 (default) relies on correlations only.}
 
+\item{Correlations}{A logic flag indicating whether an additional column with
+the correlations between the test regions and total control markets will be
+included in the final output. Set to FALSE by default.}
+
 \item{ProgressBar}{A logic flag indicating whether to display a progress bar
 to track progress. Set to FALSE by default.}
 
-\item{plot_best}{A logic flag indicating whether to plot the best 4 tests for
-each treatment length. Set to FALSE by default.}
+\item{print}{A logic flag indicating whether to print the top results. Set to
+TRUE by default.}
 
 \item{run_stochastic_process}{A logic flag indicating whether to select test
 markets through random sampling of the the similarity matrix. Given that
@@ -127,22 +133,24 @@ Set to "sequential" by default.}
 \item{side_of_test}{A string indicating whether confidence will be determined
 using a one sided or a two sided test.
 \itemize{
-         \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
-         \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
-         If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
-         If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
-         }}
+\item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+\item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+}}
 
 \item{import_augsynth_from}{Points to where the augsynth package
 should be imported from to send to the nodes.}
 }
 \value{
-A list with two Data Frames. \itemize{
-         \item{"BestMarkets":}{Data Frame with a ranking of the best markets
-         based on power, Scaled L2 Imbalance, Minimum Detectable Effect, and
-         proportion of total KPI in the test markets.}
-         \item{"PowerCurves":}{Data Frame with the resulting power curves for
-         each recommended market}
+A list with three Data Frames. \itemize{
+\item{"BestMarkets":}{Data Frame with a ranking of the best markets
+based on power, Scaled L2 Imbalance, Minimum Detectable Effect, and
+proportion of total KPI in the test markets.}
+\item{"PowerCurves":}{Data Frame with the resulting power curves for
+each recommended market.}
+\item{"parameters;"}{List of parameters to plot the results.
+Includes the data set, model, fixed-effects, and CPIC parameters.}
 }
 }
 \description{

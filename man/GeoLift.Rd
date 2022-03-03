@@ -49,14 +49,14 @@ of the time period (starting at 1), and covariates.}
 Synthetic Control Method. Augmentation through a prognostic function can improve
 fit and reduce L2 imbalance metrics.
 \itemize{
-         \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
-         \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
-                          for smaller panels (less than 40 locations and 100 time-stamps.))}
-         \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
-                         to improve fit for larger panels (more than 40 locations and 100
-                         time-stamps. }
-         \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
-         }}
+\item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+\item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+for smaller panels (less than 40 locations and 100 time-stamps.))}
+\item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+to improve fit for larger panels (more than 40 locations and 100
+time-stamps. }
+\item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
+}}
 
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
 effects in the model. Set to TRUE by default.}
@@ -66,11 +66,11 @@ through jackknifing techniques.  Set to FALSE by default.}
 
 \item{stat_test}{A string indicating the test statistic.
 \itemize{
-         \item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
-         \item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
-         Recommended for Negative Lift tests.}
-         \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
-         Recommended for Positive Lift tests.}
+\item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
+\item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
+Recommended for Negative Lift tests.}
+\item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
+Recommended for Positive Lift tests.}
 }}
 
 \item{print}{A logic flag indicating whether to print the results or not.
@@ -78,24 +78,24 @@ Set to TRUE by default.}
 }
 \value{
 GeoLift object that contains:
-         \itemize{
-         \item{"results":}{ Generalized Augmented Sunthetic Controls results.}
-         \item{"inference":}{ Data frame with inference statistics (ATT, Lift, p-value, and Confidence Interval.)}
-         \item{"data":}{ Input data.}
-         \item{"y_obs":}{ Observed outcome metric.}
-         \item{"y_hat":}{ Counterfactual outcome metric.}
-         \item{"ATT":}{ ATT estimate.}
-         \item{"ATT_se":}{ Standrd Error of the ATT estimate.}
-         \item{"TreatmentStart":}{ Time id of treatment start.}
-         \item{"TreatmentEnd":}{ Time id of treatment end.}
-         \item{"test_id":}{ List of names of the test locations.}
-         \item{"incremental":}{ Incremental outcome units (Obersved - Counterfactual).}
-         \item{"Y_id":}{ Name of the outcome variable.}
-         \item{"summary":}{ Model's Summary.}
-         \item{"ConfidenceIntervals":}{ Flag indicating whether CI will be included.}
-         \item{"lower_bound":}{ Lower confidence interval.}
-         \item{"upper_bound":}{ Upper confidence interval.}
-         }
+\itemize{
+\item{"results":}{ Generalized Augmented Sunthetic Controls results.}
+\item{"inference":}{ Data frame with inference statistics (ATT, Lift, p-value, and Confidence Interval.)}
+\item{"data":}{ Input data.}
+\item{"y_obs":}{ Observed outcome metric.}
+\item{"y_hat":}{ Counterfactual outcome metric.}
+\item{"ATT":}{ ATT estimate.}
+\item{"ATT_se":}{ Standrd Error of the ATT estimate.}
+\item{"TreatmentStart":}{ Time id of treatment start.}
+\item{"TreatmentEnd":}{ Time id of treatment end.}
+\item{"test_id":}{ List of names of the test locations.}
+\item{"incremental":}{ Incremental outcome units (Obersved - Counterfactual).}
+\item{"Y_id":}{ Name of the outcome variable.}
+\item{"summary":}{ Model's Summary.}
+\item{"ConfidenceIntervals":}{ Flag indicating whether CI will be included.}
+\item{"lower_bound":}{ Lower confidence interval.}
+\item{"upper_bound":}{ Upper confidence interval.}
+}
 }
 \description{
 GeoLift is an end-to-end geo-experimental methodology based on

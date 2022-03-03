@@ -9,7 +9,7 @@
 #'
 #' @description
 #'
-#' \code{GeoDataRead} reads a data-frame and processes it for GeoLift.
+#' `GeoDataRead` reads a data-frame and processes it for GeoLift.
 #' The function will clean the data, generate a time variable that
 #' increases by 1 for each time period (day/week/month), and aggregate
 #' the data by time and location. It is important to have data for each
@@ -236,12 +236,13 @@ GeoDataRead <- function(data,
 #' of precision.
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' As the number of controls for a Geo test increases, the model
 #' complexity grows as does the algorithm's run-time. However,
 #' there are diminishing marginal returns in adding too many control
 #' locations, especially if their time-series are very similar.
-#' \code{TrimControls} provides a method to trim the number of controls
+#' `TrimControls` provides a method to trim the number of controls
 #' in order to reduce run-times with minimal loss of precision. In general,
 #' it is recommended to have 4 to 5 times the number of controls locations
 #' than the ones we have for test locations.

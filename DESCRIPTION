@@ -1,6 +1,6 @@
 Package: GeoLift
 Title: Synthetic Control Method to Calculate Lift at a Geo Level
-Version: 2.2.2
+Version: 2.3.0
 Authors@R: c(
     person(given = "Arturo",
            family = "Esquerra",
@@ -47,7 +47,8 @@ Imports:
     graphics,
     stats,
     utils,
-    rlang
+    rlang,
+    lifecycle
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
@@ -55,3 +56,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)

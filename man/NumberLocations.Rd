@@ -70,13 +70,13 @@ default is FALSE.}
 Synthetic Control Method. Augmentation through a prognostic function can improve
 fit and reduce L2 imbalance metrics.
 \itemize{
-         \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
-         \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
-                          for smaller panels (less than 40 locations and 100 time-stamps.))}
-         \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
-                         to improve fit for larger panels (more than 40 locations and 100
-                         time-stamps. }
-         }}
+\item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+\item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+for smaller panels (less than 40 locations and 100 time-stamps.))}
+\item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+to improve fit for larger panels (more than 40 locations and 100
+time-stamps. }
+}}
 
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
 effects in the model. Set to TRUE by default.}
@@ -99,6 +99,13 @@ should be imported from to send to the nodes.}
 Table of average power by number of locations.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+
+Development on \code{NumberLocations()} is complete.
+We recommend switching to \code{GeoLiftMarketSelection()}
+for new code, which is easier to use, more featureful,
+and still under active development.#'
+
 \code{NumberLocations} calculates power to determine the
 number of test periods with unknown test locations.
 }

@@ -872,7 +872,7 @@ decide which is the best approach by setting the model parameter to
     plot(GeoTestBest, type = "ATT")
     #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 
-<img src="/private/var/folders/td/l44bnh6n4zn23vj424n2pqzx9pchjf/T/RtmpQ1HmIc/preview-310d14eb8411.dir/GeoLift_Walkthrough_files/figure-markdown_strict/GeoLiftBest-2.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftBest-2.png" style="display: block; margin: auto;" />
 
 The new results augment the GeoLift model with a Ridge prognostic
 function which improves the model fit as seen in the new L2 Imbalance

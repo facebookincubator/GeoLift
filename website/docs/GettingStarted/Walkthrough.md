@@ -717,7 +717,7 @@ Baton Rouge.
     #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```
 
-![LiftPlot](/img/plot_Lift-1.png
+![LiftPlot](/img/plot_Lift-1.png)
 
 Plotting the results is a great way to assess the model’s fit and how
 effective the campaign was. Taking a close look at the pre-treatment

@@ -361,22 +361,22 @@ duration between 10 and 15 days we obtain:
     #> 2  2       chicago, cincinnati, houston, portland       15       0.05     1
     #> 3  3                            chicago, portland       15      -0.10     1
     #> 4  4                            chicago, portland       10      -0.10     1
-    #> 5  5            atlanta, chicago, las vegas, reno       10      -0.05     1
-    #> 6  6       chicago, cincinnati, houston, portland       10      -0.10     1
+    #> 5  5       chicago, cincinnati, houston, portland       10      -0.10     1
+    #> 6  6                   chicago, houston, portland       10      -0.10     1
     #>   AvgScaledL2Imbalance Investment    AvgATT Average_MDE ProportionTotal_Y
     #> 1            0.4536741   69300.00 -174.5212 -0.04735064        0.10714670
-    #> 2            0.1971864   74118.38  159.3627  0.04829913        0.07576405
+    #> 2            0.1971864   74118.38  159.3627  0.04829912        0.07576405
     #> 3            0.1738778   64563.75 -283.8929 -0.09904014        0.03306537
     #> 4            0.1682310   43646.25 -281.0099 -0.09690716        0.03306537
-    #> 5            0.4443981   56873.25 -165.5250 -0.04393501        0.08745281
-    #> 6            0.1966996   99027.75 -343.5647 -0.10365827        0.07576405
+    #> 5            0.1966996   99027.75 -343.5647 -0.10365827        0.07576405
+    #> 6            0.2305628   75389.25 -319.8125 -0.09588481        0.05797087
     #>   abs_lift_in_zero    Holdout rank correlation
     #> 1            0.003 0.10714670    1   0.9788758
     #> 2            0.002 0.92423595    1   0.9144814
     #> 3            0.001 0.03306537    1   0.9321104
     #> 4            0.003 0.03306537    4   0.9321104
-    #> 5            0.006 0.08745281    5   0.9683079
-    #> 6            0.004 0.07576405    5   0.9144814
+    #> 5            0.004 0.07576405    5   0.9144814
+    #> 6            0.004 0.05797087    5   0.9139549
 
 The results of the power analysis and market selection provide us with
 several key metrics that we can use to select our test market. These
@@ -441,9 +441,10 @@ metrics are:
     variable allows for ties.
 
 The results in `MarketSelection` show that the test markets with the
-best ranks are: `(chicago, cincinnati, houston, portland)` and
-`(chicago, portland)`, both tied at rank 2. We can `plot()` both of
-these results to inspect them further. This plot will show how the
+best ranks are: `(chicago, cincinnati, houston, portland)`,
+`(atlanta, chicago, cleveland, las vegas, reno)` and
+`(chicago, portland)`, all of them tied at rank 1. We can `plot()` these
+last two results to inspect them further. This plot will show how the
 results of the `GeoLift()` model would look like with the latest
 possible test period as well as the test’s power curve across all
 simulations.
@@ -467,10 +468,10 @@ this market selection.
 
 
     # Plot for chicago, portland for a 15 day test
-    plot(MarketSelections, market_ID = 2, print_summary = TRUE)
+    plot(MarketSelections, market_ID = 3, print_summary = TRUE)
     #> ##################################
     #> #####   GeoLift Simulation   #####
-    #> ####  Simulating: 5% Lift  ####
+    #> ####  Simulating: -10% Lift  ####
     #> ##################################
     #> 
     #> GeoLift Results Summary
@@ -478,18 +479,18 @@ this market selection.
     #> #####     Test Statistics    #####
     #> ##################################
     #> 
-    #> * Average ATT: 159.363
-    #> * Percent Lift: 4.8%
-    #> * Incremental Y: 9562
-    #> * P-value: 0.06
+    #> * Average ATT: -283.893
+    #> * Percent Lift: -9.9%
+    #> * Incremental Y: -8517
+    #> * P-value: 0
     #> 
     #> ##################################
     #> #####   Balance Statistics   #####
     #> ##################################
     #> 
-    #> * L2 Imbalance: 948.101
-    #> * Scaled L2 Imbalance: 0.1972
-    #> * Percent improvement from naive model: 80.28%
+    #> * L2 Imbalance: 868.598
+    #> * Scaled L2 Imbalance: 0.1739
+    #> * Percent improvement from naive model: 82.61%
     #> * Average Estimated Bias: NA
     #> 
     #> ##################################
@@ -499,17 +500,19 @@ this market selection.
     #> * Prognostic Function: NONE
     #> 
     #> * Model Weights:
-    #>  * atlanta: 0.025
-    #>  * austin: 0.0377
-    #>  * baltimore: 0.0681
-    #>  * baton rouge: 0.217
-    #>  * honolulu: 0.0714
-    #>  * indianapolis: 0.0283
-    #>  * miami: 0.1635
-    #>  * nashville: 0.1883
-    #>  * reno: 0.0666
-    #>  * san diego: 0.1324
-    #>  * san francisco: 0.0017
+    #>  * austin: 0.0237
+    #>  * baton rouge: 0.1511
+    #>  * cincinnati: 0.2429
+    #>  * dallas: 0.0644
+    #>  * honolulu: 0.0669
+    #>  * houston: 0.0292
+    #>  * los angeles: 0.0179
+    #>  * miami: 0.2056
+    #>  * minneapolis: 0.0619
+    #>  * nashville: 0.0641
+    #>  * new york: 0.0216
+    #>  * reno: 0.0113
+    #>  * san diego: 0.0394
 
 <img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection_Plot2-1.png" style="display: block; margin: auto;" />
 
@@ -630,7 +633,7 @@ parameters respectively.
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 0.9% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 1.3% chance of observing an effect this large or larger assuming treatment effect is zero.
 
 The results show that the campaigns led to a 5.4% lift in units sold
 corresponding to 4667 incremental units for this 15-day test. Moreover,
@@ -800,7 +803,7 @@ decide which is the best approach by setting the model parameter to
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 1.9% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 0.9% chance of observing an effect this large or larger assuming treatment effect is zero.
 
     summary(GeoTestBest)
     #> 
@@ -812,7 +815,7 @@ decide which is the best approach by setting the model parameter to
     #> * Average ATT: 156.805
     #> * Percent Lift: 5.5%
     #> * Incremental Y: 4704
-    #> * P-value: 0.02
+    #> * P-value: 0.01
     #> 
     #> ##################################
     #> #####   Balance Statistics   #####

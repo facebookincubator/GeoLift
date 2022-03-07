@@ -208,10 +208,10 @@ The results in `MarketSelection` show that the test markets with the best ranks 
 
 ```{r GeoLiftMarketSelection_Plots}
 # Plot for chicago, cincinnati, houston, portland for a 15 day test
-plot(MarketSelections, market_ID = 1, print_summary = FALSE)
+plot(MarketSelections, market_ID = 2, print_summary = FALSE)
 
 # Plot for chicago, portland for a 15 day test
-plot(MarketSelections, market_ID = 2, print_summary = FALSE)
+plot(MarketSelections, market_ID = 3, print_summary = FALSE)
 
 ```
 

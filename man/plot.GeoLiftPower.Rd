@@ -4,7 +4,7 @@
 \alias{plot.GeoLiftPower}
 \title{Plotting function for GeoLiftPower.}
 \usage{
-\method{plot}{GeoLiftPower}(x, power = 0.8, table = TRUE, actual_values = FALSE, ...)
+\method{plot}{GeoLiftPower}(x, power = 0.8, table = TRUE, actual_values = TRUE, ...)
 }
 \arguments{
 \item{x}{GeoLiftPower object.}
@@ -14,7 +14,7 @@
 \item{table}{Plot the table of power estimates. TRUE by default.}
 
 \item{actual_values}{Logic flag indicating whether to include in the plot
-the actual values in addition to the smoothed values.}
+the actual values in addition to the smoothed values. TRUE by default.}
 
 \item{...}{additional arguments}
 }

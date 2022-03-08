@@ -4,13 +4,16 @@
 \alias{build_cluster}
 \title{Build cluster to parallelize operations across nodes in machine.}
 \usage{
-build_cluster(parallel_setup, import_augsynth_from)
+build_cluster(parallel_setup, import_augsynth_from, import_tidyr_from)
 }
 \arguments{
 \item{parallel_setup}{A string indicating parallel workers set-up.
 Can be "sequential" or "parallel".}
 
 \item{import_augsynth_from}{Points to where the augsynth package
+should be imported from to send to the nodes.}
+
+\item{import_tidyr_from}{Points to where the tidyr package
 should be imported from to send to the nodes.}
 }
 \value{

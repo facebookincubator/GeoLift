@@ -96,12 +96,12 @@ plot.GeoLiftPower <- function(x,
   lift <- unique(x$lift)
 
   PowerPlot_data <- x %>%
-    dplyr::group_by(duration, lift) %>%
+    dplyr::group_by(lift) %>%
     dplyr::summarise(power = mean(pow), investment = mean(investment)) %>%
     dplyr::mutate(AvgCost = investment / lift)
 
   spending <- x %>%
-    dplyr::group_by(duration, lift) %>%
+    dplyr::group_by(lift) %>%
     dplyr::summarize(inv = mean(investment))
 
   PowerPlot_graph <- ggplot(PowerPlot_data, aes(x = lift, y = power)) +

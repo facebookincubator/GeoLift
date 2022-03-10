@@ -1566,11 +1566,6 @@ GeoLiftPower <- function(data,
                          parallel_setup = "sequential",
                          side_of_test = "two_sided",
                          import_augsynth_from = "library(augsynth)") {
-  if (parallel == TRUE) {
-    cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
-    )
-  }
 
   # Part 1: Treatment and pre-treatment periods
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
@@ -1583,119 +1578,39 @@ GeoLiftPower <- function(data,
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
-  results <- data.frame(matrix(ncol = 8, nrow = 0))
-  colnames(results) <- c(
-    "location",
-    "pvalue",
-    "duration",
-    "lift",
-    "treatment_start",
-    "investment",
-    "cpic",
-    "ScaledL2Imbalance"
-  )
-
   if (horizon < 0) { # NEWCHANGE
-    horizon <- max(treatment_periods)
+    lookback_window <- 1
+  } else {
+    lookback_window <- max(data$time) - max(treatment_periods) - horizon + 1
   }
 
-  num_sim <- length(effect_size) * length(treatment_periods)
-
   if (ProgressBar == TRUE) {
+    num_sim <- length(effect_size) * length(treatment_periods)
     pb <- progress::progress_bar$new(
       format = "  Running Simulations [:bar] :percent",
       total = num_sim,
       clear = FALSE,
       width = 60
     )
+  } else {
+    pb <- NULL
   }
 
-  for (es in effect_size) { # iterate through lift %
-
-    stat_func <- type_of_test(
-      side_of_test = side_of_test,
-      alternative_hypothesis = ifelse(es > 0, "Positive", "Negative")
-    )
-
-    for (tp in treatment_periods) { # lifts
-      t_n <- max(data$time) - tp + 1 # Number of simulations without extrapolation
-
-      if (ProgressBar == TRUE) {
-        pb$tick()
-      }
-
-      if (parallel == TRUE) {
-        a <- foreach(
-          sim = 1:(t_n - horizon + 1), # NEWCHANGE: Horizon = earliest start time for simulations
-          .combine = cbind,
-          .errorhandling = "stop"
-        ) %dopar% {
-          pvalueCalc(
-            data = data,
-            sim = sim,
-            max_time = max_time,
-            tp = tp,
-            es = es,
-            locations = locations,
-            cpic = cpic,
-            X = c(),
-            type = type,
-            normalize = normalize,
-            fixed_effects = fixed_effects,
-            model = model,
-            stat_func = stat_func
-          )
-        }
-
-        for (i in 1:ncol(a)) {
-          results <- rbind(results, data.frame(
-            location = a[[1, i]],
-            pvalue = as.numeric(a[[2, i]]),
-            duration = as.numeric(a[[3, i]]),
-            lift = as.numeric(a[[4, i]]),
-            treatment_start = as.numeric(a[[5, i]]),
-            investment = as.numeric(a[[6, i]]),
-            cpic = cpic,
-            ScaledL2Imbalance = as.numeric(a[[7, i]])
-          ))
-        }
-      } else {
-        for (sim in 1:(t_n - horizon + 1)) {
-          aux <- NULL
-          aux <- suppressMessages(pvalueCalc(
-            data = data,
-            sim = sim,
-            max_time = max_time,
-            tp = tp,
-            es = es,
-            locations = locations,
-            cpic = cpic,
-            X = c(),
-            type = type,
-            normalize = normalize,
-            fixed_effects = fixed_effects,
-            model = model,
-            stat_func = stat_func
-          ))
-
-          results <- rbind(results, data.frame(
-            location = aux[1],
-            pvalue = as.numeric(aux[2]),
-            duration = as.numeric(aux[3]),
-            lift = as.numeric(aux[4]),
-            treatment_start = as.numeric(aux[5]),
-            investment = as.numeric(aux[6]),
-            cpic = cpic,
-            ScaledL2Imbalance = as.numeric(aux[7])
-          ))
-        }
-      }
-    }
-  }
-
-  if (parallel == TRUE) {
-    parallel::stopCluster(cl)
-  }
+  results <- run_all_simulations(
+    data = data,
+    treatment_combinations = matrix(locations, nrow = 1),
+    treatment_durations = treatment_periods,
+    effect_sizes = effect_size,
+    side_of_test = side_of_test,
+    lookback_window = lookback_window,
+    parallel = parallel,
+    pb = pb,
+    cpic = cpic,
+    X = X,
+    normalize = normalize,
+    fixed_effects = fixed_effects,
+    model = model
+  )
 
   class(results) <- c("GeoLiftPower", class(results))
 

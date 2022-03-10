@@ -12,7 +12,7 @@ GeoLiftMarketSelection(
   Y_id = "Y",
   location_id = "location",
   time_id = "time",
-  effect_size = seq(0, 0.25, 0.05),
+  effect_size = seq(-0.2, 0.2, 0.05),
   lookback_window = 1,
   include_markets = c(),
   exclude_markets = c(),

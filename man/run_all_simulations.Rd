@@ -17,9 +17,7 @@ run_all_simulations(
   X = c(),
   normalize = FALSE,
   fixed_effects = TRUE,
-  model = "none",
-  parallel_setup = "sequential",
-  import_augsynth_from = "library(augsynth)"
+  model = "none"
 )
 }
 \arguments{
@@ -76,12 +74,6 @@ for smaller panels (less than 40 locations and 100 time-stamps.))}
 to improve fit for larger panels (more than 40 locations and 100
 time-stamps. }
 }}
-
-\item{parallel_setup}{A string indicating parallel workers set-up.
-Set to "sequential" by default.}
-
-\item{import_augsynth_from}{Points to where the augsynth package
-should be imported from to send to the nodes.}
 }
 \value{
 DataFrame that contains:

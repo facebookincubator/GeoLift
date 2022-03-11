@@ -100,7 +100,6 @@ plot.GeoLiftPower <- function(x,
   EffectSize <- unique(x$EffectSize)
 
   PowerPlot_data <- x %>%
-<<<<<<< HEAD
     dplyr::group_by(duration, EffectSize) %>%
     dplyr::summarise(power = mean(pow), investment = mean(investment)) %>%
     dplyr::mutate(AvgCost = investment / EffectSize)

@@ -512,7 +512,7 @@ GeoLiftPowerFinder <- function(data,
 
         if (parallel == TRUE) {
           simulation_results <- foreach(
-            test = 1:nrow(as.matrix(BestMarkets_aux)), # NEWCHANGE: Horizon = earliest start time for simulations
+            test = 1:nrow(as.matrix(BestMarkets_aux)),
             .combine = cbind,
             .errorhandling = "stop"
           ) %dopar% {
@@ -1294,14 +1294,10 @@ NumberLocations <- function(data,
 #' sequence between 0 - 100 percent in 5 percent increments: seq(0,1,0.05).
 #' @param treatment_periods Expected length of the test. A vector of
 #' possible lengths can be entered for multiple options.
-#' @param horizon An integer that defines at which time-stamp the power simulations
-#' will start. This parameter allows the user to define which period is most relevant
-#' for the test's current in-market dynamics (a very small horizon will include
-#' simulations of time periods with dynamics that might not be relevant anymore).
-#' Ideally the horizon should encompass at least of couple of times the test length.
-#' For instance, for a power analysis with 180 days of historical data and a 15 day
-#' test, we would recommend setting horizon to at least 150. By default horizon is set
-#' to -1 which will  execute the smallest possible horizon with the provided data.
+#' @param lookback_window A number indicating how far back in time the simulations
+#' for the power analysis should go. For instance, a value equal to 5 will simulate
+#' power for the last five possible tests. By default lookback_window = 1 which
+#' will only execute the most recent test based on the data.
 #' @param cpic Cost Per Incremental Conversion for estimated test
 #' minimum budget. The default value is 0, in which case no investment
 #' estimation will be provided.
@@ -1369,7 +1365,7 @@ GeoLiftPower <- function(data,
                          locations,
                          effect_size = seq(0, 1, 0.05),
                          treatment_periods,
-                         horizon = -1,
+                         lookback_window = 1,
                          cpic = 0,
                          X = c(),
                          Y_id = "Y",
@@ -1417,8 +1413,9 @@ GeoLiftPower <- function(data,
     "ScaledL2Imbalance"
   )
 
-  if (horizon < 0) { # NEWCHANGE
-    horizon <- max(treatment_periods)
+  # Setting the lookback window to the smallest length of treatment if not provided.
+  if (lookback_window <= 0) {
+    lookback_window <- 1
   }
 
   num_sim <- length(effect_size) * length(treatment_periods)
@@ -1447,12 +1444,13 @@ GeoLiftPower <- function(data,
       }
 
       if (parallel == TRUE) {
-        a <- foreach(
-          sim = 1:(t_n - horizon + 1), # NEWCHANGE: Horizon = earliest start time for simulations
+        simulation_results <- foreach(
+          sim = 1:(lookback_window),
           .combine = cbind,
-          .errorhandling = "stop"
+          .errorhandling = "stop",
+          .verbose = FALSE
         ) %dopar% {
-          pvalueCalc(
+          suppressMessages(pvalueCalc(
             data = data,
             sim = sim,
             max_time = max_time,
@@ -1466,25 +1464,38 @@ GeoLiftPower <- function(data,
             fixed_effects = fixed_effects,
             model = model,
             stat_func = stat_func
-          )
+          ))
         }
 
-        for (i in 1:ncol(a)) {
+        if (!is.null(dim(simulation_results))) {
+          for (i in 1:ncol(simulation_results)) {
+            results <- rbind(results, data.frame(
+              location = simulation_results[[1, i]],
+              pvalue = as.numeric(simulation_results[[2, i]]),
+              duration = as.numeric(simulation_results[[3, i]]),
+              lift = as.numeric(simulation_results[[4, i]]),
+              treatment_start = as.numeric(simulation_results[[5, i]]),
+              investment = as.numeric(simulation_results[[6, i]]),
+              cpic = cpic,
+              ScaledL2Imbalance = as.numeric(simulation_results[[7, i]])
+            ))
+          }
+        } else if (length(simulation_results) > 0) {
           results <- rbind(results, data.frame(
-            location = a[[1, i]],
-            pvalue = as.numeric(a[[2, i]]),
-            duration = as.numeric(a[[3, i]]),
-            lift = as.numeric(a[[4, i]]),
-            treatment_start = as.numeric(a[[5, i]]),
-            investment = as.numeric(a[[6, i]]),
+            location = simulation_results[1],
+            pvalue = as.numeric(simulation_results[2]),
+            duration = as.numeric(simulation_results[3]),
+            lift = as.numeric(simulation_results[4]),
+            treatment_start = as.numeric(simulation_results[5]),
+            investment = as.numeric(simulation_results[6]),
             cpic = cpic,
-            ScaledL2Imbalance = as.numeric(a[[7, i]])
+            ScaledL2Imbalance = as.numeric(simulation_results[7])
           ))
         }
       } else {
-        for (sim in 1:(t_n - horizon + 1)) {
-          aux <- NULL
-          aux <- suppressMessages(pvalueCalc(
+        for (sim in 1:(lookback_window)) {
+          simulation_results <- NULL
+          simulation_results <- suppressMessages(pvalueCalc(
             data = data,
             sim = sim,
             max_time = max_time,
@@ -1501,14 +1512,14 @@ GeoLiftPower <- function(data,
           ))
 
           results <- rbind(results, data.frame(
-            location = aux[1],
-            pvalue = as.numeric(aux[2]),
-            duration = as.numeric(aux[3]),
-            lift = as.numeric(aux[4]),
-            treatment_start = as.numeric(aux[5]),
-            investment = as.numeric(aux[6]),
+            location = simulation_results[1],
+            pvalue = as.numeric(simulation_results[2]),
+            duration = as.numeric(simulation_results[3]),
+            lift = as.numeric(simulation_results[4]),
+            treatment_start = as.numeric(simulation_results[5]),
+            investment = as.numeric(simulation_results[6]),
             cpic = cpic,
-            ScaledL2Imbalance = as.numeric(aux[7])
+            ScaledL2Imbalance = as.numeric(simulation_results[7])
           ))
         }
       }
@@ -1976,17 +1987,35 @@ GeoLiftMarketSelection <- function(data,
   resultsM <- NULL
 
   for (locs in unique(results$location)) {
-    for (ts in treatment_periods) { # for(ts in treatment_periods)
+    for (ts in treatment_periods) {
       resultsFindAux <- results %>% dplyr::filter(location == locs & duration == ts & power > 0.8)
 
-      if (min(effect_size) < 0) { # if ( min(effect_size) < 0){
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize != 0)
-        MDEAux <- suppressWarnings(max(resultsFindAux$EffectSize))
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
-      } else {
-        MDEAux <- suppressWarnings(min(resultsFindAux$EffectSize))
-        resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
-      }
+      # if (min(effect_size) < 0) { # if ( min(effect_size) < 0){
+      #   resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize != 0)
+      #   MDEAux <- suppressWarnings(max(resultsFindAux$EffectSize))
+      #   resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
+      # } else {
+      #   MDEAux <- suppressWarnings(min(resultsFindAux$EffectSize))
+      #   resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
+      # }
+
+      negative_mde <- max(
+        ifelse(resultsFindAux$EffectSize < 0,
+          resultsFindAux$EffectSize,
+          min(effect_size) - 1
+        )
+      )
+      positive_mde <- min(
+        ifelse(resultsFindAux$EffectSize > 0,
+          resultsFindAux$EffectSize,
+          max(effect_size) + 1
+        )
+      )
+      MDEAux <- ifelse(
+        positive_mde > abs(negative_mde) & negative_mde != 0,
+        negative_mde,
+        positive_mde
+      )
 
       if (MDEAux != 0) { # Drop tests significant with ES = 0
         resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
@@ -2049,10 +2078,20 @@ GeoLiftMarketSelection <- function(data,
   )
 
   # Step 10: Adjust signs if Negative Lift
-  if (min(effect_size) < 0) {
-    resultsM$Investment <- -1 * resultsM$Investment
-    results$Investment <- -1 * results$Investment
-  }
+  # if (min(effect_size) < 0) {
+  #   resultsM$Investment <- -1 * resultsM$Investment
+  #   results$Investment <- -1 * results$Investment
+  # }
+  resultsM$Investment <- ifelse(
+    resultsM$EffectSize < 0,
+    -1 * resultsM$Investment,
+    resultsM$Investment
+  )
+  results$Investment <- ifelse(
+    results$EffectSize < 0,
+    -1 * results$Investment,
+    results$Investment
+  )
 
   # Step 11 - Remove tests out of budget (if applicable)
   if (!is.null(budget)) {
@@ -2062,11 +2101,16 @@ GeoLiftMarketSelection <- function(data,
   }
 
   # Step 12: Holdout Size
-  if (min(effect_size) < 0) {
-    resultsM$Holdout <- resultsM$ProportionTotal_Y
-  } else {
-    resultsM$Holdout <- 1 - resultsM$ProportionTotal_Y
-  }
+  # if (min(effect_size) < 0) {
+  #   resultsM$Holdout <- resultsM$ProportionTotal_Y
+  # } else {
+  #   resultsM$Holdout <- 1 - resultsM$ProportionTotal_Y
+  # }
+  resultsM$Holdout <- ifelse(
+    resultsM$EffectSize < 0,
+    resultsM$ProportionTotal_Y,
+    1 - resultsM$ProportionTotal_Y
+  )
 
   # Step 13: Test Size
   if (length(holdout) > 0) {

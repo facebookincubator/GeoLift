@@ -179,12 +179,11 @@ plot.GeoLiftPower <- function(x,
 
   plot(PowerPlot_graph)
 
-  output <- list(power_plot = PowerPlot_graph)
-
   if (return_power_table == TRUE) {
+    output <- list(power_plot = PowerPlot_graph)
     output <- append(output, list(power_plot_data = as.data.frame(PowerPlot_data)))
+    return(output)
   }
-  return(output)
 }
 
 

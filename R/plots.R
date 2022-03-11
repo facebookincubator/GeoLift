@@ -70,6 +70,9 @@ GeoPlot <- function(data,
 #' the smoothed values. TRUE by default.
 #' @param show_mde Logic flag indicating whether to include in the plot
 #' the positive and negative MDEs. FALSE by default.
+#' @param breaks_x_axis Numeric value indicating the number of breaks in the
+#' x-axis of the power plot. You may get slightly more or fewer breaks that
+#' requested based on `breaks_pretty()`. Set to 10 by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -82,6 +85,7 @@ plot.GeoLiftPower <- function(x,
                               actual_values = TRUE,
                               smoothed_values = TRUE,
                               show_mde = FALSE,
+                              breaks_x_axis = 10,
                               ...) {
   final_legend <- c()
   if (!inherits(x, "GeoLiftPower")) {
@@ -96,12 +100,14 @@ plot.GeoLiftPower <- function(x,
   EffectSize <- unique(x$EffectSize)
 
   PowerPlot_data <- x %>%
+
     dplyr::group_by(duration, EffectSize) %>%
     dplyr::summarise(power = mean(pow), investment = mean(investment)) %>%
     dplyr::mutate(AvgCost = investment / EffectSize)
 
   spending <- x %>%
     dplyr::group_by(duration, EffectSize) %>%
+
     dplyr::summarize(inv = mean(investment))
 
   PowerPlot_graph <- ggplot(PowerPlot_data, aes(x = EffectSize, y = power)) +
@@ -119,7 +125,7 @@ plot.GeoLiftPower <- function(x,
     ) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1))
 
-  if (sum(spending$inv > 0)) {
+  if (sum(spending$inv != 0)) {
     CostPerLift <- as.numeric(
       x %>%
         dplyr::filter(EffectSize > 0) %>%
@@ -129,7 +135,11 @@ plot.GeoLiftPower <- function(x,
     PowerPlot_graph <- PowerPlot_graph +
       scale_x_continuous(
         labels = scales::percent_format(accuracy = 1),
-        sec.axis = sec_axis(~ . * CostPerLift, name = "Estimated Investment")
+        sec.axis = sec_axis(~ . * CostPerLift,
+          breaks = scales::pretty_breaks(n = breaks_x_axis),
+          name = "Estimated Investment"
+        ),
+        breaks = scales::pretty_breaks(n = breaks_x_axis)
       )
   } else {
     PowerPlot_graph <- PowerPlot_graph +
@@ -174,12 +184,11 @@ plot.GeoLiftPower <- function(x,
 
   plot(PowerPlot_graph)
 
-  output <- list(power_plot = PowerPlot_graph)
-
   if (return_power_table == TRUE) {
+    output <- list(power_plot = PowerPlot_graph)
     output <- append(output, list(power_plot_data = as.data.frame(PowerPlot_data)))
+    return(output)
   }
-  return(output)
 }
 
 

@@ -51,11 +51,14 @@ fn_treatment <- function(df,
 #' Can be "sequential" or "parallel".
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
+#' @param import_tidyr_from Points to where the tidyr package
+#' should be imported from to send to the nodes.
 #' @return
 #' Cluster object that will parallelize operations.
 #' @export
 build_cluster <- function(parallel_setup,
-                          import_augsynth_from) {
+                          import_augsynth_from,
+                          import_tidyr_from) {
   message("Setting up cluster.")
   if (parallel_setup == "sequential") {
     cl <- parallel::makeCluster(parallel::detectCores() - 1, setup_strategy = parallel_setup)
@@ -73,11 +76,15 @@ build_cluster <- function(parallel_setup,
   })
 
   parallel::clusterCall(cl, function() {
+    eval(parse(text = import_tidyr_from))
+  })
+
+  parallel::clusterCall(cl, function() {
     attachNamespace("dplyr")
   })
-  parallel::clusterCall(cl, function() {
-    attachNamespace("tidyr")
-  })
+  # parallel::clusterCall(cl, function() {
+  #   attachNamespace("tidyr")
+  # })
 
   parallel::clusterExport(
     cl,

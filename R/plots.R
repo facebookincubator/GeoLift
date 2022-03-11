@@ -70,6 +70,9 @@ GeoPlot <- function(data,
 #' the smoothed values. TRUE by default.
 #' @param show_mde Logic flag indicating whether to include in the plot
 #' the positive and negative MDEs. FALSE by default.
+#' @param breaks_x_axis Numeric value indicating the number of breaks in the
+#' x-axis of the power plot. You may get slightly more or fewer breaks that
+#' requested based on `breaks_pretty()`. Set to 10 by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -82,6 +85,7 @@ plot.GeoLiftPower <- function(x,
                               actual_values = TRUE,
                               smoothed_values = TRUE,
                               show_mde = FALSE,
+                              breaks_x_axis = 10,
                               ...) {
   final_legend <- c()
   if (!inherits(x, "GeoLiftPower")) {
@@ -96,12 +100,11 @@ plot.GeoLiftPower <- function(x,
   lift <- unique(x$lift)
 
   PowerPlot_data <- x %>%
-    dplyr::group_by(duration, lift) %>%
-    dplyr::summarise(power = mean(pow), investment = mean(investment)) %>%
-    dplyr::mutate(AvgCost = investment / lift)
+    dplyr::group_by(lift) %>%
+    dplyr::summarise(power = mean(pow), investment = mean(investment))
 
   spending <- x %>%
-    dplyr::group_by(duration, lift) %>%
+    dplyr::group_by(lift) %>%
     dplyr::summarize(inv = mean(investment))
 
   PowerPlot_graph <- ggplot(PowerPlot_data, aes(x = lift, y = power)) +
@@ -119,17 +122,21 @@ plot.GeoLiftPower <- function(x,
     ) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1))
 
-  if (sum(spending$inv > 0)) {
+  if (sum(spending$inv != 0)) {
     CostPerLift <- as.numeric(
       x %>%
-        dplyr::filter(lift > 0) %>%
-        dplyr::mutate(AvgCost = investment / lift) %>%
+        dplyr::filter(lift != 0) %>%
+        dplyr::mutate(AvgCost = abs(investment / lift)) %>%
         dplyr::summarise(mean(AvgCost))
     )
     PowerPlot_graph <- PowerPlot_graph +
       scale_x_continuous(
         labels = scales::percent_format(accuracy = 1),
-        sec.axis = sec_axis(~ . * CostPerLift, name = "Estimated Investment")
+        sec.axis = sec_axis(~ . * CostPerLift,
+          breaks = scales::pretty_breaks(n = breaks_x_axis),
+          name = "Estimated Investment"
+        ),
+        breaks = scales::pretty_breaks(n = breaks_x_axis)
       )
   } else {
     PowerPlot_graph <- PowerPlot_graph +
@@ -157,14 +164,28 @@ plot.GeoLiftPower <- function(x,
 
   if (show_mde == TRUE) {
     final_legend <- c(final_legend, c("MDE Values" = "salmon"))
-    positive_df <- PowerPlot_data %>%
-      dplyr::filter(lift > 0 & power > 0.8)
-    negative_df <- PowerPlot_data %>%
-      dplyr::filter(lift < 0 & power > 0.8)
+    if (min(lift) < 0 & max(lift) > 0) {
+      positive_df <- PowerPlot_data %>%
+        dplyr::filter(lift > 0 & power > 0.8)
+      negative_df <- PowerPlot_data %>%
+        dplyr::filter(lift < 0 & power > 0.8)
 
-    PowerPlot_graph <- PowerPlot_graph +
-      geom_vline(xintercept = max(negative_df[, "lift"]), alpha = 0.4, colour = "salmon", linetype = "dashed") +
-      geom_vline(xintercept = min(positive_df[, "lift"]), alpha = 0.4, colour = "salmon", linetype = "dashed")
+      PowerPlot_graph <- PowerPlot_graph +
+        geom_vline(aes(xintercept = max(negative_df[, "lift"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed") +
+        geom_vline(aes(xintercept = min(positive_df[, "lift"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
+    } else if (min(lift) < 0) {
+      negative_df <- PowerPlot_data %>%
+        dplyr::filter(lift < 0 & power > 0.8)
+
+      PowerPlot_graph <- PowerPlot_graph +
+        geom_vline(aes(xintercept = max(negative_df[, "lift"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
+    } else {
+      positive_df <- PowerPlot_data %>%
+        dplyr::filter(lift > 0 & power > 0.8)
+
+      PowerPlot_graph <- PowerPlot_graph +
+        geom_vline(aes(xintercept = min(positive_df[, "lift"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
+    }
   }
 
   PowerPlot_graph <- PowerPlot_graph + scale_colour_manual(
@@ -174,12 +195,11 @@ plot.GeoLiftPower <- function(x,
 
   plot(PowerPlot_graph)
 
-  output <- list(power_plot = PowerPlot_graph)
-
   if (return_power_table == TRUE) {
+    output <- list(power_plot = PowerPlot_graph)
     output <- append(output, list(power_plot_data = as.data.frame(PowerPlot_data)))
+    return(output)
   }
-  return(output)
 }
 
 

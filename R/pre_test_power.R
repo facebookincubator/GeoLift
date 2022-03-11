@@ -404,6 +404,8 @@ pvalueCalc <- function(data,
 #'          }
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
+#' @param import_tidyr_from Points to where the tidyr package
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' Data frame with the ordered list of best locations and their
@@ -430,10 +432,13 @@ GeoLiftPowerFinder <- function(data,
                                parallel = TRUE,
                                parallel_setup = "sequential",
                                side_of_test = "two_sided",
-                               import_augsynth_from = "library(augsynth)") {
+                               import_augsynth_from = "library(augsynth)",
+                               import_tidyr_from = "library(tidyr)") {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
+      parallel_setup = parallel_setup,
+      import_augsynth_from = import_augsynth_from,
+      import_tidyr_from = import_tidyr_from
     )
   }
 
@@ -783,6 +788,8 @@ GeoLiftPowerFinder <- function(data,
 #' Set to "sequential" by default.
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
+#' @param import_tidyr_from Points to where the tidyr package
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' Data frame with the ordered list of best locations and their
@@ -809,10 +816,13 @@ GeoLiftPower.search <- function(data,
                                 run_stochastic_process = FALSE,
                                 parallel = TRUE,
                                 parallel_setup = "sequential",
-                                import_augsynth_from = "library(augsynth)") {
+                                import_augsynth_from = "library(augsynth)",
+                                import_tidyr_from = "library(tidyr)") {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
+      parallel_setup = parallel_setup,
+      import_augsynth_from = import_augsynth_from,
+      import_tidyr_from = import_tidyr_from
     )
   }
 
@@ -1076,6 +1086,8 @@ GeoLiftPower.search <- function(data,
 #' Set to "sequential" by default.
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
+#' @param import_tidyr_from Points to where the tidyr package
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' Table of average power by number of locations.
@@ -1100,10 +1112,13 @@ NumberLocations <- function(data,
                             ProgressBar = FALSE,
                             parallel = TRUE,
                             parallel_setup = "sequential",
-                            import_augsynth_from = "library(augsynth)") {
+                            import_augsynth_from = "library(augsynth)",
+                            import_tidyr_from = "library(tidyr)") {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
+      parallel_setup = parallel_setup,
+      import_augsynth_from = import_augsynth_from,
+      import_tidyr_from = import_tidyr_from
     )
   }
 
@@ -1333,6 +1348,8 @@ NumberLocations <- function(data,
 #'          }
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
+#' @param import_tidyr_from Points to where the tidyr package
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' GeoLiftPower object that contains:
@@ -1367,10 +1384,13 @@ GeoLiftPower <- function(data,
                          parallel = TRUE,
                          parallel_setup = "sequential",
                          side_of_test = "two_sided",
-                         import_augsynth_from = "library(augsynth)") {
+                         import_augsynth_from = "library(augsynth)",
+                         import_tidyr_from = "library(tidyr)") {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
+      parallel_setup = parallel_setup,
+      import_augsynth_from = import_augsynth_from,
+      import_tidyr_from = import_tidyr_from
     )
   }
 
@@ -1595,6 +1615,8 @@ GeoLiftPower <- function(data,
 #'          }
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
+#' @param import_tidyr_from Points to where the tidyr package
+#' should be imported from to send to the nodes.
 #'
 #' @return
 #' A list with three Data Frames. \itemize{
@@ -1634,10 +1656,13 @@ GeoLiftMarketSelection <- function(data,
                                    parallel = TRUE,
                                    parallel_setup = "sequential",
                                    side_of_test = "two_sided",
-                                   import_augsynth_from = "library(augsynth)") {
+                                   import_augsynth_from = "library(augsynth)",
+                                   import_tidyr_from = "library(tidyr)") {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
+      parallel_setup = parallel_setup,
+      import_augsynth_from = import_augsynth_from,
+      import_tidyr_from = import_tidyr_from
     )
   }
 

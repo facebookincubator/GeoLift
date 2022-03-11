@@ -635,7 +635,7 @@ GeoLiftPowerFinder <- function(data,
     "location",
     "pvalue",
     "duration",
-    "lift",
+    "EffectSize",
     "treatment_start",
     "ScaledL2Imbalance"
   )
@@ -663,6 +663,8 @@ GeoLiftPowerFinder <- function(data,
       clear = FALSE,
       width = 60
     )
+  } else {
+    pb <- NULL
   }
 
   message("Finding the best markets for your experiment.")
@@ -674,86 +676,22 @@ GeoLiftPowerFinder <- function(data,
       run_stochastic_process = run_stochastic_process
     )
 
-    for (es in effect_size) { # iterate through lift %
-
-      stat_func <- type_of_test(
-        side_of_test = side_of_test,
-        alternative_hypothesis = ifelse(es > 0, "positive", "negative")
-      )
-
-      for (tp in treatment_periods) { # lifts
-
-        if (ProgressBar == TRUE) {
-          pb$tick()
-        }
-
-        if (parallel == TRUE) {
-          simulation_results <- foreach(
-            test = 1:nrow(as.matrix(BestMarkets_aux)), # NEWCHANGE: Horizon = earliest start time for simulations
-            .combine = cbind,
-            .errorhandling = "stop"
-          ) %dopar% {
-            pvalueCalc(
-              data = data,
-              sim = 1,
-              max_time = max_time,
-              tp = tp,
-              es = es,
-              locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-              cpic = 0,
-              X,
-              type = "pValue",
-              normalize = normalize,
-              fixed_effects = fixed_effects,
-              model = model,
-              stat_func = stat_func
-            )
-          }
-
-          for (i in 1:ncol(simulation_results)) {
-            results <- rbind(results, data.frame(
-              location = simulation_results[[1, i]],
-              pvalue = as.numeric(simulation_results[[2, i]]),
-              duration = as.numeric(simulation_results[[3, i]]),
-              true_lift = as.numeric(simulation_results[[4, i]]),
-              treatment_start = as.numeric(simulation_results[[5, i]]),
-              ScaledL2Imbalance = as.numeric(simulation_results[[7, i]]),
-              att_estimator = as.numeric(simulation_results[[8, i]]),
-              detected_lift = as.numeric(simulation_results[[9, i]])
-            ))
-          }
-        } else {
-          for (test in 1:nrow(as.matrix(BestMarkets_aux))) {
-            simulation_results <- suppressMessages(pvalueCalc(
-              data = data,
-              sim = 1,
-              max_time = max_time,
-              tp = tp,
-              es = es,
-              locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-              cpic = 0,
-              X,
-              type = "pValue",
-              normalize = normalize,
-              fixed_effects = fixed_effects,
-              model = model,
-              stat_func = stat_func
-            ))
-
-            results <- rbind(results, data.frame(
-              location = simulation_results[1],
-              pvalue = as.numeric(simulation_results[2]),
-              duration = as.numeric(simulation_results[3]),
-              true_lift = as.numeric(simulation_results[4]),
-              treatment_start = as.numeric(simulation_results[5]),
-              ScaledL2Imbalance = as.numeric(simulation_results[7]),
-              att_estimator = as.numeric(simulation_results[8]),
-              detected_lift = as.numeric(simulation_results[9])
-            ))
-          }
-        }
-      }
-    }
+    partial_results <- run_all_simulations(
+      data = data,
+      treatment_combinations = BestMarkets_aux,
+      treatment_durations = treatment_periods,
+      effect_sizes = effect_size,
+      side_of_test = side_of_test,
+      lookback_window = 1,
+      parallel = parallel,
+      pb = pb,
+      cpic = 0,
+      X = X,
+      normalize = normalize,
+      fixed_effects = fixed_effects,
+      model = model
+    )
+    results <- rbind(results, partial_results)
   }
 
   if (parallel == TRUE) {
@@ -772,9 +710,9 @@ GeoLiftPowerFinder <- function(data,
     dplyr::distinct()
 
   resultsM <- results %>%
-    dplyr::filter(true_lift != 0) %>%
+    dplyr::filter(EffectSize != 0) %>%
     dplyr::group_by(location, duration) %>%
-    dplyr::slice(which.min(abs(true_lift)))
+    dplyr::slice(which.min(abs(EffectSize)))
 
   # Add Percent of Y in test markets
   resultsM$ProportionTotal_Y <- 1
@@ -794,11 +732,11 @@ GeoLiftPowerFinder <- function(data,
 
   # Sort Before Ranking
 
-  resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$true_lift), 3)
+  resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$EffectSize), 3)
 
   resultsM <- as.data.frame(resultsM) %>%
     dplyr::mutate(
-      rank_mde = dplyr::dense_rank(abs(true_lift)),
+      rank_mde = dplyr::dense_rank(abs(EffectSize)),
       rank_pvalue = dplyr::dense_rank(pvalue),
       rank_abszero = dplyr::dense_rank(abs_lift_in_zero)
     )
@@ -819,7 +757,7 @@ GeoLiftPowerFinder <- function(data,
     ) %>%
     dplyr::arrange(rank)
 
-  class(results) <- c("GeoLift.search", class(resultsM))
+  class(results) <- c("GeoLiftPowerFinder", class(resultsM))
 
   if (top_results > nrow(resultsM)) {
     top_results <- nrow(resultsM)
@@ -841,7 +779,7 @@ GeoLiftPowerFinder <- function(data,
         data_lifted$Y[data_lifted$location %in% locs_aux &
           data_lifted$time >= max_time - tp + 1] <-
           data_lifted$Y[data_lifted$location %in% locs_aux &
-            data_lifted$time >= max_time - tp + 1] * (1 + BestResults$true_lift[i])
+            data_lifted$time >= max_time - tp + 1] * (1 + BestResults$EffectSize[i])
 
         bestmodels[[i]] <- suppressMessages(GeoLift::GeoLift(
           Y_id = "Y",
@@ -859,25 +797,25 @@ GeoLiftPowerFinder <- function(data,
       suppressMessages(gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste(
         "locations:", BestResults$location[1],
         "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$true_lift[1],
+        BestResults$EffectSize[1],
         "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[1], 3), "%"
       )),
       plot(bestmodels[[2]], notes = paste(
         "locations:", BestResults$location[2],
         "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$true_lift[2],
+        BestResults$EffectSize[2],
         "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[2], 3), "%"
       )),
       plot(bestmodels[[3]], notes = paste(
         "locations:", BestResults$location[3],
         "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$true_lift[3],
+        BestResults$EffectSize[3],
         "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[3], 3), "%"
       )),
       plot(bestmodels[[4]], notes = paste(
         "locations:", BestResults$location[4],
         "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$true_lift[4],
+        BestResults$EffectSize[4],
         "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[4], 3), "%"
       )),
       ncol = 2
@@ -886,7 +824,7 @@ GeoLiftPowerFinder <- function(data,
   }
 
   # NEWCHANGE: Rename Lift to MDE
-  resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = true_lift)
+  resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = EffectSize)
 
   return(resultsM)
 }
@@ -1037,8 +975,8 @@ GeoLiftPower.search <- function(data,
     dplyr::summarize(Total_Y = sum(Y))
 
   # NEWCHANGE: Progress Bar
-  num_sim <- length(N) * length(treatment_periods) * nrow(BestMarkets)
   if (ProgressBar == TRUE) {
+    num_sim <- length(N) * length(treatment_periods) * nrow(BestMarkets)
     pb <- progress::progress_bar$new(
       format = "  Running Simulations [:bar] :percent",
       total = num_sim,
@@ -1562,7 +1500,7 @@ GeoLiftPower <- function(data,
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
-  if (horizon < 0) { # NEWCHANGE
+  if (horizon < 0) {
     lookback_window <- 1
   } else {
     lookback_window <- max(data$time) - max(treatment_periods) - horizon + 1

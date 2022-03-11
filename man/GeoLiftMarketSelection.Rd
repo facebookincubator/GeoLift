@@ -31,7 +31,8 @@ GeoLiftMarketSelection(
   parallel = TRUE,
   parallel_setup = "sequential",
   side_of_test = "two_sided",
-  import_augsynth_from = "library(augsynth)"
+  import_augsynth_from = "library(augsynth)",
+  import_tidyr_from = "library(tidyr)"
 )
 }
 \arguments{
@@ -140,6 +141,9 @@ If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; H
 }}
 
 \item{import_augsynth_from}{Points to where the augsynth package
+should be imported from to send to the nodes.}
+
+\item{import_tidyr_from}{Points to where the tidyr package
 should be imported from to send to the nodes.}
 }
 \value{

@@ -336,7 +336,7 @@ pvalueCalc <- function(data,
 #'
 #' @description
 #'
-#' `run_all_simulations` computes simulations for each treatment market.
+#' `run_simulations` computes simulations for each treatment market.
 #'
 #' @param data A data.frame containing the historical conversions by
 #' geographic unit. It requires a "locations" column with the geo name,
@@ -395,7 +395,7 @@ pvalueCalc <- function(data,
 #'         }
 #'
 #' @export
-run_all_simulations <- function(data,
+run_simulations <- function(data,
                                 treatment_combinations,
                                 treatment_durations,
                                 effect_sizes = 0,
@@ -415,7 +415,7 @@ run_all_simulations <- function(data,
     "duration",
     "EffectSize",
     "treatment_start",
-    "investment",
+    "Investment",
     "cpic",
     "ScaledL2Imbalance",
     "att_estimator",
@@ -498,7 +498,7 @@ run_all_simulations <- function(data,
               duration = as.numeric(simulation_results[[3, i]]),
               EffectSize = as.numeric(simulation_results[[4, i]]),
               treatment_start = as.numeric(simulation_results[[5, i]]),
-              investment = as.numeric(simulation_results[[6, i]]),
+              Investment = as.numeric(simulation_results[[6, i]]),
               cpic = cpic,
               ScaledL2Imbalance = as.numeric(simulation_results[[7, i]]),
               att_estimator = as.numeric(simulation_results[[8, i]]),
@@ -676,7 +676,7 @@ GeoLiftPowerFinder <- function(data,
       run_stochastic_process = run_stochastic_process
     )
 
-    partial_results <- run_all_simulations(
+    partial_results <- run_simulations(
       data = data,
       treatment_combinations = BestMarkets_aux,
       treatment_durations = treatment_periods,
@@ -1524,7 +1524,7 @@ GeoLiftPower <- function(data,
     )
   }
 
-  results <- run_all_simulations(
+  results <- run_simulations(
     data = data,
     treatment_combinations = matrix(locations, nrow = 1),
     treatment_durations = treatment_periods,
@@ -1546,8 +1546,8 @@ GeoLiftPower <- function(data,
 
   class(results) <- c("GeoLiftPower", class(results))
 
-  results$pow <- 0
-  results$pow[results$pvalue < alpha] <- 1
+  results$power <- 0
+  results$power[results$pvalue < alpha] <- 1
 
   return(results)
 }
@@ -1846,7 +1846,7 @@ GeoLiftMarketSelection <- function(data,
       }
     }
 
-    partial_results <- run_all_simulations(
+    partial_results <- run_simulations(
       data = data,
       treatment_combinations = BestMarkets_aux,
       treatment_durations = treatment_periods,
@@ -1886,7 +1886,7 @@ GeoLiftMarketSelection <- function(data,
     dplyr::summarise(
       power = mean(significant),
       AvgScaledL2Imbalance = mean(ScaledL2Imbalance),
-      Investment = mean(investment),
+      Investment = mean(Investment),
       AvgATT = mean(att_estimator),
       AvgDetectedLift = mean(detected_lift), .groups = "keep"
     )

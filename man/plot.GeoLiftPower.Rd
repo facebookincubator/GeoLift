@@ -11,6 +11,7 @@
   actual_values = TRUE,
   smoothed_values = TRUE,
   show_mde = FALSE,
+  breaks_x_axis = 10,
   ...
 )
 }
@@ -29,6 +30,10 @@ the smoothed values. TRUE by default.}
 
 \item{show_mde}{Logic flag indicating whether to include in the plot
 the positive and negative MDEs. FALSE by default.}
+
+\item{breaks_x_axis}{Numeric value indicating the number of breaks in the
+x-axis of the power plot. You may get slightly more or fewer breaks that
+requested based on \code{breaks_pretty()}. Set to 10 by default.}
 
 \item{...}{additional arguments}
 }

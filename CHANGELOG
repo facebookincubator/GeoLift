@@ -1,3 +1,19 @@
+GeoLift v2.3.2 (Release date: 2022-03-14)
+=========================================
+
+Changes:
+
+* Enabled GeoLiftMarketSelection to go through positive and negative effects, at the same time.
+
+GeoLift v2.3.1 (Release date: 2022-03-14)
+=========================================
+
+Changes:
+
+* Simplified code for plot.GeoLiftPower.
+* Added hyperparameter to show MDE values.
+* Added optional smoothed curve for power.
+
 GeoLift v2.3.0 (Release date: 2022-02-24)
 =========================================
 

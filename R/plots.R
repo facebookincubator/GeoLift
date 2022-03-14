@@ -63,7 +63,6 @@ GeoPlot <- function(data,
 #'
 #' @param x GeoLiftPower object.
 #' @param power Power level. By default 0.8.
-#' @param return_power_table Plot the table of power estimates. FALSE by default.
 #' @param actual_values Logic flag indicating whether to include in the plot
 #' the actual values. TRUE by default.
 #' @param smoothed_values Logic flag indicating whether to include in the plot
@@ -81,7 +80,6 @@ GeoPlot <- function(data,
 #' @export
 plot.GeoLiftPower <- function(x,
                               power = 0.8,
-                              return_power_table = FALSE,
                               actual_values = TRUE,
                               smoothed_values = TRUE,
                               show_mde = FALSE,
@@ -182,11 +180,7 @@ plot.GeoLiftPower <- function(x,
 
   plot(PowerPlot_graph)
 
-  if (return_power_table == TRUE) {
-    output <- list(power_plot = PowerPlot_graph)
-    output <- append(output, list(power_plot_data = as.data.frame(PowerPlot_data)))
-    return(output)
-  }
+  return(PowerPlot_graph)
 }
 
 
@@ -645,22 +639,37 @@ plot.GeoLiftMarketSelection <- function(x,
     print(summary(lifted))
   }
 
-  PowerPlot_graph <- ggplot(PowerPlot, aes(x = EffectSize, y = power)) +
-    geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
-    geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
-    scale_x_continuous(
-      sec.axis = sec_axis(~ . * CostPerLift,
-        breaks = scales::pretty_breaks(n = breaks_x_axis),
-        name = "Estimated Investment"
-      ),
-      breaks = scales::pretty_breaks(n = breaks_x_axis)
-    ) +
-    ylim(0, 1) +
-    geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
-    scale_colour_manual(name = "Power Curve", values = c("gray80", "#52854C")) +
-    labs(x = "Effect Size", y = "Power") +
-    theme_minimal() +
-    theme(plot.title = element_text(hjust = 0.5))
+  PowerPlot_aux <- PowerPlot
+  PowerPlot_aux <- PowerPlot_aux %>% dplyr::rename(
+    lift = EffectSize,
+    investment = Investment,
+    ScaledL2Imbalance = AvgScaledL2Imbalance,
+    pow = power
+  )
+  class(PowerPlot_aux) <- c("GeoLiftPower", class(PowerPlot_aux))
+  # PowerPlot_graph <- plot(PowerPlot_aux,
+  #                             return_power_table = TRUE,
+  #                             actual_values = TRUE,
+  #                             smoothed_values = TRUE,
+  #                             show_mde = TRUE,
+  #                             breaks_x_axis = breaks_x_axis)
+
+  # PowerPlot_graph <- ggplot(PowerPlot, aes(x = EffectSize, y = power)) +
+  #   geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
+  #   geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
+  #   scale_x_continuous(
+  #     sec.axis = sec_axis(~ . * CostPerLift,
+  #       breaks = scales::pretty_breaks(n = breaks_x_axis),
+  #       name = "Estimated Investment"
+  #     ),
+  #     breaks = scales::pretty_breaks(n = breaks_x_axis)
+  #   ) +
+  #   ylim(0, 1) +
+  #   geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
+  #   scale_colour_manual(name = "Power Curve", values = c("gray80", "#52854C")) +
+  #   labs(x = "Effect Size", y = "Power") +
+  #   theme_minimal() +
+  #   theme(plot.title = element_text(hjust = 0.5))
 
   suppressMessages(gridExtra::grid.arrange(
     plot(lifted, notes = paste(
@@ -669,7 +678,14 @@ plot.GeoLiftMarketSelection <- function(x,
       # "\n Treatment Periods:", Market$duration,
       # "\n Effect Size: ", Market$EffectSize
     )),
-    PowerPlot_graph,
+    # PowerPlot_graph,
+    plot(PowerPlot_aux,
+      return_power_table = FALSE,
+      actual_values = TRUE,
+      smoothed_values = TRUE,
+      show_mde = TRUE,
+      breaks_x_axis = breaks_x_axis
+    ),
     ncol = 1,
     nrow = 2,
     bottom = paste(

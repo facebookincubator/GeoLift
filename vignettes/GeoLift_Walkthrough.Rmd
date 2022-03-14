@@ -165,11 +165,10 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           Y_id = "Y",
                                           location_id = "location",
                                           time_id = "time",
-                                          effect_size = seq(0, 0.5, 0.05),
+                                          effect_size = seq(-0.25, 0.25, 0.05),
                                           lookback_window = 1, 
                                           include_markets = c("chicago"),
                                           exclude_markets = c("honolulu"),
-                                          holdout = c(0.5, 1),
                                           cpic = 7.50,
                                           budget = 100000,
                                           alpha = 0.1,
@@ -205,14 +204,14 @@ The results of the power analysis and market selection provide us with several k
 
 * **rank**: Ranking variable that summarizes the EffectSize, Power, AvgScaledL2Imbalance, Average_MDE, and abs_lift_in_zero to help you select the best combination of test markets. The ranking variable allows for ties.
 
-The results in `MarketSelection` show that the test markets with the best ranks are: `(chicago, cincinnati, houston, portland)` and `(chicago, portland)`, both tied at rank 2. We can `plot()` both of these results to inspect them further. This plot will show how the results of the `GeoLift()` model would look like with the latest possible test period as well as the test's power curve across all simulations.
+The results in `MarketSelection` show that the test markets with the best ranks are: `(chicago, cincinnati, houston, portland)`, `(atlanta, chicago, cleveland, las vegas, reno)` and `(chicago, portland)`, all of them tied at rank 1. We can `plot()` these last two  results to inspect them further. This plot will show how the results of the `GeoLift()` model would look like with the latest possible test period as well as the test's power curve across all simulations.
 
 ```{r GeoLiftMarketSelection_Plots}
 # Plot for chicago, cincinnati, houston, portland for a 15 day test
-plot(MarketSelections, market_ID = 1, print_summary = FALSE)
+plot(MarketSelections, market_ID = 2, print_summary = FALSE)
 
 # Plot for chicago, portland for a 15 day test
-plot(MarketSelections, market_ID = 2, print_summary = FALSE)
+plot(MarketSelections, market_ID = 3, print_summary = FALSE)
 
 ```
 
@@ -221,7 +220,7 @@ While both market selections perform excellent on all metrics, we will move furt
 ```{r GeoLiftMarketSelection_Plot2}
 
 # Plot for chicago, portland for a 15 day test
-plot(MarketSelections, market_ID = 2, print_summary = TRUE)
+plot(MarketSelections, market_ID = 3, print_summary = TRUE)
 
 ```
 

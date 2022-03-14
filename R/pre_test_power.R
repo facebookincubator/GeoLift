@@ -1648,7 +1648,7 @@ GeoLiftMarketSelection <- function(data,
                                    Y_id = "Y",
                                    location_id = "location",
                                    time_id = "time",
-                                   effect_size = seq(0, 0.25, 0.05),
+                                   effect_size = seq(-0.2, 0.2, 0.05),
                                    lookback_window = 1,
                                    include_markets = c(),
                                    exclude_markets = c(),
@@ -1989,16 +1989,6 @@ GeoLiftMarketSelection <- function(data,
   for (locs in unique(results$location)) {
     for (ts in treatment_periods) {
       resultsFindAux <- results %>% dplyr::filter(location == locs & duration == ts & power > 0.8)
-
-      # if (min(effect_size) < 0) { # if ( min(effect_size) < 0){
-      #   resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize != 0)
-      #   MDEAux <- suppressWarnings(max(resultsFindAux$EffectSize))
-      #   resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
-      # } else {
-      #   MDEAux <- suppressWarnings(min(resultsFindAux$EffectSize))
-      #   resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
-      # }
-
       negative_mde <- max(
         ifelse(resultsFindAux$EffectSize < 0,
           resultsFindAux$EffectSize,
@@ -2016,6 +2006,8 @@ GeoLiftMarketSelection <- function(data,
         negative_mde,
         positive_mde
       )
+
+      resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
 
       if (MDEAux != 0) { # Drop tests significant with ES = 0
         resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
@@ -2078,10 +2070,6 @@ GeoLiftMarketSelection <- function(data,
   )
 
   # Step 10: Adjust signs if Negative Lift
-  # if (min(effect_size) < 0) {
-  #   resultsM$Investment <- -1 * resultsM$Investment
-  #   results$Investment <- -1 * results$Investment
-  # }
   resultsM$Investment <- ifelse(
     resultsM$EffectSize < 0,
     -1 * resultsM$Investment,
@@ -2101,11 +2089,6 @@ GeoLiftMarketSelection <- function(data,
   }
 
   # Step 12: Holdout Size
-  # if (min(effect_size) < 0) {
-  #   resultsM$Holdout <- resultsM$ProportionTotal_Y
-  # } else {
-  #   resultsM$Holdout <- 1 - resultsM$ProportionTotal_Y
-  # }
   resultsM$Holdout <- ifelse(
     resultsM$EffectSize < 0,
     resultsM$ProportionTotal_Y,

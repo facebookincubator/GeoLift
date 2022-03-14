@@ -4,28 +4,22 @@
 \alias{plot.GeoLiftPower}
 \title{Plotting function for GeoLiftPower.}
 \usage{
-
 \method{plot}{GeoLiftPower}(
   x,
   power = 0.8,
-  return_power_table = FALSE,
   actual_values = TRUE,
   smoothed_values = TRUE,
   show_mde = FALSE,
   breaks_x_axis = 10,
   ...
 )
-
 }
 \arguments{
 \item{x}{GeoLiftPower object.}
 
 \item{power}{Power level. By default 0.8.}
 
-\item{return_power_table}{Plot the table of power estimates. FALSE by default.}
-
 \item{actual_values}{Logic flag indicating whether to include in the plot
-
 the actual values. TRUE by default.}
 
 \item{smoothed_values}{Logic flag indicating whether to include in the plot

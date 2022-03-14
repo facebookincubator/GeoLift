@@ -63,7 +63,6 @@ GeoPlot <- function(data,
 #'
 #' @param x GeoLiftPower object.
 #' @param power Power level. By default 0.8.
-#' @param return_power_table Plot the table of power estimates. FALSE by default.
 #' @param actual_values Logic flag indicating whether to include in the plot
 #' the actual values. TRUE by default.
 #' @param smoothed_values Logic flag indicating whether to include in the plot
@@ -81,7 +80,6 @@ GeoPlot <- function(data,
 #' @export
 plot.GeoLiftPower <- function(x,
                               power = 0.8,
-                              return_power_table = FALSE,
                               actual_values = TRUE,
                               smoothed_values = TRUE,
                               show_mde = FALSE,
@@ -179,11 +177,7 @@ plot.GeoLiftPower <- function(x,
 
   plot(PowerPlot_graph)
 
-  output <- list(power_plot = PowerPlot_graph)
-  if (return_power_table == TRUE) {
-    output <- append(output, list(power_plot_data = as.data.frame(PowerPlot_data)))
-  }
-  return(output)
+  return(PowerPlot_graph)
 }
 
 

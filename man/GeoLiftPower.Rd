@@ -9,7 +9,7 @@ GeoLiftPower(
   locations,
   effect_size = seq(0, 1, 0.05),
   treatment_periods,
-  horizon = -1,
+  lookback_window = 1,
   cpic = 0,
   X = c(),
   Y_id = "Y",
@@ -42,14 +42,10 @@ sequence between 0 - 100 percent in 5 percent increments: seq(0,1,0.05).}
 \item{treatment_periods}{Expected length of the test. A vector of
 possible lengths can be entered for multiple options.}
 
-\item{horizon}{An integer that defines at which time-stamp the power simulations
-will start. This parameter allows the user to define which period is most relevant
-for the test's current in-market dynamics (a very small horizon will include
-simulations of time periods with dynamics that might not be relevant anymore).
-Ideally the horizon should encompass at least of couple of times the test length.
-For instance, for a power analysis with 180 days of historical data and a 15 day
-test, we would recommend setting horizon to at least 150. By default horizon is set
-to -1 which will  execute the smallest possible horizon with the provided data.}
+\item{lookback_window}{A number indicating how far back in time the simulations
+for the power analysis should go. For instance, a value equal to 5 will simulate
+power for the last five possible tests. By default lookback_window = 1 which
+will only execute the most recent test based on the data.}
 
 \item{cpic}{Cost Per Incremental Conversion for estimated test
 minimum budget. The default value is 0, in which case no investment

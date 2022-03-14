@@ -1,3 +1,11 @@
+GeoLift v2.3.5 (Release date: 2022-03-14)
+=========================================
+
+Changes:
+
+* Made plot.GeoLiftMarketSelection use plot.GeoLiftPower.
+* Aligned nomenclature of all columns across GeoLiftPower & GeoLiftMarketSelection.
+
 GeoLift v2.3.4 (Release date: 2022-03-14)
 =========================================
 

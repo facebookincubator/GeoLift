@@ -81,7 +81,6 @@ GeoPlot <- function(data,
 #' @export
 plot.GeoLiftPower <- function(x,
                               power = 0.8,
-                              return_power_table = FALSE,
                               actual_values = TRUE,
                               smoothed_values = TRUE,
                               show_mde = FALSE,
@@ -192,13 +191,6 @@ plot.GeoLiftPower <- function(x,
     name = "Power Values",
     values = final_legend
   )
-
-  if (return_power_table == TRUE) {
-    output <- list(power_plot = PowerPlot_graph)
-    output <- append(output, list(power_plot_data = as.data.frame(PowerPlot_data)))
-    plot(PowerPlot_graph)
-    return(output)
-  }
 
   return(PowerPlot_graph)
 }
@@ -366,7 +358,6 @@ Lift.plot <- function(GeoLift,
       color = "Test group"
     ) +
     theme(
-      text = element_text(size = 20),
       plot.title = element_text(hjust = 0.5),
       plot.subtitle = element_text(hjust = 0.5)
     ) +
@@ -466,7 +457,6 @@ absolute_value.plot <- function(GeoLift,
       caption = notes
     ) +
     theme(
-      text = element_text(size = 20),
       plot.title = element_text(hjust = 0.5),
       plot.subtitle = element_text(hjust = 0.5)
     )
@@ -563,7 +553,6 @@ cumulative_value.plot <- function(data,
       caption = notes
     ) +
     theme(
-      text = element_text(size = 20),
       plot.title = element_text(hjust = 0.5),
       plot.subtitle = element_text(hjust = 0.5)
     ) +

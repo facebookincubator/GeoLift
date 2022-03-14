@@ -657,8 +657,8 @@ plot.GeoLiftMarketSelection <- function(x,
     geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
     scale_x_continuous(
       sec.axis = sec_axis(~ . * CostPerLift,
-                          breaks = scales::pretty_breaks(n = breaks_x_axis),
-                          name = "Estimated Investment"
+        breaks = scales::pretty_breaks(n = breaks_x_axis),
+        name = "Estimated Investment"
       ),
       breaks = scales::pretty_breaks(n = breaks_x_axis)
     ) +

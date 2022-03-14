@@ -1543,12 +1543,6 @@ GeoLiftPower <- function(data,
     pb <- NULL
   }
 
-  if (parallel == TRUE) {
-    cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
-    )
-  }
-
   results <- run_simulations(
     data = data,
     treatment_combinations = matrix(locations, nrow = 1),
@@ -1837,12 +1831,6 @@ GeoLiftMarketSelection <- function(data,
     )
   } else {
     pb <- NULL
-  }
-
-  if (parallel == TRUE) {
-    cl <- build_cluster(
-      parallel_setup = parallel_setup, import_augsynth_from = import_augsynth_from
-    )
   }
 
   for (n in N) {

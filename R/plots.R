@@ -647,7 +647,7 @@ plot.GeoLiftMarketSelection <- function(x,
     smoothed_values = smoothed_values,
     show_mde = show_mde,
     breaks_x_axis = breaks_x_axis
-  )$power_plot
+  )
 
   suppressMessages(gridExtra::grid.arrange(
     plot(lifted, notes = paste(

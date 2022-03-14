@@ -1762,6 +1762,7 @@ GeoLiftMarketSelection <- function(data,
     "att_estimator",
     "detected_lift"
   )
+  
 
   # Setting the lookback window to the smallest length of treatment if not provided.
   if (lookback_window <= 0) {

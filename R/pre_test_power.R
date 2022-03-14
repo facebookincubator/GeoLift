@@ -1762,7 +1762,6 @@ GeoLiftMarketSelection <- function(data,
     "att_estimator",
     "detected_lift"
   )
-  
 
   # Setting the lookback window to the smallest length of treatment if not provided.
   if (lookback_window <= 0) {
@@ -1980,19 +1979,22 @@ GeoLiftMarketSelection <- function(data,
     for (ts in treatment_periods) {
       resultsFindAux <- results %>% dplyr::filter(location == locs & duration == ts & power > 0.8)
       negative_mde <- max(
-        ifelse(resultsFindAux$EffectSize < 0, 
-               resultsFindAux$EffectSize, 
-               min(effect_size) - 1)
+        ifelse(resultsFindAux$EffectSize < 0,
+          resultsFindAux$EffectSize,
+          min(effect_size) - 1
         )
+      )
       positive_mde <- min(
-        ifelse(resultsFindAux$EffectSize > 0, 
-               resultsFindAux$EffectSize, 
-               max(effect_size) + 1)
+        ifelse(resultsFindAux$EffectSize > 0,
+          resultsFindAux$EffectSize,
+          max(effect_size) + 1
         )
+      )
       MDEAux <- ifelse(
-        positive_mde > abs(negative_mde) & negative_mde != 0, 
-        negative_mde, 
-        positive_mde)
+        positive_mde > abs(negative_mde) & negative_mde != 0,
+        negative_mde,
+        positive_mde
+      )
 
       resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
 
@@ -2077,9 +2079,10 @@ GeoLiftMarketSelection <- function(data,
 
   # Step 12: Holdout Size
   resultsM$Holdout <- ifelse(
-    resultsM$EffectSize < 0, 
+    resultsM$EffectSize < 0,
     resultsM$ProportionTotal_Y,
-    1 - resultsM$ProportionTotal_Y)
+    1 - resultsM$ProportionTotal_Y
+  )
 
   # Step 13: Test Size
   if (length(holdout) > 0) {

@@ -332,6 +332,188 @@ pvalueCalc <- function(data,
 }
 
 
+#' Run simulations for treatment markets.
+#'
+#' @description
+#'
+#' `run_all_simulations` computes simulations for each treatment market.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param treatment_combinations A matrix of treatment locations.
+#' Each row symbolizes a combination, each column one element of the combination.
+#' @param treatment_durations Expected durations of the experiment.
+#' @param effect_sizes A vector of effect sizes to simulate.
+#' @param side_of_test A string indicating whether confidence will be determined
+#' using a one sided or a two sided test.
+#' \itemize{
+#'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+#'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+#'          }
+#' @param lookback_window A number indicating how far back in time the simulations
+#' for the power analysis should go. For instance, a value equal to 5 will simulate
+#' power for the last five possible tests. By default lookback_window = 1 which
+#' will only execute the most recent test based on the data.
+#' @param cpic Number indicating the Cost Per Incremental Conversion.
+#' @param parallel A logic flag indicating whether to use parallel computing to
+#' speed up calculations. Set to TRUE by default.
+#' @param pb ProgressBar object. NULL by default.
+#' @param X List of names of covariates.
+#' @param normalize A logic flag indicating whether to scale the outcome which is
+#' useful to accelerate computing speed when the magnitude of the data is large. The
+#' default is FALSE.
+#' @param fixed_effects A logic flag indicating whether to include unit fixed
+#' effects in the model. Set to TRUE by default.
+#' @param model A string indicating the outcome model used to augment the Augmented
+#' Synthetic Control Method. Augmentation through a prognostic function can improve
+#' fit and reduce L2 imbalance metrics.
+#' \itemize{
+#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
+#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+#'                          to improve fit for larger panels (more than 40 locations and 100
+#'                          time-stamps. }
+#'          }
+#'
+#' @return
+#' DataFrame that contains:
+#'          \itemize{
+#'          \item{"location":}{ Test locations.}
+#'          \item{"pvalue":}{ P Value.}
+#'          \item{"tp":}{ Time period index.}
+#'          \item{"es":}{ Effect Size used for the simulation.}
+#'          \item{"treatment_start_time":}{ Treatment start time for the simulation}
+#'          \item{"investment":}{ Estimated Investment}
+#'          \item{"ScaledL2Imbalance":}{ Scaled L2 Imbalance metric}
+#'          \item{"att_estimator":}{ Detected Average Treatment on the Treated}
+#'          \item{"detected_lift":}{ Detected % Lift by GeoLift for an effect size}
+#'         }
+#'
+#' @export
+run_all_simulations <- function(data,
+                                treatment_combinations,
+                                treatment_durations,
+                                effect_sizes = 0,
+                                side_of_test = "two_sided",
+                                lookback_window = 1,
+                                parallel = TRUE,
+                                pb = NULL,
+                                cpic = 0,
+                                X = c(),
+                                normalize = FALSE,
+                                fixed_effects = TRUE,
+                                model = "none") {
+  results <- data.frame(matrix(ncol = 10, nrow = 0))
+  colnames(results) <- c(
+    "location",
+    "pvalue",
+    "duration",
+    "EffectSize",
+    "treatment_start",
+    "investment",
+    "cpic",
+    "ScaledL2Imbalance",
+    "att_estimator",
+    "detected_lift"
+  )
+
+  for (effect_size in effect_sizes) { # iterate through lift %
+    stat_func <- type_of_test(
+      side_of_test = side_of_test,
+      alternative_hypothesis = ifelse(effect_size > 0, "positive", "negative")
+    )
+
+    for (treatment_duration in treatment_durations) {
+      if (!is.null(pb)) {
+        pb$tick()
+      }
+
+      for (sim in 1:(lookback_window)) {
+        if (parallel == TRUE) {
+          simulation_results <- foreach(
+            ## Esto funciona para matrices de una sola fila?
+            test = 1:nrow(as.matrix(treatment_combinations)),
+            .combine = cbind,
+            .errorhandling = "stop",
+            .verbose = FALSE
+          ) %dopar% {
+            suppressMessages(pvalueCalc(
+              data = data,
+              sim = sim,
+              max_time = max(data$time),
+              tp = treatment_duration,
+              es = effect_size,
+              ## Esto funciona para matrices de una sola fila?
+              locations = as.list(as.matrix(treatment_combinations)[test, ]),
+              cpic = cpic,
+              X,
+              type = "pValue",
+              normalize = normalize,
+              fixed_effects = fixed_effects,
+              model = model,
+              stat_func = stat_func
+            ))
+          }
+        } else {
+          for (test in 1:nrow(as.matrix(treatment_combinations))) {
+            simulation_results <- NULL
+            simulation_results <- suppressMessages(
+              pvalueCalc(
+                data = data,
+                sim = sim,
+                max_time = max(data$time),
+                tp = treatment_duration,
+                es = effect_size,
+                locations = as.list(as.matrix(treatment_combinations)[test, ]),
+                cpic = cpic,
+                X,
+                type = "pValue",
+                normalize = normalize,
+                fixed_effects = fixed_effects,
+                model = model,
+                stat_func = stat_func
+              )
+            )
+          }
+        }
+
+        if (is.null(dim(simulation_results))) {
+          simulation_results <- matrix(
+            simulation_results,
+            nrow = length(names(simulation_results))
+          )
+        }
+
+        for (i in 1:ncol(simulation_results)) {
+          results <- rbind(
+            results,
+            data.frame(
+              location = simulation_results[[1, i]],
+              pvalue = as.numeric(simulation_results[[2, i]]),
+              duration = as.numeric(simulation_results[[3, i]]),
+              EffectSize = as.numeric(simulation_results[[4, i]]),
+              treatment_start = as.numeric(simulation_results[[5, i]]),
+              investment = as.numeric(simulation_results[[6, i]]),
+              cpic = cpic,
+              ScaledL2Imbalance = as.numeric(simulation_results[[7, i]]),
+              att_estimator = as.numeric(simulation_results[[8, i]]),
+              detected_lift = as.numeric(simulation_results[[9, i]])
+            )
+          )
+        }
+      }
+    }
+  }
+
+  return(results)
+}
+
+
 #' Power calculations for unknown test market locations, number of
 #' test markets, and test duration.
 #'
@@ -458,7 +640,7 @@ GeoLiftPowerFinder <- function(data,
     "location",
     "pvalue",
     "duration",
-    "lift",
+    "EffectSize",
     "treatment_start",
     "ScaledL2Imbalance"
   )
@@ -486,6 +668,8 @@ GeoLiftPowerFinder <- function(data,
       clear = FALSE,
       width = 60
     )
+  } else {
+    pb <- NULL
   }
 
   message("Finding the best markets for your experiment.")
@@ -497,86 +681,22 @@ GeoLiftPowerFinder <- function(data,
       run_stochastic_process = run_stochastic_process
     )
 
-    for (es in effect_size) { # iterate through lift %
-
-      stat_func <- type_of_test(
-        side_of_test = side_of_test,
-        alternative_hypothesis = ifelse(es > 0, "positive", "negative")
-      )
-
-      for (tp in treatment_periods) { # lifts
-
-        if (ProgressBar == TRUE) {
-          pb$tick()
-        }
-
-        if (parallel == TRUE) {
-          simulation_results <- foreach(
-            test = 1:nrow(as.matrix(BestMarkets_aux)),
-            .combine = cbind,
-            .errorhandling = "stop"
-          ) %dopar% {
-            pvalueCalc(
-              data = data,
-              sim = 1,
-              max_time = max_time,
-              tp = tp,
-              es = es,
-              locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-              cpic = 0,
-              X,
-              type = "pValue",
-              normalize = normalize,
-              fixed_effects = fixed_effects,
-              model = model,
-              stat_func = stat_func
-            )
-          }
-
-          for (i in 1:ncol(simulation_results)) {
-            results <- rbind(results, data.frame(
-              location = simulation_results[[1, i]],
-              pvalue = as.numeric(simulation_results[[2, i]]),
-              duration = as.numeric(simulation_results[[3, i]]),
-              true_lift = as.numeric(simulation_results[[4, i]]),
-              treatment_start = as.numeric(simulation_results[[5, i]]),
-              ScaledL2Imbalance = as.numeric(simulation_results[[7, i]]),
-              att_estimator = as.numeric(simulation_results[[8, i]]),
-              detected_lift = as.numeric(simulation_results[[9, i]])
-            ))
-          }
-        } else {
-          for (test in 1:nrow(as.matrix(BestMarkets_aux))) {
-            simulation_results <- suppressMessages(pvalueCalc(
-              data = data,
-              sim = 1,
-              max_time = max_time,
-              tp = tp,
-              es = es,
-              locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-              cpic = 0,
-              X,
-              type = "pValue",
-              normalize = normalize,
-              fixed_effects = fixed_effects,
-              model = model,
-              stat_func = stat_func
-            ))
-
-            results <- rbind(results, data.frame(
-              location = simulation_results[1],
-              pvalue = as.numeric(simulation_results[2]),
-              duration = as.numeric(simulation_results[3]),
-              true_lift = as.numeric(simulation_results[4]),
-              treatment_start = as.numeric(simulation_results[5]),
-              ScaledL2Imbalance = as.numeric(simulation_results[7]),
-              att_estimator = as.numeric(simulation_results[8]),
-              detected_lift = as.numeric(simulation_results[9])
-            ))
-          }
-        }
-      }
-    }
+    partial_results <- run_all_simulations(
+      data = data,
+      treatment_combinations = BestMarkets_aux,
+      treatment_durations = treatment_periods,
+      effect_sizes = effect_size,
+      side_of_test = side_of_test,
+      lookback_window = 1,
+      parallel = parallel,
+      pb = pb,
+      cpic = 0,
+      X = X,
+      normalize = normalize,
+      fixed_effects = fixed_effects,
+      model = model
+    )
+    results <- rbind(results, partial_results)
   }
 
   if (parallel == TRUE) {
@@ -595,9 +715,9 @@ GeoLiftPowerFinder <- function(data,
     dplyr::distinct()
 
   resultsM <- results %>%
-    dplyr::filter(true_lift != 0) %>%
+    dplyr::filter(EffectSize != 0) %>%
     dplyr::group_by(location, duration) %>%
-    dplyr::slice(which.min(abs(true_lift)))
+    dplyr::slice(which.min(abs(EffectSize)))
 
   # Add Percent of Y in test markets
   resultsM$ProportionTotal_Y <- 1
@@ -617,11 +737,11 @@ GeoLiftPowerFinder <- function(data,
 
   # Sort Before Ranking
 
-  resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$true_lift), 3)
+  resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$EffectSize), 3)
 
   resultsM <- as.data.frame(resultsM) %>%
     dplyr::mutate(
-      rank_mde = dplyr::dense_rank(abs(true_lift)),
+      rank_mde = dplyr::dense_rank(abs(EffectSize)),
       rank_pvalue = dplyr::dense_rank(pvalue),
       rank_abszero = dplyr::dense_rank(abs_lift_in_zero)
     )
@@ -642,7 +762,7 @@ GeoLiftPowerFinder <- function(data,
     ) %>%
     dplyr::arrange(rank)
 
-  class(results) <- c("GeoLift.search", class(resultsM))
+  class(results) <- c("GeoLiftPowerFinder", class(resultsM))
 
   if (top_results > nrow(resultsM)) {
     top_results <- nrow(resultsM)
@@ -664,7 +784,7 @@ GeoLiftPowerFinder <- function(data,
         data_lifted$Y[data_lifted$location %in% locs_aux &
           data_lifted$time >= max_time - tp + 1] <-
           data_lifted$Y[data_lifted$location %in% locs_aux &
-            data_lifted$time >= max_time - tp + 1] * (1 + BestResults$true_lift[i])
+            data_lifted$time >= max_time - tp + 1] * (1 + BestResults$EffectSize[i])
 
         bestmodels[[i]] <- suppressMessages(GeoLift::GeoLift(
           Y_id = "Y",
@@ -682,25 +802,25 @@ GeoLiftPowerFinder <- function(data,
       suppressMessages(gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste(
         "locations:", BestResults$location[1],
         "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$true_lift[1],
+        BestResults$EffectSize[1],
         "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[1], 3), "%"
       )),
       plot(bestmodels[[2]], notes = paste(
         "locations:", BestResults$location[2],
         "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$true_lift[2],
+        BestResults$EffectSize[2],
         "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[2], 3), "%"
       )),
       plot(bestmodels[[3]], notes = paste(
         "locations:", BestResults$location[3],
         "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$true_lift[3],
+        BestResults$EffectSize[3],
         "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[3], 3), "%"
       )),
       plot(bestmodels[[4]], notes = paste(
         "locations:", BestResults$location[4],
         "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$true_lift[4],
+        BestResults$EffectSize[4],
         "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[4], 3), "%"
       )),
       ncol = 2
@@ -709,7 +829,7 @@ GeoLiftPowerFinder <- function(data,
   }
 
   # NEWCHANGE: Rename Lift to MDE
-  resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = true_lift)
+  resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = EffectSize)
 
   return(resultsM)
 }
@@ -865,8 +985,8 @@ GeoLiftPower.search <- function(data,
     dplyr::summarize(Total_Y = sum(Y))
 
   # NEWCHANGE: Progress Bar
-  num_sim <- length(N) * length(treatment_periods) * nrow(BestMarkets)
   if (ProgressBar == TRUE) {
+    num_sim <- length(N) * length(treatment_periods) * nrow(BestMarkets)
     pb <- progress::progress_bar$new(
       format = "  Running Simulations [:bar] :percent",
       total = num_sim,
@@ -1401,130 +1521,37 @@ GeoLiftPower <- function(data,
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
-  results <- data.frame(matrix(ncol = 8, nrow = 0))
-  colnames(results) <- c(
-    "location",
-    "pvalue",
-    "duration",
-    "lift",
-    "treatment_start",
-    "investment",
-    "cpic",
-    "ScaledL2Imbalance"
-  )
-
-  # Setting the lookback window to the smallest length of treatment if not provided.
-  if (lookback_window <= 0) {
+  if (lookback_window <= 0){
     lookback_window <- 1
   }
 
-  num_sim <- length(effect_size) * length(treatment_periods)
-
   if (ProgressBar == TRUE) {
+    num_sim <- length(effect_size) * length(treatment_periods)
     pb <- progress::progress_bar$new(
       format = "  Running Simulations [:bar] :percent",
       total = num_sim,
       clear = FALSE,
       width = 60
     )
+  } else {
+    pb <- NULL
   }
 
-  for (es in effect_size) { # iterate through lift %
-
-    stat_func <- type_of_test(
-      side_of_test = side_of_test,
-      alternative_hypothesis = ifelse(es > 0, "Positive", "Negative")
-    )
-
-    for (tp in treatment_periods) { # lifts
-      t_n <- max(data$time) - tp + 1 # Number of simulations without extrapolation
-
-      if (ProgressBar == TRUE) {
-        pb$tick()
-      }
-
-      if (parallel == TRUE) {
-        simulation_results <- foreach(
-          sim = 1:(lookback_window),
-          .combine = cbind,
-          .errorhandling = "stop",
-          .verbose = FALSE
-        ) %dopar% {
-          suppressMessages(pvalueCalc(
-            data = data,
-            sim = sim,
-            max_time = max_time,
-            tp = tp,
-            es = es,
-            locations = locations,
-            cpic = cpic,
-            X = c(),
-            type = type,
-            normalize = normalize,
-            fixed_effects = fixed_effects,
-            model = model,
-            stat_func = stat_func
-          ))
-        }
-
-        if (!is.null(dim(simulation_results))) {
-          for (i in 1:ncol(simulation_results)) {
-            results <- rbind(results, data.frame(
-              location = simulation_results[[1, i]],
-              pvalue = as.numeric(simulation_results[[2, i]]),
-              duration = as.numeric(simulation_results[[3, i]]),
-              lift = as.numeric(simulation_results[[4, i]]),
-              treatment_start = as.numeric(simulation_results[[5, i]]),
-              investment = as.numeric(simulation_results[[6, i]]),
-              cpic = cpic,
-              ScaledL2Imbalance = as.numeric(simulation_results[[7, i]])
-            ))
-          }
-        } else if (length(simulation_results) > 0) {
-          results <- rbind(results, data.frame(
-            location = simulation_results[1],
-            pvalue = as.numeric(simulation_results[2]),
-            duration = as.numeric(simulation_results[3]),
-            lift = as.numeric(simulation_results[4]),
-            treatment_start = as.numeric(simulation_results[5]),
-            investment = as.numeric(simulation_results[6]),
-            cpic = cpic,
-            ScaledL2Imbalance = as.numeric(simulation_results[7])
-          ))
-        }
-      } else {
-        for (sim in 1:(lookback_window)) {
-          simulation_results <- NULL
-          simulation_results <- suppressMessages(pvalueCalc(
-            data = data,
-            sim = sim,
-            max_time = max_time,
-            tp = tp,
-            es = es,
-            locations = locations,
-            cpic = cpic,
-            X = c(),
-            type = type,
-            normalize = normalize,
-            fixed_effects = fixed_effects,
-            model = model,
-            stat_func = stat_func
-          ))
-
-          results <- rbind(results, data.frame(
-            location = simulation_results[1],
-            pvalue = as.numeric(simulation_results[2]),
-            duration = as.numeric(simulation_results[3]),
-            lift = as.numeric(simulation_results[4]),
-            treatment_start = as.numeric(simulation_results[5]),
-            investment = as.numeric(simulation_results[6]),
-            cpic = cpic,
-            ScaledL2Imbalance = as.numeric(simulation_results[7])
-          ))
-        }
-      }
-    }
-  }
+  results <- run_all_simulations(
+    data = data,
+    treatment_combinations = matrix(locations, nrow = 1),
+    treatment_durations = treatment_periods,
+    effect_sizes = effect_size,
+    side_of_test = side_of_test,
+    lookback_window = lookback_window,
+    parallel = parallel,
+    pb = pb,
+    cpic = cpic,
+    X = X,
+    normalize = normalize,
+    fixed_effects = fixed_effects,
+    model = model
+  )
 
   if (parallel == TRUE) {
     parallel::stopCluster(cl)
@@ -1761,18 +1788,6 @@ GeoLiftMarketSelection <- function(data,
   }
 
   results <- data.frame(matrix(ncol = 10, nrow = 0))
-  colnames(results) <- c(
-    "location",
-    "pvalue",
-    "duration",
-    "EffectSize",
-    "treatment_start",
-    "investment",
-    "cpic",
-    "ScaledL2Imbalance",
-    "att_estimator",
-    "detected_lift"
-  )
 
   # Setting the lookback window to the smallest length of treatment if not provided.
   if (lookback_window <= 0) {
@@ -1799,16 +1814,18 @@ GeoLiftMarketSelection <- function(data,
     dplyr::summarize(Total_Y = sum(Y))
 
   # NEWCHANGE: Progress Bar
-  num_sim <- length(N) * length(treatment_periods) * length(effect_size)
+
   if (ProgressBar == TRUE) {
+    num_sim <- length(N) * length(treatment_periods) * length(effect_size)
     pb <- progress::progress_bar$new(
       format = "  Running Simulations [:bar] :percent",
       total = num_sim,
       clear = FALSE,
       width = 60
     )
+  } else {
+    pb <- NULL
   }
-
 
   for (n in N) {
     BestMarkets_aux <- stochastic_market_selector(
@@ -1846,114 +1863,22 @@ GeoLiftMarketSelection <- function(data,
       }
     }
 
-
-    for (es in effect_size) { # iterate through lift %
-
-      stat_func <- type_of_test(
-        side_of_test = side_of_test,
-        alternative_hypothesis = ifelse(es > 0, "positive", "negative")
-      )
-
-      for (tp in treatment_periods) { # lifts
-
-        if (ProgressBar == TRUE) {
-          pb$tick()
-        }
-
-        t_n <- max(data$time) - tp + 1 # Number of simulations without extrapolation (latest start time possible for #tp)
-
-        for (sim in 1:(lookback_window)) {
-          if (parallel == TRUE) {
-            simulation_results <- foreach(
-              test = 1:nrow(as.matrix(BestMarkets_aux)),
-              .combine = cbind,
-              .errorhandling = "stop",
-              .verbose = FALSE
-            ) %dopar% {
-              suppressMessages(pvalueCalc(
-                data = data,
-                sim = sim,
-                max_time = max_time,
-                tp = tp,
-                es = es,
-                locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-                cpic = cpic,
-                X,
-                type = "pValue",
-                normalize = normalize,
-                fixed_effects = fixed_effects,
-                model = model,
-                stat_func = stat_func
-              ))
-            }
-
-
-            if (!is.null(dim(simulation_results))) {
-              for (i in 1:ncol(simulation_results)) {
-                results <- rbind(results, data.frame(
-                  location = simulation_results[[1, i]],
-                  pvalue = as.numeric(simulation_results[[2, i]]),
-                  duration = as.numeric(simulation_results[[3, i]]),
-                  EffectSize = as.numeric(simulation_results[[4, i]]),
-                  treatment_start = as.numeric(simulation_results[[5, i]]),
-                  investment = as.numeric(simulation_results[[6, i]]),
-                  cpic = cpic,
-                  ScaledL2Imbalance = as.numeric(simulation_results[[7, i]]),
-                  att_estimator = as.numeric(simulation_results[[8, i]]),
-                  detected_lift = as.numeric(simulation_results[[9, i]])
-                ))
-              }
-            } else if (length(simulation_results) > 0) {
-              results <- rbind(results, data.frame(
-                location = simulation_results[1],
-                pvalue = as.numeric(simulation_results[2]),
-                duration = as.numeric(simulation_results[3]),
-                EffectSize = as.numeric(simulation_results[4]),
-                treatment_start = as.numeric(simulation_results[5]),
-                investment = as.numeric(simulation_results[6]),
-                cpic = cpic,
-                ScaledL2Imbalance = as.numeric(simulation_results[7]),
-                att_estimator = as.numeric(simulation_results[8]),
-                detected_lift = as.numeric(simulation_results[9])
-              ))
-            }
-          } else {
-            for (test in 1:nrow(as.matrix(BestMarkets_aux))) {
-              simulation_results <- NULL
-              simulation_results <- suppressMessages(pvalueCalc(
-                data = data,
-                sim = sim,
-                max_time = max_time,
-                tp = tp,
-                es = es,
-                locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-                cpic = cpic,
-                X,
-                type = "pValue",
-                normalize = normalize,
-                fixed_effects = fixed_effects,
-                model = model,
-                stat_func = stat_func
-              ))
-
-
-              results <- rbind(results, data.frame(
-                location = simulation_results[1],
-                pvalue = as.numeric(simulation_results[2]),
-                duration = as.numeric(simulation_results[3]),
-                EffectSize = as.numeric(simulation_results[4]),
-                treatment_start = as.numeric(simulation_results[5]),
-                investment = as.numeric(simulation_results[6]),
-                cpic = cpic,
-                ScaledL2Imbalance = as.numeric(simulation_results[7]),
-                att_estimator = as.numeric(simulation_results[8]),
-                detected_lift = as.numeric(simulation_results[9])
-              ))
-            }
-          }
-        }
-      } # tp
-    }
+    partial_results <- run_all_simulations(
+      data = data,
+      treatment_combinations = BestMarkets_aux,
+      treatment_durations = treatment_periods,
+      effect_sizes = effect_size,
+      side_of_test = side_of_test,
+      lookback_window = lookback_window,
+      parallel = parallel,
+      pb = pb,
+      cpic = cpic,
+      X = X,
+      normalize = normalize,
+      fixed_effects = fixed_effects,
+      model = model
+    )
+    results <- rbind(results, partial_results)
   }
 
   if (parallel == TRUE) {

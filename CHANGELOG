@@ -1,3 +1,10 @@
+GeoLift v2.3.3 (Release date: 2022-03-14)
+=========================================
+
+Changes:
+
+* Adapted GeoLiftPower to use `lookback_window` hyperparameter replacing `horizon`, which is much less confusing.
+
 GeoLift v2.3.2 (Release date: 2022-03-14)
 =========================================
 

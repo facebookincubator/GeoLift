@@ -192,6 +192,7 @@ plot.GeoLiftPower <- function(x,
   )
 
   plot(PowerPlot_graph)
+
   return(PowerPlot_graph)
 }
 

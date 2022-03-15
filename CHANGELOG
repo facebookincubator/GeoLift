@@ -1,3 +1,12 @@
+GeoLift v2.3.5 (Release date: 2022-03-14)
+=========================================
+
+Changes:
+
+* Made plot.GeoLiftMarketSelection use plot.GeoLiftPower.
+* Aligned nomenclature of all columns across GeoLiftPower & GeoLiftMarketSelection.
+* Added side_of_test to plot.GeoLiftMarketSelection to align simulated with test confidence.
+
 GeoLift v2.3.4 (Release date: 2022-03-14)
 =========================================
 
@@ -10,7 +19,7 @@ GeoLift v2.3.3 (Release date: 2022-03-14)
 
 Changes:
 
-* Adapted GeoLiftPower to use `lookback_window` hyperparameter replacing `horizon`, which is much less confusing.
+* Adapted GeoLiftPower & GeoLiftPower.search to use `lookback_window` hyperparameter replacing `horizon`, which is much less confusing.
 
 GeoLift v2.3.2 (Release date: 2022-03-14)
 =========================================

@@ -4,7 +4,16 @@
 \alias{plot.GeoLiftMarketSelection}
 \title{Plotting function for GeoLiftMarketSelection}
 \usage{
-\method{plot}{GeoLiftMarketSelection}(x, market_ID = 0, print_summary = TRUE, breaks_x_axis = 10, ...)
+\method{plot}{GeoLiftMarketSelection}(
+  x,
+  market_ID = 0,
+  print_summary = TRUE,
+  actual_values = TRUE,
+  smoothed_values = TRUE,
+  show_mde = FALSE,
+  breaks_x_axis = 10,
+  ...
+)
 }
 \arguments{
 \item{x}{A GeoLiftMarketSelection object.}
@@ -15,6 +24,15 @@ value should reflect a valid ID from the BestMarkets data frame of the
 
 \item{print_summary}{Logic flag indicating whether to print model metrics
 from the latest possible test. Set to TRUE by default.}
+
+\item{actual_values}{Logic flag indicating whether to include in the plot
+the actual values. TRUE by default.}
+
+\item{smoothed_values}{Logic flag indicating whether to include in the plot
+the smoothed values. TRUE by default.}
+
+\item{show_mde}{Logic flag indicating whether to include in the plot
+the positive and negative MDEs. FALSE by default.}
 
 \item{breaks_x_axis}{Numeric value indicating the number of breaks in the
 x-axis of the power plot. You may get slightly more or fewer breaks that

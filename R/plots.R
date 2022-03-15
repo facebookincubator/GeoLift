@@ -98,13 +98,9 @@ plot.GeoLiftPower <- function(x,
   EffectSize <- unique(x$EffectSize)
 
   PowerPlot_data <- x %>%
-    dplyr::group_by(duration, EffectSize) %>%
-    dplyr::summarise(power = mean(pow), investment = mean(investment)) %>%
+    dplyr::group_by(EffectSize) %>%
+    dplyr::summarise(power = mean(power), investment = mean(Investment)) %>%
     dplyr::mutate(AvgCost = investment / EffectSize)
-
-  spending <- x %>%
-    dplyr::group_by(duration, EffectSize) %>%
-    dplyr::summarize(inv = mean(investment))
 
   PowerPlot_graph <- ggplot(PowerPlot_data, aes(x = EffectSize, y = power)) +
     geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
@@ -121,17 +117,18 @@ plot.GeoLiftPower <- function(x,
     ) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1))
 
-  if (sum(spending$inv != 0)) {
+  if (sum(PowerPlot_data$investment != 0)) {
     CostPerLift <- as.numeric(
       x %>%
-        dplyr::filter(EffectSize > 0) %>%
-        dplyr::mutate(AvgCost = investment / EffectSize) %>%
+        dplyr::filter(EffectSize != 0) %>%
+        dplyr::mutate(AvgCost = abs(Investment / EffectSize)) %>%
         dplyr::summarise(mean(AvgCost))
     )
     PowerPlot_graph <- PowerPlot_graph +
       scale_x_continuous(
         labels = scales::percent_format(accuracy = 1),
-        sec.axis = sec_axis(~ . * CostPerLift,
+        sec.axis = sec_axis(
+          ~ . * CostPerLift,
           breaks = scales::pretty_breaks(n = breaks_x_axis),
           name = "Estimated Investment"
         ),
@@ -163,22 +160,27 @@ plot.GeoLiftPower <- function(x,
 
   if (show_mde == TRUE) {
     final_legend <- c(final_legend, c("MDE Values" = "salmon"))
-    positive_df <- PowerPlot_data %>%
-      dplyr::filter(EffectSize > 0 & power > 0.8)
-    negative_df <- PowerPlot_data %>%
-      dplyr::filter(EffectSize < 0 & power > 0.8)
+    if (min(EffectSize) < 0) {
+      negative_df <- PowerPlot_data %>%
+        dplyr::filter(EffectSize < 0 & power > 0.8)
 
-    PowerPlot_graph <- PowerPlot_graph +
-      geom_vline(xintercept = max(negative_df[, "EffectSize"]), alpha = 0.4, colour = "salmon", linetype = "dashed") +
-      geom_vline(xintercept = min(positive_df[, "EffectSize"]), alpha = 0.4, colour = "salmon", linetype = "dashed")
+      PowerPlot_graph <- PowerPlot_graph +
+        geom_vline(aes(xintercept = max(negative_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
+    }
+
+    if (max(EffectSize) > 0) {
+      positive_df <- PowerPlot_data %>%
+        dplyr::filter(EffectSize > 0 & power > 0.8)
+
+      PowerPlot_graph <- PowerPlot_graph +
+        geom_vline(aes(xintercept = min(positive_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
+    }
   }
 
   PowerPlot_graph <- PowerPlot_graph + scale_colour_manual(
     name = "Power Values",
     values = final_legend
   )
-
-  plot(PowerPlot_graph)
 
   return(PowerPlot_graph)
 }
@@ -562,6 +564,12 @@ cumulative_value.plot <- function(data,
 #' `GeoLiftMarketSelection` output.
 #' @param print_summary Logic flag indicating whether to print model metrics
 #' from the latest possible test. Set to TRUE by default.
+#' @param actual_values Logic flag indicating whether to include in the plot
+#' the actual values. TRUE by default.
+#' @param smoothed_values Logic flag indicating whether to include in the plot
+#' the smoothed values. TRUE by default.
+#' @param show_mde Logic flag indicating whether to include in the plot
+#' the positive and negative MDEs. FALSE by default.
 #' @param breaks_x_axis Numeric value indicating the number of breaks in the
 #' x-axis of the power plot. You may get slightly more or fewer breaks that
 #' requested based on `breaks_pretty()`. Set to 10 by default.
@@ -574,6 +582,9 @@ cumulative_value.plot <- function(data,
 plot.GeoLiftMarketSelection <- function(x,
                                         market_ID = 0,
                                         print_summary = TRUE,
+                                        actual_values = TRUE,
+                                        smoothed_values = TRUE,
+                                        show_mde = FALSE,
                                         breaks_x_axis = 10,
                                         ...) {
   if (!inherits(x, "GeoLiftMarketSelection")) {
@@ -590,22 +601,21 @@ plot.GeoLiftMarketSelection <- function(x,
   locs_aux <- unlist(strsplit(stringr::str_replace_all(Market$location, ", ", ","), split = ","))
   max_time <- max(x$parameters$data$time)
 
-  PowerPlot <- as.data.frame(x$PowerCurves %>% dplyr::filter(
-    duration == Market$duration,
-    location == Market$location
-  ))
-
-  CostPerLift <- as.numeric(PowerPlot %>%
-    dplyr::filter(EffectSize != 0) %>%
-    dplyr::mutate(AvgCost = Investment / abs(EffectSize)) %>%
-    dplyr::summarise(mean(AvgCost)))
-
   data_lifted <- x$parameters$data
   data_lifted$Y[data_lifted$location %in% locs_aux &
     data_lifted$time >= max_time - Market$duration + 1] <-
     data_lifted$Y[data_lifted$location %in% locs_aux &
       data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
 
+  if (tolower(x$parameters$side_of_test) == "two_sided") {
+    stat_test <- "Total"
+  } else {
+    if (Market$EffectSize < 0) {
+      stat_test <- "Negative"
+    } else if (Market$EffectSize > 0) {
+      stat_test <- "Positive"
+    }
+  }
 
   lifted <- suppressMessages(GeoLift::GeoLift(
     Y_id = "Y",
@@ -617,6 +627,7 @@ plot.GeoLiftMarketSelection <- function(x,
     treatment_end_time = max_time,
     model = x$parameters$model,
     fixed_effects = x$parameters$fixed_effects,
+    stat_test = stat_test,
     print = TRUE
   ))
 
@@ -639,22 +650,19 @@ plot.GeoLiftMarketSelection <- function(x,
     print(summary(lifted))
   }
 
-  PowerPlot_graph <- ggplot(PowerPlot, aes(x = EffectSize, y = power)) +
-    geom_smooth(formula = y ~ x, method = "loess", se = FALSE, aes(colour = "Smoothed Values")) +
-    geom_line(size = 0.62, alpha = 0.8, aes(colour = "Actual Values")) +
-    scale_x_continuous(
-      sec.axis = sec_axis(~ . * CostPerLift,
-        breaks = scales::pretty_breaks(n = breaks_x_axis),
-        name = "Estimated Investment"
-      ),
-      breaks = scales::pretty_breaks(n = breaks_x_axis)
-    ) +
-    ylim(0, 1) +
-    geom_hline(yintercept = 0.8, linetype = "dashed", color = "grey") +
-    scale_colour_manual(name = "Power Curve", values = c("gray80", "#52854C")) +
-    labs(x = "Effect Size", y = "Power") +
-    theme_minimal() +
-    theme(plot.title = element_text(hjust = 0.5))
+  PowerPlot_data <- as.data.frame(x$PowerCurves %>% dplyr::filter(
+    duration == Market$duration,
+    location == Market$location
+  ))
+
+  class(PowerPlot_data) <- c("GeoLiftPower", class(PowerPlot_data))
+  PowerPlot_graph <- plot(
+    PowerPlot_data,
+    actual_values = actual_values,
+    smoothed_values = smoothed_values,
+    show_mde = show_mde,
+    breaks_x_axis = breaks_x_axis
+  )
 
   suppressMessages(gridExtra::grid.arrange(
     plot(lifted, notes = paste(

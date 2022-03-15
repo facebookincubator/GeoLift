@@ -1521,10 +1521,8 @@ GeoLiftPower <- function(data,
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
-  if (horizon <= 0) {
+  if (lookback_window <= 0){
     lookback_window <- 1
-  } else {
-    lookback_window <- max(data$time) - max(treatment_periods) - horizon + 1
   }
 
   if (ProgressBar == TRUE) {

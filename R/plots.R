@@ -182,8 +182,6 @@ plot.GeoLiftPower <- function(x,
     values = final_legend
   )
 
-  # plot(PowerPlot_graph)
-
   return(PowerPlot_graph)
 }
 

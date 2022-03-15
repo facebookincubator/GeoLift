@@ -855,14 +855,10 @@ GeoLiftPowerFinder <- function(data,
 #' of the time period (starting at 1), and covariates.
 #' @param treatment_periods List of treatment periods to calculate power for.
 #' @param N List of number of test markets to calculate power for.
-#' @param horizon An integer that defines at which time-stamp the power simulations
-#' will start. This parameter allows the user to define which period is most relevant
-#' for the test's current in-market dynamics (a very small horizon will include
-#' simulations of time periods with dynamics that might not be relevant anymore).
-#' Ideally the horizon should encompass at least of couple of times the test length.
-#' For instance, for a power analysis with 180 days of historical data and a 15 day
-#' test, we would recommend setting horizon to at least 150. By default horizon is set
-#' to -1 which will  execute the smallest possible horizon with the provided data.
+#' @param lookback_window A number indicating how far back in time the simulations
+#' for the power analysis should go. For instance, a value equal to 5 will simulate
+#' power for the last five possible tests. By default lookback_window = 1 which
+#' will only execute the most recent test based on the data.
 #' @param X List of names of covariates.
 #' @param Y_id Name of the outcome variable (String).
 #' @param location_id Name of the location variable (String).
@@ -919,7 +915,7 @@ GeoLiftPowerFinder <- function(data,
 GeoLiftPower.search <- function(data,
                                 treatment_periods,
                                 N = 1,
-                                horizon = -1,
+                                lookback_window = 1,
                                 X = c(),
                                 Y_id = "Y",
                                 location_id = "location",
@@ -975,8 +971,8 @@ GeoLiftPower.search <- function(data,
 
   N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
 
-  if (horizon < 0) { # NEWCHANGE
-    horizon <- max(treatment_periods)
+  if (lookback_window <= 0) { # NEWCHANGE
+    lookback_window <- 1
   }
 
   # Aggregated Y Per Location
@@ -993,6 +989,8 @@ GeoLiftPower.search <- function(data,
       clear = FALSE,
       width = 60
     )
+  } else {
+    pb <- NULL
   }
 
   for (n in N) {
@@ -1001,77 +999,23 @@ GeoLiftPower.search <- function(data,
       BestMarkets,
       run_stochastic_process = run_stochastic_process
     )
-    for (test in 1:nrow(as.matrix(BestMarkets_aux))) { # iterate through lift %
-      for (tp in treatment_periods) { # lifts
-
-        if (ProgressBar == TRUE) {
-          pb$tick()
-        }
-
-        t_n <- max(data$time) - tp + 1 # Number of simulations without extrapolation (latest start time possible for #tp)
-
-        if (parallel == TRUE) {
-          a <- foreach(
-            sim = 1:(t_n - horizon + 1), # NEWCHANGE: Horizon = earliest start time for simulations
-            .combine = cbind,
-            .errorhandling = "stop"
-          ) %dopar% {
-            pvalueCalc(
-              data = data,
-              sim = sim,
-              max_time = max_time,
-              tp = tp,
-              es = 0,
-              locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-              cpic = 0,
-              X,
-              type = type,
-              normalize = normalize,
-              fixed_effects = fixed_effects,
-              model = model,
-              stat_func = stat_func
-            )
-          }
-
-          for (i in 1:ncol(a)) {
-            results <- rbind(results, data.frame(
-              location = a[[1, i]],
-              pvalue = as.numeric(a[[2, i]]),
-              duration = as.numeric(a[[3, i]]),
-              treatment_start = as.numeric(a[[5, i]]),
-              ScaledL2Imbalance = as.numeric(a[[7, i]])
-            ))
-          }
-        } else {
-          for (sim in 1:(t_n - horizon + 1)) {
-            aux <- NULL
-            aux <- suppressMessages(pvalueCalc(
-              data = data,
-              sim = sim,
-              max_time = max_time,
-              tp = tp,
-              es = 0,
-              locations = as.list(as.matrix(BestMarkets_aux)[test, ]),
-              cpic = 0,
-              X,
-              type = type,
-              normalize = normalize,
-              fixed_effects = fixed_effects,
-              model = model,
-              stat_func = stat_func
-            ))
-
-            results <- rbind(results, data.frame(
-              location = aux[1],
-              pvalue = as.numeric(aux[2]),
-              duration = as.numeric(aux[3]),
-              treatment_start = as.numeric(aux[5]),
-              ScaledL2Imbalance = as.numeric(aux[7])
-            ))
-          }
-        }
-      }
-    }
+    
+    partial_results <- run_simulations(
+      data = data,
+      treatment_combinations = BestMarkets_aux,
+      treatment_durations = treatment_periods,
+      effect_sizes = 0,
+      side_of_test = "two_sided",
+      lookback_window = lookback_window,
+      parallel = parallel,
+      pb = pb,
+      cpic = 0,
+      X = X,
+      normalize = normalize,
+      fixed_effects = fixed_effects,
+      model = model
+    )
+    results <- rbind(results, partial_results)
   }
 
   if (parallel == TRUE) {

@@ -327,11 +327,10 @@ duration between 10 and 15 days we obtain:
                                               Y_id = "Y",
                                               location_id = "location",
                                               time_id = "time",
-                                              effect_size = seq(0, 0.5, 0.05),
+                                              effect_size = seq(-0.25, 0.25, 0.05),
                                               lookback_window = 1, 
                                               include_markets = c("chicago"),
                                               exclude_markets = c("honolulu"),
-                                              holdout = c(0.5, 1),
                                               cpic = 7.50,
                                               budget = 100000,
                                               alpha = 0.1,
@@ -357,27 +356,27 @@ duration between 10 and 15 days we obtain:
     #> Deterministic setup with 4 locations in treatment.
     #> 
     #> Deterministic setup with 5 locations in treatment.
-    #>   ID                                           location duration EffectSize
-    #> 1  1             chicago, cincinnati, houston, portland       15       0.05
-    #> 2  2                                  chicago, portland       15       0.10
-    #> 3  3             chicago, cincinnati, houston, portland       10       0.10
-    #> 4  4                                  chicago, portland       10       0.10
-    #> 5  5                         chicago, houston, portland       10       0.10
-    #> 6  6 chicago, cincinnati, houston, nashville, san diego       15       0.05
-    #>   Power AvgScaledL2Imbalance Investment   AvgATT Average_MDE ProportionTotal_Y
-    #> 1     1            0.1971864   74118.38 159.3627  0.04829913        0.07576405
-    #> 2     1            0.1738778   64563.75 290.0071  0.10117316        0.03306537
-    #> 3     1            0.1966996   99027.75 316.6204  0.09552879        0.07576405
-    #> 4     1            0.1682310   43646.25 300.9401  0.10378013        0.03306537
-    #> 5     1            0.2305628   75389.25 350.3142  0.10502968        0.05797087
-    #> 6     1            0.2699167   95755.50 146.7975  0.04282215        0.09801138
-    #>   abs_lift_in_zero   Holdout rank correlation
-    #> 1            0.002 0.9242359    1   0.9144814
-    #> 2            0.001 0.9669346    1   0.9321104
-    #> 3            0.004 0.9242359    3   0.9144814
-    #> 4            0.004 0.9669346    3   0.9321104
-    #> 5            0.005 0.9420291    5   0.9139549
-    #> 6            0.007 0.9019886    6   0.8992280
+    #>   ID                                     location duration EffectSize Power
+    #> 1  1 atlanta, chicago, cleveland, las vegas, reno       10      -0.05     1
+    #> 2  2       chicago, cincinnati, houston, portland       15       0.05     1
+    #> 3  3                            chicago, portland       15      -0.10     1
+    #> 4  4                            chicago, portland       10      -0.10     1
+    #> 5  5       chicago, cincinnati, houston, portland       10      -0.10     1
+    #> 6  6                   chicago, houston, portland       10      -0.10     1
+    #>   AvgScaledL2Imbalance Investment    AvgATT Average_MDE ProportionTotal_Y
+    #> 1            0.4536741   69300.00 -174.5212 -0.04735064        0.10714670
+    #> 2            0.1971864   74118.38  159.3627  0.04829912        0.07576405
+    #> 3            0.1738778   64563.75 -283.8929 -0.09904014        0.03306537
+    #> 4            0.1682310   43646.25 -281.0099 -0.09690716        0.03306537
+    #> 5            0.1966996   99027.75 -343.5647 -0.10365827        0.07576405
+    #> 6            0.2305628   75389.25 -319.8125 -0.09588481        0.05797087
+    #>   abs_lift_in_zero    Holdout rank correlation
+    #> 1            0.003 0.10714670    1   0.9788758
+    #> 2            0.002 0.92423595    1   0.9144814
+    #> 3            0.001 0.03306537    1   0.9321104
+    #> 4            0.003 0.03306537    4   0.9321104
+    #> 5            0.004 0.07576405    5   0.9144814
+    #> 6            0.004 0.05797087    5   0.9139549
 
 The results of the power analysis and market selection provide us with
 several key metrics that we can use to select our test market. These
@@ -442,21 +441,22 @@ metrics are:
     variable allows for ties.
 
 The results in `MarketSelection` show that the test markets with the
-best ranks are: `(chicago, cincinnati, houston, portland)` and
-`(chicago, portland)`, both tied at rank 2. We can `plot()` both of
-these results to inspect them further. This plot will show how the
+best ranks are: `(chicago, cincinnati, houston, portland)`,
+`(atlanta, chicago, cleveland, las vegas, reno)` and
+`(chicago, portland)`, all of them tied at rank 1. We can `plot()` these
+last two results to inspect them further. This plot will show how the
 results of the `GeoLift()` model would look like with the latest
 possible test period as well as the test’s power curve across all
 simulations.
 
     # Plot for chicago, cincinnati, houston, portland for a 15 day test
-    plot(MarketSelections, market_ID = 1, print_summary = FALSE)
+    plot(MarketSelections, market_ID = 2, print_summary = FALSE)
 
 <img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection_Plots-1.png" style="display: block; margin: auto;" />
 
 
     # Plot for chicago, portland for a 15 day test
-    plot(MarketSelections, market_ID = 2, print_summary = FALSE)
+    plot(MarketSelections, market_ID = 3, print_summary = FALSE)
 
 <img src="GeoLift_Walkthrough_files/figure-gfm/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;" />
 
@@ -468,10 +468,10 @@ this market selection.
 
 
     # Plot for chicago, portland for a 15 day test
-    plot(MarketSelections, market_ID = 2, print_summary = TRUE)
+    plot(MarketSelections, market_ID = 3, print_summary = TRUE)
     #> ##################################
     #> #####   GeoLift Simulation   #####
-    #> ####  Simulating: 10% Lift  ####
+    #> ####  Simulating: -10% Lift  ####
     #> ##################################
     #> 
     #> GeoLift Results Summary
@@ -479,9 +479,9 @@ this market selection.
     #> #####     Test Statistics    #####
     #> ##################################
     #> 
-    #> * Average ATT: 290.007
-    #> * Percent Lift: 10.1%
-    #> * Incremental Y: 8700
+    #> * Average ATT: -283.893
+    #> * Percent Lift: -9.9%
+    #> * Incremental Y: -8517
     #> * P-value: 0
     #> 
     #> ##################################
@@ -633,7 +633,7 @@ parameters respectively.
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 0.6% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 1.3% chance of observing an effect this large or larger assuming treatment effect is zero.
 
 The results show that the campaigns led to a 5.4% lift in units sold
 corresponding to 4667 incremental units for this 15-day test. Moreover,
@@ -803,7 +803,7 @@ decide which is the best approach by setting the model parameter to
     #> 
     #> The results are significant at a 95% level. (TOTAL)
     #> 
-    #> There is a 1.4% chance of observing an effect this large or larger assuming treatment effect is zero.
+    #> There is a 0.9% chance of observing an effect this large or larger assuming treatment effect is zero.
 
     summary(GeoTestBest)
     #> 

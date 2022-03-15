@@ -98,7 +98,7 @@ plot.GeoLiftPower <- function(x,
   EffectSize <- unique(x$EffectSize)
 
   PowerPlot_data <- x %>%
-    dplyr::group_by(duration, EffectSize) %>%
+    dplyr::group_by(EffectSize) %>%
     dplyr::summarise(power = mean(power), investment = mean(Investment)) %>%
     dplyr::mutate(AvgCost = investment / EffectSize)
 
@@ -117,13 +117,13 @@ plot.GeoLiftPower <- function(x,
     ) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1))
 
-  if (sum(PowerPlot_data$investment > 0)) {
-    CostPerLift <- as.numeric(
-      x %>%
-        dplyr::filter(EffectSize > 0) %>%
-        dplyr::mutate(AvgCost = Investment / EffectSize) %>%
-        dplyr::summarise(mean(AvgCost))
-    )
+  if (sum(PowerPlot_data$investment != 0)) {
+      CostPerLift <- as.numeric(
+        x %>%
+          dplyr::filter(EffectSize != 0) %>%
+          dplyr::mutate(AvgCost = abs(Investment / EffectSize)) %>%
+          dplyr::summarise(mean(AvgCost))
+      )
     PowerPlot_graph <- PowerPlot_graph +
       scale_x_continuous(
         labels = scales::percent_format(accuracy = 1),
@@ -160,14 +160,21 @@ plot.GeoLiftPower <- function(x,
 
   if (show_mde == TRUE) {
     final_legend <- c(final_legend, c("MDE Values" = "salmon"))
-    positive_df <- PowerPlot_data %>%
-      dplyr::filter(EffectSize > 0 & power > 0.8)
-    negative_df <- PowerPlot_data %>%
-      dplyr::filter(EffectSize < 0 & power > 0.8)
-
-    PowerPlot_graph <- PowerPlot_graph +
-      geom_vline(xintercept = max(negative_df[, "EffectSize"]), alpha = 0.4, colour = "salmon", linetype = "dashed") +
-      geom_vline(xintercept = min(positive_df[, "EffectSize"]), alpha = 0.4, colour = "salmon", linetype = "dashed")
+    if (min(EffectSize) < 0){
+      negative_df <- PowerPlot_data %>%
+        dplyr::filter(EffectSize < 0 & power > 0.8)
+      
+      PowerPlot_graph <- PowerPlot_graph +
+        geom_vline(aes(xintercept = max(negative_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, colour = "salmon", linetype = "dashed")
+    }
+    
+    if (max(EffectSize) > 0){
+      positive_df <- PowerPlot_data %>%
+        dplyr::filter(EffectSize > 0 & power > 0.8)
+      
+      PowerPlot_graph <- PowerPlot_graph +
+        geom_vline(aes(xintercept = min(positive_df[, "lift"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
+    }
   }
 
   PowerPlot_graph <- PowerPlot_graph + scale_colour_manual(
@@ -175,7 +182,7 @@ plot.GeoLiftPower <- function(x,
     values = final_legend
   )
 
-  plot(PowerPlot_graph)
+  # plot(PowerPlot_graph)
 
   return(PowerPlot_graph)
 }

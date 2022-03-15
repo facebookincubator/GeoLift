@@ -5,6 +5,7 @@ Changes:
 
 * Made plot.GeoLiftMarketSelection use plot.GeoLiftPower.
 * Aligned nomenclature of all columns across GeoLiftPower & GeoLiftMarketSelection.
+* Added side_of_test to plot.GeoLiftMarketSelection to align simulated with test confidence.
 
 GeoLift v2.3.4 (Release date: 2022-03-14)
 =========================================

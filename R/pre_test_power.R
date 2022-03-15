@@ -396,18 +396,18 @@ pvalueCalc <- function(data,
 #'
 #' @export
 run_simulations <- function(data,
-                                treatment_combinations,
-                                treatment_durations,
-                                effect_sizes = 0,
-                                side_of_test = "two_sided",
-                                lookback_window = 1,
-                                parallel = TRUE,
-                                pb = NULL,
-                                cpic = 0,
-                                X = c(),
-                                normalize = FALSE,
-                                fixed_effects = TRUE,
-                                model = "none") {
+                            treatment_combinations,
+                            treatment_durations,
+                            effect_sizes = 0,
+                            side_of_test = "two_sided",
+                            lookback_window = 1,
+                            parallel = TRUE,
+                            pb = NULL,
+                            cpic = 0,
+                            X = c(),
+                            normalize = FALSE,
+                            fixed_effects = TRUE,
+                            model = "none") {
   results <- data.frame(matrix(ncol = 10, nrow = 0))
   colnames(results) <- c(
     "location",
@@ -999,7 +999,7 @@ GeoLiftPower.search <- function(data,
       BestMarkets,
       run_stochastic_process = run_stochastic_process
     )
-    
+
     partial_results <- run_simulations(
       data = data,
       treatment_combinations = BestMarkets_aux,
@@ -2000,17 +2000,18 @@ GeoLiftMarketSelection <- function(data,
   }
 
   # Save Parameters for plotting
-  params <- list(
+  parameters <- list(
     data = data,
     model = model,
     fixed_effects = fixed_effects,
-    cpic = cpic
+    cpic = cpic,
+    side_of_test = side_of_test
   )
 
   output <- list(
     BestMarkets = as.data.frame(resultsM),
     PowerCurves = as.data.frame(results),
-    parameters = params
+    parameters = parameters
   )
 
   class(output) <- c("GeoLiftMarketSelection", class(output))

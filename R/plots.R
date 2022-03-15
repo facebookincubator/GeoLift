@@ -118,12 +118,12 @@ plot.GeoLiftPower <- function(x,
     scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1))
 
   if (sum(PowerPlot_data$investment != 0)) {
-      CostPerLift <- as.numeric(
-        x %>%
-          dplyr::filter(EffectSize != 0) %>%
-          dplyr::mutate(AvgCost = abs(Investment / EffectSize)) %>%
-          dplyr::summarise(mean(AvgCost))
-      )
+    CostPerLift <- as.numeric(
+      x %>%
+        dplyr::filter(EffectSize != 0) %>%
+        dplyr::mutate(AvgCost = abs(Investment / EffectSize)) %>%
+        dplyr::summarise(mean(AvgCost))
+    )
     PowerPlot_graph <- PowerPlot_graph +
       scale_x_continuous(
         labels = scales::percent_format(accuracy = 1),
@@ -160,18 +160,18 @@ plot.GeoLiftPower <- function(x,
 
   if (show_mde == TRUE) {
     final_legend <- c(final_legend, c("MDE Values" = "salmon"))
-    if (min(EffectSize) < 0){
+    if (min(EffectSize) < 0) {
       negative_df <- PowerPlot_data %>%
         dplyr::filter(EffectSize < 0 & power > 0.8)
-      
+
       PowerPlot_graph <- PowerPlot_graph +
         geom_vline(aes(xintercept = max(negative_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
     }
-    
-    if (max(EffectSize) > 0){
+
+    if (max(EffectSize) > 0) {
       positive_df <- PowerPlot_data %>%
         dplyr::filter(EffectSize > 0 & power > 0.8)
-      
+
       PowerPlot_graph <- PowerPlot_graph +
         geom_vline(aes(xintercept = min(positive_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
     }
@@ -573,8 +573,6 @@ cumulative_value.plot <- function(data,
 #' @param breaks_x_axis Numeric value indicating the number of breaks in the
 #' x-axis of the power plot. You may get slightly more or fewer breaks that
 #' requested based on `breaks_pretty()`. Set to 10 by default.
-#' @param side_of_test A string indicating whether confidence will be determined
-#' using a one sided or a two sided test.
 #' @param ... additional arguments
 #'
 #' @return
@@ -588,7 +586,6 @@ plot.GeoLiftMarketSelection <- function(x,
                                         smoothed_values = TRUE,
                                         show_mde = FALSE,
                                         breaks_x_axis = 10,
-                                        side_of_test = "two_sided",
                                         ...) {
   if (!inherits(x, "GeoLiftMarketSelection")) {
     stop("object must be class GeoLiftMarketSelection")
@@ -610,16 +607,16 @@ plot.GeoLiftMarketSelection <- function(x,
     data_lifted$Y[data_lifted$location %in% locs_aux &
       data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
 
-  if (tolower(side_of_test) == "two_sided"){
+  if (tolower(x$parameters$side_of_test) == "two_sided") {
     stat_test <- "Total"
   } else {
-    if (Market$EffectSize < 0){
+    if (Market$EffectSize < 0) {
       stat_test <- "Negative"
-    } else if (Market$EffectSize > 0){
+    } else if (Market$EffectSize > 0) {
       stat_test <- "Positive"
     }
   }
-  
+
   lifted <- suppressMessages(GeoLift::GeoLift(
     Y_id = "Y",
     time_id = "time",

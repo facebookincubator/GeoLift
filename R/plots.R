@@ -573,6 +573,8 @@ cumulative_value.plot <- function(data,
 #' @param breaks_x_axis Numeric value indicating the number of breaks in the
 #' x-axis of the power plot. You may get slightly more or fewer breaks that
 #' requested based on `breaks_pretty()`. Set to 10 by default.
+#' @param side_of_test A string indicating whether confidence will be determined
+#' using a one sided or a two sided test.
 #' @param ... additional arguments
 #'
 #' @return
@@ -586,6 +588,7 @@ plot.GeoLiftMarketSelection <- function(x,
                                         smoothed_values = TRUE,
                                         show_mde = FALSE,
                                         breaks_x_axis = 10,
+                                        side_of_test = "two_sided",
                                         ...) {
   if (!inherits(x, "GeoLiftMarketSelection")) {
     stop("object must be class GeoLiftMarketSelection")
@@ -607,7 +610,16 @@ plot.GeoLiftMarketSelection <- function(x,
     data_lifted$Y[data_lifted$location %in% locs_aux &
       data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
 
-
+  if (tolower(side_of_test) == "two_sided"){
+    stat_test <- "Total"
+  } else {
+    if (Market$EffectSize < 0){
+      stat_test <- "Negative"
+    } else if (Market$EffectSize > 0){
+      stat_test <- "Positive"
+    }
+  }
+  
   lifted <- suppressMessages(GeoLift::GeoLift(
     Y_id = "Y",
     time_id = "time",
@@ -618,6 +630,7 @@ plot.GeoLiftMarketSelection <- function(x,
     treatment_end_time = max_time,
     model = x$parameters$model,
     fixed_effects = x$parameters$fixed_effects,
+    stat_test = stat_test,
     print = TRUE
   ))
 

@@ -12,6 +12,7 @@
   smoothed_values = TRUE,
   show_mde = FALSE,
   breaks_x_axis = 10,
+  side_of_test = "two_sided",
   ...
 )
 }
@@ -37,6 +38,9 @@ the positive and negative MDEs. FALSE by default.}
 \item{breaks_x_axis}{Numeric value indicating the number of breaks in the
 x-axis of the power plot. You may get slightly more or fewer breaks that
 requested based on \code{breaks_pretty()}. Set to 10 by default.}
+
+\item{side_of_test}{A string indicating whether confidence will be determined
+using a one sided or a two sided test.}
 
 \item{...}{additional arguments}
 }

@@ -1886,6 +1886,9 @@ GeoLiftMarketSelection <- function(data,
       }
     }
   }
+  if (is.null(resultsM)){
+    stop('No good setups were found.  Please change hyperparameters.')
+  }
 
   # Step 5 - Add Percent of Y in test markets
   # Step 5.1 - Create the overall prop

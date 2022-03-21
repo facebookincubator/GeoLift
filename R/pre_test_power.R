@@ -1858,28 +1858,31 @@ GeoLiftMarketSelection <- function(data,
   for (locs in unique(results$location)) {
     for (ts in treatment_periods) {
       resultsFindAux <- results %>% dplyr::filter(location == locs & duration == ts & power > 0.8)
-      negative_mde <- max(
-        ifelse(resultsFindAux$EffectSize < 0,
-          resultsFindAux$EffectSize,
-          min(effect_size) - 1
+      
+      if (nrow(resultsFindAux) != 0){
+        negative_mde <- max(
+          ifelse(resultsFindAux$EffectSize < 0,
+            resultsFindAux$EffectSize,
+            min(effect_size) - 1
+          )
         )
-      )
-      positive_mde <- min(
-        ifelse(resultsFindAux$EffectSize > 0,
-          resultsFindAux$EffectSize,
-          max(effect_size) + 1
+        positive_mde <- min(
+          ifelse(resultsFindAux$EffectSize > 0,
+            resultsFindAux$EffectSize,
+            max(effect_size) + 1
+          )
         )
-      )
-      MDEAux <- ifelse(
-        positive_mde > abs(negative_mde) & negative_mde != 0,
-        negative_mde,
-        positive_mde
-      )
-
-      resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
-
-      if (MDEAux != 0) { # Drop tests significant with ES = 0
-        resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
+        MDEAux <- ifelse(
+          positive_mde > abs(negative_mde) & negative_mde != 0,
+          negative_mde,
+          positive_mde
+        )
+  
+        resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
+  
+        if (MDEAux != 0) { # Drop tests significant with ES = 0
+          resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
+        }
       }
     }
   }

@@ -1465,7 +1465,7 @@ GeoLiftPower <- function(data,
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
-  if (lookback_window <= 0){
+  if (lookback_window <= 0) {
     lookback_window <- 1
   }
 
@@ -1858,8 +1858,8 @@ GeoLiftMarketSelection <- function(data,
   for (locs in unique(results$location)) {
     for (ts in treatment_periods) {
       resultsFindAux <- results %>% dplyr::filter(location == locs & duration == ts & power > 0.8)
-      
-      if (nrow(resultsFindAux) != 0){
+
+      if (nrow(resultsFindAux) != 0) {
         negative_mde <- max(
           ifelse(resultsFindAux$EffectSize < 0,
             resultsFindAux$EffectSize,
@@ -1877,17 +1877,17 @@ GeoLiftMarketSelection <- function(data,
           negative_mde,
           positive_mde
         )
-  
+
         resultsFindAux <- resultsFindAux %>% dplyr::filter(EffectSize == MDEAux)
-  
+
         if (MDEAux != 0) { # Drop tests significant with ES = 0
           resultsM <- resultsM %>% dplyr::bind_rows(resultsFindAux)
         }
       }
     }
   }
-  if (is.null(resultsM)){
-    stop('No good setups were found.  Please change hyperparameters.')
+  if (is.null(resultsM)) {
+    stop('\nNo markets meet the criteria you provided. Consider modifying the input hyperparameters"')
   }
 
   # Step 5 - Add Percent of Y in test markets

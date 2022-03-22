@@ -1887,7 +1887,7 @@ GeoLiftMarketSelection <- function(data,
     }
   }
   if (is.null(resultsM)) {
-    stop('\nNo markets meet the criteria you provided. Consider modifying the input hyperparameters"')
+    stop('\nNo markets meet the criteria you provided. Consider modifying the input hyperparameters.')
   }
 
   # Step 5 - Add Percent of Y in test markets

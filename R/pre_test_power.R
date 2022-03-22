@@ -99,7 +99,7 @@ stochastic_market_selector <- function(treatment_size,
                                        run_stochastic_process = FALSE) {
   if (!run_stochastic_process) {
     message("\nDeterministic setup with ", treatment_size, " locations in treatment.")
-    return(similarity_matrix[, 1:treatment_size])
+    return(matrix(similarity_matrix[, 1:treatment_size], ncol=treatment_size))
   } else {
     message("\nRandom setup with ", treatment_size, " locations in treatment.")
     if (treatment_size > 0.5 * ncol(similarity_matrix)) {
@@ -121,8 +121,8 @@ stochastic_market_selector <- function(treatment_size,
     for (row in 1:nrow(sample_matrix)) { # Sort rows.
       sample_matrix[row, ] <- sort(sample_matrix[row, ])
     }
-
-    return(unique(sample_matrix))
+    
+    return(matrix(unique(sample_matrix), ncol=treatment_size))
   }
 }
 

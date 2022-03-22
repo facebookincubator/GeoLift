@@ -1,3 +1,11 @@
+GeoLift v2.3.6 (Release date: 2022-03-21)
+=========================================
+
+Changes:
+
+* Added stop when no combinations that fit criteria are obtained in GeoLiftMarketSelection.
+* Skipped iterations when power dataframe returns zero rows.
+
 GeoLift v2.3.5 (Release date: 2022-03-14)
 =========================================
 

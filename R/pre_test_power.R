@@ -26,7 +26,7 @@
 #' @param exclude_markets A list of markets or locations that won't be considered
 #' for the test market selection, but will remain in the pool of controls. Empty
 #' list by default.
-#' 
+#'
 #' @return
 #' Matrix of the best markets. The second to last columns show
 #' the best to worst market matches for the location in the first
@@ -44,7 +44,7 @@ MarketSelection <- function(data,
   astime <- seq(as.Date("2000/1/1"), by = "day", length.out = max(data$time))
   data$astime <- astime[data$time]
   exclude_markets <- tolower(exclude_markets)
-  
+
   # Check that the provided markets exist in the data.
   if (!all(exclude_markets %in% tolower(unique(data$location)))) {
     message(paste0(
@@ -53,12 +53,12 @@ MarketSelection <- function(data,
     ))
     return(NULL)
   }
-  
+
   # Exclude markets input by user by filter them out from the uploaded file data
-  if (length(exclude_markets) > 0){
+  if (length(exclude_markets) > 0) {
     data <- data[!data$location %in% exclude_markets, ]
   }
-  
+
   # Find the best matches based on DTW
   mm <- MarketMatching::best_matches(
     data = data,
@@ -72,17 +72,17 @@ MarketSelection <- function(data,
     end_match_period = max(data$astime),
     matches = length(unique(data$location)) - 1
   )
-  
+
   # Create a matrix with each row being the raked best controls for each location
   best_controls <- mm$BestMatches %>% tidyr::pivot_wider(
     id_cols = location,
     names_from = rank,
     values_from = BestControl
   )
-  
+
   best_controls <- as.matrix(best_controls)
   colnames(best_controls) <- NULL
-  
+
   return(best_controls)
 }
 
@@ -118,7 +118,7 @@ stochastic_market_selector <- function(treatment_size,
                                        run_stochastic_process = FALSE) {
   if (!run_stochastic_process) {
     message("\nDeterministic setup with ", treatment_size, " locations in treatment.")
-    return(matrix(similarity_matrix[, 1:treatment_size], ncol=treatment_size))
+    return(matrix(similarity_matrix[, 1:treatment_size], ncol = treatment_size))
   } else {
     message("\nRandom setup with ", treatment_size, " locations in treatment.")
     if (treatment_size > 0.5 * ncol(similarity_matrix)) {
@@ -140,8 +140,8 @@ stochastic_market_selector <- function(treatment_size,
     for (row in 1:nrow(sample_matrix)) { # Sort rows.
       sample_matrix[row, ] <- sort(sample_matrix[row, ])
     }
-    
-    return(matrix(unique(sample_matrix), ncol=treatment_size))
+
+    return(matrix(unique(sample_matrix), ncol = treatment_size))
   }
 }
 
@@ -1763,7 +1763,8 @@ GeoLiftMarketSelection <- function(data,
     time_id = "time",
     Y_id = "Y",
     dtw = dtw,
-    exclude_markets = exclude_markets)
+    exclude_markets = exclude_markets
+  )
 
   N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
 
@@ -1889,7 +1890,7 @@ GeoLiftMarketSelection <- function(data,
     }
   }
   if (is.null(resultsM)) {
-    stop('\nNo markets meet the criteria you provided. Consider modifying the input hyperparameters.')
+    stop("\nNo markets meet the criteria you provided. Consider modifying the input hyperparameters.")
   }
 
   # Step 5 - Add Percent of Y in test markets

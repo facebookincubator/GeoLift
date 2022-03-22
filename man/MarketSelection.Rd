@@ -9,7 +9,8 @@ MarketSelection(
   location_id = "location",
   time_id = "time",
   Y_id = "Y",
-  dtw = 0
+  dtw = 0,
+  exclude_markets = c()
 )
 }
 \arguments{
@@ -26,6 +27,10 @@ of the time period (starting at 1), and covariates.}
 
 \item{dtw}{Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
 on this metric while dtw = 0 (default) relies on correlations only.}
+
+\item{exclude_markets}{A list of markets or locations that won't be considered
+for the test market selection, but will remain in the pool of controls. Empty
+list by default.}
 }
 \value{
 Matrix of the best markets. The second to last columns show

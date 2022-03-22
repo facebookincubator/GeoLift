@@ -1,3 +1,11 @@
+GeoLift v2.3.7 (Release date: 2022-03-22)
+=========================================
+
+Changes:
+
+* Adapted output of stochastic_market_selection to be always the same, regardless of the size of N.
+* moved exclude_locations param to `MarketSelection` function.
+
 GeoLift v2.3.6 (Release date: 2022-03-21)
 =========================================
 

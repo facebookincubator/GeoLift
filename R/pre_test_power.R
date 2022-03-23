@@ -23,6 +23,9 @@
 #' @param Y_id Name of the outcome variable (String).
 #' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
 #' on this metric while dtw = 0 (default) relies on correlations only.
+#' @param exclude_markets A list of markets or locations that won't be considered
+#' for the test market selection, but will remain in the pool of controls. Empty
+#' list by default.
 #'
 #' @return
 #' Matrix of the best markets. The second to last columns show
@@ -34,11 +37,27 @@ MarketSelection <- function(data,
                             location_id = "location",
                             time_id = "time",
                             Y_id = "Y",
-                            dtw = 0) {
+                            dtw = 0,
+                            exclude_markets = c()) {
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   data$location <- tolower(data$location)
   astime <- seq(as.Date("2000/1/1"), by = "day", length.out = max(data$time))
   data$astime <- astime[data$time]
+  exclude_markets <- tolower(exclude_markets)
+
+  # Check that the provided markets exist in the data.
+  if (!all(exclude_markets %in% tolower(unique(data$location)))) {
+    message(paste0(
+      "Error: One or more markets in exclude_markets were not",
+      " found in the data. Check the provided list and try again."
+    ))
+    return(NULL)
+  }
+
+  # Exclude markets input by user by filter them out from the uploaded file data
+  if (length(exclude_markets) > 0) {
+    data <- data[!data$location %in% exclude_markets, ]
+  }
 
   # Find the best matches based on DTW
   mm <- MarketMatching::best_matches(
@@ -99,7 +118,7 @@ stochastic_market_selector <- function(treatment_size,
                                        run_stochastic_process = FALSE) {
   if (!run_stochastic_process) {
     message("\nDeterministic setup with ", treatment_size, " locations in treatment.")
-    return(similarity_matrix[, 1:treatment_size])
+    return(matrix(similarity_matrix[, 1:treatment_size], ncol = treatment_size))
   } else {
     message("\nRandom setup with ", treatment_size, " locations in treatment.")
     if (treatment_size > 0.5 * ncol(similarity_matrix)) {
@@ -122,7 +141,7 @@ stochastic_market_selector <- function(treatment_size,
       sample_matrix[row, ] <- sort(sample_matrix[row, ])
     }
 
-    return(unique(sample_matrix))
+    return(matrix(unique(sample_matrix), ncol = treatment_size))
   }
 }
 
@@ -1657,6 +1676,10 @@ GeoLiftMarketSelection <- function(data,
 
   # Data Checks
 
+  if (any(include_markets %in% exclude_markets)) {
+    stop("\ninclude_markets and exclude_markets overlap. Please define where these locations should go.")
+  }
+
   # Small Pre-treatment Periods
   if (max_time / max(treatment_periods) < 4) {
     message(paste0("Caution: Small pre-treatment period!.
@@ -1738,16 +1761,13 @@ GeoLiftMarketSelection <- function(data,
     lookback_window <- 1
   }
 
-  # Exclude markets input by user by filter them out from the uploaded file data
-  # if (length(exclude_markets) > 0) {
-  #   data <- data[!(data$location %in% exclude_markets), ]
-  # }
-
-  BestMarkets <- MarketSelection(data,
+  BestMarkets <- MarketSelection(
+    data,
     location_id = "location",
     time_id = "time",
     Y_id = "Y",
-    dtw = dtw
+    dtw = dtw,
+    exclude_markets = exclude_markets
   )
 
   N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
@@ -1794,17 +1814,8 @@ GeoLiftMarketSelection <- function(data,
       next
     }
 
-    # Exclude markets  defined at exclude_markets from possible test
-    if (length(exclude_markets) > 0) {
-      locs_to_drop <- c()
-      for (row in 1:nrow(BestMarkets_aux)) {
-        if (any(exclude_markets %in% BestMarkets_aux[row, ])) {
-          locs_to_drop <- append(locs_to_drop, row)
-        }
-      }
-      if (length(locs_to_drop) > 0) {
-        BestMarkets_aux <- BestMarkets_aux[-locs_to_drop, ]
-      }
+    if (nrow(BestMarkets_aux) == 0) {
+      stop("\nNo markets meet the criteria you provided. Consider modifying market exclusion/inclusion hyperparameters")
     }
 
     partial_results <- run_simulations(
@@ -1887,7 +1898,7 @@ GeoLiftMarketSelection <- function(data,
     }
   }
   if (is.null(resultsM)) {
-    stop('\nNo markets meet the criteria you provided. Consider modifying the input hyperparameters.')
+    stop("\nNo markets meet the criteria you provided. Consider modifying the input hyperparameters.")
   }
 
   # Step 5 - Add Percent of Y in test markets

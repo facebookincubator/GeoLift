@@ -138,6 +138,14 @@ limit_test_markets <- function(similarity_matrix,
       ". Limiting number of test markets to less or equal than half total locations."
     )
     treatment_sizes <- treatment_sizes[treatment_sizes <= 0.5 * ncol(similarity_matrix)]
+
+    if (length(treatment_sizes) == 0) {
+      treatment_sizes <- 0.5 * ncol(similarity_matrix)
+    }
+  }
+
+  if (ncol(similarity_matrix) < treatment_sizes) {
+    stop("\nParameter N is larger than markets after exclusion.  Consider excluding less markets.")
   }
 
   return(treatment_sizes)

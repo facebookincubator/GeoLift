@@ -1676,6 +1676,10 @@ GeoLiftMarketSelection <- function(data,
 
   # Data Checks
 
+  if (any(include_markets %in% exclude_markets)) {
+    stop("\ninclude_markets and exclude_markets overlap. Please define where these locations should go.")
+  }
+
   # Small Pre-treatment Periods
   if (max_time / max(treatment_periods) < 4) {
     message(paste0("Caution: Small pre-treatment period!.
@@ -1809,8 +1813,8 @@ GeoLiftMarketSelection <- function(data,
     if (is.null(BestMarkets_aux)) {
       next
     }
-    
-    if (nrow(BestMarkets_aux) == 0){
+
+    if (nrow(BestMarkets_aux) == 0) {
       stop("\nNo markets meet the criteria you provided. Consider modifying market exclusion/inclusion hyperparameters")
     }
 

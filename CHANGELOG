@@ -1,3 +1,12 @@
+GeoLift v2.3.8 (Release date: 2022-03-31)
+=========================================
+
+Changes:
+
+* Remove warning from plot(GeoLiftPower) due to geom_smooth & ylim interaction.
+* Remove warning that comes from if condition in limit_test_market.
+* Update weights in results object being displayed from GeoLift, kept the augsynth obj, moved df to df_weights.
+
 GeoLift v2.3.7 (Release date: 2022-03-22)
 =========================================
 

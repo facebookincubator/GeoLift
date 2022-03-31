@@ -296,8 +296,8 @@ GeoLift <- function(Y_id = "Y",
     "lower_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$lower_bound,
     "upper_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$upper_bound,
     "df_weights" = data.frame(
-      location = dimnames(res$results$weights)[[1]],
-      weight = unname(res$results$weights[, 1])
+      location = dimnames(augsyn$weights)[[1]],
+      weight = unname(augsyn$weights[, 1])
     )
   )
 

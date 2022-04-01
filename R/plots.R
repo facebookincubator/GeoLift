@@ -115,7 +115,8 @@ plot.GeoLiftPower <- function(x,
       plot.title = element_text(hjust = 0.5),
       plot.subtitle = element_text(hjust = 0.5)
     ) +
-    scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1))
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    coord_cartesian(ylim = c(0, 1))
 
   if (sum(PowerPlot_data$investment != 0)) {
     CostPerLift <- as.numeric(

@@ -294,12 +294,11 @@ GeoLift <- function(Y_id = "Y",
     "summary" = sum_augsyn,
     "ConfidenceIntervals" = ConfidenceIntervals,
     "lower_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$lower_bound,
-    "upper_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$upper_bound
-  )
-
-  res$results$weights <- data.frame(
-    location = dimnames(res$results$weights)[[1]],
-    weight = unname(res$results$weights[, 1])
+    "upper_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$upper_bound,
+    "df_weights" = data.frame(
+      location = dimnames(augsyn$weights)[[1]],
+      weight = unname(augsyn$weights[, 1])
+    )
   )
 
   if (print == TRUE) {
@@ -481,7 +480,7 @@ summary.GeoLift <- function(object, ...) {
     summ$Y_id <- object$Y_id
     summ$incremental <- object$incremental
     summ$bias <- mean(object$summary$bias_est)
-    summ$weights <- object$results$weights
+    summ$weights <- object$df_weights
     summ$CI <- object$ConfidenceIntervals
     summ$alpha <- object$summary$alpha
     summ$lower <- object$lower_bound

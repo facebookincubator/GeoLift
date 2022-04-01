@@ -144,8 +144,8 @@ limit_test_markets <- function(similarity_matrix,
     }
   }
 
-  if (ncol(similarity_matrix) < treatment_sizes) {
-    stop("\nParameter N is larger than markets after exclusion.  Consider excluding less markets.")
+  if (ncol(similarity_matrix) < min(treatment_sizes)) {
+    stop("\nMinimum N param is larger than markets after exclusion.  Consider excluding less markets.")
   }
 
   return(treatment_sizes)

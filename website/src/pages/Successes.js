@@ -19,7 +19,7 @@ import styles from './styles.module.css';
 const features = [
   {
     title: 'Omni-Channel Efficiency with Hudsons Bay Company',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Hudson%27s_Bay_Company_Official_Logo_2013.svg/1280px-Hudson%27s_Bay_Company_Official_Logo_2013.svg.png',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Hudson%27s_Bay_Company_Official_Logo_2013.svg',
     description: (
       <>
         Using GeoLift, Hudson’s Bay was able to measure lift in online and in-store sales
@@ -46,13 +46,27 @@ const features = [
   },
   {
     title: 'Building Brand and Sales with Super Coffee',
-    imageUrl: 'https://scontent-sjc3-1.xx.fbcdn.net/v/t1.6435-1/p100x100/146475455_3695451970571166_7309961661612546269_n.png?_nc_cat=1&ccb=1-5&_nc_sid=dbb9e7&_nc_eui2=AeG9H3ydn7q54QvS6IsuGgB7NEmGhia1Teo0SYaGJrVN6oOiRbUV_8TDSBfl_ngJ_Bk&_nc_ohc=BpLZQJlItyMAX_1SBrH&_nc_ht=scontent-sjc3-1.xx&oh=00_AT82-Y89yQdvuf7oMv3GIv8IplH2fjRFGyGI021pPfhS7w&oe=620D39BA',
+    imageUrl: 'https://scontent-sjc3-1.xx.fbcdn.net/v/t1.6435-9/146475455_3695451970571166_7309961661612546269_n.png?_nc_cat=105&_nc_map=test-rt&ccb=1-5&_nc_sid=09cbfe&_nc_eui2=AeG9H3ydn7q54QvS6IsuGgB7NEmGhia1Teo0SYaGJrVN6oOiRbUV_8TDSBfl_ngJ_Bk&_nc_ohc=q4vTJ5rfyBMAX9pNwle&_nc_ht=scontent-sjc3-1.xx&oh=00_AT8L-G0nU88JjThwNs0z-_C4Zk1O0wyi1sYGaJsDh8_8Hg&oe=626C79D2',
     description: (
       <>
         The enhanced coffee company ran Facebook video and photo ads to boost brand
         awareness and used a GeoLift study to measure in-store sales, revealing an
         11.9% in-store sales lift.
         <a href="https://www.facebook.com/business/success/super-coffee">
+        -  Learn More.
+        </a>
+      </>
+    ),
+  },
+  {
+    title: 'Cross-Channel Measurement with Liverpool',
+    imageUrl: 'https://scontent-sjc3-1.xx.fbcdn.net/v/t39.30808-6/275845667_10159868290766217_6878811270235505956_n.jpg?_nc_cat=1&_nc_map=test-rt&ccb=1-5&_nc_sid=09cbfe&_nc_eui2=AeEgXXkEQuNFEdIUcBHE_aXghNVcZa5P5DiE1Vxlrk_kODba9joGyL7vyoQ1PHdBONo&_nc_ohc=W6ae1Sr4zTYAX-8ZdVv&_nc_ht=scontent-sjc3-1.xx&oh=00_AT_U19NyRAUHoaK97Kbddy8R8wcjFQTNYN7RIvCxp1OP_g&oe=624C4405',
+    description: (
+      <>
+        The mexican retailer measured the first cross-channel GeoLift  test comparing the
+        omni-channel incrementality of Meta and Digital Display. The results revealed the
+        importance of a robust cross-channel strategy with a 14X incremental ROAS for Meta.
+        <a href="https://www.facebook.com/business/success/3-liverpool?locale=es_LA">
         -  Learn More.
         </a>
       </>

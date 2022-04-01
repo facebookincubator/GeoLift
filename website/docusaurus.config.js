@@ -11,7 +11,7 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 (module.exports = {
   title: 'GeoLift',
-  tagline: 'The Open Source solution from Meta to calculate Lift at a geo-level.',
+  tagline: 'The Open Source solution from Meta Open Source to calculate Lift at a geo-level.',
   url: 'https://facebookincubator.github.io/',
   baseUrl: '/GeoLift/',
   onBrokenLinks: 'throw',

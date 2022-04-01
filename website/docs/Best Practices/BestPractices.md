@@ -21,7 +21,6 @@ sidebar_position: 1
 
 ## Test and Control Markets
 * Match test and control markets on variables such as sales plus other relevant variables that are specific to the brand category (e.g. product distribution, seasonal variations across geos).
-* Exclude markets that had major disruptions compared to other markets in the test during the pre-test period (see COVID-19 guidelines below).
 * Test and control markets should be matched on the exact same outcome of interest, doing this may eliminate any bias in the results across markets.
 
 ---

@@ -163,7 +163,7 @@ plot.GeoLiftPower <- function(x,
     final_legend <- c(final_legend, c("MDE Values" = "salmon"))
     if (min(EffectSize) < 0) {
       negative_df <- PowerPlot_data %>%
-        dplyr::filter(EffectSize < 0 & power > 0.8)
+        dplyr::filter(EffectSize < 0 & .data$power > power)
 
       PowerPlot_graph <- PowerPlot_graph +
         geom_vline(aes(xintercept = max(negative_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
@@ -171,7 +171,7 @@ plot.GeoLiftPower <- function(x,
 
     if (max(EffectSize) > 0) {
       positive_df <- PowerPlot_data %>%
-        dplyr::filter(EffectSize > 0 & power > 0.8)
+        dplyr::filter(EffectSize > 0 & .data$power > power)
 
       PowerPlot_graph <- PowerPlot_graph +
         geom_vline(aes(xintercept = min(positive_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")

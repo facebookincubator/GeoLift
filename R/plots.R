@@ -62,7 +62,6 @@ GeoPlot <- function(data,
 #' for ease of interpretation.
 #'
 #' @param x GeoLiftPower object.
-#' @param power Power level. By default 0.8.
 #' @param actual_values Logic flag indicating whether to include in the plot
 #' the actual values. TRUE by default.
 #' @param smoothed_values Logic flag indicating whether to include in the plot
@@ -79,7 +78,6 @@ GeoPlot <- function(data,
 #'
 #' @export
 plot.GeoLiftPower <- function(x,
-                              power = 0.8,
                               actual_values = TRUE,
                               smoothed_values = TRUE,
                               show_mde = FALSE,
@@ -163,7 +161,7 @@ plot.GeoLiftPower <- function(x,
     final_legend <- c(final_legend, c("MDE Values" = "salmon"))
     if (min(EffectSize) < 0) {
       negative_df <- PowerPlot_data %>%
-        dplyr::filter(EffectSize < 0 & .data$power > power)
+        dplyr::filter(EffectSize < 0 & .data$power > 0.8)
 
       PowerPlot_graph <- PowerPlot_graph +
         geom_vline(aes(xintercept = max(negative_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")
@@ -171,7 +169,7 @@ plot.GeoLiftPower <- function(x,
 
     if (max(EffectSize) > 0) {
       positive_df <- PowerPlot_data %>%
-        dplyr::filter(EffectSize > 0 & .data$power > power)
+        dplyr::filter(EffectSize > 0 & .data$power > 0.8)
 
       PowerPlot_graph <- PowerPlot_graph +
         geom_vline(aes(xintercept = min(positive_df[, "EffectSize"]), color = "MDE Values"), alpha = 0.4, linetype = "dashed")

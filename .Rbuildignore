@@ -2,3 +2,8 @@
 ^\.Rproj\.user$
 \website
 .gitignore
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+LICENSE.md
+.github
+\doc

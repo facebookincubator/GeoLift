@@ -225,7 +225,7 @@ plot.GeoLift <- function(x,
   }
 
   if (type == "TreatmentSchedule") {
-    panelView(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
+    panelView::panelview(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
   } else if (tolower(type) %in% c("att", "incrementality")) {
     absolute_value.plot(
       GeoLift = x,

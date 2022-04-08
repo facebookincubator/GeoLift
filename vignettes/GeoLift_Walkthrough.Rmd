@@ -1,11 +1,11 @@
 ---
 title: "GeoLift Walkthrough"
 output: 
-  html_document: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{GeoLift Walkthrough}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  html_document: default
+  md_document:
+    variant: markdown_github
+knit:
+  rmarkdown::render("GeoLift_Walkthrough.Rmd", output_format = "all")
 ---
 
 ```{r, include = FALSE}

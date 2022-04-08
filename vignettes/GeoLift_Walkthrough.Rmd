@@ -6,10 +6,15 @@ output:
     variant: markdown_github
 knit:
   rmarkdown::render("GeoLift_Walkthrough.Rmd", output_format = "all")
+vignette: >
+  %\VignetteIndexEntry{GeoLift_Walkthrough}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  dev="png",
   collapse = TRUE,
   comment = "#>",
   fig.width = 8, 

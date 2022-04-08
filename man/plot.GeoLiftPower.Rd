@@ -6,7 +6,6 @@
 \usage{
 \method{plot}{GeoLiftPower}(
   x,
-  power = 0.8,
   actual_values = TRUE,
   smoothed_values = TRUE,
   show_mde = FALSE,
@@ -16,8 +15,6 @@
 }
 \arguments{
 \item{x}{GeoLiftPower object.}
-
-\item{power}{Power level. By default 0.8.}
 
 \item{actual_values}{Logic flag indicating whether to include in the plot
 the actual values. TRUE by default.}

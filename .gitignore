@@ -18,7 +18,6 @@
 
 # produced vignettes
 vignettes/*.html
-vignettes/*.pdf
 
 # knitr and R markdown default cache directories
 /*_cache/
@@ -33,3 +32,4 @@ inst/doc
 Meta
 .DS_Store
 GeoLift.Rproj
+website/website/

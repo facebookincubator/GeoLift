@@ -1,8 +1,9 @@
 ---
 title: "GeoLift Walkthrough"
-output: rmarkdown::html_vignette
+output: 
+  html_document: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GeoLift_Walkthrough}
+  %\VignetteIndexEntry{GeoLift Walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -11,8 +12,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width = 10, 
-  fig.height = 8, 
+  fig.width = 8, 
+  fig.height = 6, 
   fig.align = "center",
   warning = FALSE
 )
@@ -30,10 +31,10 @@ There are many ways to measure Lift and Geo Experimentation is one that has been
 
 ### Why GeoLift?
 GeoLift is Meta's open-source solution to measure Lift at a geographical level. By leveraging the latest advances in Synthetic Control Methods, GeoLift empowers you to start making decisions grounded in incrementality and measure the true value of your marketing campaigns. This tool offers an end-to-end solution to geo-experimentation which spans data ingestion, power analyses, market selection, and inference in this easy-to-use R package. Moreover, the tool's open-source nature makes it transparent and fully reproducible!
-
-## II: Installation
-
-You can install `GeoLift` from our [GitHub repository](https://github.com/facebookincubator/GeoLift/) using the `remotes` package.
+  
+  ## II: Installation
+  
+  You can install `GeoLift` from our [GitHub repository](https://github.com/facebookincubator/GeoLift/) using the `remotes` package.
 
 ```{r install, results="hide", message=F, eval=F}
 ## Install remotes if noy already installed
@@ -57,8 +58,8 @@ data(GeoLift_PreTest)
 ```
 
 The `GeoLift_PreTest` data set contains three variables: 
-
-1. location (city)
+  
+  1. location (city)
 2. date (in "yyyy-mm-dd" format)
 3. Y (number of conversions/KPI in each day/location).
 
@@ -68,12 +69,12 @@ The first step to run a `GeoLift` test is to read the data into the proper forma
 
 ```{r GeoDataRead}
 GeoTestData_PreTest <- GeoDataRead(data = GeoLift_PreTest,
-                                    date_id = "date",
-                                    location_id = "location",
-                                    Y_id = "Y",
-                                    X = c(), #empty list as we have no covariates
-                                    format = "yyyy-mm-dd",
-                                    summary = TRUE)
+                                   date_id = "date",
+                                   location_id = "location",
+                                   Y_id = "Y",
+                                   X = c(), #empty list as we have no covariates
+                                   format = "yyyy-mm-dd",
+                                   summary = TRUE)
 head(GeoTestData_PreTest)
 ```
 
@@ -257,12 +258,12 @@ Similarly to the process executed at the beginning of the Power Analysis phase, 
 
 ```{r GeoDataRead_Test}
 GeoTestData_Test <- GeoDataRead(data = GeoLift_Test,
-                                    date_id = "date",
-                                    location_id = "location",
-                                    Y_id = "Y",
-                                    X = c(), #empty list as we have no covariates
-                                    format = "yyyy-mm-dd",
-                                    summary = TRUE)
+                                date_id = "date",
+                                location_id = "location",
+                                Y_id = "Y",
+                                X = c(), #empty list as we have no covariates
+                                format = "yyyy-mm-dd",
+                                summary = TRUE)
 head(GeoTestData_Test)
 ```
 
@@ -282,10 +283,10 @@ The next step in the process is to calculate the actual Lift caused by the marke
 
 ```{r GeoLift}
 GeoTest <- GeoLift(Y_id = "Y",
-                    data = GeoTestData_Test,
-                    locations = c("chicago", "portland"),
-                    treatment_start_time = 91,
-                    treatment_end_time = 105)
+                   data = GeoTestData_Test,
+                   locations = c("chicago", "portland"),
+                   treatment_start_time = 91,
+                   treatment_end_time = 105)
 ```
 
 The results show that the campaigns led to a 5.4% lift in units sold corresponding to 4667 incremental units for this 15-day test. Moreover, the Average Estimated Treatment Effect is of 155.556 units every day of the test. Most importantly, we observe that these results are statistically significant at a 95% level. In fact, there's only a 1.1% chance of observing an effect of this magnitude or larger if the actual treatment effect was zero. In other words, it is extremely unlikely that these results are just due to chance. To dig deeper into the results, we can run the `summary()` of our `GeoLift` object.
@@ -318,11 +319,11 @@ While the results obtained from the test are robust and highly significant, a us
 
 ```{r GeoLiftBest}
 GeoTestBest <- GeoLift(Y_id = "Y",
-                        data = GeoTestData_Test,
-                        locations = c("chicago", "portland"),
-                        treatment_start_time = 91,
-                        treatment_end_time = 105,
-                        model = "best")
+                       data = GeoTestData_Test,
+                       locations = c("chicago", "portland"),
+                       treatment_start_time = 91,
+                       treatment_end_time = 105,
+                       model = "best")
 
 summary(GeoTestBest)
 plot(GeoTestBest, type = "Lift")

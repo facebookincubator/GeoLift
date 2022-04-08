@@ -6,6 +6,7 @@ Changes:
 * Updated .gitignore.
 * Removed large website files (reduced by 250MB).
 * Updated Rmd vignette to allow for devtools::check() w/ vignettes.
+* Removed parallel computation from MarketSelection to fix parallel issues on Windows systems.
 
 GeoLift v2.3.8 (Release date: 2022-03-31)
 =========================================

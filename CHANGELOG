@@ -1,3 +1,12 @@
+GeoLift v2.4.0 (Release date: 2022-04-08)
+=========================================
+
+Changes:
+
+* Updated .gitignore.
+* Removed large website files (reduced by 250MB).
+* Updated Rmd vignette to allow for devtools::check() w/ vignettes.
+
 GeoLift v2.3.8 (Release date: 2022-03-31)
 =========================================
 

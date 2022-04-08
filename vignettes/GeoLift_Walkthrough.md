@@ -365,7 +365,7 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
 #> 6  6                   chicago, houston, portland       10      -0.10     1
 #>   AvgScaledL2Imbalance Investment    AvgATT Average_MDE ProportionTotal_Y
 #> 1            0.4536741   69300.00 -174.5212 -0.04735064        0.10714670
-#> 2            0.1971865   74118.38  159.3627  0.04829913        0.07576405
+#> 2            0.1971864   74118.38  159.3627  0.04829912        0.07576405
 #> 3            0.1738778   64563.75 -283.8929 -0.09904014        0.03306537
 #> 4            0.1682310   43646.25 -281.0099 -0.09690716        0.03306537
 #> 5            0.1966996   99027.75 -343.5647 -0.10365827        0.07576405
@@ -649,7 +649,7 @@ GeoTest <- GeoLift(Y_id = "Y",
 #> 
 #> The results are significant at a 95% level. (TOTAL)
 #> 
-#> There is a 1.8% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.4% chance of observing an effect this large or larger assuming treatment effect is zero.
 ```
 
 The results show that the campaigns led to a 5.4% lift in units sold
@@ -673,7 +673,7 @@ summary(GeoTest)
 #> * Average ATT: 155.556
 #> * Percent Lift: 5.4%
 #> * Incremental Y: 4667
-#> * P-value: 0.02
+#> * P-value: 0.01
 #> 
 #> ##################################
 #> #####   Balance Statistics   #####
@@ -827,7 +827,7 @@ GeoTestBest <- GeoLift(Y_id = "Y",
 #> 
 #> The results are significant at a 95% level. (TOTAL)
 #> 
-#> There is a 0.9% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 0.7% chance of observing an effect this large or larger assuming treatment effect is zero.
 
 summary(GeoTestBest)
 #> 

@@ -1730,16 +1730,6 @@ GeoLiftMarketSelection <- function(data,
     return(NULL)
   }
 
-  # Make sure all simulated effect sizes have the same sign.
-  if (min(effect_size < 0 & max(effect_size) > 0)) {
-    message(paste0(
-      "Error: The specified simulated effect sizes are not all of the same ",
-      " sign. \nTry again with a vector of all positive or negative effects",
-      " sizes that includes zero."
-    ))
-    return(NULL)
-  }
-
   #  Check the holdout parameter
   if (length(holdout) > 1) {
     if (length(holdout) > 2) {

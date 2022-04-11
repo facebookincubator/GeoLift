@@ -1696,7 +1696,10 @@ GeoLiftMarketSelection <- function(data,
 
     if (length(include_markets) > 0) {
       # Keep only those equal or larger than included markets
-      N <- append(length(include_markets), N[length(include_markets) <= N])
+      N <- N[length(include_markets) <= N]
+      if (length(N) == 0){
+        stop("All N are smaller than amount of included markets. Please increase N.")
+      }
     }
   }
 

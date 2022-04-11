@@ -1,3 +1,11 @@
+GeoLift v2.4.1 (Release date: 2022-04-11)
+=========================================
+
+Changes:
+
+* Removed old check of negative and positive effects (which we can support now).
+* Changed N condition given length(include_markets) > 0.
+
 GeoLift v2.4.0 (Release date: 2022-04-08)
 =========================================
 

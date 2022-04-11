@@ -1696,7 +1696,10 @@ GeoLiftMarketSelection <- function(data,
 
     if (length(include_markets) > 0) {
       # Keep only those equal or larger than included markets
-      N <- append(length(include_markets), N[length(include_markets) <= N])
+      N <- N[length(include_markets) <= N]
+      if (length(N) == 0) {
+        stop("All N are smaller than amount of included markets. Please increase N.")
+      }
     }
   }
 
@@ -1723,16 +1726,6 @@ GeoLiftMarketSelection <- function(data,
     message(paste0(
       "Error: One or more markets in exclude_markets were not",
       " found in the data. Check the provided list and try again."
-    ))
-    return(NULL)
-  }
-
-  # Make sure all simulated effect sizes have the same sign.
-  if (min(effect_size < 0 & max(effect_size) > 0)) {
-    message(paste0(
-      "Error: The specified simulated effect sizes are not all of the same ",
-      " sign. \nTry again with a vector of all positive or negative effects",
-      " sizes that includes zero."
     ))
     return(NULL)
   }

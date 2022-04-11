@@ -479,9 +479,9 @@ run_simulations <- function(data,
             ))
           }
         } else {
+          simulation_results <- NULL
           for (test in 1:nrow(as.matrix(treatment_combinations))) {
-            simulation_results <- NULL
-            simulation_results <- suppressMessages(
+            partial_simulation_results <- suppressMessages(
               pvalueCalc(
                 data = data,
                 sim = sim,
@@ -498,6 +498,7 @@ run_simulations <- function(data,
                 stat_func = stat_func
               )
             )
+            simulation_results <- cbind(simulation_results, partial_simulation_results)
           }
         }
 

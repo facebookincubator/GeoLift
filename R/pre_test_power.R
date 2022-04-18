@@ -1842,7 +1842,7 @@ GeoLiftMarketSelection <- function(data,
 
   # Step 2 - Compute Significant & Remove Duplicates
   results <- results %>%
-    dplyr::mutate(significant = ifelse(pvalue < 0.1, 1, 0)) %>%
+    dplyr::mutate(significant = ifelse(pvalue < alpha, 1, 0)) %>%
     #   dplyr::filter(significant > 0) %>%
     dplyr::distinct()
 
@@ -1945,7 +1945,7 @@ GeoLiftMarketSelection <- function(data,
 
   # Step 9 - Rename columns
   resultsM <- dplyr::rename(resultsM,
-    Average_MDE = AvgDetectedLift, # Average_MDE = lift
+    Average_MDE = AvgDetectedLift,
     Power = power
   )
 

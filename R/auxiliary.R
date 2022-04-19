@@ -82,9 +82,6 @@ build_cluster <- function(parallel_setup,
   parallel::clusterCall(cl, function() {
     attachNamespace("dplyr")
   })
-  # parallel::clusterCall(cl, function() {
-  #   attachNamespace("tidyr")
-  # })
 
   parallel::clusterExport(
     cl,

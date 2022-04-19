@@ -239,11 +239,11 @@ type_of_test <- function(side_of_test = "two_sided", alternative_hypothesis = NU
 #'
 #' @export
 pvalueCalc <- function(data,
-                       sim, # Iterator: Sim number
-                       max_time, # test end
-                       tp, # treatment periods
-                       es, # effect size
-                       locations, # test locations to try out
+                       sim,
+                       max_time,
+                       tp,
+                       es,
+                       locations,
                        cpic,
                        X,
                        type = "pValue",
@@ -256,7 +256,7 @@ pvalueCalc <- function(data,
   pre_test_duration <- treatment_start_time - 1
   pre_treatment_start_time <- 1
 
-  if (normalize == TRUE) { # NEWCHANGE: Normalize by the sd
+  if (normalize == TRUE) {
     factor <- sd(as.matrix(data$Y))
     data$Y <- data$Y / factor
   }
@@ -307,7 +307,6 @@ pvalueCalc <- function(data,
   att_estimator <- ave_incremental_convs / tp
   lift_estimator <- ave_incremental_convs / sum(ave_pred_control_convs)
 
-  # NEWCHANGES: Option for quick imbalance-based calcs or p-value
   if (type == "pValue") {
     wide_data <- ascm_obj$data
     new_wide_data <- wide_data
@@ -441,7 +440,7 @@ run_simulations <- function(data,
     "detected_lift"
   )
 
-  for (effect_size in effect_sizes) { # iterate through lift %
+  for (effect_size in effect_sizes) {
     stat_func <- type_of_test(
       side_of_test = side_of_test,
       alternative_hypothesis = ifelse(effect_size > 0, "positive", "negative")
@@ -455,7 +454,6 @@ run_simulations <- function(data,
       for (sim in 1:(lookback_window)) {
         if (parallel == TRUE) {
           simulation_results <- foreach(
-            ## Esto funciona para matrices de una sola fila?
             test = 1:nrow(as.matrix(treatment_combinations)),
             .combine = cbind,
             .errorhandling = "stop",
@@ -467,7 +465,6 @@ run_simulations <- function(data,
               max_time = max(data$time),
               tp = treatment_duration,
               es = effect_size,
-              ## Esto funciona para matrices de una sola fila?
               locations = as.list(as.matrix(treatment_combinations)[test, ]),
               cpic = cpic,
               X,
@@ -679,7 +676,6 @@ GeoLiftPowerFinder <- function(data,
     dplyr::group_by(location) %>%
     dplyr::summarize(Total_Y = sum(Y))
 
-  # NEWCHANGE: Progress Bar
   num_sim <- length(N) * length(treatment_periods) * length(effect_size)
   if (ProgressBar == TRUE) {
     pb <- progress::progress_bar$new(
@@ -754,8 +750,6 @@ GeoLiftPowerFinder <- function(data,
   resultsM <- resultsM %>%
     dplyr::group_by(location, duration) %>%
     dplyr::slice_min(order_by = pvalue, n = 1)
-
-  # Sort Before Ranking
 
   resultsM$abs_lift_in_zero <- round(abs(resultsM$detected_lift - resultsM$EffectSize), 3)
 
@@ -848,7 +842,6 @@ GeoLiftPowerFinder <- function(data,
     }
   }
 
-  # NEWCHANGE: Rename Lift to MDE
   resultsM <- resultsM %>% dplyr::rename(MinDetectableEffect = EffectSize)
 
   return(resultsM)
@@ -991,7 +984,7 @@ GeoLiftPower.search <- function(data,
 
   N <- limit_test_markets(BestMarkets, N, run_stochastic_process)
 
-  if (lookback_window <= 0) { # NEWCHANGE
+  if (lookback_window <= 0) {
     lookback_window <- 1
   }
 
@@ -1000,7 +993,6 @@ GeoLiftPower.search <- function(data,
     dplyr::group_by(location) %>%
     dplyr::summarize(Total_Y = sum(Y))
 
-  # NEWCHANGE: Progress Bar
   if (ProgressBar == TRUE) {
     num_sim <- length(N) * length(treatment_periods) * nrow(BestMarkets)
     pb <- progress::progress_bar$new(
@@ -1055,13 +1047,11 @@ GeoLiftPower.search <- function(data,
     resultsM <- results %>%
       dplyr::group_by(location) %>%
       dplyr::summarize(mean_pow = mean(pow), mean_scaled_l2_imbalance = mean(ScaledL2Imbalance)) %>%
-      # dplyr::arrange(dplyr::desc(mean_pow)) %>%
       dplyr::distinct()
   } else if (type == "Imbalance") {
     resultsM <- results %>%
       dplyr::group_by(location) %>%
       dplyr::summarize(mean_scaled_l2_imbalance = mean(ScaledL2Imbalance)) %>%
-      # dplyr::arrange(mean_scaled_l2_imbalance) %>%
       dplyr::distinct()
   }
 
@@ -1218,7 +1208,7 @@ NumberLocations <- function(data,
                    \nIt's recommended to have at least 4x pre-treatment periods for each treatment period.\n"))
   }
 
-  results <- data.frame(matrix(ncol = 5, nrow = 0)) # NEWCHANGE: Add Imbalance
+  results <- data.frame(matrix(ncol = 5, nrow = 0))
   colnames(results) <- c("location", "pvalue", "n", "treatment_start", "ScaledL2Imbalance")
 
   if (length(number_locations) == 0) {
@@ -1241,7 +1231,6 @@ NumberLocations <- function(data,
   }
 
   for (n in number_locations) {
-    # for (t in times){
 
     if (ProgressBar == TRUE) {
       pb$tick()
@@ -1256,7 +1245,7 @@ NumberLocations <- function(data,
         pvalueCalc(
           data = data,
           sim = 1,
-          max_time = max_time, # max_time,
+          max_time = max_time,
           tp = treatment_periods,
           es = 0,
           locations = as.list(sample(locs, n, replace = FALSE)),
@@ -1285,7 +1274,7 @@ NumberLocations <- function(data,
         aux <- suppressMessages(pvalueCalc(
           data = data,
           sim = 1,
-          max_time = max_time, # max_time,
+          max_time = max_time,
           tp = treatment_periods,
           es = 0,
           locations = as.list(sample(locs, n, replace = FALSE)),
@@ -1771,8 +1760,6 @@ GeoLiftMarketSelection <- function(data,
     dplyr::group_by(location) %>%
     dplyr::summarize(Total_Y = sum(Y))
 
-  # NEWCHANGE: Progress Bar
-
   if (ProgressBar == TRUE) {
     num_sim <- length(N) * length(treatment_periods) * length(effect_size)
     pb <- progress::progress_bar$new(
@@ -1843,7 +1830,6 @@ GeoLiftMarketSelection <- function(data,
   # Step 2 - Compute Significant & Remove Duplicates
   results <- results %>%
     dplyr::mutate(significant = ifelse(pvalue < alpha, 1, 0)) %>%
-    #   dplyr::filter(significant > 0) %>%
     dplyr::distinct()
 
   # Step 3 - Compute average Metrics
@@ -1918,7 +1904,6 @@ GeoLiftMarketSelection <- function(data,
     dplyr::slice_max(order_by = power, n = 1)
 
   # Step 7 - Create Rank variable - Adding New Ranking System
-  abs_lift_in_zero <- true_lift <- NULL # might change to es
   resultsM$abs_lift_in_zero <- round(abs(resultsM$AvgDetectedLift - resultsM$EffectSize), 3)
 
   resultsM <- as.data.frame(resultsM) %>%

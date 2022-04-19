@@ -80,7 +80,7 @@ GeoDataRead <- function(data,
   data$location <- tolower(data$location)
   initial_locations <- length(unique(data$location))
 
-  # NEWCHANGE: Remove commas from locations
+  # Remove commas from locations
   data$location <- gsub(",", "", gsub("([a-zA-Z]),", "\\1", data$location))
 
   # Determine the separator
@@ -104,7 +104,7 @@ GeoDataRead <- function(data,
   # Remove separators
 
   if (format %in% valid_formats_day) {
-    date_format <- gsub(sep, "", format) # Remove sep
+    date_format <- gsub(sep, "", format)
     date_format <- gsub("yyyy", "Y", date_format)
     date_format <- gsub("mm", "m", date_format)
     date_format <- gsub("dd", "d", date_format)
@@ -119,7 +119,7 @@ GeoDataRead <- function(data,
       as.POSIXct(format = "%Y-%m-%d") %>%
       as.numeric()
   } else if (format %in% valid_formats_week) {
-    date_format <- gsub(sep, "", format) # Remove sep
+    date_format <- gsub(sep, "", format)
     date_format <- gsub("yyyy", "Y", date_format)
     date_format <- gsub("ww", "W", date_format)
     date_format <- unlist(strsplit(date_format, split = ""))
@@ -175,9 +175,6 @@ GeoDataRead <- function(data,
   } else {
     data <- subset(data, select = -c(ID))
   }
-
-  # Remove revenue with zeroes
-  # data <- filter(data, Y > 0)
 
   # Remove null conversion values
   data <- data[!is.na(data$Y), ]

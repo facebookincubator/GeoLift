@@ -1231,7 +1231,6 @@ NumberLocations <- function(data,
   }
 
   for (n in number_locations) {
-
     if (ProgressBar == TRUE) {
       pb$tick()
     }

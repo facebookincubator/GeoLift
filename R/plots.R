@@ -46,7 +46,6 @@ GeoPlot <- function(data,
     geom_vline(xintercept = treatment_start, linetype = "dashed", size = size_vline, color = "grey35") +
     geom_dl(aes(label = !!sym(location_id)), method = list(dl.combine("last.points"), cex = 0.8)) +
     xlim(0, 1.15 * (max(data[[time_id]]))) +
-    # ylab("") +
     labs(y = KPI_id, caption = notes) +
     theme_minimal()
 
@@ -631,13 +630,6 @@ plot.GeoLiftMarketSelection <- function(x,
   ))
 
   if (print_summary) {
-    # message(paste0(
-    #   "##################################",
-    #   "\n#####   GeoLift Simulation   #####\n",
-    #   "##################################\n",
-    #   "\n** Simulating a ",
-    #   100*round(Market$EffectSize,2),
-    #   "% Effect Size **" ))
     message(paste0(
       "##################################",
       "\n#####   GeoLift Simulation   #####\n",
@@ -664,12 +656,7 @@ plot.GeoLiftMarketSelection <- function(x,
   )
 
   suppressMessages(gridExtra::grid.arrange(
-    plot(lifted, notes = paste(
-      # "Locations:", Market$location,
-      # "\n Rank:", Market$rank,
-      # "\n Treatment Periods:", Market$duration,
-      # "\n Effect Size: ", Market$EffectSize
-    )),
+    plot(lifted),
     PowerPlot_graph,
     ncol = 1,
     nrow = 2,

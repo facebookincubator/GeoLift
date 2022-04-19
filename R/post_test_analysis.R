@@ -214,7 +214,6 @@ GeoLift <- function(Y_id = "Y",
     "Upper.Conf.Int"
   )
 
-  # NEWCHANGE: To avoid running the time-consuming summary process, create and store the object for re-use
   if (tolower(stat_test) == "total") {
     side_of_test <- "two_sided"
     alternative_hypothesis <- NULL
@@ -232,20 +231,19 @@ GeoLift <- function(Y_id = "Y",
   sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = stat_func)
 
   if (paste(augsyn$call)[1] == "single_augsynth") {
-    mean <- sum_augsyn[["average_att"]][["Estimate"]] # Use summary object
-    se <- sum_augsyn[["average_att"]][["Std.Error"]] # Use summary object
+    mean <- sum_augsyn[["average_att"]][["Estimate"]]
+    se <- sum_augsyn[["average_att"]][["Std.Error"]]
 
     loc_id <- c(which(augsyn$data$trt == 1))
     locs_id <- as.data.frame(loc_id, nrow = length(loc_id))
-    # locs_id$name <- unlist(locations) #OLD
-    locs_id$name <- unlist(unique(data_aux$location)[c(which(augsyn$data$trt == 1))]) # NEWCHANGE: Make sure we keep order
+    locs_id$name <- unlist(unique(data_aux$location)[c(which(augsyn$data$trt == 1))])
 
     y_obs <- c(augsyn$data$X[loc_id, ], augsyn$data$y[loc_id, ])
     y_hat <- predict(augsyn, att = FALSE)
     ATT <- predict(augsyn, att = TRUE)
-    ATT_se <- sum_augsyn$att$Std.Error # Use summary object
+    ATT_se <- sum_augsyn$att$Std.Error
 
-    pred_conversions <- predict(augsyn)[treatment_start_time:treatment_end_time] # NEWCHANGE: Store object to avoid re-processing
+    pred_conversions <- predict(augsyn)[treatment_start_time:treatment_end_time]
 
     if (length(locations) == 1) {
       lift <- (sum(augsyn$data$y[loc_id, ]) - sum(pred_conversions)) /
@@ -253,7 +251,7 @@ GeoLift <- function(Y_id = "Y",
     } else if (length(locations) > 1) {
       lift <- (sum(colMeans(augsyn$data$y[loc_id, ])) -
         sum(pred_conversions)) /
-        abs(sum(pred_conversions)) # NEWCHANGE: Avoid errors with signs
+        abs(sum(pred_conversions))
     }
 
     incremental <- sum(augsyn$data$y[loc_id, ]) - (sum(pred_conversions) * length(loc_id))
@@ -261,7 +259,7 @@ GeoLift <- function(Y_id = "Y",
     inference_df <- inference_df %>% tibble::add_row(
       ATT = mean,
       Perc.Lift = 100 * round(lift, 3),
-      pvalue = sum_augsyn$average_att$p_val, # pvalue(augsyn),
+      pvalue = sum_augsyn$average_att$p_val,
       Lower.Conf.Int = sum_augsyn$average_att$lower_bound,
       Upper.Conf.Int = sum_augsyn$average_att$upper_bound
     )
@@ -311,7 +309,6 @@ GeoLift <- function(Y_id = "Y",
         " for test markets:"
       )
     ))
-    # paste(toupper(locations), collapse = ", ")
     for (i in 1:length(locations)) {
       message(paste(i, toupper(locations[i])))
     }
@@ -470,9 +467,8 @@ summary.GeoLift <- function(object, ...) {
     summ$pvalue <- object$inference$pvalue
     summ$LowerCI <- object$inference$Lower.Conf.Int
     summ$UpperCI <- object$inference$Upper.Conf.Int
-    summ$L2Imbalance <- object$summary$l2_imbalance # NEWCHANGE
-    summ$L2ImbalanceScaled <- object$summary$scaled_l2_imbalance # NEWCHANGE
-    # summ$PercentImprove <- round(1 - GeoLift$summary$scaled_l2_imbalance,3)*100 #NEWCHANGE
+    summ$L2Imbalance <- object$summary$l2_imbalance
+    summ$L2ImbalanceScaled <- object$summary$scaled_l2_imbalance
     summ$ATT <- object$summary$att
     summ$start <- object$TreatmentStart
     summ$end <- object$TreatmentEnd

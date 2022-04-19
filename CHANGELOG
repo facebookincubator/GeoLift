@@ -1,3 +1,10 @@
+GeoLift v2.4.21 (Release date: 2022-04-19)
+=========================================
+
+Changes:
+
+* Added alpha param within the body of GeoLiftMarketSelection.
+
 GeoLift v2.4.2 (Release date: 2022-04-11)
 =========================================
 

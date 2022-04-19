@@ -33,7 +33,7 @@
 #' column.
 #'
 #' @export
-MarketSelection <- function(data,
+MarketSelection_v2 <- function(data,
                             location_id = "location",
                             time_id = "time",
                             Y_id = "Y",

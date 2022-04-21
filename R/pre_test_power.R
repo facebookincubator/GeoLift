@@ -1924,7 +1924,7 @@ GeoLiftMarketSelection <- function(data,
       rank_abszero = NULL,
       Locs = NULL
     ) %>%
-    dplyr::arrange(rank)
+    dplyr::arrange(rank, location)
 
   # Step 9 - Rename columns
   resultsM <- dplyr::rename(resultsM,

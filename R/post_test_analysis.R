@@ -537,9 +537,10 @@ print.summary.GeoLift <- function(x, ...) {
       "\n* Prognostic Function: ", toupper(x$progfunc), "\n",
       "\n* Model Weights:"
     ))
-    for (row in 1:nrow(x$weights)) {
-      if (abs(round(as.double(x$weights$weight[row]), 4)) >= 0.0001) {
-        message(paste0(" * ", x$weights$location[row], ": ", round(x$weights$weight[row], 4)))
+    x$weights_2 <- arrange(x$weights, desc(weight))
+    for (row in 1:nrow(x$weights_2)) {
+      if (abs(round(as.double(x$weights_2$weight[row]), 4)) >= 0.0001) {
+        message(paste0(" * ", x$weights_2$location[row], ": ", round(x$weights_2$weight[row], 4)))
       }
     }
   } else if (x$type == "single" & x$CI == TRUE) {
@@ -572,3 +573,4 @@ print.summary.GeoLift <- function(x, ...) {
     }
   }
 }
+

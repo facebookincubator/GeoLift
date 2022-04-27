@@ -320,7 +320,7 @@ GeoLift <- function(Y_id = "Y",
       100 * round(lift, 3), "%\n\n",
       "Incremental ", paste(Y_id), ": ", round(incremental, 0), "\n\n",
       "Average Estimated Treatment Effect (ATT): ", round(mean, 3),
-      "\n\n", significant, " (", toupper(stat_test), ")",
+      "\n\n", significant, " (", toupper(stat_test), " LIFT TEST)",
       "\n\nThere is a ", round(100 * inference_df$pvalue, 2),
       "% chance of observing an effect this large or larger assuming treatment effect is zero.",
       sep = ""
@@ -564,9 +564,10 @@ print.summary.GeoLift <- function(x, ...) {
       "##################################\n",
       "\n* Model Weights:"
     ))
-    for (row in 1:nrow(x$weights)) {
-      if (abs(round(as.double(x$weights$weight[row]), 4)) >= 0.0001) {
-        message(paste0(" * ", x$weights$location[row], ": ", round(x$weights$weight[row], 4)))
+    x$weights_2 <- arrange(x$weights, desc(weight))
+    for (row in 1:nrow(x$weights_2)) {
+      if (abs(round(as.double(x$weights_2$weight[row]), 4)) >= 0.0001) {
+        message(paste0(" * ", x$weights_2$location[row], ": ", round(x$weights_2$weight[row], 4)))
       }
     }
   }

@@ -276,6 +276,16 @@ GeoLift <- function(Y_id = "Y",
     significant <- "The results are not statistically significant."
   }
 
+  if(toupper(stat_test) == "TOTAL"){
+    testtype <- "TWO-SIDED LIFT TEST)"
+  } else if(toupper(stat_test) == "POSITIVE"){
+    testtype <- "ONE-SIDED POSITIVE LIFT TEST)"
+  } else{
+    testtype <- "ONE-SIDED NEGATIVE LIFT TEST)"
+        }
+
+
+
   res <- list(
     "results" = augsyn,
     "inference" = inference_df,
@@ -320,7 +330,7 @@ GeoLift <- function(Y_id = "Y",
       100 * round(lift, 3), "%\n\n",
       "Incremental ", paste(Y_id), ": ", round(incremental, 0), "\n\n",
       "Average Estimated Treatment Effect (ATT): ", round(mean, 3),
-      "\n\n", significant, " (", toupper(stat_test), " LIFT TEST)",
+      "\n\n", significant, " (", testtype ,
       "\n\nThere is a ", round(100 * inference_df$pvalue, 2),
       "% chance of observing an effect this large or larger assuming treatment effect is zero.",
       sep = ""

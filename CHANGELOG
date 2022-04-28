@@ -1,3 +1,12 @@
+GeoLift v2.4.23 (Release date: 2022-04-28)
+=========================================
+
+Changes:
+
+* Changed how type of test is displayed from 'TOTAL', 'POSITIVE', 'NEGATIVE' to 'TWO-SIDED LIFT TEST', 'ONE-SIDED POSITIVE LIFT TEST', 'ONE-SIDED NEGATIVE LIFT TEST'
+* Changed order of geographies outputted in the synthetic control equation fom alphabetical order to importance by weights 
+* Simplified summary function by reducing lines of coded needed to handle pasting the confidence interval.
+
 GeoLift v2.4.22 (Release date: 2022-04-21)
 =========================================
 

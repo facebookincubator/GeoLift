@@ -31,6 +31,7 @@ remotes::install_github("facebookincubator/GeoLift")
 - aesquerra@fb.com, Arturo Esquerra, Facebook Marketing Science Partner
 - kpanchal@fb.com, Kanishka Panchal, Facebook Marketing Science Partner
 - nicocru@fb.com, Nicolas Cruces, Facebook Marketing Science Partner
+- michaelkhalil@fb.com, Michael Khalil, Facebook Marketing Science Partner
 
 ## Join the GeoLift community
 - [Facebook page](https://www.facebook.com/groups/fbgeolift/)

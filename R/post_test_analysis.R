@@ -276,13 +276,13 @@ GeoLift <- function(Y_id = "Y",
     significant <- "The results are not statistically significant."
   }
 
-  if(toupper(stat_test) == "TOTAL"){
+  if (toupper(stat_test) == "TOTAL") {
     testtype <- "TWO-SIDED LIFT TEST)"
-  } else if(toupper(stat_test) == "POSITIVE"){
+  } else if (toupper(stat_test) == "POSITIVE") {
     testtype <- "ONE-SIDED POSITIVE LIFT TEST)"
-  } else{
+  } else {
     testtype <- "ONE-SIDED NEGATIVE LIFT TEST)"
-        }
+  }
 
 
 
@@ -330,7 +330,7 @@ GeoLift <- function(Y_id = "Y",
       100 * round(lift, 3), "%\n\n",
       "Incremental ", paste(Y_id), ": ", round(incremental, 0), "\n\n",
       "Average Estimated Treatment Effect (ATT): ", round(mean, 3),
-      "\n\n", significant, " (", testtype ,
+      "\n\n", significant, " (", testtype,
       "\n\nThere is a ", round(100 * inference_df$pvalue, 2),
       "% chance of observing an effect this large or larger assuming treatment effect is zero.",
       sep = ""
@@ -515,6 +515,7 @@ summary.GeoLift <- function(object, ...) {
 #' Plot GeoLift summary.
 #'
 #' @export
+
 print.summary.GeoLift <- function(x, ...) {
   if (!inherits(x, "summary.GeoLift")) {
     stop("object must be class summary.GeoLift")
@@ -522,18 +523,24 @@ print.summary.GeoLift <- function(x, ...) {
 
   message("\nGeoLift Results Summary\n")
 
-  if (x$type == "single" & x$CI == FALSE) {
-    message(paste0(
+  if (x$type == "single") {
+    test_statistics <- paste0(
       "##################################",
       "\n#####     Test Statistics    #####\n",
       "##################################\n",
       "\n* Average ATT: ", round(x$ATT_est, 3),
       "\n* Percent Lift: ", round(x$PercLift, 2), "%",
       "\n* Incremental ", paste(x$Y_id), ": ", round(x$incremental, 0),
-      "\n* P-value: ", round(x$pvalue, 2),
-      # "\n* 90% Confidence Interval: (", round(summ$LowerCI,3),  NEWCHANGE: Need to fix
-      # ", ", round(summ$UpperCI,3), ")",
+      "\n* P-value: ", round(x$pvalue, 2)
+    )
 
+    if (x$CI == TRUE) {
+      test_statistics <- paste0(
+        test_statistics,
+        "\n* ", (1 - x$alpha) * 100, "% Confidence Interval: (", round(x$lower * x$factor, 3), ", ", round(x$upper * x$factor, 3), ")"
+      )
+    }
+    balance_statistics <- paste0(
       "\n\n##################################",
       "\n#####   Balance Statistics   #####\n",
       "##################################\n",
@@ -546,41 +553,13 @@ print.summary.GeoLift <- function(x, ...) {
       "##################################\n",
       "\n* Prognostic Function: ", toupper(x$progfunc), "\n",
       "\n* Model Weights:"
-    ))
-    sorted_weights <- arrange(x$weights, desc(weight))
-    for (row in 1:nrow(sorted_weights)) {
-      if (abs(round(as.double(sorted_weights$weight[row]), 4)) >= 0.0001) {
-        message(paste0(" * ", sorted_weights$location[row], ": ", round(sorted_weights$weight[row], 4)))
-      }
-    }
-  } else if (x$type == "single" & x$CI == TRUE) {
-    message(paste0(
-      "##################################",
-      "\n#####     Test Statistics    #####\n",
-      "##################################\n",
-      "\n* Average ATT: ", round(x$ATT_est, 3),
-      "\n* Percent Lift: ", round(x$PercLift, 2), "%",
-      "\n* Incremental ", paste(x$Y_id), ": ", round(x$incremental, 0),
-      "\n* P-value: ", round(x$pvalue, 2),
-      "\n* ", (1 - x$alpha) * 100, "% Confidence Interval: (", round(x$lower * x$factor, 3), ", ", round(x$upper * x$factor, 3), ")",
-      "\n\n##################################",
-      "\n#####   Balance Statistics   #####\n",
-      "##################################\n",
-      "\n* L2 Imbalance: ", round(x$L2Imbalance, 3),
-      "\n* Scaled L2 Imbalance: ", round(x$L2ImbalanceScaled, 4),
-      "\n* Percent improvement from naive model: ", round(1 - x$L2ImbalanceScaled, 4) * 100, "%",
-      "\n* Average Estimated Bias: ", round(x$bias, 3),
-      "\n\n##################################",
-      "\n#####     Model Weights      #####\n",
-      "##################################\n",
-      "\n* Model Weights:"
-    ))
-    sorted_weights <- arrange(x$weights, desc(weight))
-    for (row in 1:nrow(sorted_weights)) {
-      if (abs(round(as.double(sorted_weights$weight[row]), 4)) >= 0.0001) {
-        message(paste0(" * ", sorted_weights$location[row], ": ", round(sorted_weights$weight[row], 4)))
-      }
+    )
+    message(test_statistics, balance_statistics)
+  }
+  sorted_weights <- dplyr::arrange(x$weights, dplyr::desc(abs(weight)))
+  for (row in 1:nrow(sorted_weights)) {
+    if (abs(round(as.double(sorted_weights$weight[row]), 4)) >= 0.0001) {
+      message(paste0(" * ", sorted_weights$location[row], ": ", round(sorted_weights$weight[row], 4)))
     }
   }
 }
-

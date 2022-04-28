@@ -1,6 +1,6 @@
 Package: GeoLift
 Title: Synthetic Control Method to Calculate Lift at a Geo Level
-Version: 2.4.22
+Version: 2.4.23
 Authors@R: c(
     person(given = "Arturo",
            family = "Esquerra",
@@ -13,7 +13,11 @@ Authors@R: c(
     person(given = "Kanishka",
            family = "Panchal",
            role = c("aut"),
-           email = "kpanchal@fb.com"))
+           email = "kpanchal@fb.com")),
+    person(given = "Michael",
+           family = "Khalil",
+           role = c("aut"),
+           email = "michaelkhalil@fb.com"))
 Description: GeoLift is an end-to-end solution to measure lift at 
     a geographical level. It is a flexible and robust implementation
     of Augmented Generalized Synthetic Controls. The package

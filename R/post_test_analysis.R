@@ -556,7 +556,8 @@ print.summary.GeoLift <- function(x, ...) {
     )
     message(test_statistics, balance_statistics)
   }
-  sorted_weights <- dplyr::arrange(x$weights, dplyr::desc(abs(weight)))
+
+  sorted_weights <- dplyr::arrange(x$weights, dplyr::desc(abs(x$weights$weight)))
   for (row in 1:nrow(sorted_weights)) {
     if (abs(round(as.double(sorted_weights$weight[row]), 4)) >= 0.0001) {
       message(paste0(" * ", sorted_weights$location[row], ": ", round(sorted_weights$weight[row], 4)))

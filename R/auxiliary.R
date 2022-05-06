@@ -311,7 +311,7 @@ get_correlation_coefficient <- function(data, locs = c()) {
   data_aux <- AppendAgg(data, locs = locs)
   data_aux <- data_aux[data_aux$location %in% c("control_markets", "test_markets"), ] %>%
     tidyr::pivot_wider(names_from = location, values_from=Y, id_cols=time)
-  cor_coefficient <- cor(data_aux$control_markets, data_aux$treatment_markets)
+  cor_coefficient <- cor(data_aux$control_markets, data_aux$test_markets)
   return(cor_coefficient)
 }
 

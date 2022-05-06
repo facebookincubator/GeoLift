@@ -1,3 +1,10 @@
+GeoLift v2.4.24 (Release date: 2022-05-09)
+=========================================
+
+Changes:
+- Added get_market_correlation function using the cor function to get within market correlations faster when dtw=0.
+- Removed unnecessary MarketCorrelations function.
+
 GeoLift v2.4.23 (Release date: 2022-04-28)
 =========================================
 

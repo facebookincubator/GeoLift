@@ -241,56 +241,6 @@ AppendAgg <- function(data, locs = NULL) {
   return(as.data.frame(aux))
 }
 
-#' Auxiliary function to calculate correlations between input markets.
-#'
-#' @description
-#'
-#' Auxiliary function to calculate correlations between input markets.
-#'
-#' @param data A data.frame containing the historical conversions by
-#' geographic unit. It requires a "locations" column with the geo name,
-#' a "Y" column with the outcome data (units), a time column with the indicator
-#' of the time period (starting at 1), and covariates.
-#' @param location_id Name of the location variable (String).
-#' @param time_id Name of the time variable (String).
-#' @param Y_id Name of the outcome variable (String).
-#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
-#' on this metric while dtw = 0 (default) relies on correlations only.
-#' @param markets List of markets to use in the calculation of the correlations.
-#'
-#' @return
-#' MarketMatching object.
-#'
-#' @export
-MarketCorrelations <- function(data,
-                               location_id = "location",
-                               time_id = "time",
-                               Y_id = "Y",
-                               dtw = 0,
-                               markets = NULL) {
-  data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
-  data$location <- tolower(data$location)
-  astime <- seq(as.Date("2000/1/1"), by = "day", length.out = max(data$time))
-  data$astime <- astime[data$time]
-
-  # Find the best matches based on DTW
-  mm <- MarketMatching::best_matches(
-    data = data,
-    id_variable = "location",
-    date_variable = "astime",
-    matching_variable = "Y",
-    parallel = TRUE,
-    warping_limit = 1,
-    dtw_emphasis = dtw,
-    start_match_period = min(data$astime),
-    end_match_period = max(data$astime),
-    markets_to_be_matched = markets,
-    matches = length(unique(data$location)) - 1
-  )
-
-  return(mm)
-}
-
 #' Calculate correlations between input markets.
 #'
 #' @description
@@ -310,7 +260,7 @@ MarketCorrelations <- function(data,
 get_correlation_coefficient <- function(data, locs = c()) {
   data_aux <- AppendAgg(data, locs = locs)
   data_aux <- data_aux[data_aux$location %in% c("control_markets", "test_markets"), ] %>%
-    tidyr::pivot_wider(names_from = location, values_from=Y, id_cols=time)
+    tidyr::pivot_wider(names_from = location, values_from = Y, id_cols = time)
   cor_coefficient <- cor(data_aux$control_markets, data_aux$test_markets)
   return(cor_coefficient)
 }

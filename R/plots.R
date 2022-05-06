@@ -702,7 +702,7 @@ plotCorrels <- function(data,
                         KPI_id = "",
                         dtw = 0) {
   data_aux <- AppendAgg(data, locs = locs)
-  correl <- GetCorrel(data, locs = locs, dtw = dtw)
+  correl <- get_correlation_coefficient(data, locs = locs)
 
   if (scaled == TRUE) {
     data_aux$Yscaled <- 0

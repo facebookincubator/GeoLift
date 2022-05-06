@@ -302,18 +302,17 @@ MarketCorrelations <- function(data,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param locs List of markets to use in the calculation of the correlations.
-#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
-#' on this metric while dtw = 0 (default) relies on correlations only.
 #'
 #' @return
 #' Correlation coefficient.
 #'
 #' @export
-GetCorrel <- function(data, locs = c(), dtw = 0) {
+get_correlation_coefficient <- function(data, locs = c()) {
   data_aux <- AppendAgg(data, locs = locs)
-
-  Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("control_markets", "test_markets"), ], dtw = dtw)
-  return(Correl$BestMatches$Correlation[[1]])
+  data_aux <- data_aux[data_aux$location %in% c("control_markets", "test_markets"), ] %>%
+    tidyr::pivot_wider(names_from = location, values_from=Y, id_cols=time)
+  cor_coefficient <- cor(data_aux$control_markets, data_aux$treatment_markets)
+  return(cor_coefficient)
 }
 
 #' Function to obtain the synthetic control weights.

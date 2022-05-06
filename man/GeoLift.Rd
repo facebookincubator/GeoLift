@@ -110,7 +110,12 @@ of an ad campaign.
 Authors:
 \itemize{
   \item Nicolas Cruces \email{nicocru@fb.com}
-  \item Kanishka Panchal \email{kpanchal@fb.com}
+}
+
+Other contributors:
+\itemize{
+  \item Kanishka Panchal \email{kpanchal@fb.com} [contributor]
+  \item Michael Khalil \email{michaelkhalil@fb.com} [contributor]
 }
 
 }

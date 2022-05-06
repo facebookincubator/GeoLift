@@ -7,6 +7,66 @@
 # NumberLocations, GeoLiftPower.
 
 
+#' Get within market correlations for all locations.
+#' 
+#' @description 
+#' 
+#' `get_market_correlations` calculates a notion of similarity between markets
+#' to help inform the combinations of treatments.
+#' 
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' 
+#' @return A Dataframe where each column represents the closest market to the 
+#' market in the first column, ordering them by their correlation factor.
+#' 
+#' @export
+get_market_correlations <- function(data){
+  pivoted_data <- data %>% 
+    tidyr::pivot_wider(id_cols=time, names_from=location, values_from=Y) %>%
+    dplyr::select(!time)
+  market_combinations <- combn(1:ncol(pivoted_data), 2)
+  all_cor_df <- data.frame(
+    location_1 = colnames(pivoted_data),
+    location_2 = colnames(pivoted_data),
+    correlation = 1
+  )
+  
+  for (col_combination in 1:ncol(market_combinations)){
+    location_1 <- market_combinations[, col_combination][1]
+    location_2 <- market_combinations[, col_combination][2]
+    cor_loc1_loc2 <- cor(pivoted_data[, location_1], pivoted_data[, location_2])
+    single_cor_df <- data.frame(
+      location_1 = c(
+        colnames(pivoted_data)[location_1], 
+        colnames(pivoted_data)[location_2]),
+      location_2 = c(
+        colnames(pivoted_data)[location_2], 
+        colnames(pivoted_data)[location_1]),
+      correlation = rep(cor_loc1_loc2, 2)
+    )
+    all_cor_df <- rbind(all_cor_df, single_cor_df)
+  }
+  
+  final_cor_df <- all_cor_df %>%
+    dplyr::arrange(location_1, -correlation) %>%
+    dplyr::mutate(
+      name_vble = rep(
+        paste0("location_", 2:(ncol(pivoted_data)+1)), 
+        ncol(pivoted_data)
+      )
+    ) %>%
+    tidyr::pivot_wider(
+      id_cols=location_1, 
+      values_from=location_2, 
+      names_from=name_vble) %>%
+    dplyr::select(!location_2)
+  
+  return(final_cor_df)
+}
+
 #' Market selection tool.
 #'
 #' @description
@@ -59,26 +119,30 @@ MarketSelection <- function(data,
     data <- data[!data$location %in% exclude_markets, ]
   }
 
-  # Find the best matches based on DTW
-  mm <- MarketMatching::best_matches(
-    data = data,
-    id_variable = "location",
-    date_variable = "astime",
-    matching_variable = "Y",
-    parallel = FALSE,
-    warping_limit = 1,
-    dtw_emphasis = dtw,
-    start_match_period = min(data$astime),
-    end_match_period = max(data$astime),
-    matches = length(unique(data$location)) - 1
-  )
-
-  # Create a matrix with each row being the raked best controls for each location
-  best_controls <- mm$BestMatches %>% tidyr::pivot_wider(
-    id_cols = location,
-    names_from = rank,
-    values_from = BestControl
-  )
+  if (dtw == 0){
+    best_controls <- get_market_correlations(data)
+  } else {
+    # Find the best matches based on DTW
+    mm <- MarketMatching::best_matches(
+      data = data,
+      id_variable = "location",
+      date_variable = "astime",
+      matching_variable = "Y",
+      parallel = FALSE,
+      warping_limit = 1,
+      dtw_emphasis = dtw,
+      start_match_period = min(data$astime),
+      end_match_period = max(data$astime),
+      matches = length(unique(data$location)) - 1
+    )
+    
+    # Create a matrix with each row being the raked best controls for each location
+    best_controls <- mm$BestMatches %>% tidyr::pivot_wider(
+      id_cols = location,
+      names_from = rank,
+      values_from = BestControl
+    )
+  }
 
   best_controls <- as.matrix(best_controls)
   colnames(best_controls) <- NULL
@@ -1984,7 +2048,14 @@ GeoLiftMarketSelection <- function(data,
   if (Correlations) {
     resultsM$correlation <- 0
     for (row in 1:nrow(resultsM)) {
-      resultsM$correlation[row] <- GetCorrel(data, locs = unlist(strsplit(stringr::str_replace_all(resultsM$location[row], ", ", ","), split = ",")))
+      resultsM$correlation[row] <- get_correlation_coefficient(
+        data, 
+        locs = unlist(
+          strsplit(
+            stringr::str_replace_all(resultsM$location[row], ", ", ","), 
+            split = ",")
+          )
+        )
     }
   }
 

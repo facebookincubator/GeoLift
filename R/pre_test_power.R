@@ -27,33 +27,16 @@ get_market_correlations <- function(data) {
   pivoted_data <- data %>%
     tidyr::pivot_wider(id_cols = time, names_from = location, values_from = Y) %>%
     dplyr::select(!time)
-  market_combinations <- combn(1:ncol(pivoted_data), 2)
-  all_cor_df <- data.frame(
-    location_1 = colnames(pivoted_data),
-    location_2 = colnames(pivoted_data),
-    correlation = 1
-  )
-
-  for (col_combination in 1:ncol(market_combinations)) {
-    location_1 <- market_combinations[, col_combination][1]
-    location_2 <- market_combinations[, col_combination][2]
-    cor_loc1_loc2 <- cor(pivoted_data[, location_1], pivoted_data[, location_2])
-    single_cor_df <- data.frame(
-      location_1 = c(
-        colnames(pivoted_data)[location_1],
-        colnames(pivoted_data)[location_2]
-      ),
-      location_2 = c(
-        colnames(pivoted_data)[location_2],
-        colnames(pivoted_data)[location_1]
-      ),
-      correlation = rep(cor_loc1_loc2, 2)
-    )
-    all_cor_df <- rbind(all_cor_df, single_cor_df)
-  }
-
-  final_cor_df <- all_cor_df %>%
-    dplyr::arrange(location_1, -correlation) %>%
+  
+  correlation_df <- pivoted_data %>%
+    as.matrix %>%
+    cor %>%
+    as.data.frame %>%
+    tibble::rownames_to_column(var = "var1") %>%
+    tidyr::pivot_longer(cols=-var1, names_to="var2", values_to="correlation")
+  
+  sorted_correlation_df <- correlation_df %>%
+    dplyr::arrange(var1, -correlation) %>%
     dplyr::mutate(
       name_vble = rep(
         paste0("location_", 2:(ncol(pivoted_data) + 1)),
@@ -61,13 +44,13 @@ get_market_correlations <- function(data) {
       )
     ) %>%
     tidyr::pivot_wider(
-      id_cols = location_1,
-      values_from = location_2,
+      id_cols = var1,
+      values_from = var2,
       names_from = name_vble
     ) %>%
     dplyr::select(!location_2)
-
-  return(final_cor_df)
+  
+  return(sorted_correlation_df)
 }
 
 #' Market selection tool.

@@ -64,6 +64,7 @@ utils::globalVariables(
     "Level",
     "lift",
     "location",
+    "location_2",
     "Locs",
     "lower",
     "lower_bound",
@@ -94,6 +95,8 @@ utils::globalVariables(
     "Units",
     "upper",
     "upper_bound",
+    "var1",
+    "var2",
     "Y"
   )
 )

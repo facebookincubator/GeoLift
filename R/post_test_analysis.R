@@ -117,93 +117,53 @@ GeoLift <- function(Y_id = "Y",
   }
 
   # Optimizing model based on Scaled L2 Score
-  if (model == "best" & length(locations) > 1) {
-    scaled_l2_none <- tryCatch(
-      expr = {
-        augsynth::augsynth(fmla,
-          unit = location, time = time,
-          data = data_aux,
-          t_int = treatment_start_time,
-          progfunc = "none",
-          scm = T,
-          fixedeff = fixed_effects
-        )$scaled_l2_imbalance
-      },
-      error = function(e) {
-        1
+  if (model == "best") {
+    all_ascms <- list()
+    for (progfunc in c("none", "ridge", "GSYN")){
+      if (length(locations) == 1 & progfunc == "GSYN"){
+        all_ascms[progfunc] <- list("scaled_l2_imbalance" = 1)
+      } else {
+        ascm <- tryCatch(
+          expr = {
+            augsynth::augsynth(fmla,
+                               unit = location, time = time,
+                               data = data_aux,
+                               t_int = treatment_start_time,
+                               progfunc = progfunc,
+                               scm = T,
+                               fixedeff = fixed_effects
+            )
+          },
+          error = function(e) {
+            list("scaled_l2_imbalance" = 1)
+          }
+        )
+        all_ascms[progfunc] <- ascm
       }
-    )
-    scaled_l2_ridge <- tryCatch(
-      expr = {
-        augsynth::augsynth(fmla,
-          unit = location, time = time,
-          data = data_aux,
-          t_int = treatment_start_time,
-          progfunc = "ridge",
-          scm = T,
-          fixedeff = fixed_effects
-        )$scaled_l2_imbalance
-      },
-      error = function(e) {
-        1
-      }
-    )
-    scaled_l2_gsyn <- tryCatch(
-      expr = {
-        augsynth::augsynth(fmla,
-          unit = location, time = time,
-          data = data_aux,
-          t_int = treatment_start_time,
-          progfunc = "GSYN",
-          scm = T,
-          fixedeff = fixed_effects
-        )$scaled_l2_imbalance
-      },
-      error = function(e) {
-        1
-      }
-    )
+    }
+    
+    scaled_l2_none <- round(all_ascms$none$scaled_l2_imbalance, 3)
+    scaled_l2_ridge <- round(all_ascms$ridge$scaled_l2_imbalance, 3)
+    scaled_l2_gsyn <- round(all_ascms$GSYN$scaled_l2_imbalance, 3)
+    
+    if (scaled_l2_none > scaled_l2_gsyn & scaled_l2_ridge > scaled_l2_gsyn){
+      augsyn <- all_ascms$GSYN
+    } else if (scaled_l2_none > scaled_l2_ridge & scaled_l2_gsyn > scaled_l2_ridge){
+      augsyn <- all_ascms$ridge
+    } else {
+      augsyn <- all_ascms$none
+    }
 
-    if (round(scaled_l2_none, 3) > round(scaled_l2_gsyn, 3) & round(scaled_l2_ridge, 3) > round(scaled_l2_gsyn, 3)) {
-      model <- "GSYN"
-    } else if (round(scaled_l2_none, 3) > round(scaled_l2_ridge, 3) & round(scaled_l2_gsyn, 3) > round(scaled_l2_ridge, 3)) {
-      model <- "ridge"
-    } else {
-      model <- "None"
-    }
-  } else if (model == "best" & length(locations) == 1) {
-    scaled_l2_none <- augsynth::augsynth(fmla,
-      unit = location, time = time,
-      data = data_aux,
-      t_int = treatment_start_time,
-      progfunc = "none",
-      scm = T,
-      fixedeff = fixed_effects
-    )$scaled_l2_imbalance
-    scaled_l2_ridge <- augsynth::augsynth(fmla,
-      unit = location, time = time,
-      data = data_aux,
-      t_int = treatment_start_time,
-      progfunc = "ridge",
-      scm = T,
-      fixedeff = fixed_effects
-    )$scaled_l2_imbalance
-    if (round(scaled_l2_none, 3) > round(scaled_l2_ridge, 3)) {
-      model <- "ridge"
-    } else {
-      model <- "none"
-    }
+  } else {
+    augsyn <- augsynth::augsynth(fmla,
+                                 unit = location, time = time,
+                                 data = data_aux,
+                                 t_int = treatment_start_time,
+                                 progfunc = model,
+                                 scm = T,
+                                 fixedeff = fixed_effects
+    )
   }
-
-  # Single Augsynth
-  augsyn <- augsynth::augsynth(fmla,
-    unit = location, time = time,
-    data = data_aux,
-    t_int = treatment_start_time,
-    progfunc = model,
-    scm = T,
-    fixedeff = fixed_effects
-  )
 
   inference_df <- data.frame(matrix(ncol = 5, nrow = 0))
   colnames(inference_df) <- c(

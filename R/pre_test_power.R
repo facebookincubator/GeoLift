@@ -27,14 +27,14 @@ get_market_correlations <- function(data) {
   pivoted_data <- data %>%
     tidyr::pivot_wider(id_cols = time, names_from = location, values_from = Y) %>%
     dplyr::select(!time)
-  
+
   correlation_df <- pivoted_data %>%
-    as.matrix %>%
-    cor %>%
-    as.data.frame %>%
+    as.matrix() %>%
+    cor() %>%
+    as.data.frame() %>%
     tibble::rownames_to_column(var = "var1") %>%
-    tidyr::pivot_longer(cols=-var1, names_to="var2", values_to="correlation")
-  
+    tidyr::pivot_longer(cols = -var1, names_to = "var2", values_to = "correlation")
+
   sorted_correlation_df <- correlation_df %>%
     dplyr::arrange(var1, -correlation) %>%
     dplyr::mutate(
@@ -49,7 +49,7 @@ get_market_correlations <- function(data) {
       names_from = name_vble
     ) %>%
     dplyr::select(!location_2)
-  
+
   return(sorted_correlation_df)
 }
 

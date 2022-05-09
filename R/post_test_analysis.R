@@ -119,22 +119,24 @@ GeoLift <- function(Y_id = "Y",
   # Optimizing model based on Scaled L2 Score
   if (model == "best") {
     all_ascms <- list()
-    for (progfunc in c("none", "ridge", "GSYN")){
-      if (length(locations) == 1 & progfunc == "GSYN"){
+    for (progfunc in c("none", "ridge", "GSYN")) {
+      if (length(locations) == 1 & progfunc == "GSYN") {
         all_ascms[[progfunc]] <- list("scaled_l2_imbalance" = 1)
       } else {
-        message("Running model with ", 
-                ifelse(progfunc == "none", "no", progfunc), 
-                " prognostic function.\n")
+        message(
+          "Running model with ",
+          ifelse(progfunc == "none", "no", progfunc),
+          " prognostic function.\n"
+        )
         ascm <- tryCatch(
           expr = {
             suppressMessages(augsynth::augsynth(fmla,
-                               unit = location, time = time,
-                               data = data_aux,
-                               t_int = treatment_start_time,
-                               progfunc = progfunc,
-                               scm = T,
-                               fixedeff = fixed_effects
+              unit = location, time = time,
+              data = data_aux,
+              t_int = treatment_start_time,
+              progfunc = progfunc,
+              scm = T,
+              fixedeff = fixed_effects
             ))
           },
           error = function(e) {
@@ -144,33 +146,34 @@ GeoLift <- function(Y_id = "Y",
         all_ascms[[eval(progfunc)]] <- ascm
       }
     }
-    
+
     scaled_l2_none <- round(all_ascms$none$scaled_l2_imbalance, 3)
     scaled_l2_ridge <- round(all_ascms$ridge$scaled_l2_imbalance, 3)
     scaled_l2_gsyn <- round(all_ascms$GSYN$scaled_l2_imbalance, 3)
-    
-    if (scaled_l2_none > scaled_l2_gsyn & scaled_l2_ridge > scaled_l2_gsyn){
+
+    if (scaled_l2_none > scaled_l2_gsyn & scaled_l2_ridge > scaled_l2_gsyn) {
       message("Selected GSYN as best model.")
       augsyn <- all_ascms$GSYN
-    } else if (scaled_l2_none > scaled_l2_ridge & scaled_l2_gsyn > scaled_l2_ridge){
+    } else if (scaled_l2_none > scaled_l2_ridge & scaled_l2_gsyn > scaled_l2_ridge) {
       message("Selected Ridge as best model.")
       augsyn <- all_ascms$ridge
     } else {
       message("Selected model without prognostic function as best model.")
       augsyn <- all_ascms$none
     }
-
   } else {
-    message("Running model with ", 
-            ifelse(progfunc == "none", "no", progfunc), 
-            " prognostic function.\n")
+    message(
+      "Running model with ",
+      ifelse(progfunc == "none", "no", progfunc),
+      " prognostic function.\n"
+    )
     augsyn <- suppressMessages(augsynth::augsynth(fmla,
-                                 unit = location, time = time,
-                                 data = data_aux,
-                                 t_int = treatment_start_time,
-                                 progfunc = model,
-                                 scm = T,
-                                 fixedeff = fixed_effects
+      unit = location, time = time,
+      data = data_aux,
+      t_int = treatment_start_time,
+      progfunc = model,
+      scm = T,
+      fixedeff = fixed_effects
     ))
   }
 
@@ -264,23 +267,23 @@ GeoLift <- function(Y_id = "Y",
 }
 
 #' Print pretty GeoLift output.
-#' 
-#' @description 
-#' 
+#'
+#' @description
+#'
 #' Print GeoLift output.
-#' 
+#'
 #' @param x GeoLift object.
 #' @param ... Optional arguments
-#' 
+#'
 #' @return
 #' GeoLift output message
-#' 
+#'
 #' @export
-print.GeoLift <- function(x, ...){
-    if (!inherits(x, "GeoLift")) {
-      stop("object must be class GeoLift")
-    }
-  
+print.GeoLift <- function(x, ...) {
+  if (!inherits(x, "GeoLift")) {
+    stop("object must be class GeoLift")
+  }
+
   if (x$inference$pvalue < 0.05) {
     is_significant <- "The results are significant at a 95% level."
   } else if (x$inference$pvalue < 0.10) {
@@ -290,7 +293,7 @@ print.GeoLift <- function(x, ...){
   } else {
     is_significant <- "The results are not statistically significant."
   }
-  
+
   if (toupper(x$stat_test) == "TOTAL") {
     test_type <- "TWO-SIDED LIFT TEST)"
   } else if (toupper(x$stat_test) == "POSITIVE") {
@@ -298,7 +301,7 @@ print.GeoLift <- function(x, ...){
   } else {
     test_type <- "ONE-SIDED NEGATIVE LIFT TEST)"
   }
-  
+
   message(paste0(
     paste0("\nGeoLift Output\n\n"),
     paste0(

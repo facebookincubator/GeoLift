@@ -3,6 +3,7 @@
 S3method(plot,GeoLift)
 S3method(plot,GeoLiftMarketSelection)
 S3method(plot,GeoLiftPower)
+S3method(print,GeoLift)
 S3method(print,GeoLiftMarketSelection)
 S3method(print,summary.GeoLift)
 S3method(summary,GeoLift)

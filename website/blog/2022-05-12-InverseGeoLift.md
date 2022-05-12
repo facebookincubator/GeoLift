@@ -29,26 +29,15 @@ However, **it can be detrimental to run an experiment with a large holdout when 
 
 ## A new hope
 
-A great way to reduce holdout size without compromising experiment accuracy is to flip GeoLift on its head: instead of showing media to the treatment group and holding out the control group, you holdout the treatment group and show media to the control group.  This is what we refer to as an Inverse GeoLift.
+A great way to reduce holdout size without compromising experiment accuracy is to **flip GeoLift on its head**: instead of showing media to the treatment group and holding out the control group, you holdout the treatment group and show media to the control group.  This is what we refer to as an Inverse GeoLift.
 
-
-
-
-Treatment Group
-Control Group
-Standard GeoLift
-Sees media ads
-Holdout from media ads
-Inverse GeoLift
-Holdout from media ads
-Sees media ads
-
-
+![InverseTable](https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/InverseLiftTable.png?raw=true)
 
 Inverse GeoLifts have a different interpretation than Standard GeoLifts.  Instead of measuring the contribution that media is having on the treatment locations, you are measuring the opportunity cost that holding out media has on the treatment locations.
 
-The main assumption here is that positive and negative effects are interchangeable.  In other words, if you would run a Standard or an Inverse GeoLift, the only thing that would change is the sign of the effect, not its absolute value.  Don’t worry: when setting up a GeoLift and deciding which is the best treatment group for the experiment, the difference between the detected effect and the true effect is a variable that we are taking into account to rank different location combinations. Treatment setups that have a low difference are preferred and will be highly ranked.  Check here to see what the ranking variables look like in our Walkthrough.
+The main assumption here is that positive and negative effects are interchangeable.  In other words, if you would run a Standard or an Inverse GeoLift, the only thing that would change is the sign of the effect, not its absolute value.  **Don’t worry**: when setting up a GeoLift and deciding which is the best treatment group for the experiment, the difference between the detected effect and the true effect is a variable that we are taking into account to rank different location combinations. Treatment setups that have a low difference are preferred and will be highly ranked.  [Check here](https://github.com/facebookincubator/GeoLift/blob/main/vignettes/GeoLift_Walkthrough.md#power-analysis) to see what the ranking variables look like in our Walkthrough.
 
+![TypesGeoLift](https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/TypesGeoLift.png?raw=true)
 
 ## Tips for building and analyzing an Inverse GeoLift
 
@@ -58,7 +47,7 @@ As long as you know your Cost Per Incremental Conversion (CPIC), Standard GeoLif
 
 If your treatment group is currently investing less than the required budget, then it will be hard to detect an effect, given that the CPIC is accurate.  You should try to select treatment setups that have a current investment that is below the absolute value of the required budget.  If there are no feasible options,  we suggest increasing the budget for all markets within the control group to ensure that the minimum amount of investment in the treatment group is met.  While this could change Business As Usual media circumstances, it becomes necessary in order to run a well-powered experiment. A good ad hoc rule for these cases is to compute the extra budget needed by calculating the difference between the required budget and the current investment in treatment and scaling that by the treatment investment share over total investment.  This will give you the value that you need to put up to run a successful experiment.
 
-Extra investment in Control = Required budget in T - Current investment in TCurrent investment in TCurrent investment in C
+![ExtraInvestment](https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/ExtraInvestment.png?raw=true)
 
 ### Keep an eye on the weights for the counterfactual.
 

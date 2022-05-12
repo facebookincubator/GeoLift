@@ -46,7 +46,7 @@ const features = [
   },
   {
     title: 'Building Brand and Sales with Super Coffee',
-    imageUrl: 'https://scontent-sjc3-1.xx.fbcdn.net/v/t1.6435-9/146475455_3695451970571166_7309961661612546269_n.png?_nc_cat=105&_nc_map=test-rt&ccb=1-5&_nc_sid=09cbfe&_nc_eui2=AeG9H3ydn7q54QvS6IsuGgB7NEmGhia1Teo0SYaGJrVN6oOiRbUV_8TDSBfl_ngJ_Bk&_nc_ohc=q4vTJ5rfyBMAX9pNwle&_nc_ht=scontent-sjc3-1.xx&oh=00_AT8L-G0nU88JjThwNs0z-_C4Zk1O0wyi1sYGaJsDh8_8Hg&oe=626C79D2',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/SuperCoffeeLogo2.png?raw=true',
     description: (
       <>
         The enhanced coffee company ran Facebook video and photo ads to boost brand
@@ -60,13 +60,28 @@ const features = [
   },
   {
     title: 'Cross-Channel Measurement with Liverpool',
-    imageUrl: 'https://scontent-sjc3-1.xx.fbcdn.net/v/t39.30808-6/275845667_10159868290766217_6878811270235505956_n.jpg?_nc_cat=1&_nc_map=test-rt&ccb=1-5&_nc_sid=09cbfe&_nc_eui2=AeEgXXkEQuNFEdIUcBHE_aXghNVcZa5P5DiE1Vxlrk_kODba9joGyL7vyoQ1PHdBONo&_nc_ohc=W6ae1Sr4zTYAX-8ZdVv&_nc_ht=scontent-sjc3-1.xx&oh=00_AT_U19NyRAUHoaK97Kbddy8R8wcjFQTNYN7RIvCxp1OP_g&oe=624C4405',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/LiverpoolLogo.jpeg?raw=true',
     description: (
       <>
         The mexican retailer measured the first cross-channel GeoLift  test comparing the
         omni-channel incrementality of Meta and Digital Display. The results revealed the
         importance of a robust cross-channel strategy with a 14X incremental ROAS for Meta.
         <a href="https://www.facebook.com/business/success/3-liverpool?locale=es_LA">
+        -  Learn More.
+        </a>
+      </>
+    ),
+  },
+  {
+    title: 'Strategy Optimization with Ruffles',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/LiverpoolLogo.jpeg?raw=true',
+    description: (
+      <>
+        Ruffles ran the first multi-cell GeoLift test in Mexico to measure and optimize the impact that
+        their branding campaigns had on Sales. The test results showed that broad targeting strategies
+        had a 45% higher incremental Return on Investment (3.2X iROAS for Broad Audiences vs. 2.2X iROAS
+        for Narrow Audiences).
+        <a href="https://www.facebook.com/business/success/ruffles-mexico?locale=es_LA">
         -  Learn More.
         </a>
       </>

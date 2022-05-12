@@ -63,16 +63,16 @@ A symmetric power curve with respect to the y axis will guarantee that there are
 
 At the end of your experiment, you will want to know how much each incremental action in the treatment group cost.  Since you did not invest in the treatment, you need to estimate the budget in that group.  In order to do so, you can calculate the sum of GeoLift weights from the counterfactual and multiply them by the investment per location in the control.  Dividing it by the incremental conversions will give you the Cost Per Incremental Conversion.
 
-CPIC = iN GeoLift weight i * investmentiIncremental conversions for each market i in the Control group
+![CPIC](https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/CPICEquation.png?raw=true)
 
 ## What’s up next?
 
 Stay tuned for our next blog posts, related to topics like:
 
-Calibrating your MMM model with GeoLift.
-What should my lookback window be?
-When should our GeoLift test start?
+- Calibrating your MMM model with GeoLift.
+- What should my lookback window be?
+- When should our GeoLift test start?
 
 ## Want to try out your first Inverse GeoLift?
 
-Install our Github package by following this link, or join our Facebook Group if you have further questions on our open source tool!
+Install our Github package by [following this link](https://github.com/facebookincubator/GeoLift#installing-geolift), or join our Facebook Group if you have further questions on our open source tool!

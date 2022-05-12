@@ -73,8 +73,8 @@ const features = [
     ),
   },
   {
-    title: 'Strategy Optimization with Ruffles',
-    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/LiverpoolLogo.jpeg?raw=true',
+    title: 'Strategy Optimization with Multi-Cell GeoLifts for Ruffles',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/RufflesLogo.png?raw=true',
     description: (
       <>
         Ruffles ran the first multi-cell GeoLift test in Mexico to measure and optimize the impact that

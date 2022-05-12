@@ -25,7 +25,7 @@ In order to construct a robust counterfactual, GeoLift usually requires more tha
 
 However, **it can be detrimental to run an experiment with a large holdout when you would like to measure ongoing media efforts**.  This has to do with the opportunity cost of running a test.  When you are holding out media from certain locations, your total KPI will decrease by the effect that media has in those locations, scaled by the size of the holdout.
 
-![OppCost](https://drive.google.com/file/d/1Vs9DBG6H4po32437HzDnzCVYw0G1n--b/view?usp=sharing)
+![OppCost](https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/OppCost.png?raw=true)
 
 ## A new hope
 

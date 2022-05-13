@@ -164,7 +164,7 @@ GeoLift <- function(Y_id = "Y",
   } else {
     message(
       "Running model with ",
-      ifelse(progfunc == "none", "no", progfunc),
+      ifelse(model == "none", "no", model),
       " prognostic function.\n"
     )
     augsyn <- suppressMessages(augsynth::augsynth(fmla,

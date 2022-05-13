@@ -2,8 +2,6 @@
 title: "GeoLift Walkthrough"
 output: 
   html_document: default
-  md_document:
-    variant: markdown_github
 knit:
   rmarkdown::render("GeoLift_Walkthrough.Rmd", output_format = "all")
 vignette: >
@@ -37,9 +35,9 @@ There are many ways to measure Lift and Geo Experimentation is one that has been
 ### Why GeoLift?
 GeoLift is Meta's open-source solution to measure Lift at a geographical level. By leveraging the latest advances in Synthetic Control Methods, GeoLift empowers you to start making decisions grounded in incrementality and measure the true value of your marketing campaigns. This tool offers an end-to-end solution to geo-experimentation which spans data ingestion, power analyses, market selection, and inference in this easy-to-use R package. Moreover, the tool's open-source nature makes it transparent and fully reproducible!
   
-  ## II: Installation
+## II: Installation
   
-  You can install `GeoLift` from our [GitHub repository](https://github.com/facebookincubator/GeoLift/) using the `remotes` package.
+You can install `GeoLift` from our [GitHub repository](https://github.com/facebookincubator/GeoLift/) using the `remotes` package.
 
 ```{r install, results="hide", message=F, eval=F}
 ## Install remotes if noy already installed
@@ -64,7 +62,7 @@ data(GeoLift_PreTest)
 
 The `GeoLift_PreTest` data set contains three variables: 
   
-  1. location (city)
+1. location (city)
 2. date (in "yyyy-mm-dd" format)
 3. Y (number of conversions/KPI in each day/location).
 
@@ -115,6 +113,8 @@ Running a prospective power analysis is fundamental prior to executing a test. I
 * Align expectations.
 
 Assessing the power and selecting the test markets for a GeoLift test can be accomplished through the `GeoLiftMarketSelection()` function. Through a series of simulations, this algorithm will find which are the best combinations of test and control locations for the experiment. Moreover, for each of these test market selections, the function will display the Minimum Detectable Effect, minimum investment needed to run a successful test, and other important model-fit metrics that will help us select the test that best matches our goals and resources.
+
+#### Understanding Power Function Parameters
 
 The key parameters needed to run this function are:
 

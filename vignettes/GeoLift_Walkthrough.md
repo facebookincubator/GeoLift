@@ -165,7 +165,7 @@ display the Minimum Detectable Effect, minimum investment needed to run
 a successful test, and other important model-fit metrics that will help
 us select the test that best matches our goals and resources.
 
-#### Understanding Power Function Parameters
+### Understanding Power Function Parameters
 
 The key parameters needed to run this function are:
 
@@ -350,15 +350,6 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           fixed_effects = TRUE)
 #> Setting up cluster.
 #> Importing functions into cluster.
-#> Attempting to load the environment 'package:dplyr'
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 #> 
 #> Deterministic setup with 2 locations in treatment.
 #> 
@@ -372,23 +363,25 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
 #> 2  2       chicago, cincinnati, houston, portland       15       0.05     1
 #> 3  3                            chicago, portland       15      -0.10     1
 #> 4  4                            chicago, portland       10      -0.10     1
-#> 5  5            atlanta, chicago, las vegas, reno       10      -0.05     1
-#> 6  6       chicago, cincinnati, houston, portland       10      -0.10     1
+#> 5  5       chicago, cincinnati, houston, portland       10      -0.10     1
+#> 6  6                   chicago, houston, portland       10      -0.10     1
 #>   AvgScaledL2Imbalance Investment    AvgATT Average_MDE ProportionTotal_Y
 #> 1            0.4536741   69300.00 -174.5213 -0.04735064        0.10714670
 #> 2            0.1971864   74118.38  159.3627  0.04829913        0.07576405
 #> 3            0.1738778   64563.75 -283.8929 -0.09904014        0.03306537
 #> 4            0.1682310   43646.25 -281.0099 -0.09690716        0.03306537
-#> 5            0.4443981   56873.25 -165.5250 -0.04393501        0.08745281
-#> 6            0.1966996   99027.75 -343.5646 -0.10365826        0.07576405
+#> 5            0.1966996   99027.75 -343.5646 -0.10365826        0.07576405
+#> 6            0.2305628   75389.25 -319.8125 -0.09588481        0.05797087
 #>   abs_lift_in_zero    Holdout rank correlation
 #> 1            0.003 0.10714670    1   0.9788758
 #> 2            0.002 0.92423595    1   0.9144814
 #> 3            0.001 0.03306537    1   0.9321104
 #> 4            0.003 0.03306537    4   0.9321104
-#> 5            0.006 0.08745281    5   0.9683079
-#> 6            0.004 0.07576405    5   0.9144814
+#> 5            0.004 0.07576405    5   0.9144814
+#> 6            0.004 0.05797087    5   0.9139549
 ```
+
+### Power output - ranking variables
 
 The results of the power analysis and market selection provide us with
 several key metrics that we can use to select our test market. These
@@ -571,7 +564,7 @@ crucially includes results for the duration of the campaign. Depending
 on the vertical and product, adding a post-campaign cooldown period
 might be useful.
 
-#### Test Data
+### Test Data
 
 Data for the campaign results can be accessed at `GeoLift_Test`.
 
@@ -626,7 +619,7 @@ GeoPlot(GeoTestData_Test,
 
 <img src="GeoLift_Walkthrough_files/figure-markdown_github/plottingTest-1.png" style="display: block; margin: auto;" />
 
-#### GeoLift Inference
+### GeoLift Inference
 
 The next step in the process is to calculate the actual Lift caused by
 the marketing campaigns on our test locations. To do so we make use of
@@ -662,7 +655,7 @@ GeoTest
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 0.7% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.8% chance of observing an effect this large or larger assuming treatment effect is zero.
 ```
 
 The results show that the campaigns led to a 5.4% lift in units sold
@@ -686,7 +679,7 @@ summary(GeoTest)
 #> * Average ATT: 155.556
 #> * Percent Lift: 5.4%
 #> * Incremental Y: 4667
-#> * P-value: 0.01
+#> * P-value: 0.02
 #> 
 #> ##################################
 #> #####   Balance Statistics   #####
@@ -796,7 +789,7 @@ to our test locations. Moreover, point-wise confidence intervals are
 included in this chart which help us measure how significant each day’s
 Lift has been.
 
-#### Improving The Model
+### Improving The Model
 
 While the results obtained from the test are robust and highly
 significant, a useful feature of GeoLift is its ability to improve the
@@ -841,7 +834,7 @@ GeoTestBest
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 1% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.7% chance of observing an effect this large or larger assuming treatment effect is zero.
 summary(GeoTestBest)
 #> 
 #> GeoLift Results Summary
@@ -852,7 +845,7 @@ summary(GeoTestBest)
 #> * Average ATT: 156.805
 #> * Percent Lift: 5.5%
 #> * Incremental Y: 4704
-#> * P-value: 0.01
+#> * P-value: 0.02
 #> 
 #> ##################################
 #> #####   Balance Statistics   #####

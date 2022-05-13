@@ -115,7 +115,7 @@ Running a prospective power analysis is fundamental prior to executing a test. I
 
 Assessing the power and selecting the test markets for a GeoLift test can be accomplished through the `GeoLiftMarketSelection()` function. Through a series of simulations, this algorithm will find which are the best combinations of test and control locations for the experiment. Moreover, for each of these test market selections, the function will display the Minimum Detectable Effect, minimum investment needed to run a successful test, and other important model-fit metrics that will help us select the test that best matches our goals and resources.
 
-#### Understanding Power Function Parameters
+### Understanding Power Function Parameters
 
 The key parameters needed to run this function are:
 
@@ -180,6 +180,8 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           Correlations = TRUE,
                                           fixed_effects = TRUE)
 ```
+
+### Power output - ranking variables
 
 The results of the power analysis and market selection provide us with several key metrics that we can use to select our test market. These metrics are:
 
@@ -246,13 +248,11 @@ head(dplyr::arrange(weights, desc(weight)))
 
 ```
 
-
-
 ## Example - Analyzing the Test Results
 
 Based on the results of the Power Calculations, a test is set-up in which a \$65,000 and 15-day marketing campaign was executed in the cities of Chicago and Portland while the rest of the locations were put on holdout. Following the completion from this marketing campaign, we receive sales data that reflects these results. This new data-set contains the same format and information as the pre-test one but crucially includes results for the duration of the campaign. Depending on the vertical and product, adding a post-campaign cooldown period might be useful. 
 
-#### Test Data
+### Test Data
 
 Data for the campaign results can be accessed at `GeoLift_Test`.
 
@@ -283,7 +283,7 @@ GeoPlot(GeoTestData_Test,
         treatment_start = 91)
 ```
 
-#### GeoLift Inference
+### GeoLift Inference
 
 The next step in the process is to calculate the actual Lift caused by the marketing campaigns on our test locations. To do so we make use of the `GeoLift()` function, which will take as input the GeoLift dataframe as well as information about the test such as which were the cities in the treatment group, when the test started, and when it ended through the `locations`, `treatment_start_time`, and `treatment_end_time` parameters respectively.
 
@@ -320,7 +320,7 @@ plot(GeoTest, type = "ATT")
 
 Looking at the Average Estimated Treatment Effect's plot can also be extremely useful. The ATT metric shows us the magnitude of the Average Treatment Effect on a daily basis in contrast with the previous (Lift) plot which focused on aggregated effects. Moreover, this is a great example of a good GeoLift model as it has very small ATT values in the pre-treatment period and large ones when the treatment is administered to our test locations. Moreover, point-wise confidence intervals are included in this chart which help us measure how significant each day's Lift has been.
 
-#### Improving The Model
+### Improving The Model
 
 While the results obtained from the test are robust and highly significant, a useful feature of GeoLift is its ability to improve the model fit even further and reduce bias through augmentation by a prognostic function. There are several options for augmentation of the standard GeoLift model such as regularization (specifically Ridge) and an application of Generalized Synthetic Control Model (GSC). While each of these approaches provide it's own set of advantages, for instance Ridge regularization usually performs well when the number of units and time-periods isn't large while GSC helps improve fit for situations with many pre-treatment periods, GeoLift offers the option to let the model decide which is the best approach by setting the model parameter to "best".
 

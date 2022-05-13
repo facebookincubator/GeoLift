@@ -2,6 +2,8 @@
 title: "GeoLift Walkthrough"
 output: 
   html_document: default
+  md_document:
+    variant: markdown_github
 knit:
   rmarkdown::render("GeoLift_Walkthrough.Rmd", output_format = "all")
 vignette: >
@@ -22,9 +24,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-# `GeoLift`: And end-to-end solution to Measure Lift at a Geo Level
+# `GeoLift`: And end-to-end solution to Measure Lift at a Geo Level {.tabset}
 
-## I: Introduction
+## Introduction 
 
 ### What is Lift?
 Lift is a scientific measurement technique which allows users to accurately understand and compare the value of their strategies. Lift, which is grounded on experimental design, is typically used to measure the true or _causal_ effect that an ad campaign had on business metrics such as Sales, App Installs, or Leads. By estimating the _incremental_ effect that these strategies provide, analysts are able to understand, analyze, and optimize their cross-channel strategies through data and science. 
@@ -35,7 +37,7 @@ There are many ways to measure Lift and Geo Experimentation is one that has been
 ### Why GeoLift?
 GeoLift is Meta's open-source solution to measure Lift at a geographical level. By leveraging the latest advances in Synthetic Control Methods, GeoLift empowers you to start making decisions grounded in incrementality and measure the true value of your marketing campaigns. This tool offers an end-to-end solution to geo-experimentation which spans data ingestion, power analyses, market selection, and inference in this easy-to-use R package. Moreover, the tool's open-source nature makes it transparent and fully reproducible!
   
-## II: Installation
+## Installation
   
 You can install `GeoLift` from our [GitHub repository](https://github.com/facebookincubator/GeoLift/) using the `remotes` package.
 
@@ -51,9 +53,8 @@ remotes::install_github("facebookincubator/GeoLift")
 library(GeoLift)
 ```
 
-## III: GeoLift Example
+## Example - Data
 
-### Data
 To show an end-to-end implementation of GeoLift we will use simulated data of 40 US cities across 90 days to: design a test, select test markets, run power calculations, and finally calculate the Lift caused by the campaign. As with every GeoLift test, we start analyzing pre-test historical information. We will use the data included in the `GeoLift` package.
 
 ```{r load_data, results="hide", warning=F, message=F}
@@ -96,7 +97,7 @@ GeoPlot(GeoTestData_PreTest,
 
 In this case we see a similar pattern that's shared across all locations. These structural similarities between regions are the key to a successful test!
 
-### Power Analysis
+## Example - Power Analysis
 
 Running a prospective power analysis is fundamental prior to executing a test. It is only through a thorough statistical analysis of our data that we can set it up for success. In general, through the power analysis we can find:
 
@@ -247,7 +248,7 @@ head(dplyr::arrange(weights, desc(weight)))
 
 
 
-### Analyzing the Test Results
+## Example - Analyzing the Test Results
 
 Based on the results of the Power Calculations, a test is set-up in which a \$65,000 and 15-day marketing campaign was executed in the cities of Chicago and Portland while the rest of the locations were put on holdout. Following the completion from this marketing campaign, we receive sales data that reflects these results. This new data-set contains the same format and information as the pre-test one but crucially includes results for the duration of the campaign. Depending on the vertical and product, adding a post-campaign cooldown period might be useful. 
 
@@ -337,3 +338,5 @@ plot(GeoTestBest, type = "ATT")
 ```
 
 The new results augment the GeoLift model with a Ridge prognostic function which improves the model fit as seen in the new L2 Imbalance metrics. This additional robustness is translated in a small increase in the Percent Lift. Furthermore, by augmenting the model with a prognostic function, we have an estimate of the estimated bias that was removed by the Augmented Synthetic Control Model.
+
+# {-}

@@ -364,11 +364,11 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
 #> 5  5       chicago, cincinnati, houston, portland       10      -0.10     1
 #> 6  6                   chicago, houston, portland       10      -0.10     1
 #>   AvgScaledL2Imbalance Investment    AvgATT Average_MDE ProportionTotal_Y
-#> 1            0.4536741   69300.00 -174.5212 -0.04735064        0.10714670
+#> 1            0.4536741   69300.00 -174.5213 -0.04735064        0.10714670
 #> 2            0.1971864   74118.38  159.3627  0.04829912        0.07576405
 #> 3            0.1738778   64563.75 -283.8929 -0.09904014        0.03306537
 #> 4            0.1682310   43646.25 -281.0099 -0.09690716        0.03306537
-#> 5            0.1966996   99027.75 -343.5647 -0.10365827        0.07576405
+#> 5            0.1966996   99027.75 -343.5646 -0.10365826        0.07576405
 #> 6            0.2305628   75389.25 -319.8125 -0.09588481        0.05797087
 #>   abs_lift_in_zero    Holdout rank correlation
 #> 1            0.003 0.10714670    1   0.9788758
@@ -506,19 +506,19 @@ plot(MarketSelections, market_ID = 3, print_summary = TRUE)
 #> * Prognostic Function: NONE
 #> 
 #> * Model Weights:
-#>  * austin: 0.0237
-#>  * baton rouge: 0.1511
 #>  * cincinnati: 0.2429
-#>  * dallas: 0.0644
-#>  * honolulu: 0.0669
-#>  * houston: 0.0292
-#>  * los angeles: 0.0179
 #>  * miami: 0.2056
-#>  * minneapolis: 0.0619
+#>  * baton rouge: 0.1511
+#>  * honolulu: 0.0669
+#>  * dallas: 0.0644
 #>  * nashville: 0.0641
-#>  * new york: 0.0216
-#>  * reno: 0.0113
+#>  * minneapolis: 0.0619
 #>  * san diego: 0.0394
+#>  * houston: 0.0292
+#>  * austin: 0.0237
+#>  * new york: 0.0216
+#>  * los angeles: 0.0179
+#>  * reno: 0.0113
 ```
 
 <img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plot2-1.png" style="display: block; margin: auto;" />
@@ -630,26 +630,7 @@ GeoTest <- GeoLift(Y_id = "Y",
                    locations = c("chicago", "portland"),
                    treatment_start_time = 91,
                    treatment_end_time = 105)
-#> One outcome and one treatment time found. Running single_augsynth.
-#> 
-#> GeoLift Output
-#> 
-#> Test results for 15 treatment periods, from time-stamp 91 to 105 for test markets:
-#> 1 CHICAGO
-#> 2 PORTLAND
-#> ##################################
-#> #####     Test Statistics    #####
-#> ##################################
-#> 
-#> Percent Lift: 5.4%
-#> 
-#> Incremental Y: 4667
-#> 
-#> Average Estimated Treatment Effect (ATT): 155.556
-#> 
-#> The results are significant at a 95% level. (TOTAL)
-#> 
-#> There is a 1.4% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> Running model with no prognostic function.
 ```
 
 The results show that the campaigns led to a 5.4% lift in units sold
@@ -673,7 +654,7 @@ summary(GeoTest)
 #> * Average ATT: 155.556
 #> * Percent Lift: 5.4%
 #> * Incremental Y: 4667
-#> * P-value: 0.01
+#> * P-value: 0.02
 #> 
 #> ##################################
 #> #####   Balance Statistics   #####
@@ -691,19 +672,19 @@ summary(GeoTest)
 #> * Prognostic Function: NONE
 #> 
 #> * Model Weights:
-#>  * austin: 0.0465
-#>  * baton rouge: 0.1335
 #>  * cincinnati: 0.2272
-#>  * dallas: 0.0739
-#>  * honolulu: 0.0673
-#>  * houston: 0.0046
 #>  * miami: 0.2028
+#>  * baton rouge: 0.1335
 #>  * minneapolis: 0.09
+#>  * dallas: 0.0739
 #>  * nashville: 0.0685
-#>  * new york: 0.0046
+#>  * honolulu: 0.0673
+#>  * austin: 0.0465
+#>  * san diego: 0.0451
 #>  * reno: 0.0306
 #>  * san antonio: 0.0054
-#>  * san diego: 0.0451
+#>  * new york: 0.0046
+#>  * houston: 0.0046
 ```
 
 The summary show additional test statistics such as the p-value which
@@ -805,29 +786,10 @@ GeoTestBest <- GeoLift(Y_id = "Y",
                        treatment_start_time = 91,
                        treatment_end_time = 105,
                        model = "best")
-#> One outcome and one treatment time found. Running single_augsynth.
-#> One outcome and one treatment time found. Running single_augsynth.
-#> One outcome and one treatment time found. Running single_augsynth.
-#> One outcome and one treatment time found. Running single_augsynth.
-#> 
-#> GeoLift Output
-#> 
-#> Test results for 15 treatment periods, from time-stamp 91 to 105 for test markets:
-#> 1 CHICAGO
-#> 2 PORTLAND
-#> ##################################
-#> #####     Test Statistics    #####
-#> ##################################
-#> 
-#> Percent Lift: 5.5%
-#> 
-#> Incremental Y: 4704
-#> 
-#> Average Estimated Treatment Effect (ATT): 156.805
-#> 
-#> The results are significant at a 95% level. (TOTAL)
-#> 
-#> There is a 0.7% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> Running model with no prognostic function.
+#> Running model with ridge prognostic function.
+#> Running model with GSYN prognostic function.
+#> Selected Ridge as best model.
 
 summary(GeoTestBest)
 #> 
@@ -857,40 +819,40 @@ summary(GeoTestBest)
 #> * Prognostic Function: RIDGE
 #> 
 #> * Model Weights:
-#>  * atlanta: 3e-04
-#>  * austin: 0.0467
-#>  * baltimore: 1e-04
-#>  * baton rouge: 0.1337
-#>  * boston: -4e-04
 #>  * cincinnati: 0.2273
-#>  * columbus: 1e-04
-#>  * dallas: 0.0741
-#>  * denver: 1e-04
-#>  * detroit: 1e-04
-#>  * honolulu: 0.0674
-#>  * houston: 0.0048
-#>  * indianapolis: 1e-04
-#>  * jacksonville: -1e-04
-#>  * kansas city: -1e-04
-#>  * los angeles: 2e-04
-#>  * memphis: -2e-04
 #>  * miami: 0.2029
-#>  * milwaukee: -2e-04
+#>  * baton rouge: 0.1337
 #>  * minneapolis: 0.0901
+#>  * dallas: 0.0741
 #>  * nashville: 0.0687
-#>  * new orleans: -2e-04
+#>  * honolulu: 0.0674
+#>  * austin: 0.0467
+#>  * san diego: 0.0452
+#>  * reno: 0.0308
+#>  * san antonio: 0.0056
+#>  * houston: 0.0048
 #>  * new york: 0.0048
 #>  * oakland: -0.001
 #>  * oklahoma city: -7e-04
-#>  * orlando: 1e-04
+#>  * boston: -4e-04
 #>  * philadelphia: -4e-04
-#>  * reno: 0.0308
-#>  * saint paul: 2e-04
 #>  * salt lake city: -3e-04
-#>  * san antonio: 0.0056
-#>  * san diego: 0.0452
+#>  * atlanta: 3e-04
+#>  * milwaukee: -2e-04
+#>  * los angeles: 2e-04
+#>  * memphis: -2e-04
+#>  * new orleans: -2e-04
+#>  * saint paul: 2e-04
 #>  * san francisco: 1e-04
+#>  * denver: 1e-04
 #>  * tucson: -1e-04
+#>  * kansas city: -1e-04
+#>  * orlando: 1e-04
+#>  * indianapolis: 1e-04
+#>  * detroit: 1e-04
+#>  * jacksonville: -1e-04
+#>  * columbus: 1e-04
+#>  * baltimore: 1e-04
 plot(GeoTestBest, type = "Lift")
 #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```

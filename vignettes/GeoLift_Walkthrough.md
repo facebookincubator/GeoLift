@@ -55,6 +55,8 @@ remotes::install_github("facebookincubator/GeoLift")
 
 ``` r
 library(GeoLift)
+library(gridExtra)
+library(ggplot2)
 ```
 
 Example - Data
@@ -451,8 +453,8 @@ best ranks are: `(chicago, cincinnati, houston, portland)`,
 `(chicago, portland)`, all of them tied at rank 1. We can `plot()` these
 last two results to inspect them further. This plot will show how the
 results of the `GeoLift()` model would look like with the latest
-possible test period as well as the test’s power curve across all
-simulations.
+possible test period as well as the test’s power curve across a single
+simulation.
 
 ``` r
 # Plot for chicago, cincinnati, houston, portland for a 15 day test
@@ -468,6 +470,52 @@ plot(MarketSelections, market_ID = 3, print_summary = FALSE)
 ```
 
 <img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;" />
+
+### Power output - deep dive into power curves
+
+In order to ensure that power is consistent throughout time for these
+locations, we can run more than 1 simulation for each of the top
+contenders that came out of `GeoLiftMarketSelection`.
+
+We will do this by running the `GeoLiftPower` method and expanding our
+`lookback_window` to 10 days, only for these two treatment combinations
+and plot their results.
+
+``` r
+top_market_power_data <- list()
+for (market_id in 2:3){
+  market_row <- MarketSelections$BestMarkets %>% dplyr::filter(ID == market_id)
+  treatment_locations <- stringr::str_split(market_row$location, ", ")[[1]]
+  treatment_duration <- market_row$duration
+  lookback_window <- 10
+
+  power_data <- GeoLiftPower(
+    data = GeoTestData_PreTest,
+    locations = treatment_locations,
+    effect_size = seq(-0.15, 0.15, 0.01),
+    lookback_window = lookback_window,
+    treatment_periods = treatment_duration,
+    cpic = 7.5,
+    side_of_test = "one_sided"
+  )
+  top_market_power_data[[market_id]] <- power_data
+}
+#> Setting up cluster.
+#> Importing functions into cluster.
+#> Setting up cluster.
+#> Importing functions into cluster.
+
+gridExtra::grid.arrange(
+  plot(top_market_power_data[[2]], show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +
+    labs(title = unique(top_market_power_data[[2]]$location)),
+  plot(top_market_power_data[[3]], show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +
+    labs(title = unique(top_market_power_data[[3]]$location)),
+  ncol=1,
+  nrow=2
+)
+```
+
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftPower top contenders-1.png" style="display: block; margin: auto;" />
 
 While both market selections perform excellent on all metrics, we will
 move further with the latter since it allows us to run a successful test
@@ -655,7 +703,7 @@ GeoTest
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 1.8% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.2% chance of observing an effect this large or larger assuming treatment effect is zero.
 ```
 
 The results show that the campaigns led to a 5.4% lift in units sold
@@ -679,7 +727,7 @@ summary(GeoTest)
 #> * Average ATT: 155.556
 #> * Percent Lift: 5.4%
 #> * Incremental Y: 4667
-#> * P-value: 0.02
+#> * P-value: 0.01
 #> 
 #> ##################################
 #> #####   Balance Statistics   #####
@@ -834,7 +882,7 @@ GeoTestBest
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 1.7% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.2% chance of observing an effect this large or larger assuming treatment effect is zero.
 summary(GeoTestBest)
 #> 
 #> GeoLift Results Summary
@@ -845,7 +893,7 @@ summary(GeoTestBest)
 #> * Average ATT: 156.805
 #> * Percent Lift: 5.5%
 #> * Incremental Y: 4704
-#> * P-value: 0.02
+#> * P-value: 0.01
 #> 
 #> ##################################
 #> #####   Balance Statistics   #####

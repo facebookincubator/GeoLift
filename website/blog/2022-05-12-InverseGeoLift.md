@@ -7,10 +7,10 @@ tags: [GeoLift, Geo Measurement, Inverse GeoLift]
 
 ## TL;DR:
 
-Inverse GeoLifts help advertisers reduce geo experiment holdout sizes by inverting who sees ads: they show ads to the control group and do not show ads to the treatment group.
-Given that geo-experiments require large control groups, Inverse GeoLifts are a good way of reducing holdout groups and opportunity cost without losing testing accuracy.
-While Standard GeoLifts are great tools to measure a new media activity, ongoing media is best tested with an Inverse GeoLift.
-MMM calibration: Standard GeoLifts are straightforward inputs into MMMs, while Inverse GeoLifts have a larger complexity for this use case.
+- Inverse GeoLifts help advertisers reduce geo experiment holdout sizes by inverting who sees ads: they show ads to the control group and do not show ads to the treatment group.
+- Given that geo-experiments require large control groups, Inverse GeoLifts are a good way of reducing holdout groups and opportunity cost without losing testing accuracy.
+- While Standard GeoLifts are great tools to measure a new media activity, ongoing media is best tested with an Inverse GeoLift.
+- MMM calibration: Standard GeoLifts are straightforward inputs into MMMs, while Inverse GeoLifts have a larger complexity for this use case.
 
 ## Introduction and motivation
 

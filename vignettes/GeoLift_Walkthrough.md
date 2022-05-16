@@ -478,53 +478,45 @@ locations, we can run more than 1 simulation for each of the top
 contenders that came out of `GeoLiftMarketSelection`.
 
 We will do this by running the `GeoLiftPower` method and expanding our
-`lookback_window` to 10 days, only for these two treatment combinations
-and plot their results.
+`lookback_window` to 10 days, only for this treatment combination and
+plot their results.
+
+#### NOTE: You could repeat this process for the top 5 treatment combinations that come out of GeoLiftMarketSelection, with increased lookback windows and compare their power curves. We will do it only for Chicago and Portland here.
 
 ``` r
-top_market_power_data <- list()
-for (market_id in 2:3){
-  market_row <- MarketSelections$BestMarkets %>% dplyr::filter(ID == market_id)
-  treatment_locations <- stringr::str_split(market_row$location, ", ")[[1]]
-  treatment_duration <- market_row$duration
-  lookback_window <- 10
+market_id = 3
+market_row <- MarketSelections$BestMarkets %>% dplyr::filter(ID == market_id)
+treatment_locations <- stringr::str_split(market_row$location, ", ")[[1]]
+treatment_duration <- market_row$duration
+lookback_window <- 10
 
-  power_data <- GeoLiftPower(
-    data = GeoTestData_PreTest,
-    locations = treatment_locations,
-    effect_size = seq(-0.15, 0.15, 0.01),
-    lookback_window = lookback_window,
-    treatment_periods = treatment_duration,
-    cpic = 7.5,
-    side_of_test = "one_sided"
-  )
-  top_market_power_data[[market_id]] <- power_data
-}
-#> Setting up cluster.
-#> Importing functions into cluster.
-#> Setting up cluster.
-#> Importing functions into cluster.
-
-gridExtra::grid.arrange(
-  plot(top_market_power_data[[2]], show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +
-    labs(title = unique(top_market_power_data[[2]]$location)),
-  plot(top_market_power_data[[3]], show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +
-    labs(title = unique(top_market_power_data[[3]]$location)),
-  ncol=1,
-  nrow=2
+power_data <- GeoLiftPower(
+  data = GeoTestData_PreTest,
+  locations = treatment_locations,
+  effect_size = seq(-0.15, 0.15, 0.01),
+  lookback_window = lookback_window,
+  treatment_periods = treatment_duration,
+  cpic = 7.5,
+  side_of_test = "one_sided"
 )
+#> Setting up cluster.
+#> Importing functions into cluster.
+
+plot(power_data, show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +
+    labs(caption = unique(power_data$location))
 ```
 
 <img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftPower top contenders-1.png" style="display: block; margin: auto;" />
 
 While both market selections perform excellent on all metrics, we will
 move further with the latter since it allows us to run a successful test
-with a smaller budget. Finally, changing the `print_summary` parameter
-of `plot()` to `TRUE` can provide us with additional information about
-this market selection.
+with a smaller budget. Also, the power curve is symmetrical with respect
+to the y axis, it has no power when the true effect is zero, and has a
+similar behavior with more simulations. Finally, changing the
+`print_summary` parameter of `plot()` to `TRUE` can provide us with
+additional information about this market selection.
 
 ``` r
-
 # Plot for chicago, portland for a 15 day test
 plot(MarketSelections, market_ID = 3, print_summary = TRUE)
 #> ##################################
@@ -578,7 +570,6 @@ plot(MarketSelections, market_ID = 3, print_summary = TRUE)
 #### **Note:** Given that we are not using the complete pre-treatment data to calculate the weights in our power analysis simulations, the ones displayed by the plotting function above are not the *final* values. However, you can easily obtain them with the `GetWeights()` function.
 
 ``` r
-
 weights <- GetWeights(Y_id = "Y",
                       location_id = "location",
                       time_id = "time",
@@ -703,7 +694,7 @@ GeoTest
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 1.2% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 0.8% chance of observing an effect this large or larger assuming treatment effect is zero.
 ```
 
 The results show that the campaigns led to a 5.4% lift in units sold
@@ -882,7 +873,7 @@ GeoTestBest
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 1.2% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 0.9% chance of observing an effect this large or larger assuming treatment effect is zero.
 summary(GeoTestBest)
 #> 
 #> GeoLift Results Summary

@@ -349,7 +349,8 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           budget = 100000,
                                           alpha = 0.1,
                                           Correlations = TRUE,
-                                          fixed_effects = TRUE)
+                                          fixed_effects = TRUE,
+                                          side_of_test = "one_sided")
 #> Setting up cluster.
 #> Importing functions into cluster.
 #> 
@@ -361,26 +362,26 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
 #> 
 #> Deterministic setup with 5 locations in treatment.
 #>   ID                                     location duration EffectSize Power
-#> 1  1 atlanta, chicago, cleveland, las vegas, reno       10      -0.05     1
-#> 2  2       chicago, cincinnati, houston, portland       15       0.05     1
-#> 3  3                            chicago, portland       15      -0.10     1
-#> 4  4                            chicago, portland       10      -0.10     1
-#> 5  5       chicago, cincinnati, houston, portland       10      -0.10     1
-#> 6  6                   chicago, houston, portland       10      -0.10     1
+#> 1  1      atlanta, chicago, las vegas, saint paul       15      -0.05     1
+#> 2  2                            chicago, portland       15      -0.05     1
+#> 3  3      atlanta, chicago, las vegas, saint paul       10      -0.05     1
+#> 4  4       chicago, cincinnati, houston, portland       15      -0.05     1
+#> 5  5            chicago, houston, nashville, reno       15      -0.05     1
+#> 6  6 atlanta, chicago, cleveland, las vegas, reno       10      -0.05     1
 #>   AvgScaledL2Imbalance Investment    AvgATT Average_MDE ProportionTotal_Y
-#> 1            0.4536741   69300.00 -174.5213 -0.04735064        0.10714670
-#> 2            0.1971864   74118.38  159.3627  0.04829913        0.07576405
-#> 3            0.1738778   64563.75 -283.8929 -0.09904014        0.03306537
-#> 4            0.1682310   43646.25 -281.0099 -0.09690716        0.03306537
-#> 5            0.1966996   99027.75 -343.5646 -0.10365826        0.07576405
-#> 6            0.2305628   75389.25 -319.8125 -0.09588481        0.05797087
+#> 1            0.5558341   85305.00 -189.8766 -0.05007765        0.08767192
+#> 2            0.1738778   32281.87 -140.4179 -0.04898682        0.03306537
+#> 3            0.5978398   57760.87 -182.5825 -0.04753797        0.08767192
+#> 4            0.1971864   74118.37 -170.0523 -0.05153888        0.07576405
+#> 5            0.3321341   75556.12 -161.7403 -0.04825348        0.07816073
+#> 6            0.4536741   69300.00 -174.5213 -0.04735064        0.10714670
 #>   abs_lift_in_zero    Holdout rank correlation
-#> 1            0.003 0.10714670    1   0.9788758
-#> 2            0.002 0.92423595    1   0.9144814
-#> 3            0.001 0.03306537    1   0.9321104
-#> 4            0.003 0.03306537    4   0.9321104
-#> 5            0.004 0.07576405    5   0.9144814
-#> 6            0.004 0.05797087    5   0.9139549
+#> 1            0.000 0.08767192    1   0.9775394
+#> 2            0.001 0.03306537    2   0.9321104
+#> 3            0.002 0.08767192    3   0.9775394
+#> 4            0.002 0.07576405    3   0.9144814
+#> 5            0.002 0.07816073    3   0.9146693
+#> 6            0.003 0.10714670    6   0.9788758
 ```
 
 ### Power output - ranking variables
@@ -521,7 +522,7 @@ additional information about this market selection.
 plot(MarketSelections, market_ID = 3, print_summary = TRUE)
 #> ##################################
 #> #####   GeoLift Simulation   #####
-#> ####  Simulating: -10% Lift  ####
+#> ####  Simulating: -5% Lift  ####
 #> ##################################
 #> 
 #> GeoLift Results Summary
@@ -529,18 +530,18 @@ plot(MarketSelections, market_ID = 3, print_summary = TRUE)
 #> #####     Test Statistics    #####
 #> ##################################
 #> 
-#> * Average ATT: -283.893
-#> * Percent Lift: -9.9%
-#> * Incremental Y: -8517
-#> * P-value: 0
+#> * Average ATT: -182.582
+#> * Percent Lift: -4.8%
+#> * Incremental Y: -7303
+#> * P-value: 0.04
 #> 
 #> ##################################
 #> #####   Balance Statistics   #####
 #> ##################################
 #> 
-#> * L2 Imbalance: 868.598
-#> * Scaled L2 Imbalance: 0.1739
-#> * Percent improvement from naive model: 82.61%
+#> * L2 Imbalance: 1146.615
+#> * Scaled L2 Imbalance: 0.5978
+#> * Percent improvement from naive model: 40.22%
 #> * Average Estimated Bias: NA
 #> 
 #> ##################################
@@ -550,19 +551,20 @@ plot(MarketSelections, market_ID = 3, print_summary = TRUE)
 #> * Prognostic Function: NONE
 #> 
 #> * Model Weights:
-#>  * cincinnati: 0.2429
-#>  * miami: 0.2056
-#>  * baton rouge: 0.1511
-#>  * honolulu: 0.0669
-#>  * dallas: 0.0644
-#>  * nashville: 0.0641
-#>  * minneapolis: 0.0619
-#>  * san diego: 0.0394
-#>  * houston: 0.0292
-#>  * austin: 0.0237
-#>  * new york: 0.0216
-#>  * los angeles: 0.0179
-#>  * reno: 0.0113
+#>  * nashville: 0.3299
+#>  * milwaukee: 0.1507
+#>  * reno: 0.1133
+#>  * columbus: 0.0644
+#>  * new orleans: 0.0548
+#>  * san diego: 0.0521
+#>  * san antonio: 0.0493
+#>  * miami: 0.0408
+#>  * cincinnati: 0.0371
+#>  * phoenix: 0.034
+#>  * san francisco: 0.0315
+#>  * orlando: 0.0212
+#>  * oakland: 0.0208
+#>  * denver: 1e-04
 ```
 
 <img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plot2-1.png" style="display: block; margin: auto;" />
@@ -694,7 +696,7 @@ GeoTest
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 0.8% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.4% chance of observing an effect this large or larger assuming treatment effect is zero.
 ```
 
 The results show that the campaigns led to a 5.4% lift in units sold
@@ -873,7 +875,7 @@ GeoTestBest
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 0.9% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.3% chance of observing an effect this large or larger assuming treatment effect is zero.
 summary(GeoTestBest)
 #> 
 #> GeoLift Results Summary

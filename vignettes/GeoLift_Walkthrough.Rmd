@@ -180,7 +180,8 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           budget = 100000,
                                           alpha = 0.1,
                                           Correlations = TRUE,
-                                          fixed_effects = TRUE)
+                                          fixed_effects = TRUE,
+                                          side_of_test = "one_sided")
 ```
 
 ### Power output - ranking variables

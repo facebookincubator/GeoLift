@@ -19,8 +19,7 @@ GeoLift(
   model = "none",
   fixed_effects = TRUE,
   ConfidenceIntervals = FALSE,
-  stat_test = "Total",
-  print = TRUE
+  stat_test = "Total"
 )
 }
 \arguments{
@@ -72,9 +71,6 @@ Recommended for Negative Lift tests.}
 \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 Recommended for Positive Lift tests.}
 }}
-
-\item{print}{A logic flag indicating whether to print the results or not.
-Set to TRUE by default.}
 }
 \value{
 GeoLift object that contains:

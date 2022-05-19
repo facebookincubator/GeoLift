@@ -48,8 +48,6 @@
 #'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 #'          Recommended for Positive Lift tests.}
 #' }
-#' @param print A logic flag indicating whether to print the results or not.
-#' Set to TRUE by default.
 #'
 #' @return
 #' GeoLift object that contains:
@@ -85,8 +83,7 @@ GeoLift <- function(Y_id = "Y",
                     model = "none",
                     fixed_effects = TRUE,
                     ConfidenceIntervals = FALSE,
-                    stat_test = "Total",
-                    print = TRUE) {
+                    stat_test = "Total") {
 
   # Rename variables to standard names used by GeoLift
   data <- data %>% dplyr::rename(

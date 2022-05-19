@@ -159,7 +159,7 @@ GeoLift <- function(Y_id = "Y",
       unit = location, time = time,
       data = data_aux,
       t_int = treatment_start_time,
-      progfunc = 'GSYN',
+      progfunc = progfunc,
       scm = T,
       fixedeff = fixed_effects))
 

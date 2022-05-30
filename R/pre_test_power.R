@@ -95,7 +95,7 @@ MarketSelection <- function(data,
 #'
 #' @description
 #'
-#' `build_stochastic_matrix` selects the markets to be tested
+#' `stochastic_market_selector` selects the markets to be tested
 #' by randomly sampling from the `similarity_matrix`.
 #' It gets groups of 2 elements and samples one of them. It repeats
 #' this process until the `treatment_size` is equal to the sample.

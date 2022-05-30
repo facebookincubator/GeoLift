@@ -256,7 +256,7 @@ AppendAgg <- function(data, locs = NULL) {
 #'
 #' @return
 #' Correlation coefficient.
-#'
+#' 
 #' @export
 CorrelationCoefficient <- function(data, locs = c()) {
   data_aux <- AppendAgg(data, locs = locs)

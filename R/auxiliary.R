@@ -375,7 +375,7 @@ GetWeights <- function(Y_id = "Y",
 #'
 #' @description
 #'
-#' `get_market_correlations` calculates a notion of similarity between markets
+#' `MarketCorrelations` calculates a notion of similarity between markets
 #' to help inform the combinations of treatments.
 #'
 #' @param data A data.frame containing the historical conversions by

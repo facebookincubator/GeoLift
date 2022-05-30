@@ -17,6 +17,6 @@ A Dataframe where each column represents the closest market to the
 market in the first column, ordering them by their correlation factor.
 }
 \description{
-\code{get_market_correlations} calculates a notion of similarity between markets
+\code{MarketCorrelations} calculates a notion of similarity between markets
 to help inform the combinations of treatments.
 }

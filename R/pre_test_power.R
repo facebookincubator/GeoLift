@@ -3,55 +3,9 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes function MarketSelection, stochastic_market_selector, pvalueCalc,
-# type_of_test, GeoLiftMarketSelection, GeoLiftPowerFinder, GeoLiftPower.search,
-# NumberLocations, GeoLiftPower.
+# type_of_test, run_simulations, GeoLiftMarketSelection, GeoLiftPowerFinder, 
+# GeoLiftPower.search, NumberLocations, GeoLiftPower.
 
-
-#' Get within market correlations for all locations.
-#'
-#' @description
-#'
-#' `get_market_correlations` calculates a notion of similarity between markets
-#' to help inform the combinations of treatments.
-#'
-#' @param data A data.frame containing the historical conversions by
-#' geographic unit. It requires a "locations" column with the geo name,
-#' a "Y" column with the outcome data (units), a time column with the indicator
-#' of the time period (starting at 1), and covariates.
-#'
-#' @return A Dataframe where each column represents the closest market to the
-#' market in the first column, ordering them by their correlation factor.
-#'
-#' @export
-get_market_correlations <- function(data) {
-  pivoted_data <- data %>%
-    tidyr::pivot_wider(id_cols = time, names_from = location, values_from = Y) %>%
-    dplyr::select(!time)
-
-  correlation_df <- pivoted_data %>%
-    as.matrix() %>%
-    cor() %>%
-    as.data.frame() %>%
-    tibble::rownames_to_column(var = "var1") %>%
-    tidyr::pivot_longer(cols = -var1, names_to = "var2", values_to = "correlation")
-
-  sorted_correlation_df <- correlation_df %>%
-    dplyr::arrange(var1, -correlation) %>%
-    dplyr::mutate(
-      name_vble = rep(
-        paste0("location_", 2:(ncol(pivoted_data) + 1)),
-        ncol(pivoted_data)
-      )
-    ) %>%
-    tidyr::pivot_wider(
-      id_cols = var1,
-      values_from = var2,
-      names_from = name_vble
-    ) %>%
-    dplyr::select(!location_2)
-
-  return(sorted_correlation_df)
-}
 
 #' Market selection tool.
 #'
@@ -106,7 +60,7 @@ MarketSelection <- function(data,
   }
 
   if (dtw == 0) {
-    best_controls <- get_market_correlations(data)
+    best_controls <- MarketCorrelations(data)
   } else {
     # Find the best matches based on DTW
     mm <- MarketMatching::best_matches(
@@ -141,7 +95,7 @@ MarketSelection <- function(data,
 #'
 #' @description
 #'
-#' `build_stochastic_matrix` selects the markets to be tested
+#' `stochastic_market_selector` selects the markets to be tested
 #' by randomly sampling from the `similarity_matrix`.
 #' It gets groups of 2 elements and samples one of them. It repeats
 #' this process until the `treatment_size` is equal to the sample.
@@ -2034,7 +1988,7 @@ GeoLiftMarketSelection <- function(data,
   if (Correlations) {
     resultsM$correlation <- 0
     for (row in 1:nrow(resultsM)) {
-      resultsM$correlation[row] <- get_correlation_coefficient(
+      resultsM$correlation[row] <- CorrelationCoefficient(
         data,
         locs = unlist(
           strsplit(

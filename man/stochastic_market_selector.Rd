@@ -30,7 +30,7 @@ Returns a matrix of sampled combinations of treatments.
 Each row represents a different treatment.
 }
 \description{
-\code{build_stochastic_matrix} selects the markets to be tested
+\code{stochastic_market_selector} selects the markets to be tested
 by randomly sampling from the \code{similarity_matrix}.
 It gets groups of 2 elements and samples one of them. It repeats
 this process until the \code{treatment_size} is equal to the sample.

@@ -3,8 +3,8 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes function fn_treatment, build_cluster, limit_test_markets,
-# get_date_from_test_periods, get_market_correlations, AppendAgg, 
-# get_correlation_coefficient, GetWeights
+# get_date_from_test_periods, MarketCorrelations, AppendAgg, 
+# CorrelationCoefficient, GetWeights
 
 
 #' Auxiliary function to generate the treatment variable D.
@@ -258,7 +258,7 @@ AppendAgg <- function(data, locs = NULL) {
 #' Correlation coefficient.
 #'
 #' @export
-get_correlation_coefficient <- function(data, locs = c()) {
+CorrelationCoefficient <- function(data, locs = c()) {
   data_aux <- AppendAgg(data, locs = locs)
   data_aux <- data_aux[data_aux$location %in% c("control_markets", "test_markets"), ] %>%
     tidyr::pivot_wider(names_from = location, values_from = Y, id_cols = time)
@@ -387,7 +387,7 @@ GetWeights <- function(Y_id = "Y",
 #' market in the first column, ordering them by their correlation factor.
 #'
 #' @export
-get_market_correlations <- function(data) {
+MarketCorrelations <- function(data) {
   pivoted_data <- data %>%
     tidyr::pivot_wider(id_cols = time, names_from = location, values_from = Y) %>%
     dplyr::select(!time)

@@ -60,7 +60,7 @@ MarketSelection <- function(data,
   }
 
   if (dtw == 0) {
-    best_controls <- get_market_correlations(data)
+    best_controls <- MarketCorrelations(data)
   } else {
     # Find the best matches based on DTW
     mm <- MarketMatching::best_matches(
@@ -1988,7 +1988,7 @@ GeoLiftMarketSelection <- function(data,
   if (Correlations) {
     resultsM$correlation <- 0
     for (row in 1:nrow(resultsM)) {
-      resultsM$correlation[row] <- get_correlation_coefficient(
+      resultsM$correlation[row] <- CorrelationCoefficient(
         data,
         locs = unlist(
           strsplit(

@@ -3,7 +3,8 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes function fn_treatment, build_cluster, limit_test_markets,
-# get_date_from_test_periods.
+# get_date_from_test_periods, get_market_correlations, AppendAgg, 
+# get_correlation_coefficient, GetWeights
 
 
 #' Auxiliary function to generate the treatment variable D.
@@ -367,4 +368,51 @@ GetWeights <- function(Y_id = "Y",
   )
 
   return(results)
+}
+
+
+#' Get within market correlations for all locations.
+#'
+#' @description
+#'
+#' `get_market_correlations` calculates a notion of similarity between markets
+#' to help inform the combinations of treatments.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#'
+#' @return A Dataframe where each column represents the closest market to the
+#' market in the first column, ordering them by their correlation factor.
+#'
+#' @export
+get_market_correlations <- function(data) {
+  pivoted_data <- data %>%
+    tidyr::pivot_wider(id_cols = time, names_from = location, values_from = Y) %>%
+    dplyr::select(!time)
+  
+  correlation_df <- pivoted_data %>%
+    as.matrix %>%
+    cor %>%
+    as.data.frame %>%
+    tibble::rownames_to_column(var = "var1") %>%
+    tidyr::pivot_longer(cols=-var1, names_to="var2", values_to="correlation")
+  
+  sorted_correlation_df <- correlation_df %>%
+    dplyr::arrange(var1, -correlation) %>%
+    dplyr::mutate(
+      name_vble = rep(
+        paste0("location_", 2:(ncol(pivoted_data) + 1)),
+        ncol(pivoted_data)
+      )
+    ) %>%
+    tidyr::pivot_wider(
+      id_cols = var1,
+      values_from = var2,
+      names_from = name_vble
+    ) %>%
+    dplyr::select(!location_2)
+  
+  return(sorted_correlation_df)
 }

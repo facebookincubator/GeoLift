@@ -120,11 +120,7 @@ GeoLift <- function(Y_id = "Y",
       if (length(locations) == 1 & progfunc == "GSYN") {
         ascm_imbalances[[progfunc]] <- list("scaled_l2_imbalance" = 1)
       } else {
-        message(
-          "Running model with ",
-          ifelse(progfunc == "none", "no", progfunc),
-          " prognostic function.\n"
-        )
+
         ascm <- tryCatch(
           expr = {
             suppressMessages(augsynth::augsynth(fmla,
@@ -164,11 +160,7 @@ GeoLift <- function(Y_id = "Y",
       fixedeff = fixed_effects))
 
   } else {
-    message(
-      "Running model with ",
-      ifelse(model == "none", "no", model),
-      " prognostic function.\n"
-    )
+
     augsyn <- suppressMessages(augsynth::augsynth(fmla,
       unit = location, time = time,
       data = data_aux,

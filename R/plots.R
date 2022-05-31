@@ -625,8 +625,7 @@ plot.GeoLiftMarketSelection <- function(x,
     treatment_end_time = max_time,
     model = x$parameters$model,
     fixed_effects = x$parameters$fixed_effects,
-    stat_test = stat_test,
-    print = TRUE
+    stat_test = stat_test
   ))
 
   if (print_summary) {

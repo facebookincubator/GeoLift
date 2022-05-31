@@ -3,8 +3,8 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes function MarketSelection, stochastic_market_selector, pvalueCalc,
-# type_of_test, GeoLiftMarketSelection, GeoLiftPowerFinder, GeoLiftPower.search,
-# NumberLocations, GeoLiftPower.
+# type_of_test, run_simulations, GeoLiftMarketSelection, GeoLiftPowerFinder, 
+# GeoLiftPower.search, NumberLocations, GeoLiftPower.
 
 
 #' Market selection tool.
@@ -59,26 +59,30 @@ MarketSelection <- function(data,
     data <- data[!data$location %in% exclude_markets, ]
   }
 
-  # Find the best matches based on DTW
-  mm <- MarketMatching::best_matches(
-    data = data,
-    id_variable = "location",
-    date_variable = "astime",
-    matching_variable = "Y",
-    parallel = FALSE,
-    warping_limit = 1,
-    dtw_emphasis = dtw,
-    start_match_period = min(data$astime),
-    end_match_period = max(data$astime),
-    matches = length(unique(data$location)) - 1
-  )
+  if (dtw == 0) {
+    best_controls <- MarketCorrelations(data)
+  } else {
+    # Find the best matches based on DTW
+    mm <- MarketMatching::best_matches(
+      data = data,
+      id_variable = "location",
+      date_variable = "astime",
+      matching_variable = "Y",
+      parallel = FALSE,
+      warping_limit = 1,
+      dtw_emphasis = dtw,
+      start_match_period = min(data$astime),
+      end_match_period = max(data$astime),
+      matches = length(unique(data$location)) - 1
+    )
 
-  # Create a matrix with each row being the raked best controls for each location
-  best_controls <- mm$BestMatches %>% tidyr::pivot_wider(
-    id_cols = location,
-    names_from = rank,
-    values_from = BestControl
-  )
+    # Create a matrix with each row being the raked best controls for each location
+    best_controls <- mm$BestMatches %>% tidyr::pivot_wider(
+      id_cols = location,
+      names_from = rank,
+      values_from = BestControl
+    )
+  }
 
   best_controls <- as.matrix(best_controls)
   colnames(best_controls) <- NULL
@@ -91,7 +95,7 @@ MarketSelection <- function(data,
 #'
 #' @description
 #'
-#' `build_stochastic_matrix` selects the markets to be tested
+#' `stochastic_market_selector` selects the markets to be tested
 #' by randomly sampling from the `similarity_matrix`.
 #' It gets groups of 2 elements and samples one of them. It repeats
 #' this process until the `treatment_size` is equal to the sample.
@@ -1984,7 +1988,15 @@ GeoLiftMarketSelection <- function(data,
   if (Correlations) {
     resultsM$correlation <- 0
     for (row in 1:nrow(resultsM)) {
-      resultsM$correlation[row] <- GetCorrel(data, locs = unlist(strsplit(stringr::str_replace_all(resultsM$location[row], ", ", ","), split = ",")))
+      resultsM$correlation[row] <- CorrelationCoefficient(
+        data,
+        locs = unlist(
+          strsplit(
+            stringr::str_replace_all(resultsM$location[row], ", ", ","),
+            split = ","
+          )
+        )
+      )
     }
   }
 

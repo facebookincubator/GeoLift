@@ -2,37 +2,21 @@
 % Please edit documentation in R/auxiliary.R
 \name{MarketCorrelations}
 \alias{MarketCorrelations}
-\title{Auxiliary function to calculate correlations between input markets.}
+\title{Get within market correlations for all locations.}
 \usage{
-MarketCorrelations(
-  data,
-  location_id = "location",
-  time_id = "time",
-  Y_id = "Y",
-  dtw = 0,
-  markets = NULL
-)
+MarketCorrelations(data)
 }
 \arguments{
 \item{data}{A data.frame containing the historical conversions by
 geographic unit. It requires a "locations" column with the geo name,
 a "Y" column with the outcome data (units), a time column with the indicator
 of the time period (starting at 1), and covariates.}
-
-\item{location_id}{Name of the location variable (String).}
-
-\item{time_id}{Name of the time variable (String).}
-
-\item{Y_id}{Name of the outcome variable (String).}
-
-\item{dtw}{Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
-on this metric while dtw = 0 (default) relies on correlations only.}
-
-\item{markets}{List of markets to use in the calculation of the correlations.}
 }
 \value{
-MarketMatching object.
+A Dataframe where each column represents the closest market to the
+market in the first column, ordering them by their correlation factor.
 }
 \description{
-Auxiliary function to calculate correlations between input markets.
+\code{MarketCorrelations} calculates a notion of similarity between markets
+to help inform the combinations of treatments.
 }

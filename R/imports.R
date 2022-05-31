@@ -39,6 +39,7 @@ utils::globalVariables(
     "AvgDetectedLift",
     "AvgScaledL2Imbalance",
     "BestControl",
+    "correlation",
     "c_obs",
     "c_obs_lower_bound",
     "c_obs_upper_bound",
@@ -63,6 +64,7 @@ utils::globalVariables(
     "Level",
     "lift",
     "location",
+    "location_2",
     "Locs",
     "lower",
     "lower_bound",
@@ -71,6 +73,7 @@ utils::globalVariables(
     "mean_p",
     "mean_pow",
     "mean_scaled_l2_imbalance",
+    "name_vble",
     "pow",
     "ProportionTotal_Y",
     "pvalue",
@@ -92,6 +95,8 @@ utils::globalVariables(
     "Units",
     "upper",
     "upper_bound",
+    "var1",
+    "var2",
     "Y"
   )
 )

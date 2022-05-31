@@ -3,7 +3,8 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes function fn_treatment, build_cluster, limit_test_markets,
-# get_date_from_test_periods.
+# get_date_from_test_periods, MarketCorrelations, AppendAgg, 
+# CorrelationCoefficient, GetWeights
 
 
 #' Auxiliary function to generate the treatment variable D.
@@ -241,56 +242,6 @@ AppendAgg <- function(data, locs = NULL) {
   return(as.data.frame(aux))
 }
 
-#' Auxiliary function to calculate correlations between input markets.
-#'
-#' @description
-#'
-#' Auxiliary function to calculate correlations between input markets.
-#'
-#' @param data A data.frame containing the historical conversions by
-#' geographic unit. It requires a "locations" column with the geo name,
-#' a "Y" column with the outcome data (units), a time column with the indicator
-#' of the time period (starting at 1), and covariates.
-#' @param location_id Name of the location variable (String).
-#' @param time_id Name of the time variable (String).
-#' @param Y_id Name of the outcome variable (String).
-#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
-#' on this metric while dtw = 0 (default) relies on correlations only.
-#' @param markets List of markets to use in the calculation of the correlations.
-#'
-#' @return
-#' MarketMatching object.
-#'
-#' @export
-MarketCorrelations <- function(data,
-                               location_id = "location",
-                               time_id = "time",
-                               Y_id = "Y",
-                               dtw = 0,
-                               markets = NULL) {
-  data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
-  data$location <- tolower(data$location)
-  astime <- seq(as.Date("2000/1/1"), by = "day", length.out = max(data$time))
-  data$astime <- astime[data$time]
-
-  # Find the best matches based on DTW
-  mm <- MarketMatching::best_matches(
-    data = data,
-    id_variable = "location",
-    date_variable = "astime",
-    matching_variable = "Y",
-    parallel = TRUE,
-    warping_limit = 1,
-    dtw_emphasis = dtw,
-    start_match_period = min(data$astime),
-    end_match_period = max(data$astime),
-    markets_to_be_matched = markets,
-    matches = length(unique(data$location)) - 1
-  )
-
-  return(mm)
-}
-
 #' Calculate correlations between input markets.
 #'
 #' @description
@@ -302,18 +253,17 @@ MarketCorrelations <- function(data,
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param locs List of markets to use in the calculation of the correlations.
-#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
-#' on this metric while dtw = 0 (default) relies on correlations only.
 #'
 #' @return
 #' Correlation coefficient.
-#'
+#' 
 #' @export
-GetCorrel <- function(data, locs = c(), dtw = 0) {
+CorrelationCoefficient <- function(data, locs = c()) {
   data_aux <- AppendAgg(data, locs = locs)
-
-  Correl <- MarketCorrelations(data_aux[data_aux$location %in% c("control_markets", "test_markets"), ], dtw = dtw)
-  return(Correl$BestMatches$Correlation[[1]])
+  data_aux <- data_aux[data_aux$location %in% c("control_markets", "test_markets"), ] %>%
+    tidyr::pivot_wider(names_from = location, values_from = Y, id_cols = time)
+  cor_coefficient <- cor(data_aux$control_markets, data_aux$test_markets)
+  return(cor_coefficient)
 }
 
 #' Function to obtain the synthetic control weights.
@@ -418,4 +368,51 @@ GetWeights <- function(Y_id = "Y",
   )
 
   return(results)
+}
+
+
+#' Get within market correlations for all locations.
+#'
+#' @description
+#'
+#' `MarketCorrelations` calculates a notion of similarity between markets
+#' to help inform the combinations of treatments.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#'
+#' @return A Dataframe where each column represents the closest market to the
+#' market in the first column, ordering them by their correlation factor.
+#'
+#' @export
+MarketCorrelations <- function(data) {
+  pivoted_data <- data %>%
+    tidyr::pivot_wider(id_cols = time, names_from = location, values_from = Y) %>%
+    dplyr::select(!time)
+  
+  correlation_df <- pivoted_data %>%
+    as.matrix %>%
+    cor %>%
+    as.data.frame %>%
+    tibble::rownames_to_column(var = "var1") %>%
+    tidyr::pivot_longer(cols=-var1, names_to="var2", values_to="correlation")
+  
+  sorted_correlation_df <- correlation_df %>%
+    dplyr::arrange(var1, -correlation) %>%
+    dplyr::mutate(
+      name_vble = rep(
+        paste0("location_", 2:(ncol(pivoted_data) + 1)),
+        ncol(pivoted_data)
+      )
+    ) %>%
+    tidyr::pivot_wider(
+      id_cols = var1,
+      values_from = var2,
+      names_from = name_vble
+    ) %>%
+    dplyr::select(!location_2)
+  
+  return(sorted_correlation_df)
 }

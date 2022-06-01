@@ -2,7 +2,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-# Includes function GeoLift, cumulative_lift, summary.GeoLift,
+# Includes function GeoLift, print.GeoLift, cumulative_lift, summary.GeoLift,
 # print.summary.GeoLift.
 
 
@@ -48,8 +48,6 @@
 #'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 #'          Recommended for Positive Lift tests.}
 #' }
-#' @param print A logic flag indicating whether to print the results or not.
-#' Set to TRUE by default.
 #'
 #' @return
 #' GeoLift object that contains:
@@ -85,8 +83,7 @@ GeoLift <- function(Y_id = "Y",
                     model = "none",
                     fixed_effects = TRUE,
                     ConfidenceIntervals = FALSE,
-                    stat_test = "Total",
-                    print = TRUE) {
+                    stat_test = "Total") {
 
   # Rename variables to standard names used by GeoLift
   data <- data %>% dplyr::rename(
@@ -117,93 +114,62 @@ GeoLift <- function(Y_id = "Y",
   }
 
   # Optimizing model based on Scaled L2 Score
-  if (model == "best" & length(locations) > 1) {
-    scaled_l2_none <- tryCatch(
-      expr = {
-        augsynth::augsynth(fmla,
-          unit = location, time = time,
-          data = data_aux,
-          t_int = treatment_start_time,
-          progfunc = "none",
-          scm = T,
-          fixedeff = fixed_effects
-        )$scaled_l2_imbalance
-      },
-      error = function(e) {
-        1
-      }
-    )
-    scaled_l2_ridge <- tryCatch(
-      expr = {
-        augsynth::augsynth(fmla,
-          unit = location, time = time,
-          data = data_aux,
-          t_int = treatment_start_time,
-          progfunc = "ridge",
-          scm = T,
-          fixedeff = fixed_effects
-        )$scaled_l2_imbalance
-      },
-      error = function(e) {
-        1
-      }
-    )
-    scaled_l2_gsyn <- tryCatch(
-      expr = {
-        augsynth::augsynth(fmla,
-          unit = location, time = time,
-          data = data_aux,
-          t_int = treatment_start_time,
-          progfunc = "GSYN",
-          scm = T,
-          fixedeff = fixed_effects
-        )$scaled_l2_imbalance
-      },
-      error = function(e) {
-        1
-      }
-    )
+  if (model == "best") {
+    ascm_imbalances <- list()
+    for (progfunc in c("none", "ridge", "GSYN")) {
+      if (length(locations) == 1 & progfunc == "GSYN") {
+        ascm_imbalances[[progfunc]] <- list("scaled_l2_imbalance" = 1)
+      } else {
 
-    if (round(scaled_l2_none, 3) > round(scaled_l2_gsyn, 3) & round(scaled_l2_ridge, 3) > round(scaled_l2_gsyn, 3)) {
-      model <- "GSYN"
-    } else if (round(scaled_l2_none, 3) > round(scaled_l2_ridge, 3) & round(scaled_l2_gsyn, 3) > round(scaled_l2_ridge, 3)) {
-      model <- "ridge"
-    } else {
-      model <- "None"
+        ascm <- tryCatch(
+          expr = {
+            suppressMessages(augsynth::augsynth(fmla,
+              unit = location, time = time,
+              data = data_aux,
+              t_int = treatment_start_time,
+              progfunc = progfunc,
+              scm = T,
+              fixedeff = fixed_effects
+            ))
+          },
+          error = function(e) {
+            list("scaled_l2_imbalance" = 1)
+          }
+        )
+        ascm_imbalances[[eval(progfunc)]] <- round(ascm$scaled_l2_imbalance, 3)
+      }
     }
-  } else if (model == "best" & length(locations) == 1) {
-    scaled_l2_none <- augsynth::augsynth(fmla,
+
+    if (ascm_imbalances$none > ascm_imbalances$GSYN & ascm_imbalances$ridge > ascm_imbalances$GSYN) {
+      message("Selected GSYN as best model.")
+      progfunc <- 'GSYN'
+    } else if (ascm_imbalances$none > ascm_imbalances$ridge & ascm_imbalances$GSYN > ascm_imbalances$ridge) {
+      message("Selected Ridge as best model.")
+      progfunc <- 'ridge'
+    } else {
+      message("Selected model without prognostic function as best model.")
+      progfunc <- 'none'
+    }
+    augsyn <- suppressMessages(augsynth::augsynth(
+      fmla,
       unit = location, time = time,
       data = data_aux,
       t_int = treatment_start_time,
-      progfunc = "none",
+      progfunc = progfunc,
       scm = T,
-      fixedeff = fixed_effects
-    )$scaled_l2_imbalance
-    scaled_l2_ridge <- augsynth::augsynth(fmla,
+      fixedeff = fixed_effects))
+
+  } else {
+
+    augsyn <- suppressMessages(augsynth::augsynth(fmla,
       unit = location, time = time,
       data = data_aux,
       t_int = treatment_start_time,
-      progfunc = "ridge",
+      progfunc = model,
       scm = T,
       fixedeff = fixed_effects
-    )$scaled_l2_imbalance
-    if (round(scaled_l2_none, 3) > round(scaled_l2_ridge, 3)) {
-      model <- "ridge"
-    } else {
-      model <- "none"
-    }
+    ))
   }
-
-  # Single Augsynth
-  augsyn <- augsynth::augsynth(fmla,
-    unit = location, time = time,
-    data = data_aux,
-    t_int = treatment_start_time,
-    progfunc = model,
-    scm = T,
-    fixedeff = fixed_effects
-  )
 
   inference_df <- data.frame(matrix(ncol = 5, nrow = 0))
   colnames(inference_df) <- c(
@@ -265,27 +231,6 @@ GeoLift <- function(Y_id = "Y",
     )
   }
 
-
-  if (inference_df$pvalue < 0.05) {
-    significant <- "The results are significant at a 95% level."
-  } else if (inference_df$pvalue < 0.10) {
-    significant <- "The results are significant at a 90% level."
-  } else if (inference_df$pvalue < 0.20) {
-    significant <- "The results are significant at a 80% level."
-  } else {
-    significant <- "The results are not statistically significant."
-  }
-
-  if (toupper(stat_test) == "TOTAL") {
-    testtype <- "TWO-SIDED LIFT TEST)"
-  } else if (toupper(stat_test) == "POSITIVE") {
-    testtype <- "ONE-SIDED POSITIVE LIFT TEST)"
-  } else {
-    testtype <- "ONE-SIDED NEGATIVE LIFT TEST)"
-  }
-
-
-
   res <- list(
     "results" = augsyn,
     "inference" = inference_df,
@@ -306,42 +251,77 @@ GeoLift <- function(Y_id = "Y",
     "df_weights" = data.frame(
       location = dimnames(augsyn$weights)[[1]],
       weight = unname(augsyn$weights[, 1])
-    )
+    ),
+    "stat_test" = stat_test
   )
-
-  if (print == TRUE) {
-    message(paste0(
-      paste0("\nGeoLift Output\n\n"),
-      paste0(
-        "Test results for ", (treatment_end_time - treatment_start_time + 1),
-        " treatment periods, from time-stamp ",
-        treatment_start_time, " to ", treatment_end_time,
-        " for test markets:"
-      )
-    ))
-    for (i in 1:length(locations)) {
-      message(paste(i, toupper(locations[i])))
-    }
-    message(paste0(
-      "##################################",
-      "\n#####     Test Statistics    #####\n",
-      "##################################\n",
-      "\nPercent Lift: ",
-      100 * round(lift, 3), "%\n\n",
-      "Incremental ", paste(Y_id), ": ", round(incremental, 0), "\n\n",
-      "Average Estimated Treatment Effect (ATT): ", round(mean, 3),
-      "\n\n", significant, " (", testtype,
-      "\n\nThere is a ", round(100 * inference_df$pvalue, 2),
-      "% chance of observing an effect this large or larger assuming treatment effect is zero.",
-      sep = ""
-    ))
-  }
 
   class(res) <- c("GeoLift", class(res))
 
   return(res)
 }
 
+#' Print pretty GeoLift output.
+#'
+#' @description
+#'
+#' Print GeoLift output.
+#'
+#' @param x GeoLift object.
+#' @param ... Optional arguments
+#'
+#' @return
+#' GeoLift output message
+#'
+#' @export
+print.GeoLift <- function(x, ...) {
+  if (!inherits(x, "GeoLift")) {
+    stop("object must be class GeoLift")
+  }
+
+  if (x$inference$pvalue < 0.05) {
+    is_significant <- "The results are significant at a 95% level."
+  } else if (x$inference$pvalue < 0.10) {
+    is_significant <- "The results are significant at a 90% level."
+  } else if (x$inference$pvalue < 0.20) {
+    is_significant <- "The results are significant at a 80% level."
+  } else {
+    is_significant <- "The results are not statistically significant."
+  }
+
+  if (toupper(x$stat_test) == "TOTAL") {
+    test_type <- "TWO-SIDED LIFT TEST)"
+  } else if (toupper(x$stat_test) == "POSITIVE") {
+    test_type <- "ONE-SIDED POSITIVE LIFT TEST)"
+  } else {
+    test_type <- "ONE-SIDED NEGATIVE LIFT TEST)"
+  }
+
+  message(paste0(
+    paste0("\nGeoLift Output\n\n"),
+    paste0(
+      "Test results for ", (x$TreatmentEnd - x$TreatmentStart + 1),
+      " treatment periods, from time-stamp ",
+      x$TreatmentStart, " to ", x$TreatmentEnd,
+      " for test markets:"
+    )
+  ))
+  for (i in 1:length(x$test_id$name)) {
+    message(paste(i, toupper(x$test_id$name[i])))
+  }
+  message(paste0(
+    "##################################",
+    "\n#####     Test Statistics    #####\n",
+    "##################################\n",
+    "\nPercent Lift: ",
+    round(x$inference$Perc.Lift, 3), "%\n\n",
+    "Incremental ", paste(x$Y_id), ": ", round(x$incremental, 0), "\n\n",
+    "Average Estimated Treatment Effect (ATT): ", round(x$inference$ATT, 3),
+    "\n\n", is_significant, " (", test_type,
+    "\n\nThere is a ", round(100 * x$inference$pvalue, 2),
+    "% chance of observing an effect this large or larger assuming treatment effect is zero.",
+    sep = ""
+  ))
+}
 
 #' Calculate cumulative lift
 #'

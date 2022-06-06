@@ -90,6 +90,10 @@
                 to: 'docs/intro',
               },
               {
+                label: 'Blueprint Course',
+                href: 'https://www.facebookblueprint.com/student/path/253063-geolift-marketing-measurement?sid=cd9a46bc-9685-4af4-8ac3-4482e858fba9&sid_i=5',
+              },
+              {
                 label: 'Success Cases',
                 to: 'Successes',
               },

@@ -65,6 +65,8 @@ At the end of your experiment, you will want to know how much each incremental a
 
 ![CPIC](https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/CPICEquation.png?raw=true)
 
+Where t0 represents the last pre-treatment time-stamp, T represents the treatment end, and N represents the number of units in the pool of controls.
+
 ## What’s up next?
 
 Stay tuned for our next blog posts, related to topics like:

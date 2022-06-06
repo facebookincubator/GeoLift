@@ -432,6 +432,43 @@ simulations.
 ```
 ![GeoPlot](/img/GeoLiftMarketSelection_Plots-2.png)
 
+### Power output - deep dive into power curves
+
+In order to ensure that power is consistent throughout time for these
+locations, we can run more than 1 simulation for each of the top
+contenders that came out of `GeoLiftMarketSelection`.
+
+We will do this by running the `GeoLiftPower` method and expanding our
+`lookback_window` to 10 days, only for this treatment combination and
+plot their results.
+
+#### NOTE: You could repeat this process for the top 5 treatment combinations that come out of GeoLiftMarketSelection, with increased lookback windows and compare their power curves. We will do it only for Chicago and Portland here.
+
+``` r
+market_id = 3
+market_row <- MarketSelections$BestMarkets %>% dplyr::filter(ID == market_id)
+treatment_locations <- stringr::str_split(market_row$location, ", ")[[1]]
+treatment_duration <- market_row$duration
+lookback_window <- 10
+
+power_data <- GeoLiftPower(
+  data = GeoTestData_PreTest,
+  locations = treatment_locations,
+  effect_size = seq(-0.15, 0.15, 0.01),
+  lookback_window = lookback_window,
+  treatment_periods = treatment_duration,
+  cpic = 7.5,
+  side_of_test = "one_sided"
+)
+#> Setting up cluster.
+#> Importing functions into cluster.
+
+plot(power_data, show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +
+    labs(caption = unique(power_data$location))
+```
+
+![GeoLiftPowerTopContenders](/img/GeoLiftPower-top-contenders-1.png)
+
 While both market selections perform excellent on all metrics, we will
 move further with the latter since it allows us to run a successful test
 with a smaller budget. Finally, changing the `print_summary` parameter

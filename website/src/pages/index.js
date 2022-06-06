@@ -160,6 +160,31 @@ export default function Home() {
             </div>
           </section>
         )}
+
+        <div className="padding-vert--xl">
+          <div className="container">
+            <div className="row">
+              <div className="col col--6">
+                <iframe
+                  width="100%"
+                  height="400"
+                  src="https://www.youtube.com/embed/RymwMzqrOc4"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                />
+              </div>
+              <div className={clsx('col col--6', styles.descriptionSection)}>
+                <h2>GeoLift: Simplicity in Geo-Experimentation</h2>
+                <p className={styles.descriptionSectionText}>From identifying where to run your
+                experiment and running the power calculations, to measuring the Lift from your
+                marketing campaigns, GeoLift has the tools you need to understanding the true
+                incremental value of your marketing and help businesses make better decisions. </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
          {featuresIntro && featuresIntro.length > 0 && (
           <section className={styles.footerfeatures}>
             <div className="container">

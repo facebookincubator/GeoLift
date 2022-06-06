@@ -142,13 +142,13 @@ GeoLift <- function(Y_id = "Y",
 
     if (ascm_imbalances$none > ascm_imbalances$GSYN & ascm_imbalances$ridge > ascm_imbalances$GSYN) {
       message("Selected GSYN as best model.")
-      progfunc <- 'GSYN'
+      progfunc <- "GSYN"
     } else if (ascm_imbalances$none > ascm_imbalances$ridge & ascm_imbalances$GSYN > ascm_imbalances$ridge) {
       message("Selected Ridge as best model.")
-      progfunc <- 'ridge'
+      progfunc <- "ridge"
     } else {
       message("Selected model without prognostic function as best model.")
-      progfunc <- 'none'
+      progfunc <- "none"
     }
     augsyn <- suppressMessages(augsynth::augsynth(
       fmla,
@@ -157,8 +157,8 @@ GeoLift <- function(Y_id = "Y",
       t_int = treatment_start_time,
       progfunc = progfunc,
       scm = T,
-      fixedeff = fixed_effects))
-
+      fixedeff = fixed_effects
+    ))
   } else {
 
     augsyn <- suppressMessages(augsynth::augsynth(fmla,

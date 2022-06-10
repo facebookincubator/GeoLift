@@ -12,6 +12,7 @@ Lift.plot(
   title = "",
   subtitle = "",
   notes = "",
+  post_treatment_periods = 0,
   ...
 )
 }
@@ -30,6 +31,8 @@ weekly or daily. Defaults to daily.}
 \item{subtitle}{String for the subtitle of the plot. Empty by default.}
 
 \item{notes}{String to add notes to the plot. Empty by default.}
+
+\item{post_treatment_periods}{Number of post-treatment periods. Zero by default.}
 
 \item{...}{additional arguments}
 }

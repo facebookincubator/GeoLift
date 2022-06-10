@@ -222,7 +222,7 @@ plot.GeoLift <- function(x,
   }
 
   if (type == "TreatmentSchedule") {
-    panelView::panelview(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
+    panelView::panelView(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
   } else if (tolower(type) %in% c("att", "incrementality")) {
     absolute_value.plot(
       GeoLift = x,
@@ -266,6 +266,7 @@ plot.GeoLift <- function(x,
 #' @param title String for the title of the plot. Empty by default.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
 #' @param notes String to add notes to the plot. Empty by default.
+#' @param post_treatment_periods Number of post-treatment periods. Zero by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -279,6 +280,7 @@ Lift.plot <- function(GeoLift,
                       title = "",
                       subtitle = "",
                       notes = "",
+                      post_treatment_periods = 0,
                       ...) {
   treatment_obs <- as.data.frame(
     colMeans(
@@ -327,12 +329,24 @@ Lift.plot <- function(GeoLift,
 
   colors <- c("Treatment" = "#52854C", "Control" = "#7030A0")
 
-  ggplot(df, aes(x = Time)) +
+  # Post Treatment Periods
+  df$post_treatment <- "Treatment Period"
+  if(post_treatment_periods > 0){
+    post_treatment_linetype <- "dashed"
+    df$post_treatment[(plot_dates$treatment_end - post_treatment_periods + 1): plot_dates$treatment_end] <- "Post-treatment Period"
+    df <- rbind(df, df[(plot_dates$treatment_end - post_treatment_periods + 1),])
+    df$post_treatment[nrow(df)] <- "Treatment Period"
+  } else{
+    post_treatment_linetype <- "blank"
+  }
+
+  ggplot(df, aes(x = Time, fill = post_treatment)) +
     geom_line(
       aes(y = c_obs, color = "Control"),
       linetype = "dashed", alpha = 1.5
     ) +
-    geom_ribbon(aes(ymin = c_obs_lower_bound, ymax = c_obs_upper_bound), alpha = 0.2, fill = "#4B4196") +
+    geom_ribbon(aes(ymin = c_obs_lower_bound, ymax = c_obs_upper_bound), alpha = 0.2) +
+    #scale_fill_manual(values = c( "#4B4196", "gray44"), name = "fill")  +#, fill = "#4B4196") +
     geom_line(
       aes(y = t_obs, color = "Treatment")
     ) +
@@ -347,10 +361,15 @@ Lift.plot <- function(GeoLift,
     ) +
     theme(
       plot.title = element_text(hjust = 0.5),
-      plot.subtitle = element_text(hjust = 0.5)
+      plot.subtitle = element_text(hjust = 0.5),
+      title = element_blank()
     ) +
     geom_vline(xintercept = plot_dates$treatment_start, linetype = "dashed", alpha = 0.3) +
-    scale_color_manual(values = colors)
+    geom_vline(xintercept = (plot_dates$treatment_end - abs(post_treatment_periods)),
+               linetype = post_treatment_linetype, alpha = 0.3) +
+    scale_color_manual(values = colors) +
+    scale_fill_manual(values = c("gray44", "#4B4196"), name = "fill") +
+    guides(shape = guide_legend(order = 2),col = guide_legend(order = 1))
 }
 
 
@@ -369,6 +388,9 @@ Lift.plot <- function(GeoLift,
 #' @param title Character for the title of the plot. NULL by default.
 #' @param subtitle Character for the subtitle of the plot. NULL by default.
 #' @param notes String to add notes to the plot. Empty by default.
+#' @param ROPE  A logic flag indicating whether to plot the region
+#' of practical equivalence (ROPE) at a 90% percentile. FALSE by default.
+#' @param post_treatment_periods Number of post-treatment periods. Zero by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -383,6 +405,8 @@ absolute_value.plot <- function(GeoLift,
                                 title = "",
                                 subtitle = "",
                                 notes = "",
+                                ROPE = FALSE,
+                                post_treatment_periods = 0,
                                 ...) {
   df <- GeoLift$summary$att
   df <- df[, c("Time", "Estimate", "lower_bound", "upper_bound")]
@@ -431,11 +455,39 @@ absolute_value.plot <- function(GeoLift,
     }
   }
 
-  ggplot(df, aes(x = Time, y = Estimate)) +
+  # Compute ROPE
+  rope_quantiles <- quantile(df[1:plot_dates$treatment_start - 1,2], c(0.1,0.9))
+  if(ROPE == TRUE){
+    rope_linetype <- "dashed"
+  } else{
+    rope_linetype <- "blank"
+  }
+
+  # Post Treatment Periods
+  df$post_treatment <- "Treatment Period"
+  if(post_treatment_periods > 0){
+    post_treatment_linetype <- "dashed"
+    df$post_treatment[(plot_dates$treatment_end - post_treatment_periods + 1): plot_dates$treatment_end] <- "Post-treatment Period"
+    df <- rbind(df, df[(plot_dates$treatment_end - post_treatment_periods + 1),])
+    df$post_treatment[nrow(df)] <- "Treatment Period"
+  } else{
+    post_treatment_linetype <- "blank"
+  }
+
+  ggplot(df, aes(x = Time, y = Estimate, fill = post_treatment)) +
     geom_line(linetype = "dashed", color = "#373472", size = 0.75) +
     geom_vline(xintercept = plot_dates$treatment_start, linetype = "dashed", alpha = 0.3) +
+    geom_vline(xintercept = (plot_dates$treatment_end - abs(post_treatment_periods)),
+               linetype = post_treatment_linetype, alpha = 0.3) +
     geom_hline(yintercept = 0, alpha = 0.5) +
-    geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.2, fill = "#4B4196") +
+    geom_segment(aes(y = rope_quantiles[[1]], yend = rope_quantiles[[1]],
+                     x = plot_dates$treatment_start, xend = plot_dates$treatment_end),
+                     linetype = rope_linetype, colour = "darkgrey") +
+    geom_segment(aes(y = rope_quantiles[[2]], yend = rope_quantiles[[2]],
+                     x = plot_dates$treatment_start, xend = plot_dates$treatment_end),
+                 linetype = rope_linetype, colour = "darkgrey") +
+    geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.2) + #4B4196
+    scale_fill_manual(values = c("gray44", "#4B4196"), name = "fill")  +
     theme_minimal() +
     labs(
       y = ylab,
@@ -446,8 +498,11 @@ absolute_value.plot <- function(GeoLift,
     ) +
     theme(
       plot.title = element_text(hjust = 0.5),
-      plot.subtitle = element_text(hjust = 0.5)
+      plot.subtitle = element_text(hjust = 0.5),
+      title = element_blank()
     )
+
+
 }
 
 

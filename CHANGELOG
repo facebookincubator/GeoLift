@@ -1,9 +1,20 @@
+GeoLift v2.4.32 (Release date: 2022-06-10)
+=========================================
+
+Changes:
+* Added post-treatment analysis capabilities to the GeoLift plot (Lift.plot through the
+"post_treatment_periods" parameter.
+* Added post-treatment and Region of Practical Equivalence (ROPE) analyses to the ATT plot
+(absolute_value.plot).
+* Fixed issue with TreatmentSchedule plot.
+
+
 GeoLift v2.4.31 (Release date: 2022-05-09)
 =========================================
 
 Changes:
-* When model = "best", we were running one more time augsynth after the best model was chosen.  
-If we keep all runs in a list and chose the best one best on the l2 scaled criteria, 
+* When model = "best", we were running one more time augsynth after the best model was chosen.
+If we keep all runs in a list and chose the best one best on the l2 scaled criteria,
 then we could just call the previous run.
 * Simplified and built a loop for the best runs.
 * Split GeoLift into two and added print.GeoLift to get the output if the user wants it.
@@ -21,7 +32,7 @@ GeoLift v2.4.23 (Release date: 2022-04-28)
 Changes:
 
 * Changed how type of test is displayed from 'TOTAL', 'POSITIVE', 'NEGATIVE' to 'TWO-SIDED LIFT TEST', 'ONE-SIDED POSITIVE LIFT TEST', 'ONE-SIDED NEGATIVE LIFT TEST'
-* Changed order of geographies outputted in the synthetic control equation fom alphabetical order to importance by weights 
+* Changed order of geographies outputted in the synthetic control equation fom alphabetical order to importance by weights
 * Simplified summary function by reducing lines of coded needed to handle pasting the confidence interval.
 
 GeoLift v2.4.22 (Release date: 2022-04-21)

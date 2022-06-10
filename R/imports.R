@@ -74,6 +74,7 @@ utils::globalVariables(
     "mean_pow",
     "mean_scaled_l2_imbalance",
     "name_vble",
+    "post_treatment",
     "pow",
     "ProportionTotal_Y",
     "pvalue",

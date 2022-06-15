@@ -106,13 +106,27 @@ const features = [
     imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/uala_logo.png?raw=true',
     description: (
       <>
-        Clorox usually runs ads to their female audience in Chile.  They ran a GeoLift to determine the
-        impact that showing ads had on the extended population, comparing against women only, and measuring
-        over sales.  Results showed an increment in 9% in total sales in the treatment regions.
         Ualá was interested in understanding whether their attribution model was correctly stating the impact
-        that each media channel had.  They used an
+        that each media channel had.  They used an&nbsp;
         <a href = "https://facebookincubator.github.io/GeoLift/blog/inverse-geolift/">
-        Inverse GeoLift </a>
+          Inverse GeoLift </a>
+        to determine the effect that their biggest online media had, and compare it to
+        their attribution. Results showed that they were overattributing by 2x!
+        <a href="https://medium.com/ual%C3%A1-tech/marketing-y-ciencia-c%C3%B3mo-evaluar-el-impacto-de-campa%C3%B1as-con-geo-experimentos-ef666fef5af0">
+        -  Learn More.
+        </a>
+      </>
+    ),
+  },
+  {
+    title: 'Robyn (MMM) + GeoLift in Gaming to Measure Omni-channel in App-Heavy Businesses',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/uala_logo.png?raw=true',
+    description: (
+      <>
+        Ualá was interested in understanding whether their attribution model was correctly stating the impact
+        that each media channel had.  They used an&nbsp;
+        <a href = "https://facebookincubator.github.io/GeoLift/blog/inverse-geolift/">
+          Inverse GeoLift </a>
         to determine the effect that their biggest online media had, and compare it to
         their attribution. Results showed that they were overattributing by 2x!
         <a href="https://medium.com/ual%C3%A1-tech/marketing-y-ciencia-c%C3%B3mo-evaluar-el-impacto-de-campa%C3%B1as-con-geo-experimentos-ef666fef5af0">

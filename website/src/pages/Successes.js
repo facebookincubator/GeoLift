@@ -24,10 +24,10 @@ const features = [
       <>
         Flow, FVR, GameReach, Gaminator and BlueCasino - mobile gaming developers and industry leaders - sought
         to find a new source-of-truth for their last-touch attribution models after seeing a sharp decline in
-        attributed downloads due to Apple's iOS 14.5+. Leveraging a combination of Open Source Solutions by Meta,
+        attributed downloads due to Apple's iOS 14.5+. Leveraging Meta Open Source Solutions,
         they combined the cross-channel measurement capabilities of Marketing Mix Models with&nbsp;
-        <a href = "https://facebookexperimental.github.io/Robyn/">Robyn </a> and the incrementality-based measurement
-        provided by GeoLift to increase the incremental ROAS of Meta by 47% and optimize their marketing spend with a
+        <a href = "https://facebookexperimental.github.io/Robyn/">Robyn </a> and GeoLift's incrementality-based measurement
+        to increase the incremental ROAS of Meta by 47% and optimize their marketing spend with a
         22% uplift in Meta's share of wallet.<br></br>
         <a href="https://www.facebook.com/business/measurement/case-studies/unified-measurement-for-app-based-businesses">
         - Learn More -

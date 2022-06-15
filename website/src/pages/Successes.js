@@ -66,6 +66,21 @@ const features = [
       </>
     ),
   },
+	{
+    title: 'How Fashion Retailer Missguided Improved their Analytics with GeoLift',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/missguided_logo.png?raw=true',
+    description: (
+      <>
+      	UK-based online fashion retailer Missguided leveraged GeoLift to measure the true incremental effect of their
+        Meta marketing campaigns. Through this geo-experiment, Missguided realized that Meta was driving nearly
+        double the value previously identified! The test results showed a 4.1x incremental return on ad-spend compared
+        with 1.7x reported by last-click attribution models.<br></br>
+        <a href="https://www.facebook.com/business/measurement/case-studies/missguided">
+        - Learn More -
+        </a>
+      </>
+    ),
+  },
   {
     title: 'Strategy Optimization with Multi-Cell GeoLifts for Ruffles',
     imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/RufflesLogo.png?raw=true',

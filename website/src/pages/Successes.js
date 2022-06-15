@@ -52,20 +52,6 @@ const features = [
       </>
     ),
   },
-  {
-    title: 'Proving Ad Effectiveness in Expanded Audiences with Clorox',
-    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/clorox.png?raw=true',
-    description: (
-      <>
-        Clorox usually runs ads to their female audience in Chile.  They ran a GeoLift to determine the
-        impact that showing ads had on the extended population, comparing against women only, and measuring
-        over sales.  Results showed an increment in 9% in total sales in the treatment regions.<br></br>
-        <a href="hhttps://www.facebook.com/business/success/clorox-chile">
-        - Learn More -
-        </a>
-      </>
-    ),
-  },
 	{
     title: 'How Fashion Retailer Missguided Improved their Analytics with GeoLift',
     imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/missguided_logo.png?raw=true',
@@ -76,6 +62,20 @@ const features = [
         double the value previously identified! The test results showed a 4.1x incremental return on ad-spend compared
         with 1.7x reported by last-click attribution models.<br></br>
         <a href="https://www.facebook.com/business/measurement/case-studies/missguided">
+        - Learn More -
+        </a>
+      </>
+    ),
+  },
+  {
+    title: 'Proving Ad Effectiveness in Expanded Audiences with Clorox',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/clorox.png?raw=true',
+    description: (
+      <>
+        Clorox usually runs ads to their female audience in Chile.  They ran a GeoLift to determine the
+        impact that showing ads had on the extended population, comparing against women only, and measuring
+        over sales.  Results showed an increment in 9% in total sales in the treatment regions.<br></br>
+        <a href="hhttps://www.facebook.com/business/success/clorox-chile">
         - Learn More -
         </a>
       </>

@@ -26,7 +26,7 @@ const features = [
         as a result of campaigns on Facebook and Instagram. The company saw a 12.9X incremental
         return on ad spend (iROAS) utilizing this approach.
         <a href="https://www.facebook.com/business/measurement/case-studies/hudsons-bay-company#">
-        -  Learn More.
+        -  Learn More.&nbsp;
         </a>
       </>
     ),
@@ -39,7 +39,7 @@ const features = [
         Scotiabank Mexico was able to measure for the first time the omni-channel
         incremental impact that their Facebook campaigns had on bank account openings.
         <a href="https://www.facebook.com/business/success/2-scotiabank-mexico?locale=es_LA">
-        -  Learn More.
+        -  Learn More.&nbsp;
         </a>
       </>
     ),
@@ -53,7 +53,7 @@ const features = [
         awareness and used a GeoLift study to measure in-store sales, revealing an
         11.9% in-store sales lift.
         <a href="https://www.facebook.com/business/success/super-coffee">
-        -  Learn More.
+        -  Learn More.&nbsp;
         </a>
       </>
     ),
@@ -67,7 +67,7 @@ const features = [
         omni-channel incrementality of Meta and Digital Display. The results revealed the
         importance of a robust cross-channel strategy with a 14X incremental ROAS for Meta.
         <a href="https://www.facebook.com/business/success/3-liverpool?locale=es_LA">
-        -  Learn More.
+        -  Learn More.&nbsp;
         </a>
       </>
     ),
@@ -82,7 +82,7 @@ const features = [
         had a 45% higher incremental Return on Investment (3.2X iROAS for Broad Audiences vs. 2.2X iROAS
         for Narrow Audiences).
         <a href="https://www.facebook.com/business/success/ruffles-mexico?locale=es_LA">
-        -  Learn More.
+        -  Learn More.&nbsp;
         </a>
       </>
     ),
@@ -96,7 +96,7 @@ const features = [
         impact that showing ads had on the extended population, comparing against women only, and measuring
         over sales.  Results showed an increment in 9% in total sales in the treatment regions.
         <a href="hhttps://www.facebook.com/business/success/clorox-chile">
-        -  Learn More.
+        -  Learn More.&nbsp;
         </a>
       </>
     ),
@@ -111,7 +111,7 @@ const features = [
         <a href = "https://facebookincubator.github.io/GeoLift/blog/inverse-geolift/">
           Inverse GeoLift </a>
         to determine the effect that their biggest online media had, and compare it to
-        their attribution. Results showed that they were overattributing by 2x!
+        their attribution. Results showed that they were overattributing by 2x!&nbsp;
         <a href="https://medium.com/ual%C3%A1-tech/marketing-y-ciencia-c%C3%B3mo-evaluar-el-impacto-de-campa%C3%B1as-con-geo-experimentos-ef666fef5af0">
         -  Learn More.
         </a>
@@ -119,17 +119,18 @@ const features = [
     ),
   },
   {
-    title: 'Robyn (MMM) + GeoLift in Gaming to Measure Omni-channel in App-Heavy Businesses',
-    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/uala_logo.png?raw=true',
+    title: 'Redefining App Measurement for the Gaming Industry through Meta Open Source Solutions',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/robyn_geolift.png?raw=true',
     description: (
       <>
-        Ualá was interested in understanding whether their attribution model was correctly stating the impact
-        that each media channel had.  They used an&nbsp;
-        <a href = "https://facebookincubator.github.io/GeoLift/blog/inverse-geolift/">
-          Inverse GeoLift </a>
-        to determine the effect that their biggest online media had, and compare it to
-        their attribution. Results showed that they were overattributing by 2x!
-        <a href="https://medium.com/ual%C3%A1-tech/marketing-y-ciencia-c%C3%B3mo-evaluar-el-impacto-de-campa%C3%B1as-con-geo-experimentos-ef666fef5af0">
+        Flow, FVR, GameReach, Gaminator and BlueCasino - mobile gaming developers and industry leaders - sought
+        to find a new source-of-truth for their last-touch attribution models after seeing a sharp decline in
+        attributed downloads due to Apple's iOS 14.5+. Leveraging a combination of Open Source Solutions by Meta,
+        they combined the cross-channel measurement capabilities of Marketing Mix Models with&nbsp;
+        <a href = "https://facebookexperimental.github.io/Robyn/">Robyn </a> and the incrementality-based measurement
+        provided by GeoLift to increase the incremental ROAS of Meta by 47% and optimize their marketing spend with a
+        22% uplift in Meta's share of wallet.&nbsp;
+        <a href="https://www.facebook.com/business/measurement/case-studies/unified-measurement-for-app-based-businesses">
         -  Learn More.
         </a>
       </>

@@ -87,6 +87,20 @@ const features = [
       </>
     ),
   },
+  {
+    title: 'Proving Ad Effectiveness in Expanded Audiences with Clorox',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/clorox.png?raw=true',
+    description: (
+      <>
+        Clorox usually runs ads to their female audience in Chile.  They ran a GeoLift to determine the
+        impact that showing ads had on the extended population, comparing against women only, and measuring
+        over sales.  Results showed an increment in 9% in total sales in the treatment regions.
+        <a href="hhttps://www.facebook.com/business/success/clorox-chile">
+        -  Learn More.
+        </a>
+      </>
+    ),
+  },
 ];
 
 function Feature({imageUrl, title, description}) {

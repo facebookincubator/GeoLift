@@ -75,7 +75,7 @@ const features = [
         Clorox usually runs ads to their female audience in Chile.  They ran a GeoLift to determine the
         impact that showing ads had on the extended population, comparing against women only, and measuring
         over sales.  Results showed an increment in 9% in total sales in the treatment regions.<br></br>
-        <a href="hhttps://www.facebook.com/business/success/clorox-chile">
+        <a href="https://www.facebook.com/business/success/clorox-chile">
         - Learn More -
         </a>
       </>

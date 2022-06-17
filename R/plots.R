@@ -303,7 +303,10 @@ Lift.plot <- function(GeoLift,
   )
 
   if (!is.null(treatment_end_date)) {
-    plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency = frequency)
+    plot_dates <- get_date_from_test_periods(GeoLift,
+                                             treatment_end_date,
+                                             post_treatment_periods = post_treatment_periods,
+                                             frequency = frequency)
     df$Time <- plot_dates$date_vector
   } else {
     message(
@@ -313,6 +316,10 @@ Lift.plot <- function(GeoLift,
       treatment_start = GeoLift$TreatmentStart,
       treatment_end = GeoLift$TreatmentEnd
     )
+  }
+
+  if(post_treatment_periods < 0){
+    post_treatment_periods <- abs(post_treatment_periods)
   }
 
   if (!is.null(plot_start_date)) {
@@ -333,11 +340,15 @@ Lift.plot <- function(GeoLift,
   df$post_treatment <- "Treatment Period"
   if(post_treatment_periods > 0){
     post_treatment_linetype <- "dashed"
-    df$post_treatment[(plot_dates$treatment_end - post_treatment_periods + 1): plot_dates$treatment_end] <- "Post-treatment Period"
-    df <- rbind(df, df[(plot_dates$treatment_end - post_treatment_periods + 1),])
+    df$post_treatment[(nrow(df) - post_treatment_periods + 1):nrow(df)] <- "Post-treatment Period"
+    df <- rbind(df, df[(nrow(df) - post_treatment_periods + 1),])
     df$post_treatment[nrow(df)] <- "Treatment Period"
   } else{
     post_treatment_linetype <- "blank"
+  }
+
+  if(!is.null(treatment_end_date)){
+    plot_dates$treatment_end <- plot_dates$treatment_end + post_treatment_periods
   }
 
   ggplot(df, aes(x = Time, fill = post_treatment)) +
@@ -435,8 +446,15 @@ absolute_value.plot <- function(GeoLift,
     stop("Please specify which plot type you would like: ATT or Incrementality.")
   }
 
+  if(post_treatment_periods < 0){
+    post_treatment_periods <- abs(post_treatment_periods)
+  }
+
   if (!is.null(treatment_end_date)) {
-    plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency = frequency)
+    plot_dates <- get_date_from_test_periods(GeoLift,
+                                             treatment_end_date,
+                                             post_treatment_periods = post_treatment_periods,
+                                             frequency = frequency)
     df$Time <- plot_dates$date_vector
   } else {
     message(
@@ -456,7 +474,14 @@ absolute_value.plot <- function(GeoLift,
   }
 
   # Compute ROPE
-  rope_quantiles <- quantile(df[1:plot_dates$treatment_start - 1,2], c(0.1,0.9))
+  if(is.numeric(plot_dates$treatment_start)){
+    rope_quantiles <- quantile(df[1:plot_dates$treatment_start - 1,2], c(0.1,0.9))
+  } else{
+    rope_quantiles <- quantile(df[1:(nrow(df) -
+                                       as.numeric(plot_dates$treatment_end -
+                                                    plot_dates$treatment_start) -
+                                       post_treatment_periods),2], c(0.1,0.9))
+  }
   if(ROPE == TRUE){
     rope_linetype <- "dashed"
   } else{
@@ -466,18 +491,23 @@ absolute_value.plot <- function(GeoLift,
   # Post Treatment Periods
   df$post_treatment <- "Treatment Period"
   if(post_treatment_periods > 0){
-    post_treatment_linetype <- "dashed"
-    df$post_treatment[(plot_dates$treatment_end - post_treatment_periods + 1): plot_dates$treatment_end] <- "Post-treatment Period"
-    df <- rbind(df, df[(plot_dates$treatment_end - post_treatment_periods + 1),])
-    df$post_treatment[nrow(df)] <- "Treatment Period"
+      post_treatment_linetype <- "dashed"
+      df$post_treatment[(nrow(df) - post_treatment_periods + 1):nrow(df)] <- "Post-treatment Period"
+      df <- rbind(df, df[(nrow(df) - post_treatment_periods + 1),])
+      df$post_treatment[nrow(df)] <- "Treatment Period"
   } else{
     post_treatment_linetype <- "blank"
   }
 
+  if(!is.null(treatment_end_date)){
+    plot_dates$treatment_end <- plot_dates$treatment_end + post_treatment_periods
+  }
+
+
   ggplot(df, aes(x = Time, y = Estimate, fill = post_treatment)) +
     geom_line(linetype = "dashed", color = "#373472", size = 0.75) +
     geom_vline(xintercept = plot_dates$treatment_start, linetype = "dashed", alpha = 0.3) +
-    geom_vline(xintercept = (plot_dates$treatment_end - abs(post_treatment_periods)),
+    geom_vline(xintercept = (plot_dates$treatment_end - post_treatment_periods),
                linetype = post_treatment_linetype, alpha = 0.3) +
     geom_hline(yintercept = 0, alpha = 0.5) +
     geom_segment(aes(y = rope_quantiles[[1]], yend = rope_quantiles[[1]],

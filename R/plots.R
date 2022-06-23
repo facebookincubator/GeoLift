@@ -357,7 +357,6 @@ Lift.plot <- function(GeoLift,
       linetype = "dashed", alpha = 1.5
     ) +
     geom_ribbon(aes(ymin = c_obs_lower_bound, ymax = c_obs_upper_bound), alpha = 0.2) +
-    #scale_fill_manual(values = c( "#4B4196", "gray44"), name = "fill")  +#, fill = "#4B4196") +
     geom_line(
       aes(y = t_obs, color = "Treatment")
     ) +
@@ -379,7 +378,9 @@ Lift.plot <- function(GeoLift,
     geom_vline(xintercept = (plot_dates$treatment_end - abs(post_treatment_periods)),
                linetype = post_treatment_linetype, alpha = 0.3) +
     scale_color_manual(values = colors) +
-    scale_fill_manual(values = c("gray44", "#4B4196"), name = "fill") +
+    scale_fill_manual(breaks = c("Post-treatment Period", "Treatment Period"),
+                      values = c("gray44", "#4B4196"),
+                      name = "fill") +
     guides(shape = guide_legend(order = 2),col = guide_legend(order = 1))
 }
 
@@ -517,7 +518,9 @@ absolute_value.plot <- function(GeoLift,
                      x = plot_dates$treatment_start, xend = plot_dates$treatment_end),
                  linetype = rope_linetype, colour = "darkgrey") +
     geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.2) + #4B4196
-    scale_fill_manual(values = c("gray44", "#4B4196"), name = "fill")  +
+    scale_fill_manual(breaks = c("Post-treatment Period", "Treatment Period"),
+                      values = c("gray44", "#4B4196"),
+                      name = "fill") +
     theme_minimal() +
     labs(
       y = ylab,

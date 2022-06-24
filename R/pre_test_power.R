@@ -3,7 +3,7 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes function MarketSelection, stochastic_market_selector, pvalueCalc,
-# type_of_test, run_simulations, GeoLiftMarketSelection, GeoLiftPowerFinder, 
+# type_of_test, run_simulations, GeoLiftMarketSelection, GeoLiftPowerFinder,
 # GeoLiftPower.search, NumberLocations, GeoLiftPower.
 
 

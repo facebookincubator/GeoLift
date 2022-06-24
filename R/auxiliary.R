@@ -397,11 +397,11 @@ MarketCorrelations <- function(data) {
     dplyr::select(!time)
 
   correlation_df <- pivoted_data %>%
-    as.matrix %>%
-    cor %>%
-    as.data.frame %>%
+    as.matrix() %>%
+    cor() %>%
+    as.data.frame() %>%
     tibble::rownames_to_column(var = "var1") %>%
-    tidyr::pivot_longer(cols=-var1, names_to="var2", values_to="correlation")
+    tidyr::pivot_longer(cols = -var1, names_to = "var2", values_to = "correlation")
 
   sorted_correlation_df <- correlation_df %>%
     dplyr::arrange(var1, -correlation) %>%

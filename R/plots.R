@@ -202,6 +202,7 @@ plot.GeoLiftPower <- function(x,
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
 #' @param subtitle String for the subtitle of the plot. Empty by default.
 #' @param notes String to add notes to the plot. Empty by default.
+#' @param post_treatment_periods Number of post-treatment periods. Zero by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -216,13 +217,14 @@ plot.GeoLift <- function(x,
                          title = "",
                          subtitle = "",
                          notes = "",
+                         post_treatment_periods = 0,
                          ...) {
   if (!inherits(x, "GeoLift")) {
     stop("object must be class GeoLift")
   }
 
   if (type == "TreatmentSchedule") {
-    panelView::panelView(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
+    panelView::panelview(Y ~ D, data = x$data, index = c("location", "time"), pre.post = TRUE)
   } else if (tolower(type) %in% c("att", "incrementality")) {
     absolute_value.plot(
       GeoLift = x,
@@ -233,6 +235,7 @@ plot.GeoLift <- function(x,
       title = title,
       subtitle = subtitle,
       notes = notes,
+      post_treatment_periods = post_treatment_periods,
       ...
     )
   } else if (tolower(type) == "lift") {
@@ -244,6 +247,7 @@ plot.GeoLift <- function(x,
       title = title,
       subtitle = subtitle,
       notes = notes,
+      post_treatment_periods = post_treatment_periods,
       ...
     )
   } else {
@@ -304,9 +308,10 @@ Lift.plot <- function(GeoLift,
 
   if (!is.null(treatment_end_date)) {
     plot_dates <- get_date_from_test_periods(GeoLift,
-                                             treatment_end_date,
-                                             post_treatment_periods = post_treatment_periods,
-                                             frequency = frequency)
+      treatment_end_date,
+      post_treatment_periods = post_treatment_periods,
+      frequency = frequency
+    )
     df$Time <- plot_dates$date_vector
   } else {
     message(
@@ -318,7 +323,7 @@ Lift.plot <- function(GeoLift,
     )
   }
 
-  if(post_treatment_periods < 0){
+  if (post_treatment_periods < 0) {
     post_treatment_periods <- abs(post_treatment_periods)
   }
 
@@ -338,16 +343,16 @@ Lift.plot <- function(GeoLift,
 
   # Post Treatment Periods
   df$post_treatment <- "Treatment Period"
-  if(post_treatment_periods > 0){
+  if (post_treatment_periods > 0) {
     post_treatment_linetype <- "dashed"
     df$post_treatment[(nrow(df) - post_treatment_periods + 1):nrow(df)] <- "Post-treatment Period"
-    df <- rbind(df, df[(nrow(df) - post_treatment_periods + 1),])
+    df <- rbind(df, df[(nrow(df) - post_treatment_periods + 1), ])
     df$post_treatment[nrow(df)] <- "Treatment Period"
-  } else{
+  } else {
     post_treatment_linetype <- "blank"
   }
 
-  if(!is.null(treatment_end_date)){
+  if (!is.null(treatment_end_date)) {
     plot_dates$treatment_end <- plot_dates$treatment_end + post_treatment_periods
   }
 
@@ -375,13 +380,17 @@ Lift.plot <- function(GeoLift,
       title = element_blank()
     ) +
     geom_vline(xintercept = plot_dates$treatment_start, linetype = "dashed", alpha = 0.3) +
-    geom_vline(xintercept = (plot_dates$treatment_end - abs(post_treatment_periods)),
-               linetype = post_treatment_linetype, alpha = 0.3) +
+    geom_vline(
+      xintercept = (plot_dates$treatment_end - abs(post_treatment_periods)),
+      linetype = post_treatment_linetype, alpha = 0.3
+    ) +
     scale_color_manual(values = colors) +
-    scale_fill_manual(breaks = c("Post-treatment Period", "Treatment Period"),
-                      values = c("gray44", "#4B4196"),
-                      name = "fill") +
-    guides(shape = guide_legend(order = 2),col = guide_legend(order = 1))
+    scale_fill_manual(
+      breaks = c("Post-treatment Period", "Treatment Period"),
+      values = c("gray44", "#4B4196"),
+      name = "fill"
+    ) +
+    guides(shape = guide_legend(order = 2), col = guide_legend(order = 1))
 }
 
 
@@ -447,15 +456,16 @@ absolute_value.plot <- function(GeoLift,
     stop("Please specify which plot type you would like: ATT or Incrementality.")
   }
 
-  if(post_treatment_periods < 0){
+  if (post_treatment_periods < 0) {
     post_treatment_periods <- abs(post_treatment_periods)
   }
 
   if (!is.null(treatment_end_date)) {
     plot_dates <- get_date_from_test_periods(GeoLift,
-                                             treatment_end_date,
-                                             post_treatment_periods = post_treatment_periods,
-                                             frequency = frequency)
+      treatment_end_date,
+      post_treatment_periods = post_treatment_periods,
+      frequency = frequency
+    )
     df$Time <- plot_dates$date_vector
   } else {
     message(
@@ -475,32 +485,32 @@ absolute_value.plot <- function(GeoLift,
   }
 
   # Compute ROPE
-  if(is.numeric(plot_dates$treatment_start)){
-    rope_quantiles <- quantile(df[1:plot_dates$treatment_start - 1,2], c(0.1,0.9))
-  } else{
+  if (is.numeric(plot_dates$treatment_start)) {
+    rope_quantiles <- quantile(df[1:plot_dates$treatment_start - 1, 2], c(0.1, 0.9))
+  } else {
     rope_quantiles <- quantile(df[1:(nrow(df) -
-                                       as.numeric(plot_dates$treatment_end -
-                                                    plot_dates$treatment_start) -
-                                       post_treatment_periods),2], c(0.1,0.9))
+      as.numeric(plot_dates$treatment_end -
+        plot_dates$treatment_start) -
+      post_treatment_periods), 2], c(0.1, 0.9))
   }
-  if(ROPE == TRUE){
+  if (ROPE == TRUE) {
     rope_linetype <- "dashed"
-  } else{
+  } else {
     rope_linetype <- "blank"
   }
 
   # Post Treatment Periods
   df$post_treatment <- "Treatment Period"
-  if(post_treatment_periods > 0){
-      post_treatment_linetype <- "dashed"
-      df$post_treatment[(nrow(df) - post_treatment_periods + 1):nrow(df)] <- "Post-treatment Period"
-      df <- rbind(df, df[(nrow(df) - post_treatment_periods + 1),])
-      df$post_treatment[nrow(df)] <- "Treatment Period"
-  } else{
+  if (post_treatment_periods > 0) {
+    post_treatment_linetype <- "dashed"
+    df$post_treatment[(nrow(df) - post_treatment_periods + 1):nrow(df)] <- "Post-treatment Period"
+    df <- rbind(df, df[(nrow(df) - post_treatment_periods + 1), ])
+    df$post_treatment[nrow(df)] <- "Treatment Period"
+  } else {
     post_treatment_linetype <- "blank"
   }
 
-  if(!is.null(treatment_end_date)){
+  if (!is.null(treatment_end_date)) {
     plot_dates$treatment_end <- plot_dates$treatment_end + post_treatment_periods
   }
 
@@ -508,19 +518,29 @@ absolute_value.plot <- function(GeoLift,
   ggplot(df, aes(x = Time, y = Estimate, fill = post_treatment)) +
     geom_line(linetype = "dashed", color = "#373472", size = 0.75) +
     geom_vline(xintercept = plot_dates$treatment_start, linetype = "dashed", alpha = 0.3) +
-    geom_vline(xintercept = (plot_dates$treatment_end - post_treatment_periods),
-               linetype = post_treatment_linetype, alpha = 0.3) +
+    geom_vline(
+      xintercept = (plot_dates$treatment_end - post_treatment_periods),
+      linetype = post_treatment_linetype, alpha = 0.3
+    ) +
     geom_hline(yintercept = 0, alpha = 0.5) +
-    geom_segment(aes(y = rope_quantiles[[1]], yend = rope_quantiles[[1]],
-                     x = plot_dates$treatment_start, xend = plot_dates$treatment_end),
-                     linetype = rope_linetype, colour = "darkgrey") +
-    geom_segment(aes(y = rope_quantiles[[2]], yend = rope_quantiles[[2]],
-                     x = plot_dates$treatment_start, xend = plot_dates$treatment_end),
-                 linetype = rope_linetype, colour = "darkgrey") +
-    geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.2) + #4B4196
-    scale_fill_manual(breaks = c("Post-treatment Period", "Treatment Period"),
-                      values = c("gray44", "#4B4196"),
-                      name = "fill") +
+    geom_segment(aes(
+      y = rope_quantiles[[1]], yend = rope_quantiles[[1]],
+      x = plot_dates$treatment_start, xend = plot_dates$treatment_end
+    ),
+    linetype = rope_linetype, colour = "darkgrey"
+    ) +
+    geom_segment(aes(
+      y = rope_quantiles[[2]], yend = rope_quantiles[[2]],
+      x = plot_dates$treatment_start, xend = plot_dates$treatment_end
+    ),
+    linetype = rope_linetype, colour = "darkgrey"
+    ) +
+    geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.2) + # 4B4196
+    scale_fill_manual(
+      breaks = c("Post-treatment Period", "Treatment Period"),
+      values = c("gray44", "#4B4196"),
+      name = "fill"
+    ) +
     theme_minimal() +
     labs(
       y = ylab,
@@ -534,8 +554,6 @@ absolute_value.plot <- function(GeoLift,
       plot.subtitle = element_text(hjust = 0.5),
       title = element_blank()
     )
-
-
 }
 
 

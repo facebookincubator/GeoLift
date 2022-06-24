@@ -1,6 +1,6 @@
 ---
 slug: blueprint-geolift
-title: Meta Blueprint Course - Measure the Incremental Impact of Your Marketing With GeoLift
+title: GeoLift Blueprint Course by Meta
 authors: [arturo, nicolas, michael]
 tags: [GeoLift, Geo Measurement]
 ---

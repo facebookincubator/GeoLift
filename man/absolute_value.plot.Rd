@@ -13,6 +13,8 @@ absolute_value.plot(
   title = "",
   subtitle = "",
   notes = "",
+  ROPE = FALSE,
+  post_treatment_periods = 0,
   ...
 )
 }
@@ -33,6 +35,11 @@ weekly or daily. Defaults to daily.}
 \item{subtitle}{Character for the subtitle of the plot. NULL by default.}
 
 \item{notes}{String to add notes to the plot. Empty by default.}
+
+\item{ROPE}{A logic flag indicating whether to plot the region
+of practical equivalence (ROPE) at a 90\% percentile. FALSE by default.}
+
+\item{post_treatment_periods}{Number of post-treatment periods. Zero by default.}
 
 \item{...}{additional arguments}
 }

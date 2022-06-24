@@ -1,6 +1,6 @@
 Package: GeoLift
 Title: Synthetic Control Method to Calculate Lift at a Geo Level
-Version: 2.4.31
+Version: 2.4.32
 Authors@R: c(
     person(given = "Arturo",
            family = "Esquerra",
@@ -39,6 +39,7 @@ Imports:
     doParallel,
     foreach,
     ggrepel,
+    gridExtra,
     MarketMatching,
     magrittr,
     dplyr,
@@ -48,7 +49,9 @@ Imports:
     tibble,
     tidyr,
     parallel,
+    progress,
     graphics,
+    scales,
     stats,
     utils,
     rlang,

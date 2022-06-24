@@ -3,7 +3,7 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes function fn_treatment, build_cluster, limit_test_markets,
-# get_date_from_test_periods, MarketCorrelations, AppendAgg, 
+# get_date_from_test_periods, MarketCorrelations, AppendAgg,
 # CorrelationCoefficient, GetWeights
 
 
@@ -158,6 +158,7 @@ limit_test_markets <- function(similarity_matrix,
 #'
 #' @param GeoLift GeoLift object.
 #' @param treatment_end_date Character that represents a date in year-month=day format.
+#' @param post_treatment_periods Number of post-treatment periods. Zero by default.
 #' @param frequency Character that represents periodicity of time stamps. Can be either
 #' weekly or daily. Defaults to daily.
 #'
@@ -170,19 +171,22 @@ limit_test_markets <- function(similarity_matrix,
 #'         }
 #'
 #' @export
-get_date_from_test_periods <- function(GeoLift, treatment_end_date, frequency = "daily") {
+get_date_from_test_periods <- function(GeoLift,
+                                       treatment_end_date,
+                                       post_treatment_periods = 0,
+                                       frequency = "daily") {
   treatment_end_period <- GeoLift$TreatmentEnd
   treatment_start_period <- GeoLift$TreatmentStart
   if (tolower(frequency) == "daily") {
     date_vector <- seq(
-      as.Date(treatment_end_date) - treatment_end_period + 1,
-      as.Date(treatment_end_date),
+      as.Date(treatment_end_date) - treatment_end_period + post_treatment_periods + 1,
+      as.Date(treatment_end_date) + post_treatment_periods,
       by = "day"
     )
   } else if (tolower(frequency) == "weekly") {
     date_vector <- seq(
       as.Date(treatment_end_date) - treatment_end_period * 7 + 7,
-      as.Date(treatment_end_date),
+      as.Date(treatment_end_date) + post_treatment_periods * 7,
       by = "week"
     )
   } else {
@@ -256,7 +260,7 @@ AppendAgg <- function(data, locs = NULL) {
 #'
 #' @return
 #' Correlation coefficient.
-#' 
+#'
 #' @export
 CorrelationCoefficient <- function(data, locs = c()) {
   data_aux <- AppendAgg(data, locs = locs)
@@ -391,14 +395,14 @@ MarketCorrelations <- function(data) {
   pivoted_data <- data %>%
     tidyr::pivot_wider(id_cols = time, names_from = location, values_from = Y) %>%
     dplyr::select(!time)
-  
+
   correlation_df <- pivoted_data %>%
-    as.matrix %>%
-    cor %>%
-    as.data.frame %>%
+    as.matrix() %>%
+    cor() %>%
+    as.data.frame() %>%
     tibble::rownames_to_column(var = "var1") %>%
-    tidyr::pivot_longer(cols=-var1, names_to="var2", values_to="correlation")
-  
+    tidyr::pivot_longer(cols = -var1, names_to = "var2", values_to = "correlation")
+
   sorted_correlation_df <- correlation_df %>%
     dplyr::arrange(var1, -correlation) %>%
     dplyr::mutate(
@@ -413,6 +417,6 @@ MarketCorrelations <- function(data) {
       names_from = name_vble
     ) %>%
     dplyr::select(!location_2)
-  
+
   return(sorted_correlation_df)
 }

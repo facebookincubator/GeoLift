@@ -297,7 +297,7 @@ pvalueCalc <- function(data,
       time = time,
       data = data_aux,
       t_int = treatment_start_time,
-      progfunc = "GSYN",
+      progfunc = model,
       scm = T,
       fixedeff = fixed_effects
     )

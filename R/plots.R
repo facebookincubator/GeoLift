@@ -70,6 +70,7 @@ GeoPlot <- function(data,
 #' @param breaks_x_axis Numeric value indicating the number of breaks in the
 #' x-axis of the power plot. You may get slightly more or fewer breaks that
 #' requested based on `breaks_pretty()`. Set to 10 by default.
+#' @param notes String with additional notes to add as caption.
 #' @param ... additional arguments
 #'
 #' @return
@@ -81,6 +82,7 @@ plot.GeoLiftPower <- function(x,
                               smoothed_values = TRUE,
                               show_mde = FALSE,
                               breaks_x_axis = 10,
+                              notes = "",
                               ...) {
   final_legend <- c()
   if (!inherits(x, "GeoLiftPower")) {
@@ -105,7 +107,8 @@ plot.GeoLiftPower <- function(x,
       title = "GeoLift Power Curve",
       subtitle = paste0("Treatment Periods: ", unique(x$duration)),
       x = "Effect Size",
-      y = "Power"
+      y = "Power",
+      caption = notes
     ) +
     theme_minimal() +
     theme(

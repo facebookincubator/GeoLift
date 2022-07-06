@@ -84,6 +84,7 @@ utils::globalVariables(
     "sim",
     "simulation_results",
     "summ",
+    "sum_y",
     "t_obs",
     "temp_Markets",
     "test",

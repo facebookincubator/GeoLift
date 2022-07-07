@@ -192,7 +192,7 @@ GeoLift <- function(Y_id = "Y",
     alternative_hypothesis = alternative_hypothesis
   )
 
-  sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = stat_func)
+  sum_augsyn <- summary(augsyn, alpha = alpha, inf_type = "conformal", stat_func = stat_func)
 
   if (paste(augsyn$call)[1] == "single_augsynth") {
     mean <- sum_augsyn[["average_att"]][["Estimate"]]
@@ -244,8 +244,8 @@ GeoLift <- function(Y_id = "Y",
     "Y_id" = Y_id,
     "summary" = sum_augsyn,
     "ConfidenceIntervals" = ConfidenceIntervals,
-    "lower_bound" = mean(summary(augsyn, alpha = alpha, inf_type = "conformal", stat_func = stat_func)$att$lower_bound[treatment_start_time:treatment_end_time]),
-    "upper_bound" = mean(summary(augsyn, alpha = alpha, inf_type = "conformal", stat_func = stat_func)$att$upper_bound[treatment_start_time:treatment_end_time]),
+    "lower_bound" = mean(sum_augsyn$att$lower_bound[treatment_start_time:treatment_end_time]),
+    "upper_bound" = mean(sum_augsyn$att$upper_bound[treatment_start_time:treatment_end_time]),
     "df_weights" = data.frame(
       location = dimnames(augsyn$weights)[[1]],
       weight = unname(augsyn$weights[, 1])

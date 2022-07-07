@@ -244,13 +244,14 @@ GeoLift <- function(Y_id = "Y",
     "Y_id" = Y_id,
     "summary" = sum_augsyn,
     "ConfidenceIntervals" = ConfidenceIntervals,
-    "lower_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$lower_bound,
-    "upper_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$upper_bound,
+    "lower_bound" = mean(summary(augsyn, alpha = alpha, inf_type = "conformal", stat_func = stat_func)$att$lower_bound[treatment_start_time:treatment_end_time]),
+    "upper_bound" = mean(summary(augsyn, alpha = alpha, inf_type = "conformal", stat_func = stat_func)$att$upper_bound[treatment_start_time:treatment_end_time]),
     "df_weights" = data.frame(
       location = dimnames(augsyn$weights)[[1]],
       weight = unname(augsyn$weights[, 1])
     ),
-    "stat_test" = stat_test
+    "stat_test" = stat_test,
+    "factor" = ncol(augsyn$data$y) * nrow(locs_id)
   )
 
   class(res) <- c("GeoLift", class(res))
@@ -319,6 +320,26 @@ print.GeoLift <- function(x, ...) {
     "% chance of observing an effect this large or larger assuming treatment effect is zero.",
     sep = ""
   ))
+
+  if (x$ConfidenceIntervals) {
+    message(paste0(
+      "\nATT ",
+      (1 - x$summary$alpha) * 100,
+      "% Confidence Interval: (",
+      round(x$lower_bound, 2),
+      ", ",
+      round(x$upper_bound, 2),
+      ")",
+      "\nIncremental Y ",
+      (1 - x$summary$alpha) * 100,
+      "% Confidence Interval: (",
+      # round(x$lower_bound, 2) * x$factor,
+      round(x$lower_bound) * x$factor,
+      ", ",
+      round(x$upper_bound, 2) * x$factor,
+      ")"
+    ))
+  }
 }
 
 #' Calculate cumulative lift
@@ -469,7 +490,7 @@ summary.GeoLift <- function(object, ...) {
     summ$alpha <- object$summary$alpha
     summ$lower <- object$lower_bound
     summ$upper <- object$upper_bound
-    summ$factor <- ncol(object$results$data$y) * nrow(object$test_id)
+    summ$factor <- object$factor
     summ$progfunc <- object$results$progfunc
   }
 

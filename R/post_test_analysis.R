@@ -193,6 +193,12 @@ GeoLift <- function(Y_id = "Y",
   )
 
   sum_augsyn <- summary(augsyn, alpha = alpha, inf_type = "conformal", stat_func = stat_func)
+  confidence_intervals <- AggConfIntervals(
+    sum_augsyn,
+    treatment_start_time,
+    treatment_end_time,
+    alpha
+  )
 
   if (paste(augsyn$call)[1] == "single_augsynth") {
     mean <- sum_augsyn[["average_att"]][["Estimate"]]
@@ -224,8 +230,8 @@ GeoLift <- function(Y_id = "Y",
       ATT = mean,
       Perc.Lift = 100 * round(lift, 3),
       pvalue = sum_augsyn$average_att$p_val,
-      Lower.Conf.Int = sum_augsyn$average_att$lower_bound,
-      Upper.Conf.Int = sum_augsyn$average_att$upper_bound
+      Lower.Conf.Int = confidence_intervals$att_ci_lb,
+      Upper.Conf.Int = confidence_intervals$att_ci_ub
     )
   }
 
@@ -244,8 +250,8 @@ GeoLift <- function(Y_id = "Y",
     "Y_id" = Y_id,
     "summary" = sum_augsyn,
     "ConfidenceIntervals" = ConfidenceIntervals,
-    "lower_bound" = mean(sum_augsyn$att$lower_bound[treatment_start_time:treatment_end_time]),
-    "upper_bound" = mean(sum_augsyn$att$upper_bound[treatment_start_time:treatment_end_time]),
+    "lower_bound" = confidence_intervals$att_ci_lb,
+    "upper_bound" = confidence_intervals$att_ci_ub,
     "df_weights" = data.frame(
       location = dimnames(augsyn$weights)[[1]],
       weight = unname(augsyn$weights[, 1])
@@ -257,6 +263,38 @@ GeoLift <- function(Y_id = "Y",
   class(res) <- c("GeoLift", class(res))
 
   return(res)
+}
+
+#' GeoLift Confidence Intervals
+#'
+#' @description
+#'
+#' Calculate ATT Aggregate Confidence Intervals w/conformal approach
+#'
+#' @param summary_augsynth Result of calling summary function on augsynth object.
+#' @param treatment_start_time Time index of the start of the treatment.
+#' @param treatment_end_time Time index of the end of the treatment.
+#' @param alpha Significance level. Set to 0.1 by default.
+#'
+#' @return List that contains values for the ATT estimate, and the aggregate
+#' Confidence Intervals.
+#'
+#' @export
+AggConfIntervals <- function(summary_augsynth,
+                             treatment_start_time,
+                             treatment_end_time,
+                             alpha) {
+  atts <- summary_augsynth$att[treatment_start_time:treatment_end_time]
+  ci_lbs <- summary_augsynth$lb[!is.na(summary_augsynth$lb)]
+  stdevs <- (atts - ci_lbs) / qnorm(1 - alpha / 2)
+  vars <- stdevs^2
+  avg_var <- sum(vars) / length(vars)
+  avg_stdev <- sqrt(avg_var)
+
+  att <- summary_augsynth$att[treatment_end_time + 1]
+  new_att_ci_lb <- att - qnorm(1 - alpha / 2) * avg_stdev
+  new_att_ci_ub <- att + qnorm(1 - alpha / 2) * avg_stdev
+  return(list(att = att, att_ci_lb = new_att_ci_lb, att_ci_ub = new_att_ci_ub))
 }
 
 #' Print pretty GeoLift output.

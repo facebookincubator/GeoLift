@@ -193,6 +193,7 @@ GeoLift <- function(Y_id = "Y",
   )
 
   sum_augsyn <- summary(augsyn, alpha = alpha, inf_type = "conformal", stat_func = stat_func)
+
   confidence_intervals <- AggConfIntervals(
     sum_augsyn,
     treatment_start_time,
@@ -284,14 +285,14 @@ AggConfIntervals <- function(summary_augsynth,
                              treatment_start_time,
                              treatment_end_time,
                              alpha) {
-  atts <- summary_augsynth$att[treatment_start_time:treatment_end_time]
-  ci_lbs <- summary_augsynth$lb[!is.na(summary_augsynth$lb)]
+  atts <- summary_augsynth$att$Estimate[treatment_start_time:treatment_end_time]
+  ci_lbs <- summary_augsynth$att$lower_bound[treatment_start_time:treatment_end_time]
   stdevs <- (atts - ci_lbs) / qnorm(1 - alpha / 2)
   vars <- stdevs^2
   avg_var <- sum(vars) / length(vars)
   avg_stdev <- sqrt(avg_var)
 
-  att <- summary_augsynth$att[treatment_end_time + 1]
+  att <- summary_augsynth$average_att$Estimate
   new_att_ci_lb <- att - qnorm(1 - alpha / 2) * avg_stdev
   new_att_ci_ub <- att + qnorm(1 - alpha / 2) * avg_stdev
   return(list(att = att, att_ci_lb = new_att_ci_lb, att_ci_ub = new_att_ci_ub))

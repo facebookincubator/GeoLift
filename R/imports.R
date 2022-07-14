@@ -38,15 +38,18 @@ utils::globalVariables(
     "AvgCost",
     "AvgDetectedLift",
     "AvgScaledL2Imbalance",
+    "base_lift",
     "BestControl",
     "correlation",
     "c_obs",
     "c_obs_lower_bound",
     "c_obs_upper_bound",
+    "cell",
     "conf_level",
     "conf.level",
     "date_unix",
     "detected_lift",
+    "DID",
     "diff_lower",
     "diff_upper",
     "duration",
@@ -99,6 +102,7 @@ utils::globalVariables(
     "upper_bound",
     "var1",
     "var2",
+    "Winner",
     "Y"
   )
 )

@@ -1,3 +1,10 @@
+GeoLift v2.5.0 (Release date: 2022-07-19)
+=========================================
+
+Changes:
+* Added a Conformal Inference procedure to calculate the Confidence Interval of the Aggregate Lift.
+* Added Multi-cell capabilities for GeoLift.
+
 GeoLift v2.4.32 (Release date: 2022-06-10)
 =========================================
 

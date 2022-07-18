@@ -9,12 +9,7 @@ MultiCellPower(
   test_markets = list(),
   effect_size = seq(-0.25, 0.25, 0.05),
   lookback_window = NULL,
-  side_of_test = NULL,
-  plot = TRUE,
-  actual_values = TRUE,
-  smoothed_values = FALSE,
-  show_mde = TRUE,
-  breaks_x_axis = 10
+  side_of_test = NULL
 )
 }
 \arguments{
@@ -43,22 +38,6 @@ will be populated by the value specified in \code{MultiCellMarketSelection}.
 If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 }}
-
-\item{plot}{Logic flag indicating whether to plot all power curves. Set to TRUE
-by default.}
-
-\item{actual_values}{Logic flag indicating whether to include in the plot
-the actual values. TRUE by default.}
-
-\item{smoothed_values}{Logic flag indicating whether to include in the plot
-the smoothed values. TRUE by default.}
-
-\item{show_mde}{Logic flag indicating whether to include in the plot
-the positive and negative MDEs. FALSE by default.}
-
-\item{breaks_x_axis}{Numeric value indicating the number of breaks in the
-x-axis of the power plot. You may get slightly more or fewer breaks that
-requested based on \code{breaks_pretty()}. Set to 10 by default.}
 }
 \value{
 A 'MultiCellPower' object with three objects:

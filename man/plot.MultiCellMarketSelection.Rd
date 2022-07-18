@@ -9,8 +9,8 @@
   test_markets = list(),
   print_summary = FALSE,
   actual_values = TRUE,
-  smoothed_values = TRUE,
-  show_mde = FALSE,
+  smoothed_values = FALSE,
+  show_mde = TRUE,
   breaks_x_axis = 10,
   ...
 )

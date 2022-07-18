@@ -274,8 +274,8 @@ GeoLift <- function(Y_id = "Y",
     "Y_id" = Y_id,
     "summary" = sum_augsyn,
     "ConfidenceIntervals" = ConfidenceIntervals,
-    "lower_bound" = ci[1],
-    "upper_bound" = ci[2],
+    "lower_bound" = ci[1] * ncol(augsyn$data$y) * nrow(locs_id),
+    "upper_bound" = ci[2] * ncol(augsyn$data$y) * nrow(locs_id),
     "df_weights" = data.frame(
       location = dimnames(augsyn$weights)[[1]],
       weight = unname(augsyn$weights[, 1])
@@ -545,7 +545,7 @@ print.summary.GeoLift <- function(x, ...) {
     if (x$CI == TRUE) {
       test_statistics <- paste0(
         test_statistics,
-        "\n* ", (1 - x$alpha) * 100, "% Confidence Interval: (", round(x$lower * x$factor, 3), ", ", round(x$upper * x$factor, 3), ")"
+        "\n* ", (1 - x$alpha) * 100, "% Confidence Interval: (", round(x$lower, 3), ", ", round(x$upper, 3), ")"
       )
     }
     balance_statistics <- paste0(
@@ -634,7 +634,7 @@ ConfIntervals <- function(augsynth,
     new_wide_data$y <- matrix(1, nrow = n, ncol = 1)
 
     # Create grid with zero
-    grid <- seq(mean(post_att) - 4 * post_sd, mean(post_att) + 4 * post_sd, length.out = grid_size)
+    grid <- seq(mean(post_att) - 6 * post_sd, mean(post_att) + 6 * post_sd, length.out = grid_size)
     grid <- c(0,grid) #Adding 0 to the grid for null troubleshooting
 
     # Calculate p-values for the grid
@@ -651,7 +651,17 @@ ConfIntervals <- function(augsynth,
     )
 
     ci <- c(min(grid[pvalues >= alpha]), max(grid[pvalues >= alpha]))
+
+    #Fix signs if bound is Inf
+    if (ci[1] == Inf){
+      ci[1] <- -ci[1]
+    }
+    if (ci[2] == -Inf){
+      ci[2] <- -ci[2]
+    }
+
   }
+
   return(ci)
 }
 

@@ -39,7 +39,7 @@ a "Y" column with the outcome data (units), a time column with the indicator
 of the time period (starting at 1), and covariates.}
 
 \item{locations}{A list of lists of test markets per cell. The recommended layout is
-\code{list(cell_1 = "locA", cell2 = "locB", cell3 = "locC",...)}.}
+\code{list(cell_1 = list("locA"), cell2 = list("locB"), cell3 = list("locC"),...)}.}
 
 \item{treatment_start_time}{Time index of the start of the treatment.}
 

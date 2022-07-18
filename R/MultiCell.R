@@ -148,6 +148,11 @@ MultiCellMarketSelection <- function(data,
     stop("\nEnter a valid sampling_method (check the function documentation for more details).")
   }
 
+  # Check side_of_test
+  if(!(tolower(side_of_test) %in% c("one_sided", "two_sided"))){
+    stop("\nEnter a valid side_of_test ('one_sided', 'two_sided').")
+  }
+
   # Populate N if it's not provided
   if (length(N) == 0) {
     N <- unique(round(quantile(c(1:round(length(unique(data$location))/k)),
@@ -306,14 +311,14 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #'
 #' Plotting function for `MultiCellMarketSelection`. This function plots the
 #' latest possible test given the data and duration as well as the power curve
-#' across historical simulations for a given merket_id and cell_id.
+#' across historical simulations for a given market_id and cell_id.
 #'
 #' @param x A MultiCellMarketSelection object.
-#' @param cell_ID Numeric value indicating the cell.
-#' @param market_ID Numeric value indicating the market to be plotted. This
-#' value should reflect a valid ID from the `MultiCellMarketSelection` output.
+#' @param test_markets List of market IDs per cell. The list must contain exactly
+#' k numeric values corresponding to the power analysis. The recommended layout is
+#' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
 #' @param print_summary Logic flag indicating whether to print model metrics
-#' from the latest possible test. Set to TRUE by default.
+#' from the latest possible test. Set to FALSE by default.
 #' @param actual_values Logic flag indicating whether to include in the plot
 #' the actual values. TRUE by default.
 #' @param smoothed_values Logic flag indicating whether to include in the plot
@@ -323,6 +328,8 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #' @param breaks_x_axis Numeric value indicating the number of breaks in the
 #' x-axis of the power plot. You may get slightly more or fewer breaks that
 #' requested based on `breaks_pretty()`. Set to 10 by default.
+#' @param print_summary Logic flag indicating whether to print model metrics
+#' from the latest possible test. Set to FALSE by default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -331,35 +338,35 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #' @export
 
 plot.MultiCellMarketSelection <- function(x,
-                                        cell_ID = 0,
-                                        market_ID = 0,
-                                        print_summary = TRUE,
-                                        actual_values = TRUE,
-                                        smoothed_values = TRUE,
-                                        show_mde = FALSE,
-                                        breaks_x_axis = 10,
-                                        ...) {
+                                          test_markets = list(),
+                                          print_summary = FALSE,
+                                          actual_values = TRUE,
+                                          smoothed_values = TRUE,
+                                          show_mde = FALSE,
+                                          breaks_x_axis = 10,
+                                          ...) {
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
   }
 
-  # Check cell_ID
-  if (!(cell_ID %in% seq(1:x$test_details$k))) {
-    stop("Please enter a valid numeric cell_ID.")
+  if(length(test_markets) != length(x$Models)){
+    stop("\nMake sure an ID is provided for each cell in the analysis.")
   }
 
-  # Will plot the lift plot with the MDE and the power curve
-  if (!(market_ID %in% x$Models[[cell_ID]]$BestMarkets)) {
-    stop("Please enter a valid market_ID.")
+  if(!(all(sapply(test_markets, is.numeric)))){
+    stop("\nMake sure all input IDs in test_markets are numeric.")
   }
 
-  plot(x$Models[[cell_ID]],
-       market_ID = market_ID,
-       print_summary = print_summary,
-       actual_values = actual_values,
-       smoothed_values = smoothed_values,
-       show_mde = show_mde,
-       breaks_x_axis = breaks_x_axis)
+  for (cell in 1:length(x$Models)){
+    plot(x$Models[[cell]],
+         market_ID = test_markets[[cell]],
+         print_summary = print_summary,
+         actual_values = actual_values,
+         smoothed_values = smoothed_values,
+         show_mde = show_mde,
+         breaks_x_axis = breaks_x_axis,
+         print_summary = print_summary)
+  }
 
 }
 
@@ -383,6 +390,15 @@ plot.MultiCellMarketSelection <- function(x,
 #' for the power analysis should go. For instance, a value equal to 5 will simulate
 #' power for the last five possible tests. By default lookback_window = 1 which
 #' will only execute the most recent test based on the data.
+#' @param side_of_test A string indicating whether confidence will be determined
+#' using a one sided or a two sided test. If set to NULL (default), the `side_of_test`
+#' will be populated by the value specified in `MultiCellMarketSelection`.
+#' \itemize{
+#'          \item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+#'          \item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+#'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+#'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+#'          }
 #' @param plot Logic flag indicating whether to plot all power curves. Set to TRUE
 #' by default.
 #' @param actual_values Logic flag indicating whether to include in the plot
@@ -404,15 +420,16 @@ plot.MultiCellMarketSelection <- function(x,
 #'
 #' @export
 
-MultiCellPower <- function(x, #MultiCellPower
-                             test_markets = list(),
-                             effect_size = seq(-0.25,0.25,0.05),
-                             lookback_window = NULL,
-                             plot = TRUE,
-                             actual_values = TRUE,
-                             smoothed_values = FALSE,
-                             show_mde = TRUE,
-                             breaks_x_axis = 10){
+MultiCellPower <- function(x,
+                           test_markets = list(),
+                           effect_size = seq(-0.25,0.25,0.05),
+                           lookback_window = NULL,
+                           side_of_test = NULL,
+                           plot = TRUE,
+                           actual_values = TRUE,
+                           smoothed_values = FALSE,
+                           show_mde = TRUE,
+                           breaks_x_axis = 10){
 
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
@@ -430,13 +447,25 @@ MultiCellPower <- function(x, #MultiCellPower
     lookback_window <- x$test_details$lookback_window
   }
 
+  # Check side_of_test
+  if (!is.null(side_of_test)){
+    if(!(tolower(side_of_test) %in% c("one_sided", "two_sided"))){
+      stop("\nEnter a valid side_of_test ('one_sided', 'two_sided').")
+    }
+  }
+
   PowerCurves <- c()
   test_locs <- c()
 
+  # List of test locations
+  for (cell in 1:length(test_markets)){
+    test_locs <- append(test_locs, list(stringr::str_split(x[[2]][[cell]]$BestMarkets$location[test_markets[[cell]]], ", ")[[1]]))
+  }
+
+
   for (cell in 1:length(test_markets)){
     PowerAux <- NULL
-    test_locs <- append(test_locs, list(stringr::str_split(x[[2]][[cell]]$BestMarkets$location[test_markets[[cell]]], ", ")[[1]]))
-    data_aux <- x$data %>% dplyr::filter(!(location %in% test_locs[-c(cell)] ))
+    data_aux <- x$data %>% dplyr::filter(!(location %in% unlist(test_locs[-c(cell)]) ))
 
     PowerAux <- suppressMessages(GeoLiftPower(data = data_aux,
                                               locations = test_locs[[cell]],
@@ -452,7 +481,9 @@ MultiCellPower <- function(x, #MultiCellPower
                                               fixed_effects = x$test_details$fixed_effects,
                                               parallel = x$test_details$parallel,
                                               parallel_setup = x$test_details$parallel_setup,
-                                              side_of_test = x$test_details$side_of_test))
+                                              side_of_test = ifelse(is.null(side_of_test),
+                                                                    x$test_details$side_of_test,
+                                                                    side_of_test)))
 
     PowerCurves <- append(PowerCurves, list(PowerAux))
     names(PowerCurves)[cell] <- paste0("cell_",eval(cell))
@@ -500,6 +531,77 @@ print.MultiCellPower <- function(x, ...) {
 
 }
 
+#' Plotting function for MultiCellPower
+#'
+#' @description
+#'
+#' Plotting function for `MultiCellPower`. This function plots the
+#' Power Curves for all given test markets
+#' latest possible test given the data and duration as well as the power curve
+#' across historical simulations for a given merket_id and cell_id.
+#'
+#' @param x A MultiCellMarketSelection object.
+#' @param actual_values Logic flag indicating whether to include in the plot
+#' the actual values. TRUE by default.
+#' @param smoothed_values Logic flag indicating whether to include in the plot
+#' the smoothed values. TRUE by default.
+#' @param show_mde Logic flag indicating whether to include in the plot
+#' the positive and negative MDEs. FALSE by default.
+#' @param breaks_x_axis Numeric value indicating the number of breaks in the
+#' x-axis of the power plot. You may get slightly more or fewer breaks that
+#' requested based on `breaks_pretty()`. Set to 10 by default.
+#' @param stacked Logic flag indicating whether to stack all the Multi-Cell plots
+#' together vertically or to output each one of them separately. Set to TRUE by
+#' default.
+#' @param ... additional arguments
+#'
+#' @return
+#' MultiCellPower plot.
+#'
+#' @export
+
+plot.MultiCellPower <- function(x,
+                                actual_values = TRUE,
+                                smoothed_values = FALSE,
+                                show_mde = TRUE,
+                                breaks_x_axis = 10,
+                                stacked = TRUE,
+                                          ...) {
+
+  if (!inherits(x, "MultiCellPower")) {
+    stop("object must be class MultiCellPower")
+  }
+
+  if(stacked){
+    aux <- lapply(x$PowerCurves, function(x) plot(x,
+                                                  actual_values = actual_values,
+                                                  smoothed_values = smoothed_values,
+                                                  show_mde = show_mde,
+                                                  breaks_x_axis = breaks_x_axis,
+                                                  notes = paste0("Cell : ", x[1,1])))
+
+    suppressMessages(gridExtra::grid.arrange(
+      grobs = aux,
+      ncol = 1,
+      nrow = length(x$PowerCurves)
+    ))
+
+  } else{
+    for (cell in 1:length(x$PowerCurves)){
+      print(plot(x$PowerCurves[[cell]],
+                 actual_values = actual_values,
+                 smoothed_values = smoothed_values,
+                 show_mde = show_mde,
+                 breaks_x_axis = breaks_x_axis,
+                 notes = paste0("Cell ", cell, ": ", x$PowerCurves[[cell]][1,1])))
+    }
+  }
+
+
+
+
+}
+
 
 #' Multi-Cell Winner Declaration Method for Market Selection.
 #'
@@ -534,6 +636,14 @@ print.MultiCellPower <- function(x, ...) {
 #'          \item{"conformal":}{ Conformal Inference. Defualt.}
 #'          \item{"jackknife+":}{ Jackknife+ (exclusively for stat_test = "Total").}
 #'          }
+#' @param stat_test A string indicating the test statistic.
+#' \itemize{
+#'          \item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
+#'          \item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
+#'          Recommended for Negative Lift tests.}
+#'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
+#'          Recommended for Positive Lift tests.}
+#' }
 #'
 #' @return A list with two objects:
 #' \itemize{
@@ -550,29 +660,39 @@ MultiCellWinner <- function(x,
                             geolift_type = "standard",
                             ROAS = seq(0,5,0.05),
                             alpha = 0.1,
-                            method = "conformal"
+                            method = "conformal",
+                            stat_test = "Total"
 ){
 
   if (!inherits(x, "MultiCellPower")) {
     stop("object must be class MultiCellPower")
   }
 
+  # Check ROAS
   if (min(ROAS) < 0){
     stop("\nMake sure all ROAS values are positive.")
   } else if(min(ROAS == 0)){
     ROAS <- c(0, ROAS)
   }
 
+  # Check effect_size
   if(length(effect_size) > 1){
     stop("\nPlease specify a single value of effect_size to analyze.")
   }
 
+  # Check geolift_type
   if(!(tolower(geolift_type) %in% c("standard", "inverse"))){
     stop("\nPlease specify a valid geolift_type test ('standard', 'inverse').")
   }
 
+  # Check method
   if(!(tolower(method) %in% c("conformal", "jackknife+"))){
     stop("\nPlease specify a valid geolift_type test ('conformal', 'jackknife+').")
+  }
+
+  # Check stat_test
+  if(!(stat_test %in% c("Total", "Negative", "Positive"))){
+    stop("\nEnter a valid stat_test ('Total', 'Negative', 'Positive').")
   }
 
   #Set variables
@@ -608,16 +728,16 @@ MultiCellWinner <- function(x,
   # Resulting dataframe
   sims <- data.frame(matrix(ncol=12,nrow=0))
   colnames(sims) <- c("cell_A",
-                      "cell_B",
                       "incremental_A",
+                      "lowerCI_Cell_A",
+                      "upperCI_Cell_A",
+                      "cell_B",
                       "incremental_B",
+                      "lowerCI_Cell_B",
+                      "upperCI_Cell_B",
                       "duration",
                       "base_lift",
                       "ROAS",
-                      "lowerCI_Cell_A",
-                      "upperCI_Cell_A",
-                      "lowerCI_Cell_B",
-                      "upperCI_Cell_B",
                       "DID")
 
   combinations <- combn(seq(1:length(x$PowerCurves)),2)
@@ -629,11 +749,14 @@ MultiCellWinner <- function(x,
       test_locs_aux <- c(test_locs[[combinations[,combo][1]]],test_locs[[combinations[,combo][2]]])
       data_aux <- x$data %>% dplyr::filter(!(location %in% unlist(test_locs)[!(unlist(test_locs) %in% test_locs_aux)]))
 
+      print(test_locs_aux)
+      print(length(unique(data_aux$location)))
+
       data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] * (1 + effect_size*roas)
       data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] * (1 + effect_size)
 
 
-      gl_a <- suppressMessages(GeoLift(Y_id = "Y", #podria quitar los renames porque tienen nombre estándar por paso 1
+      gl_a <- suppressMessages(GeoLift(Y_id = "Y",
                                        time_id = x$test_details$time_id,
                                        location_id = x$test_details$location_id,
                                        X = x$test_details$X,
@@ -647,7 +770,7 @@ MultiCellWinner <- function(x,
                                        ConfidenceIntervals = TRUE,
                                        method = method,
                                        grid_size = 250,
-                                       stat_test = "Total"))
+                                       stat_test = stat_test))
 
       gl_b <- suppressMessages(GeoLift(Y_id = "Y",
                                        time_id = x$test_details$time_id,
@@ -663,7 +786,7 @@ MultiCellWinner <- function(x,
                                        ConfidenceIntervals = TRUE,
                                        method = method,
                                        grid_size = 250,
-                                       stat_test = "Total"))
+                                       stat_test = stat_test))
 
       if(gl_a$upper_bound < gl_b$lower_bound){
         DID_aux <- 1
@@ -672,16 +795,16 @@ MultiCellWinner <- function(x,
       }
 
       sims <- rbind(sims, list("cell_A" = unlist(lapply(test_locs[combinations[,combo][1]], function(x) paste(x, collapse = ", "))),
-                               "cell_B" = unlist(lapply(test_locs[combinations[,combo][2]], function(x) paste(x, collapse = ", "))),
                                "incremental_A" = gl_a$incremental,
+                               "lowerCI_Cell_A" = round(gl_a$lower_bound, 2),
+                               "upperCI_Cell_A" = round(gl_a$upper_bound, 2),
+                               "cell_B" = unlist(lapply(test_locs[combinations[,combo][2]], function(x) paste(x, collapse = ", "))),
                                "incremental_B" = gl_b$incremental,
+                               "lowerCI_Cell_B" = round(gl_b$lower_bound, 2),
+                               "upperCI_Cell_B" = round(gl_b$upper_bound, 2),
                                "duration" = duration,
                                "base_lift" = effect_size,
                                "ROAS" = roas,
-                               "lowerCI_Cell_A" = gl_a$lower_bound,
-                               "upperCI_Cell_A" = gl_a$upper_bound,
-                               "lowerCI_Cell_B" = gl_b$lower_bound,
-                               "upperCI_Cell_B" = gl_b$upper_bound,
                                "DID" = DID_aux) )
 
       if(DID_aux == 1){break}
@@ -740,7 +863,7 @@ print.MultiCellWinner <- function(x, ...) {
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param locations A list of lists of test markets per cell. The recommended layout is
-#' `list(cell_1 = "locA", cell2 = "locB", cell3 = "locC",...)`.
+#' `list(cell_1 = list("locA"), cell2 = list("locB"), cell3 = list("locC"),...)`.
 #' @param treatment_start_time Time index of the start of the treatment.
 #' @param treatment_end_time Time index of the end of the treatment.
 #' @param alpha Significance level. Set to 0.1 by default.
@@ -824,13 +947,19 @@ GeoLiftMultiCell <- function(Y_id = "Y",
     stop("\nPlease enter a list of test locations by cell.")
   }
 
-  # Check that locations is a list
+  # Check that the locations are characters
   if(!(all(sapply(unlist(locations), is.character)))){
     stop("\nMake sure all test locations are characters.")
   }
 
+  # Check geolift_type
   if(!(tolower(geolift_type) %in% c("standard", "inverse"))){
     stop("\nPlease specify a valid geolift_type test ('standard', 'inverse').")
+  }
+
+  # Check stat_test
+  if(!(stat_test %in% c("Total", "Negative", "Positive"))){
+    stop("\nEnter a valid stat_test ('Total', 'Negative', 'Positive').")
   }
 
   k <- length(locations)
@@ -838,7 +967,7 @@ GeoLiftMultiCell <- function(Y_id = "Y",
   GeoLiftResults <- list()
 
   for(cell in 1:k){
-    data_aux <- data %>% dplyr::filter(!(location %in% locations[-c(cell)] ))
+    data_aux <- data %>% dplyr::filter(!(location %in% unlist(locations[-c(cell)]) ))
     aux <- GeoLift(Y_id = Y_id,
                    time_id = time_id,
                    location_id = location_id,
@@ -860,7 +989,7 @@ GeoLiftMultiCell <- function(Y_id = "Y",
 
   if(winner_declaration){
     combinations <- combn(seq(1:k),2)
-    pairwise <- as.data.frame(matrix(ncol = 3, nrow = 0))
+    pairwise <- as.data.frame(matrix(ncol = 7, nrow = 0))
 
     for (combo in 1:ncol(combinations)){
       aux_locs_a <- locations[combinations[,combo][1]]
@@ -868,31 +997,45 @@ GeoLiftMultiCell <- function(Y_id = "Y",
       winner_aux <- NA
 
       if (tolower(geolift_type) == "standard"){
-        if(GeoLiftResults[[combinations[,combo][1]]]$lower_bound <
+        if(GeoLiftResults[[combinations[,combo][1]]]$lower_bound >
            GeoLiftResults[[combinations[,combo][2]]]$upper_bound){
           winner_aux <- unlist(lapply(aux_locs_a, function(x) paste(x, collapse = ", ")))
-        } else if(GeoLiftResults[[combinations[,combo][2]]]$lower_bound <
+        } else if(GeoLiftResults[[combinations[,combo][2]]]$lower_bound >
                   GeoLiftResults[[combinations[,combo][1]]]$upper_bound){
           winner_aux <- unlist(lapply(aux_locs_b, function(x) paste(x, collapse = ", ")))
         }
       } else{
-        if(GeoLiftResults[[combinations[,combo][1]]]$uower_bound <
-           GeoLiftResults[[combinations[,combo][2]]]$lpper_bound){
+        if(GeoLiftResults[[combinations[,combo][1]]]$upper_bound <
+           GeoLiftResults[[combinations[,combo][2]]]$lower_bound){
           winner_aux <- unlist(lapply(aux_locs_a, function(x) paste(x, collapse = ", ")))
-        } else if(GeoLiftResults[[combinations[,combo][2]]]$uower_bound <
-                  GeoLiftResults[[combinations[,combo][1]]]$lpper_bound){
+        } else if(GeoLiftResults[[combinations[,combo][2]]]$upper_bound <
+                  GeoLiftResults[[combinations[,combo][1]]]$lower_bound){
           winner_aux <- unlist(lapply(aux_locs_b, function(x) paste(x, collapse = ", ")))
         }
       }
 
       pairwise <- rbind(pairwise,c("Cell_A" = unlist(lapply(aux_locs_a, function(x) paste(x, collapse = ", "))),
+                                   "Lower_A" = round(GeoLiftResults[[combinations[,combo][1]]]$lower_bound,2),
+                                   "Upper_A" = round(GeoLiftResults[[combinations[,combo][1]]]$upper_bound,2),
                                    "Cell_B" = unlist(lapply(aux_locs_b, function(x) paste(x, collapse = ", "))),
+                                   "Lower_B" = round(GeoLiftResults[[combinations[,combo][2]]]$lower_bound,2),
+                                   "Upper_B" = round(GeoLiftResults[[combinations[,combo][2]]]$upper_bound,2),
                                    "Winner" = winner_aux))
+
       names(pairwise) <- c("Cell_A",
+                           "Lower_A",
+                           "Upper_A",
                            "Cell_B",
+                           "Lower_B",
+                           "Upper_B",
                            "Winner")
 
     }
+
+    message(paste0(
+      "\n##################################",
+      "\n##### Pairwise  Comparisons #####\n",
+      "##################################\n"))
 
     print(pairwise)
 
@@ -900,12 +1043,22 @@ GeoLiftMultiCell <- function(Y_id = "Y",
 
     for(cell in 1:k){
       aux_pairwise <- pairwise %>% dplyr::filter(Winner == unlist(lapply(locations[cell], function(x) paste(x, collapse = ", "))))
-      n_wins <- ncol(aux_pairwise)
+      n_wins <- nrow(aux_pairwise)
       if(n_wins == k-1){
         winner <- unlist(lapply(locations[cell], function(x) paste(x, collapse = ", ")))
         break
       }
     }
+
+    if(!(is.na(winner))){
+      message(paste0(
+        "\n##################################",
+        "\n#####   Winner Declaration   #####\n",
+        "##################################\n\n",
+      "* Winner Cell:\n",
+      " ", toupper(winner)))
+    }
+
   }
 
 
@@ -989,7 +1142,7 @@ print.GeoLiftMultiCell <- function(x, ...) {
       "Average Estimated Treatment Effect (ATT): ", round(x$results[[cell]]$inference$ATT, 3),
       "\n\n", is_significant, " (", test_type,
       "\n\nThere is a ", round(100 * x$results[[cell]]$inference$pvalue, 2),
-      "% chance of observing an effect this large or larger assuming treatment effect is zero.",
+      "% chance of observing an effect this large or larger assuming treatment effect is zero.\n\n",
       sep = ""
     ))
 
@@ -1019,9 +1172,11 @@ summary.GeoLiftMultiCell <- function(object, ...) {
       "\n#####     Cell ",
       cell,
       " Results    #####\n",
-      "##################################\n"))
+      "##################################"))
 
     print(summary(object$results[[cell]]))
+
+    message(paste0("\n\n"))
 
     }
 
@@ -1043,8 +1198,10 @@ summary.GeoLiftMultiCell <- function(object, ...) {
 #' weekly or daily. Defaults to daily.
 #' @param title String for the title of the plot. Empty by default.
 #' @param plot_start_date Character that represents initial date of plot in year-month-day format.
-#' @param subtitle String for the subtitle of the plot. Empty by default.
 #' @param post_treatment_periods Number of post-treatment periods. Zero by default.
+#' @param stacked Logic flag indicating whether to stack all the Multi-Cell plots
+#' together vertically or to output each one of them separately. Set to TRUE by
+#' default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -1058,8 +1215,8 @@ plot.GeoLiftMultiCell <- function(x,
                                   frequency = "daily",
                                   plot_start_date = NULL,
                                   title = "",
-                                  subtitle = "",
                                   post_treatment_periods = 0,
+                                  stacked = TRUE,
                                   ...) {
   if (!inherits(x, "GeoLiftMultiCell")) {
     stop("object must be class GeoLiftMultiCell")
@@ -1069,16 +1226,33 @@ plot.GeoLiftMultiCell <- function(x,
     stop("\nPlease specify a valid geolift_type test ('Lift', 'ATT', 'TreatmentSchedule').")
   }
 
-  for(cell in 1:length(x$results)){
-    plot(x$results[[cell]],
-         type = type,
-         treatment_end_date = treatment_end_date,
-         frequency = frequency,
-         plot_start_date = plot_start_date,
-         title = title,
-         subtitle = title,
-         notes = paste0("Cell ", cell),
-         post_treatment_periods = post_treatment_periods)
+  if (stacked){
+    aux <- lapply(x$results, function(x) plot(x,
+                                              type = type,
+                                              treatment_end_date = treatment_end_date,
+                                              frequency = frequency,
+                                              plot_start_date = plot_start_date,
+                                              title = title,
+                                              subtitle = paste0("Cell: ", paste(x$test_id$name, collapse = ", ")),
+                                              post_treatment_periods = post_treatment_periods))
+
+    suppressMessages(gridExtra::grid.arrange(
+      grobs = aux,
+      ncol = 1,
+      nrow = length(x$results)
+    ))
+  } else{
+    for(cell in 1:length(x$results)){
+      print(plot(x$results[[cell]],
+                 type = type,
+                 treatment_end_date = treatment_end_date,
+                 frequency = frequency,
+                 plot_start_date = plot_start_date,
+                 title = title,
+                 subtitle = paste0("Cell ", cell, ":\n", paste(x$results[[cell]]$test_id$name, collapse = ", ")),
+                 post_treatment_periods = post_treatment_periods))
+    }
+
   }
 
 }

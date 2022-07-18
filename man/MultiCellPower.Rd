@@ -9,6 +9,7 @@ MultiCellPower(
   test_markets = list(),
   effect_size = seq(-0.25, 0.25, 0.05),
   lookback_window = NULL,
+  side_of_test = NULL,
   plot = TRUE,
   actual_values = TRUE,
   smoothed_values = FALSE,
@@ -32,6 +33,16 @@ zero.}
 for the power analysis should go. For instance, a value equal to 5 will simulate
 power for the last five possible tests. By default lookback_window = 1 which
 will only execute the most recent test based on the data.}
+
+\item{side_of_test}{A string indicating whether confidence will be determined
+using a one sided or a two sided test. If set to NULL (default), the \code{side_of_test}
+will be populated by the value specified in \code{MultiCellMarketSelection}.
+\itemize{
+\item{"two_sided":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Defualt.}
+\item{"one_sided":}{ One-sided test against positive or negaative effects i.e.
+If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
+If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
+}}
 
 \item{plot}{Logic flag indicating whether to plot all power curves. Set to TRUE
 by default.}

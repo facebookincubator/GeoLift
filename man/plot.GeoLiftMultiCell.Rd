@@ -11,7 +11,6 @@
   frequency = "daily",
   plot_start_date = NULL,
   title = "",
-  subtitle = "",
   post_treatment_periods = 0,
   ...
 )
@@ -32,8 +31,6 @@ weekly or daily. Defaults to daily.}
 \item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
 
 \item{title}{String for the title of the plot. Empty by default.}
-
-\item{subtitle}{String for the subtitle of the plot. Empty by default.}
 
 \item{post_treatment_periods}{Number of post-treatment periods. Zero by default.}
 

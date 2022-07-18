@@ -10,7 +10,8 @@ MultiCellWinner(
   geolift_type = "standard",
   ROAS = seq(0, 5, 0.05),
   alpha = 0.1,
-  method = "conformal"
+  method = "conformal",
+  stat_test = "Total"
 )
 }
 \arguments{
@@ -41,6 +42,15 @@ aggregate ATT Confidence Intervals.
 \itemize{
 \item{"conformal":}{ Conformal Inference. Defualt.}
 \item{"jackknife+":}{ Jackknife+ (exclusively for stat_test = "Total").}
+}}
+
+\item{stat_test}{A string indicating the test statistic.
+\itemize{
+\item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
+\item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
+Recommended for Negative Lift tests.}
+\item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
+Recommended for Positive Lift tests.}
 }}
 }
 \value{

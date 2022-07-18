@@ -6,9 +6,8 @@
 \usage{
 \method{plot}{MultiCellMarketSelection}(
   x,
-  cell_ID = 0,
-  market_ID = 0,
-  print_summary = TRUE,
+  test_markets = list(),
+  print_summary = FALSE,
   actual_values = TRUE,
   smoothed_values = TRUE,
   show_mde = FALSE,
@@ -19,13 +18,12 @@
 \arguments{
 \item{x}{A MultiCellMarketSelection object.}
 
-\item{cell_ID}{Numeric value indicating the cell.}
-
-\item{market_ID}{Numeric value indicating the market to be plotted. This
-value should reflect a valid ID from the \code{MultiCellMarketSelection} output.}
+\item{test_markets}{List of market IDs per cell. The list must contain exactly
+k numeric values corresponding to the power analysis. The recommended layout is
+\code{list(cell_1 = 1, cell2 = 1, cell3 = 1,...)}.}
 
 \item{print_summary}{Logic flag indicating whether to print model metrics
-from the latest possible test. Set to TRUE by default.}
+from the latest possible test. Set to FALSE by default.}
 
 \item{actual_values}{Logic flag indicating whether to include in the plot
 the actual values. TRUE by default.}

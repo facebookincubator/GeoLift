@@ -10,6 +10,7 @@
   smoothed_values = FALSE,
   show_mde = TRUE,
   breaks_x_axis = 10,
+  stacked = TRUE,
   ...
 )
 }
@@ -28,6 +29,10 @@ the positive and negative MDEs. FALSE by default.}
 \item{breaks_x_axis}{Numeric value indicating the number of breaks in the
 x-axis of the power plot. You may get slightly more or fewer breaks that
 requested based on \code{breaks_pretty()}. Set to 10 by default.}
+
+\item{stacked}{Logic flag indicating whether to stack all the Multi-Cell plots
+together vertically or to output each one of them separately. Set to TRUE by
+default.}
 
 \item{...}{additional arguments}
 }

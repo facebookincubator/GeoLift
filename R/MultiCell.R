@@ -202,7 +202,7 @@ MultiCellMarketSelection <- function(data,
 
   # Initializing output objects
   GeoLift_Markets <- list()
-  TopChoices <- data.frame(matrix(ncol = 10, nrow = 0))
+  TopChoices <- data.frame(matrix(ncol = 11, nrow = 0))
 
   for (cell_id in 1:k){
     locations <- rank_by_loc$location[rank_by_loc$cell == cell_id]
@@ -250,6 +250,7 @@ MultiCellMarketSelection <- function(data,
                                                                    "duration",
                                                                    "EffectSize",
                                                                    "AvgScaledL2Imbalance",
+                                                                   "abs_lift_in_zero",
                                                                    "Investment",
                                                                    "ProportionTotal_Y",
                                                                    "Holdout",
@@ -341,8 +342,8 @@ plot.MultiCellMarketSelection <- function(x,
                                           test_markets = list(),
                                           print_summary = FALSE,
                                           actual_values = TRUE,
-                                          smoothed_values = TRUE,
-                                          show_mde = FALSE,
+                                          smoothed_values = FALSE,
+                                          show_mde = TRUE,
                                           breaks_x_axis = 10,
                                           ...) {
   if (!inherits(x, "MultiCellMarketSelection")) {
@@ -364,8 +365,7 @@ plot.MultiCellMarketSelection <- function(x,
          actual_values = actual_values,
          smoothed_values = smoothed_values,
          show_mde = show_mde,
-         breaks_x_axis = breaks_x_axis,
-         print_summary = print_summary)
+         breaks_x_axis = breaks_x_axis)
   }
 
 }
@@ -399,17 +399,6 @@ plot.MultiCellMarketSelection <- function(x,
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#' @param plot Logic flag indicating whether to plot all power curves. Set to TRUE
-#' by default.
-#' @param actual_values Logic flag indicating whether to include in the plot
-#' the actual values. TRUE by default.
-#' @param smoothed_values Logic flag indicating whether to include in the plot
-#' the smoothed values. TRUE by default.
-#' @param show_mde Logic flag indicating whether to include in the plot
-#' the positive and negative MDEs. FALSE by default.
-#' @param breaks_x_axis Numeric value indicating the number of breaks in the
-#' x-axis of the power plot. You may get slightly more or fewer breaks that
-#' requested based on `breaks_pretty()`. Set to 10 by default.
 #'
 #' @return A 'MultiCellPower' object with three objects:
 #' \itemize{
@@ -424,12 +413,7 @@ MultiCellPower <- function(x,
                            test_markets = list(),
                            effect_size = seq(-0.25,0.25,0.05),
                            lookback_window = NULL,
-                           side_of_test = NULL,
-                           plot = TRUE,
-                           actual_values = TRUE,
-                           smoothed_values = FALSE,
-                           show_mde = TRUE,
-                           breaks_x_axis = 10){
+                           side_of_test = NULL){
 
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
@@ -488,14 +472,6 @@ MultiCellPower <- function(x,
     PowerCurves <- append(PowerCurves, list(PowerAux))
     names(PowerCurves)[cell] <- paste0("cell_",eval(cell))
 
-    if(plot == TRUE){
-      print(plot(PowerAux,
-                 actual_values = actual_values,
-                 smoothed_values = smoothed_values,
-                 show_mde = show_mde,
-                 breaks_x_axis = breaks_x_axis,
-                 notes = paste0("Cell ", cell, ": ", PowerAux[1,1])))
-    }
   }
 
   res <- list(PowerCurves = PowerCurves,
@@ -710,11 +686,11 @@ MultiCellWinner <- function(x,
         dplyr::filter(power > 0.8, EffectSize < 0 ) %>%
         dplyr::slice_max(EffectSize, n = 1)
     }
-    test_params[cell,1] <- aux$location #location
-    test_params[cell,2] <- aux$EffectSize #effect_size
-    test_params[cell,3] <- aux$duration #duration
-    test_params[cell,4] <- aux$cpic #cpic
-    test_params[cell,5] <- aux$Investment #investment
+    test_params[cell,1] <- aux$location[1] #location
+    test_params[cell,2] <- mean(aux$EffectSize) #effect_size
+    test_params[cell,3] <- max(aux$duration) #duration
+    test_params[cell,4] <- mean(aux$cpic) #cpic
+    test_params[cell,5] <- mean(aux$Investment) #investment
 
     test_locs <- append(test_locs, list(stringr::str_split(x$PowerCurves[[cell]]$location[1], ", ")[[1]]))
   }
@@ -748,9 +724,6 @@ MultiCellWinner <- function(x,
     for (roas in ROAS){
       test_locs_aux <- c(test_locs[[combinations[,combo][1]]],test_locs[[combinations[,combo][2]]])
       data_aux <- x$data %>% dplyr::filter(!(location %in% unlist(test_locs)[!(unlist(test_locs) %in% test_locs_aux)]))
-
-      print(test_locs_aux)
-      print(length(unique(data_aux$location)))
 
       data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] * (1 + effect_size*roas)
       data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] * (1 + effect_size)
@@ -1137,7 +1110,7 @@ print.GeoLiftMultiCell <- function(x, ...) {
       "\nPercent Lift: ",
       round(x$results[[cell]]$inference$Perc.Lift, 3), "%\n\n",
       "p-value: ",
-      round(x$results[[cell]]$inference$pvalue, 2), "%\n\n",
+      round(x$results[[cell]]$inference$pvalue, 2), "\n\n",
       "Incremental ", paste(x$results[[cell]]$Y_id), ": ", round(x$results[[cell]]$incremental, 0), "\n\n",
       "Average Estimated Treatment Effect (ATT): ", round(x$results[[cell]]$inference$ATT, 3),
       "\n\n", is_significant, " (", test_type,

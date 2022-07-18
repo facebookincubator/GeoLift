@@ -12,6 +12,7 @@
   plot_start_date = NULL,
   title = "",
   post_treatment_periods = 0,
+  stacked = TRUE,
   ...
 )
 }
@@ -33,6 +34,10 @@ weekly or daily. Defaults to daily.}
 \item{title}{String for the title of the plot. Empty by default.}
 
 \item{post_treatment_periods}{Number of post-treatment periods. Zero by default.}
+
+\item{stacked}{Logic flag indicating whether to stack all the Multi-Cell plots
+together vertically or to output each one of them separately. Set to TRUE by
+default.}
 
 \item{...}{additional arguments}
 }

@@ -34,8 +34,7 @@
 #' @param time_id Name of the time variable (String).
 #' @param effect_size A vector of effect sizes to test by default a
 #' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
-#' Only input sequences that are entirely positive or negative and that include
-#' zero.
+#' Make sure that the sequence includes zero.
 #' @param treatment_periods List of treatment periods to calculate power for. It
 #' is recommended to specify a single treatment length for multi-cell Market Selections.
 #' @param lookback_window A number indicating how far back in time the simulations
@@ -318,19 +317,19 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #' @param test_markets List of market IDs per cell. The list must contain exactly
 #' k numeric values corresponding to the power analysis. The recommended layout is
 #' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
-#' @param print_summary Logic flag indicating whether to print model metrics
-#' from the latest possible test. Set to FALSE by default.
-#' @param actual_values Logic flag indicating whether to include in the plot
-#' the actual values. TRUE by default.
-#' @param smoothed_values Logic flag indicating whether to include in the plot
-#' the smoothed values. TRUE by default.
-#' @param show_mde Logic flag indicating whether to include in the plot
-#' the positive and negative MDEs. FALSE by default.
-#' @param breaks_x_axis Numeric value indicating the number of breaks in the
-#' x-axis of the power plot. You may get slightly more or fewer breaks that
-#' requested based on `breaks_pretty()`. Set to 10 by default.
-#' @param print_summary Logic flag indicating whether to print model metrics
-#' from the latest possible test. Set to FALSE by default.
+#' @param type Type of plot. By default "Lift" which plots the
+#' incrementality on the outcome variable. If type is set to "ATT",
+#' the average ATT is plotted. If type is set to "Incrementality",
+#' daily incremental values are plotted.
+#' @param treatment_end_date Character that represents a date in year-month=day format.
+#' @param frequency Character that represents periodicity of time stamps. Can be either
+#' weekly or daily. Defaults to daily.
+#' @param plot_start_date Character that represents initial date of plot in year-month-day format.
+#' @param post_treatment_periods Number of post-treatment periods. Zero by default.
+#' @param title String for the title of the plot. Empty by default.
+#' @param stacked Logic flag indicating whether to stack all the Multi-Cell plots
+#' together vertically or to output each one of them separately. Set to TRUE by
+#' default.
 #' @param ... additional arguments
 #'
 #' @return
@@ -340,12 +339,15 @@ print.MultiCellMarketSelection <- function(x, ...) {
 
 plot.MultiCellMarketSelection <- function(x,
                                           test_markets = list(),
-                                          print_summary = FALSE,
-                                          actual_values = TRUE,
-                                          smoothed_values = FALSE,
-                                          show_mde = TRUE,
-                                          breaks_x_axis = 10,
+                                          type = "Lift",
+                                          treatment_end_date = NULL,
+                                          frequency = "daily",
+                                          plot_start_date = NULL,
+                                          post_treatment_periods = 0,
+                                          title = "",
+                                          stacked = TRUE,
                                           ...) {
+
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
   }
@@ -358,15 +360,79 @@ plot.MultiCellMarketSelection <- function(x,
     stop("\nMake sure all input IDs in test_markets are numeric.")
   }
 
-  for (cell in 1:length(x$Models)){
-    plot(x$Models[[cell]],
-         market_ID = test_markets[[cell]],
-         print_summary = print_summary,
-         actual_values = actual_values,
-         smoothed_values = smoothed_values,
-         show_mde = show_mde,
-         breaks_x_axis = breaks_x_axis)
+  if(!(tolower(type) %in% c("lift", "att", "treatmentschedule"))){
+    stop("\nPlease specify a valid geolift_type test ('Lift', 'ATT', 'TreatmentSchedule').")
   }
+
+  plots <- list()
+
+  for(cell in 1:length(x$Models)){
+    Market <- x$Models[[cell]]$BestMarkets %>% dplyr::filter(ID == test_markets[cell])
+    locs_aux <- unlist(strsplit(stringr::str_replace_all(Market$location, ", ", ","), split = ","))
+    max_time <- max(x$Models[[cell]]$parameters$data$time)
+
+    data_lifted <- x$Models[[cell]]$parameters$data
+    data_lifted$Y[data_lifted$location %in% locs_aux &
+                    data_lifted$time >= max_time - Market$duration + 1] <-
+      data_lifted$Y[data_lifted$location %in% locs_aux &
+                      data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
+
+    if (tolower(x$Models[[cell]]$parameters$side_of_test) == "two_sided") {
+      stat_test <- "Total"
+    } else {
+      if (Market$EffectSize < 0) {
+        stat_test <- "Negative"
+      } else if (Market$EffectSize > 0) {
+        stat_test <- "Positive"
+      }
+    }
+
+    lifted <- suppressMessages(GeoLift::GeoLift(
+      Y_id = "Y",
+      time_id = "time",
+      location_id = "location",
+      data = data_lifted,
+      locations = locs_aux,
+      treatment_start_time = max_time - Market$duration + 1,
+      treatment_end_time = max_time,
+      model = x$Models[[cell]]$parameters$model,
+      fixed_effects = x$Models[[cell]]$parameters$fixed_effects,
+      stat_test = stat_test
+    ))
+
+    plots <- append(plots, list(lifted))
+
+  }
+
+  if (stacked){
+    aux <- lapply(plots, function(x) plot(x,
+                                         type = type,
+                                         treatment_end_date = treatment_end_date,
+                                         frequency = frequency,
+                                         plot_start_date = plot_start_date,
+                                         title = title,
+                                         subtitle = paste0("Cell: ", paste(x$test_id$name, collapse = ", ")),
+                                         post_treatment_periods = post_treatment_periods))
+
+    suppressMessages(gridExtra::grid.arrange(
+      grobs = aux,
+      ncol = 1,
+      nrow = length(x$Models)
+    ))
+  } else{
+    for(cell in 1:length(x$Models)){
+      print(plot(plots[[cell]],
+                 type = type,
+                 treatment_end_date = treatment_end_date,
+                 frequency = frequency,
+                 plot_start_date = plot_start_date,
+                 title = title,
+                 subtitle = paste0("Cell ", cell, ":\n", paste(plots[[cell]]$test_id$name, collapse = ", ")),
+                 post_treatment_periods = post_treatment_periods))
+    }
+
+  }
+
 
 }
 
@@ -384,8 +450,7 @@ plot.MultiCellMarketSelection <- function(x,
 #' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
 #' @param effect_size A vector of effect sizes to test by default a
 #' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
-#' Only input sequences that are entirely positive or negative and that include
-#' zero.
+#' Make sure that the sequence includes zero.
 #' @param lookback_window A number indicating how far back in time the simulations
 #' for the power analysis should go. For instance, a value equal to 5 will simulate
 #' power for the last five possible tests. By default lookback_window = 1 which
@@ -603,8 +668,6 @@ plot.MultiCellPower <- function(x,
 #' `seq(0,5,0.05)` by default.
 #' A vector of effect sizes to test by default a
 #' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
-#' Only input sequences that are entirely positive or negative and that include
-#' zero.
 #' @param alpha Significance Level. By default 0.1.
 #' @param method A string indicating the method used to calculate the
 #' aggregate ATT Confidence Intervals.

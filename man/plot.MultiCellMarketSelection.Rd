@@ -7,11 +7,13 @@
 \method{plot}{MultiCellMarketSelection}(
   x,
   test_markets = list(),
-  print_summary = FALSE,
-  actual_values = TRUE,
-  smoothed_values = FALSE,
-  show_mde = TRUE,
-  breaks_x_axis = 10,
+  type = "Lift",
+  treatment_end_date = NULL,
+  frequency = "daily",
+  plot_start_date = NULL,
+  post_treatment_periods = 0,
+  title = "",
+  stacked = TRUE,
   ...
 )
 }
@@ -22,21 +24,25 @@
 k numeric values corresponding to the power analysis. The recommended layout is
 \code{list(cell_1 = 1, cell2 = 1, cell3 = 1,...)}.}
 
-\item{print_summary}{Logic flag indicating whether to print model metrics
-from the latest possible test. Set to FALSE by default.}
+\item{type}{Type of plot. By default "Lift" which plots the
+incrementality on the outcome variable. If type is set to "ATT",
+the average ATT is plotted. If type is set to "Incrementality",
+daily incremental values are plotted.}
 
-\item{actual_values}{Logic flag indicating whether to include in the plot
-the actual values. TRUE by default.}
+\item{treatment_end_date}{Character that represents a date in year-month=day format.}
 
-\item{smoothed_values}{Logic flag indicating whether to include in the plot
-the smoothed values. TRUE by default.}
+\item{frequency}{Character that represents periodicity of time stamps. Can be either
+weekly or daily. Defaults to daily.}
 
-\item{show_mde}{Logic flag indicating whether to include in the plot
-the positive and negative MDEs. FALSE by default.}
+\item{plot_start_date}{Character that represents initial date of plot in year-month-day format.}
 
-\item{breaks_x_axis}{Numeric value indicating the number of breaks in the
-x-axis of the power plot. You may get slightly more or fewer breaks that
-requested based on \code{breaks_pretty()}. Set to 10 by default.}
+\item{post_treatment_periods}{Number of post-treatment periods. Zero by default.}
+
+\item{title}{String for the title of the plot. Empty by default.}
+
+\item{stacked}{Logic flag indicating whether to stack all the Multi-Cell plots
+together vertically or to output each one of them separately. Set to TRUE by
+default.}
 
 \item{...}{additional arguments}
 }

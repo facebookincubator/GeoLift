@@ -57,8 +57,7 @@ it will populate the list of markets with the deciles of the total number of loc
 
 \item{effect_size}{A vector of effect sizes to test by default a
 sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
-Only input sequences that are entirely positive or negative and that include
-zero.}
+Make sure that the sequence includes zero.}
 
 \item{treatment_periods}{List of treatment periods to calculate power for. It
 is recommended to specify a single treatment length for multi-cell Market Selections.}

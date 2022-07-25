@@ -21,8 +21,7 @@ k numeric values corresponding to the power analysis. The recommended layout is
 
 \item{effect_size}{A vector of effect sizes to test by default a
 sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
-Only input sequences that are entirely positive or negative and that include
-zero.}
+Make sure that the sequence includes zero.}
 
 \item{lookback_window}{A number indicating how far back in time the simulations
 for the power analysis should go. For instance, a value equal to 5 will simulate

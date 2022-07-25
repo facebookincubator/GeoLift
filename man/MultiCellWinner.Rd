@@ -31,9 +31,7 @@ from the treatment.}
 \item{ROAS}{Vector of incremental Return on Ad Spend (iROAS) values to assess. Set to
 \code{seq(0,5,0.05)} by default.
 A vector of effect sizes to test by default a
-sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
-Only input sequences that are entirely positive or negative and that include
-zero.}
+sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).}
 
 \item{alpha}{Significance Level. By default 0.1.}
 

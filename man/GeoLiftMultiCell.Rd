@@ -63,8 +63,8 @@ time-stamps. }
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
 effects in the model. Set to TRUE by default.}
 
-\item{ConfidenceIntervals}{A logic flag indicating whether to estimate confidence intervals
-through jackknifing techniques.  Set to FALSE by default.}
+\item{ConfidenceIntervals}{A logic flag indicating whether to estimate confidence intervals.
+Set to FALSE by default.}
 
 \item{method}{A string indicating the method used to calculate the
 aggregate ATT Confidence Intervals.

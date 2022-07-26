@@ -38,8 +38,8 @@
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
-#' @param ConfidenceIntervals A logic flag indicating whether to estimate confidence intervals
-#' through jackknifing techniques.  Set to FALSE by default.
+#' @param ConfidenceIntervals A logic flag indicating whether to estimate confidence intervals.
+#' Set to FALSE by default.
 #' @param method A string indicating the method used to calculate the
 #' aggregate ATT Confidence Intervals.
 #' \itemize{

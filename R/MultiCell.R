@@ -666,8 +666,6 @@ plot.MultiCellPower <- function(x,
 #'          }
 #' @param ROAS Vector of incremental Return on Ad Spend (iROAS) values to assess. Set to
 #' `seq(0,5,0.05)` by default.
-#' A vector of effect sizes to test by default a
-#' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
 #' @param alpha Significance Level. By default 0.1.
 #' @param method A string indicating the method used to calculate the
 #' aggregate ATT Confidence Intervals.
@@ -917,8 +915,8 @@ print.MultiCellWinner <- function(x, ...) {
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
-#' @param ConfidenceIntervals A logic flag indicating whether to estimate confidence intervals
-#' through jackknifing techniques.  Set to FALSE by default.
+#' @param ConfidenceIntervals A logic flag indicating whether to estimate confidence intervals.
+#' Set to FALSE by default.
 #' @param method A string indicating the method used to calculate the
 #' aggregate ATT Confidence Intervals.
 #' \itemize{

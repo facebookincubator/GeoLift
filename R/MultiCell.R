@@ -3,9 +3,8 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes functions MultiCellMarketSelection, print.MultiCellMarketSelection,
-# plot.MultiCellMarketSelection, MultiCellPower, print.MultiCellPower,
-# MultiCellWinner, print.MultiCellWinner, GeoLiftMultiCell, print.GeoLiftMultiCell,
-# summary.GeoLiftMultiCell, plot.GeoLiftMultiCell
+# MultiCellPower, print.MultiCellPower, MultiCellWinner, print.MultiCellWinner,
+# GeoLiftMultiCell, print.GeoLiftMultiCell, summary.GeoLiftMultiCell,
 
 
 #' Multi-Cell Sampling Method.
@@ -282,6 +281,7 @@ MultiCellMarketSelection <- function(data,
 
 }
 
+
 #' Print pretty MultiCellMarketSelection output.
 #'
 #' @description
@@ -305,136 +305,6 @@ print.MultiCellMarketSelection <- function(x, ...) {
 
 }
 
-#' Plotting function for MultiCellMarketSelection
-#'
-#' @description
-#'
-#' Plotting function for `MultiCellMarketSelection`. This function plots the
-#' latest possible test given the data and duration as well as the power curve
-#' across historical simulations for a given market_id and cell_id.
-#'
-#' @param x A MultiCellMarketSelection object.
-#' @param test_markets List of market IDs per cell. The list must contain exactly
-#' k numeric values corresponding to the power analysis. The recommended layout is
-#' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
-#' @param type Type of plot. By default "Lift" which plots the
-#' incrementality on the outcome variable. If type is set to "ATT",
-#' the average ATT is plotted. If type is set to "Incrementality",
-#' daily incremental values are plotted.
-#' @param treatment_end_date Character that represents a date in year-month=day format.
-#' @param frequency Character that represents periodicity of time stamps. Can be either
-#' weekly or daily. Defaults to daily.
-#' @param plot_start_date Character that represents initial date of plot in year-month-day format.
-#' @param post_treatment_periods Number of post-treatment periods. Zero by default.
-#' @param title String for the title of the plot. Empty by default.
-#' @param stacked Logic flag indicating whether to stack all the Multi-Cell plots
-#' together vertically or to output each one of them separately. Set to TRUE by
-#' default.
-#' @param ... additional arguments
-#'
-#' @return
-#' MultiCellMarketSelection plot.
-#'
-#' @export
-
-plot.MultiCellMarketSelection <- function(x,
-                                          test_markets = list(),
-                                          type = "Lift",
-                                          treatment_end_date = NULL,
-                                          frequency = "daily",
-                                          plot_start_date = NULL,
-                                          post_treatment_periods = 0,
-                                          title = "",
-                                          stacked = TRUE,
-                                          ...) {
-
-  if (!inherits(x, "MultiCellMarketSelection")) {
-    stop("object must be class MultiCellMarketSelection")
-  }
-
-  if(length(test_markets) != length(x$Models)){
-    stop("\nMake sure an ID is provided for each cell in the analysis.")
-  }
-
-  if(!(all(sapply(test_markets, is.numeric)))){
-    stop("\nMake sure all input IDs in test_markets are numeric.")
-  }
-
-  if(!(tolower(type) %in% c("lift", "att", "treatmentschedule"))){
-    stop("\nPlease specify a valid geolift_type test ('Lift', 'ATT', 'TreatmentSchedule').")
-  }
-
-  plots <- list()
-
-  for(cell in 1:length(x$Models)){
-    Market <- x$Models[[cell]]$BestMarkets %>% dplyr::filter(ID == test_markets[cell])
-    locs_aux <- unlist(strsplit(stringr::str_replace_all(Market$location, ", ", ","), split = ","))
-    max_time <- max(x$Models[[cell]]$parameters$data$time)
-
-    data_lifted <- x$Models[[cell]]$parameters$data
-    data_lifted$Y[data_lifted$location %in% locs_aux &
-                    data_lifted$time >= max_time - Market$duration + 1] <-
-      data_lifted$Y[data_lifted$location %in% locs_aux &
-                      data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
-
-    if (tolower(x$Models[[cell]]$parameters$side_of_test) == "two_sided") {
-      stat_test <- "Total"
-    } else {
-      if (Market$EffectSize < 0) {
-        stat_test <- "Negative"
-      } else if (Market$EffectSize > 0) {
-        stat_test <- "Positive"
-      }
-    }
-
-    lifted <- suppressMessages(GeoLift::GeoLift(
-      Y_id = "Y",
-      time_id = "time",
-      location_id = "location",
-      data = data_lifted,
-      locations = locs_aux,
-      treatment_start_time = max_time - Market$duration + 1,
-      treatment_end_time = max_time,
-      model = x$Models[[cell]]$parameters$model,
-      fixed_effects = x$Models[[cell]]$parameters$fixed_effects,
-      stat_test = stat_test
-    ))
-
-    plots <- append(plots, list(lifted))
-
-  }
-
-  if (stacked){
-    aux <- lapply(plots, function(x) plot(x,
-                                         type = type,
-                                         treatment_end_date = treatment_end_date,
-                                         frequency = frequency,
-                                         plot_start_date = plot_start_date,
-                                         title = title,
-                                         subtitle = paste0("Cell: ", paste(x$test_id$name, collapse = ", ")),
-                                         post_treatment_periods = post_treatment_periods))
-
-    suppressMessages(gridExtra::grid.arrange(
-      grobs = aux,
-      ncol = 1,
-      nrow = length(x$Models)
-    ))
-  } else{
-    for(cell in 1:length(x$Models)){
-      print(plot(plots[[cell]],
-                 type = type,
-                 treatment_end_date = treatment_end_date,
-                 frequency = frequency,
-                 plot_start_date = plot_start_date,
-                 title = title,
-                 subtitle = paste0("Cell ", cell, ":\n", paste(plots[[cell]]$test_id$name, collapse = ", ")),
-                 post_treatment_periods = post_treatment_periods))
-    }
-
-  }
-
-
-}
 
 #' Multi-Cell Power Analysis Method.
 #'
@@ -549,6 +419,7 @@ MultiCellPower <- function(x,
 
 }
 
+
 #' Print pretty MultiCellPower output.
 #'
 #' @description
@@ -569,77 +440,6 @@ print.MultiCellPower <- function(x, ...) {
   }
 
   print(x$PowerCurves)
-
-}
-
-#' Plotting function for MultiCellPower
-#'
-#' @description
-#'
-#' Plotting function for `MultiCellPower`. This function plots the
-#' Power Curves for all given test markets
-#' latest possible test given the data and duration as well as the power curve
-#' across historical simulations for a given merket_id and cell_id.
-#'
-#' @param x A MultiCellMarketSelection object.
-#' @param actual_values Logic flag indicating whether to include in the plot
-#' the actual values. TRUE by default.
-#' @param smoothed_values Logic flag indicating whether to include in the plot
-#' the smoothed values. TRUE by default.
-#' @param show_mde Logic flag indicating whether to include in the plot
-#' the positive and negative MDEs. FALSE by default.
-#' @param breaks_x_axis Numeric value indicating the number of breaks in the
-#' x-axis of the power plot. You may get slightly more or fewer breaks that
-#' requested based on `breaks_pretty()`. Set to 10 by default.
-#' @param stacked Logic flag indicating whether to stack all the Multi-Cell plots
-#' together vertically or to output each one of them separately. Set to TRUE by
-#' default.
-#' @param ... additional arguments
-#'
-#' @return
-#' MultiCellPower plot.
-#'
-#' @export
-
-plot.MultiCellPower <- function(x,
-                                actual_values = TRUE,
-                                smoothed_values = FALSE,
-                                show_mde = TRUE,
-                                breaks_x_axis = 10,
-                                stacked = TRUE,
-                                          ...) {
-
-  if (!inherits(x, "MultiCellPower")) {
-    stop("object must be class MultiCellPower")
-  }
-
-  if(stacked){
-    aux <- lapply(x$PowerCurves, function(x) plot(x,
-                                                  actual_values = actual_values,
-                                                  smoothed_values = smoothed_values,
-                                                  show_mde = show_mde,
-                                                  breaks_x_axis = breaks_x_axis,
-                                                  notes = paste0("Cell : ", x[1,1])))
-
-    suppressMessages(gridExtra::grid.arrange(
-      grobs = aux,
-      ncol = 1,
-      nrow = length(x$PowerCurves)
-    ))
-
-  } else{
-    for (cell in 1:length(x$PowerCurves)){
-      print(plot(x$PowerCurves[[cell]],
-                 actual_values = actual_values,
-                 smoothed_values = smoothed_values,
-                 show_mde = show_mde,
-                 breaks_x_axis = breaks_x_axis,
-                 notes = paste0("Cell ", cell, ": ", x$PowerCurves[[cell]][1,1])))
-    }
-  }
-
-
-
 
 }
 
@@ -881,6 +681,7 @@ print.MultiCellWinner <- function(x, ...) {
 
 }
 
+
 #' GeoLiftMultiCell inference calculation.
 #'
 #' @description
@@ -1106,6 +907,7 @@ GeoLiftMultiCell <- function(Y_id = "Y",
 
 }
 
+
 #' Print pretty GeoLiftMultiCell output.
 #'
 #' @description
@@ -1183,6 +985,7 @@ print.GeoLiftMultiCell <- function(x, ...) {
   }
 }
 
+
 #' Summary method for GeoLiftMultiCell
 #'
 #' @description
@@ -1213,80 +1016,5 @@ summary.GeoLiftMultiCell <- function(object, ...) {
     message(paste0("\n\n"))
 
     }
-
-}
-
-#' Plot for GeoLiftMultiCell
-#'
-#' @description
-#'
-#' Plot for GeoLiftMultiCell objects.
-#'
-#' @param x GeoLiftMultiCell object.
-#' @param type Type of plot. By default "Lift" which plots the
-#' incrementality on the outcome variable. If type is set to "ATT",
-#' the average ATT is plotted. If type is set to "Incrementality",
-#' daily incremental values are plotted.
-#' @param treatment_end_date Character that represents a date in year-month=day format.
-#' @param frequency Character that represents periodicity of time stamps. Can be either
-#' weekly or daily. Defaults to daily.
-#' @param title String for the title of the plot. Empty by default.
-#' @param plot_start_date Character that represents initial date of plot in year-month-day format.
-#' @param post_treatment_periods Number of post-treatment periods. Zero by default.
-#' @param stacked Logic flag indicating whether to stack all the Multi-Cell plots
-#' together vertically or to output each one of them separately. Set to TRUE by
-#' default.
-#' @param ... additional arguments
-#'
-#' @return
-#' GeoLiftMultiCell plots.
-#'
-#' @export
-
-plot.GeoLiftMultiCell <- function(x,
-                                  type = "Lift",
-                                  treatment_end_date = NULL,
-                                  frequency = "daily",
-                                  plot_start_date = NULL,
-                                  title = "",
-                                  post_treatment_periods = 0,
-                                  stacked = TRUE,
-                                  ...) {
-  if (!inherits(x, "GeoLiftMultiCell")) {
-    stop("object must be class GeoLiftMultiCell")
-  }
-
-  if(!(tolower(type) %in% c("lift", "att", "treatmentschedule"))){
-    stop("\nPlease specify a valid geolift_type test ('Lift', 'ATT', 'TreatmentSchedule').")
-  }
-
-  if (stacked){
-    aux <- lapply(x$results, function(x) plot(x,
-                                              type = type,
-                                              treatment_end_date = treatment_end_date,
-                                              frequency = frequency,
-                                              plot_start_date = plot_start_date,
-                                              title = title,
-                                              subtitle = paste0("Cell: ", paste(x$test_id$name, collapse = ", ")),
-                                              post_treatment_periods = post_treatment_periods))
-
-    suppressMessages(gridExtra::grid.arrange(
-      grobs = aux,
-      ncol = 1,
-      nrow = length(x$results)
-    ))
-  } else{
-    for(cell in 1:length(x$results)){
-      print(plot(x$results[[cell]],
-                 type = type,
-                 treatment_end_date = treatment_end_date,
-                 frequency = frequency,
-                 plot_start_date = plot_start_date,
-                 title = title,
-                 subtitle = paste0("Cell ", cell, ":\n", paste(x$results[[cell]]$test_id$name, collapse = ", ")),
-                 post_treatment_periods = post_treatment_periods))
-    }
-
-  }
 
 }

@@ -524,7 +524,7 @@ MultiCellWinner <- function(x,
 
   # Check method
   if(!(tolower(method) %in% c("conformal", "jackknife+"))){
-    stop("\nPlease specify a valid geolift_type test ('conformal', 'jackknife+').")
+    stop("\nPlease specify a valid method test ('conformal', 'jackknife+').")
   }
 
   # Check stat_test
@@ -653,6 +653,10 @@ MultiCellWinner <- function(x,
               simulations = sims)
 
   class(res) <- c("MultiCellWinner", class(res))
+
+  if(length(results) < 1){
+    message("No Winners were found. Please change the locations, baseline effect_size, or ROAS sequence to find a Winner.")
+  }
 
   return(res)
 
@@ -983,6 +987,7 @@ print.GeoLiftMultiCell <- function(x, ...) {
     ))
 
   }
+
 }
 
 
@@ -994,27 +999,86 @@ print.GeoLiftMultiCell <- function(x, ...) {
 #' test.
 #'
 #' @param object GeoLiftMultiCell object.
+#' @param table Logic flag indicating whether to plot only a table
+#' summarizing the results or the entire verbose output of each cell's
+#' GeoLift object summary. FALSE by default.
 #' @param ... Optional arguments
 #'
 #' @export
-summary.GeoLiftMultiCell <- function(object, ...) {
+summary.GeoLiftMultiCell <- function(object,
+                                     table = FALSE,
+                                     ...) {
   if (!inherits(object, "GeoLiftMultiCell")) {
     stop("object must be class GeoLiftMultiCell")
   }
 
-  for(cell in 1:length(object$results)){
+  if(!table){
 
-    message(paste0(
-      "##################################",
-      "\n#####     Cell ",
-      cell,
-      " Results    #####\n",
-      "##################################"))
+    for(cell in 1:length(object$results)){
 
-    print(summary(object$results[[cell]]))
+      message(paste0(
+        "##################################",
+        "\n#####     Cell ",
+        cell,
+        " Results    #####\n",
+        "##################################"))
 
-    message(paste0("\n\n"))
+      print(summary(object$results[[cell]]))
+
+      message(paste0("\n\n"))
 
     }
+
+  } else{
+
+
+    cells_aux <- list()
+    locations_aux <- list()
+    duration_aux <- list()
+    lift_aux <- list()
+    pvalue_aux <- list()
+    incremental_aux <- list()
+    ATT_aux <- list()
+    stattest_aux <- list()
+    statsig_aux <- list()
+    progfunc_aux <- list()
+
+    for (cell in 1:length(object$results)){
+
+      if (toupper(object$results[[cell]]$stat_test) == "TOTAL") {
+        test_type <- "TWO-SIDED LIFT TEST"
+      } else if (toupper(object$results[[cell]]$stat_test) == "POSITIVE") {
+        test_type <- "ONE-SIDED POSITIVE LIFT TEST"
+      } else {
+        test_type <- "ONE-SIDED NEGATIVE LIFT TEST"
+      }
+
+      cells_aux <- append(cells_aux, cell)
+      locations_aux <- append(locations_aux, toupper(paste0(object$results[[cell]]$test_id$name, collapse = ", ")))
+      duration_aux <- append(duration_aux, (object$results[[cell]]$TreatmentEnd - object$results[[cell]]$TreatmentStart + 1))
+      lift_aux <- append(lift_aux, paste0(round(object$results[[cell]]$inference$Perc.Lift, 3),"%"))
+      pvalue_aux <- append(pvalue_aux, round(object$results[[cell]]$inference$pvalue, 2))
+      incremental_aux <- append(incremental_aux, round(object$results[[cell]]$incremental, 0))
+      ATT_aux <- append(ATT_aux, round(object$results[[cell]]$inference$ATT, 3))
+      stattest_aux <- append(stattest_aux, test_type)
+      statsig_aux <- append(statsig_aux, ifelse(object$results[[cell]]$inference$pvalue < object$results[[cell]]$summary$alpha, 1 ,0))
+      progfunc_aux <- append(progfunc_aux, toupper(object$results[[cell]]$results$progfunc))
+    }
+
+    printresults <- data.frame(Cell = unlist(cells_aux),
+                               Location = unlist(locations_aux),
+                               Duration = unlist(duration_aux),
+                               Lift = unlist(lift_aux),
+                               Incremental = unlist(incremental_aux),
+                               ATT = unlist(ATT_aux),
+                               pValue = unlist(pvalue_aux),
+                               Stat_Test = unlist(stattest_aux),
+                               Stat_Sig = unlist(statsig_aux),
+                               Prognostic_Func = unlist(progfunc_aux)
+    )
+
+    message(paste0(knitr::kable(printresults), collapse="\n"))
+  }
+
 
 }

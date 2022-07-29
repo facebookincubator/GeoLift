@@ -4,10 +4,14 @@
 \alias{summary.GeoLiftMultiCell}
 \title{Summary method for GeoLiftMultiCell}
 \usage{
-\method{summary}{GeoLiftMultiCell}(object, ...)
+\method{summary}{GeoLiftMultiCell}(object, table = FALSE, ...)
 }
 \arguments{
 \item{object}{GeoLiftMultiCell object.}
+
+\item{table}{Logic flag indicating whether to plot only a table
+summarizing the results or the entire verbose output of each cell's
+GeoLift object summary. FALSE by default.}
 
 \item{...}{Optional arguments}
 }

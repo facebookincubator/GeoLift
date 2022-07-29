@@ -944,7 +944,8 @@ plot.MultiCellMarketSelection <- function(x,
     suppressMessages(gridExtra::grid.arrange(
       grobs = aux,
       ncol = 1,
-      nrow = length(x$Models)
+      nrow = length(x$Models),
+      bottom = paste("Note: Plots with applied MDE applied in the treatment period.")
     ))
   } else{
     for(cell in 1:length(x$Models)){
@@ -954,7 +955,8 @@ plot.MultiCellMarketSelection <- function(x,
                  frequency = frequency,
                  plot_start_date = plot_start_date,
                  title = title,
-                 subtitle = paste0("Cell ", cell, ":\n", paste(plots[[cell]]$test_id$name, collapse = ", ")),
+                 subtitle = paste0("Cell ", cell, ":\n", paste(plots[[cell]]$test_id$name, collapse = ", "),
+                                   ":\nPlots with applied MDE in the Treatment period."),
                  post_treatment_periods = post_treatment_periods))
     }
 
@@ -1073,8 +1075,8 @@ plot.GeoLiftMultiCell <- function(x,
     stop("object must be class GeoLiftMultiCell")
   }
 
-  if(!(tolower(type) %in% c("lift", "att", "treatmentschedule"))){
-    stop("\nPlease specify a valid geolift_type test ('Lift', 'ATT', 'TreatmentSchedule').")
+  if(!(tolower(type) %in% c("lift", "att", "treatmentschedule", "incrementality"))){
+    stop("\nPlease specify a valid geolift_type test ('Lift', 'ATT', 'TreatmentSchedule', 'Incrementality').")
   }
 
   if (stacked){

@@ -812,8 +812,7 @@ GeoLiftPowerFinder <- function(data,
           treatment_start_time = max_time - tp + 1,
           treatment_end_time = max_time,
           model = model,
-          fixed_effects = fixed_effects,
-          print = FALSE
+          fixed_effects = fixed_effects
         ))
       }
       suppressMessages(gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste(

@@ -1047,6 +1047,7 @@ summary.GeoLiftMultiCell <- function(object,
     stattest_aux <- list()
     statsig_aux <- list()
     progfunc_aux <- list()
+    winner_aux <- list()
 
     for (cell in 1:length(object$results)){
 
@@ -1068,6 +1069,10 @@ summary.GeoLiftMultiCell <- function(object,
       stattest_aux <- append(stattest_aux, test_type)
       statsig_aux <- append(statsig_aux, ifelse(object$results[[cell]]$inference$pvalue < object$results[[cell]]$summary$alpha, 1 ,0))
       progfunc_aux <- append(progfunc_aux, toupper(object$results[[cell]]$results$progfunc))
+      ifelse(all(object$results[[cell]]$test_id$name %in% unlist(stringr::str_split(object$Winner[[1]], ", "))),
+             winner_aux <- append(winner_aux, "Winner"),
+             winner_aux <- append(winner_aux, ""))
+
     }
 
     printresults <- data.frame(Cell = unlist(cells_aux),
@@ -1079,7 +1084,8 @@ summary.GeoLiftMultiCell <- function(object,
                                pValue = unlist(pvalue_aux),
                                Stat_Test = unlist(stattest_aux),
                                Stat_Sig = unlist(statsig_aux),
-                               Prognostic_Func = unlist(progfunc_aux)
+                               Prognostic_Func = unlist(progfunc_aux),
+                               Winner = unlist(winner_aux)
     )
 
     message(paste0(knitr::kable(printresults), collapse="\n"))

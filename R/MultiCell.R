@@ -654,7 +654,7 @@ MultiCellWinner <- function(x,
 
   class(res) <- c("MultiCellWinner", class(res))
 
-  if(length(results) < 1){
+  if(nrow(results) < 1){
     message("No Winners were found. Please change the locations, baseline effect_size, or ROAS sequence to find a Winner.")
   }
 
@@ -681,7 +681,12 @@ print.MultiCellWinner <- function(x, ...) {
     stop("object must be class MultiCellWinner")
   }
 
-  print(x$results)
+  if(nrow(x$results) > 1){
+    print(x$results)
+  } else{
+    message("No Winners were found. Please change the locations, baseline effect_size, or ROAS sequence to find a Winner.")
+  }
+
 
 }
 

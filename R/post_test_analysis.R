@@ -650,14 +650,17 @@ ConfIntervals <- function(augsynth,
                                                    stat_func = stat_func)}
     )
 
-    ci <- c(min(grid[pvalues >= alpha]), max(grid[pvalues >= alpha]))
+    ci <- c(suppressWarnings(min(grid[pvalues >= alpha])),
+            suppressWarnings(max(grid[pvalues >= alpha])))
 
-    #Fix signs if bound is Inf
-    if (ci[1] == Inf){
-      ci[1] <- -ci[1]
-    }
-    if (ci[2] == -Inf){
-      ci[2] <- -ci[2]
+    #Change to resampling if no CI is found via conformal
+    if(ci[1] == Inf || ci[2] == -Inf){
+      sum_aux <- summary(augsynth,
+                         alpha = alpha,
+                         inf_type = "jackknife+")
+      ci[1] <- sum_aux$average_att$lower_bound
+      ci[2] <- sum_aux$average_att$upper_bound
+      message("Conformal method of Confidence Interval calculation unsuccessful. Changing Confidence Interval calculation method to jackknife+.")
     }
 
   }

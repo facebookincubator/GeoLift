@@ -343,6 +343,7 @@ print.GeoLift <- function(x, ...) {
     "\nPercent Lift: ",
     round(x$inference$Perc.Lift, 3), "%\n\n",
     "Incremental ", paste(x$Y_id), ": ", round(x$incremental, 0), "\n\n",
+    ifelse(x$ConfidenceIntervals,paste0(((1 - x$summary$alpha) * 100), "% Confidence Interval: (", round(x$lower, 3), ", ", round(x$upper, 3), ")", "\n\n"),""),
     "Average Estimated Treatment Effect (ATT): ", round(x$inference$ATT, 3),
     "\n\n", is_significant, " (", test_type,
     "\n\nThere is a ", round(100 * x$inference$pvalue, 2),

@@ -256,7 +256,7 @@ MultiCellMarketSelection <- function(data,
                                                                                   nrow(MarketSelections$BestMarkets)),])
   }
 
-  TopChoices <- TopChoices %>% dplyr::arrange(cell, rank)
+  TopChoices <- TopChoices %>% dplyr::arrange(ID, cell)
 
   res <- list(TopChoices = TopChoices,
               Models = GeoLift_Markets,

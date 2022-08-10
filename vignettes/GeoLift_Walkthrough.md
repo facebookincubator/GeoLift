@@ -133,7 +133,7 @@ GeoPlot(GeoTestData_PreTest,
         location_id = "location")
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/plotting-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/plotting-1.png" style="display: block; margin: auto;" width="800" height="600"/>
 
 In this case we see a similar pattern that’s shared across all
 locations. These structural similarities between regions are the key to
@@ -465,7 +465,7 @@ simulation.
 plot(MarketSelections, market_ID = 1, print_summary = FALSE)
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-1.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 ``` r
 
@@ -473,7 +473,7 @@ plot(MarketSelections, market_ID = 1, print_summary = FALSE)
 plot(MarketSelections, market_ID = 2, print_summary = FALSE)
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 ### Power output - deep dive into power curves
 
@@ -515,7 +515,7 @@ plot(power_data,
     notes = unique(power_data$location))
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftPower top contenders-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftPower top contenders-1.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 While both market selections perform excellent on all metrics, we will
 move further with the latter since it allows us to run a successful test
@@ -576,7 +576,7 @@ plot(MarketSelections, market_ID = 2, print_summary = TRUE)
 ##  * reno: 0.0113
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 #### **Note:** Given that we are not using the complete pre-treatment data to calculate the weights in our power analysis simulations, the ones displayed by the plotting function above are not the *final* values. However, you can easily obtain them with the `GetWeights()` function.
 
@@ -677,7 +677,7 @@ GeoPlot(GeoTestData_Test,
         treatment_start = 91)
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/plottingTest-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/plottingTest-1.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 ### GeoLift Inference
 
@@ -825,7 +825,7 @@ plot(GeoTest, type = "Lift")
 #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/plot_Lift-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/plot_Lift-1.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 Plotting the results is a great way to assess the model’s fit and how
 effective the campaign was. Taking a close look at the pre-treatment
@@ -845,7 +845,7 @@ plot(GeoTest, type = "ATT")
 #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/plot_ATT-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/plot_ATT-1.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 Looking at the Average Estimated Treatment Effect’s plot can also be
 extremely useful. The ATT metric shows us the magnitude of the Average
@@ -981,14 +981,14 @@ plot(GeoTestBest, type = "Lift")
 #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftBest-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftBest-1.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 ``` r
 plot(GeoTestBest, type = "ATT")
 #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftBest-2.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftBest-2.png" style="display: block; margin: auto;"  width="800" height="600"/>
 
 The new results augment the GeoLift model with a Ridge prognostic
 function which improves the model fit as seen in the new L2 Imbalance

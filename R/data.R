@@ -33,3 +33,21 @@
 #' }
 #'
 "GeoLift_Test"
+
+
+#' GeoLift Multi-Cell Example Data - Test
+#'
+#' Simulated Multi-Cell data of daily conversions for 40 US cities for a period of 90
+#' pre-intervention days followed by a 15-day campaign on two cells: Cell 1 chicago
+#' & cincinnati and Cell B honolulu and indianapolis.
+#' This dataset provides information to run a Multi-Cell GeoLift test for the
+#' two cells that received an intervention.
+#'
+#' @format A data frame with historical information to run a GeoLift analysis:
+#' \describe{
+#'    \item{date}{Date in yyyy-mm-dd format}
+#'    \item{location}{Name of the city}
+#'    \item{Y}{Number of conversions}
+#' }
+#'
+"GeoLift_Test_MultiCell"

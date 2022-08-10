@@ -50,7 +50,7 @@ of the time period (starting at 1), and covariates.}
 
 \item{effect_size}{A vector of effect sizes to test by default a
 sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
-Only input sequences that are entirely positive or negative.}
+Make sure that the sequence includes zero.}
 
 \item{top_results}{Number of results to display.}
 

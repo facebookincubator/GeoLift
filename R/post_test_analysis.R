@@ -38,8 +38,16 @@
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
-#' @param ConfidenceIntervals A logic flag indicating whether to estimate confidence intervals
-#' through jackknifing techniques.  Set to FALSE by default.
+#' @param ConfidenceIntervals A logic flag indicating whether to estimate confidence intervals.
+#' Set to FALSE by default.
+#' @param method A string indicating the method used to calculate the
+#' aggregate ATT Confidence Intervals.
+#' \itemize{
+#'          \item{"conformal":}{ Conformal Inference. Defualt.}
+#'          \item{"jackknife+":}{ Jackknife+ (exclusively for stat_test = "Total").}
+#' }
+#' @param grid_size Number of grid points to use when inverting the hypothesis
+#' test for Conformal Inference. Set to 250 by default.
 #' @param stat_test A string indicating the test statistic.
 #' \itemize{
 #'          \item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
@@ -83,6 +91,8 @@ GeoLift <- function(Y_id = "Y",
                     model = "none",
                     fixed_effects = TRUE,
                     ConfidenceIntervals = FALSE,
+                    method = "conformal",
+                    grid_size = 250,
                     stat_test = "Total") {
 
   # Rename variables to standard names used by GeoLift
@@ -194,6 +204,26 @@ GeoLift <- function(Y_id = "Y",
 
   sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = stat_func)
 
+  # Confidence Intervals
+  if(ConfidenceIntervals == FALSE){
+    ci <- c(NA,NA)
+  } else if(ConfidenceIntervals == TRUE){
+    if(!(tolower(method) %in% c("conformal", "jackknife+"))) {
+      stop("method must be one of {'conformal', 'jackknife+'}")
+    } else {
+      if(tolower(stat_test) != "total"){
+        method <- "conformal" #jackknife+ is exclusively for "Total"
+      }
+      ci <- ConfIntervals(augsynth = augsyn,
+                          treatment_start_time = treatment_start_time,
+                          treatment_end_time = treatment_end_time,
+                          alpha = alpha,
+                          stat_func = stat_func,
+                          method = tolower(method),
+                          grid_size = grid_size)
+    }
+  }
+
   if (paste(augsyn$call)[1] == "single_augsynth") {
     mean <- sum_augsyn[["average_att"]][["Estimate"]]
     se <- sum_augsyn[["average_att"]][["Std.Error"]]
@@ -224,8 +254,8 @@ GeoLift <- function(Y_id = "Y",
       ATT = mean,
       Perc.Lift = 100 * round(lift, 3),
       pvalue = sum_augsyn$average_att$p_val,
-      Lower.Conf.Int = sum_augsyn$average_att$lower_bound,
-      Upper.Conf.Int = sum_augsyn$average_att$upper_bound
+      Lower.Conf.Int = ci[1],
+      Upper.Conf.Int = ci[2]
     )
   }
 
@@ -244,8 +274,8 @@ GeoLift <- function(Y_id = "Y",
     "Y_id" = Y_id,
     "summary" = sum_augsyn,
     "ConfidenceIntervals" = ConfidenceIntervals,
-    "lower_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$lower_bound,
-    "upper_bound" = summary(augsyn, alpha = alpha, inf_type = "jackknife+")$average_att$upper_bound,
+    "lower_bound" = ci[1] * ncol(augsyn$data$y) * nrow(locs_id),
+    "upper_bound" = ci[2] * ncol(augsyn$data$y) * nrow(locs_id),
     "df_weights" = data.frame(
       location = dimnames(augsyn$weights)[[1]],
       weight = unname(augsyn$weights[, 1])
@@ -313,6 +343,7 @@ print.GeoLift <- function(x, ...) {
     "\nPercent Lift: ",
     round(x$inference$Perc.Lift, 3), "%\n\n",
     "Incremental ", paste(x$Y_id), ": ", round(x$incremental, 0), "\n\n",
+    ifelse(x$ConfidenceIntervals,paste0(((1 - x$summary$alpha) * 100), "% Confidence Interval: (", round(x$lower, 3), ", ", round(x$upper, 3), ")", "\n\n"),""),
     "Average Estimated Treatment Effect (ATT): ", round(x$inference$ATT, 3),
     "\n\n", is_significant, " (", test_type,
     "\n\nThere is a ", round(100 * x$inference$pvalue, 2),
@@ -515,7 +546,7 @@ print.summary.GeoLift <- function(x, ...) {
     if (x$CI == TRUE) {
       test_statistics <- paste0(
         test_statistics,
-        "\n* ", (1 - x$alpha) * 100, "% Confidence Interval: (", round(x$lower * x$factor, 3), ", ", round(x$upper * x$factor, 3), ")"
+        "\n* ", (1 - x$alpha) * 100, "% Confidence Interval: (", round(x$lower, 3), ", ", round(x$upper, 3), ")"
       )
     }
     balance_statistics <- paste0(
@@ -542,3 +573,102 @@ print.summary.GeoLift <- function(x, ...) {
     }
   }
 }
+
+
+#' GeoLift Confidence Intervals
+#'
+#' @description
+#'
+#' Calculate the Aggregate ATT Confidence Intervals
+#'
+#' @param augsynth Augsynth object.
+#' @param treatment_start_time Time index of the start of the treatment.
+#' @param treatment_end_time Time index of the end of the treatment.
+#' @param alpha Significance level. Set to 0.1 by default.
+#' @param stat_func Function to compute the test statistic.
+#' @param method A string indicating the method used to calculate the
+#' aggregate ATT Confidence Intervals.
+#' \itemize{
+#'          \item{"conformal":}{ Conformal Inference.}
+#'          \item{"jackknife+":}{ Jackknife+.}
+#' }
+#' @param grid_size Number of grid points to use when inverting the hypothesis
+#' test for Conformal Inference.
+#'
+#' @return List the Confidence Interval for the specified alpha.
+#'
+#' @export
+
+ConfIntervals <- function(augsynth,
+                          treatment_start_time,
+                          treatment_end_time,
+                          alpha,
+                          stat_func,
+                          method,
+                          grid_size){
+
+  ci <- c(NA,NA)
+
+  if(method == "jackknife+"){
+    sum_aux <- summary(augsynth,
+                       alpha = alpha,
+                       inf_type = "jackknife+")
+    ci[1] <- sum_aux$average_att$lower_bound
+    ci[2] <- sum_aux$average_att$upper_bound
+  } else{
+    #Prepare data
+    wide_data <- augsynth$data
+    synth_data <- augsynth$data$synth_data
+    n <- nrow(wide_data$X)
+    t0 <- dim(synth_data$Z0)[1]
+    t_final <- dim(synth_data$Y0plot)[1]
+    post_length <- treatment_end_time - treatment_start_time + 1
+
+    # Calculate ATTs and SD
+    att <- predict(augsynth, att = T)
+    post_att <- att[(t0 +1):t_final]
+    post_sd <- sqrt(mean(post_att ^ 2))
+
+    # Add final period with some data
+    new_wide_data <- wide_data
+    new_wide_data$X <- cbind(wide_data$X, wide_data$y)
+    new_wide_data$y <- matrix(1, nrow = n, ncol = 1)
+
+    # Create grid with zero
+    grid <- seq(mean(post_att) - 6 * post_sd, mean(post_att) + 6 * post_sd, length.out = grid_size)
+    grid <- c(0,grid) #Adding 0 to the grid for null troubleshooting
+
+    # Calculate p-values for the grid
+    pvalues <- sapply(grid,
+                 function(null){
+                   augsynth:::compute_permute_pval(wide_data =new_wide_data,
+                                                   ascm = augsynth,
+                                                   h0 = null,
+                                                   post_length = post_length,
+                                                   type = "block",
+                                                   q = 1,
+                                                   ns = 1000,
+                                                   stat_func = stat_func)}
+    )
+
+    ci <- c(suppressWarnings(min(grid[pvalues >= alpha])),
+            suppressWarnings(max(grid[pvalues >= alpha])))
+
+    #Change to resampling if no CI is found via conformal
+    if(ci[1] == Inf || ci[2] == -Inf){
+      sum_aux <- summary(augsynth,
+                         alpha = alpha,
+                         inf_type = "jackknife+")
+      ci[1] <- sum_aux$average_att$lower_bound
+      ci[2] <- sum_aux$average_att$upper_bound
+      message("Conformal method of Confidence Interval calculation unsuccessful. Changing Confidence Interval calculation method to jackknife+.")
+    }
+
+  }
+
+  return(ci)
+}
+
+
+
+

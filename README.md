@@ -8,6 +8,7 @@ GeoLift is an end-to-end solution to measure Lift at a Geo-level using the lates
 
 Check out the vignette for a more detailed description of the main functionalities of the package:
 - [GeoLift Walkthrough](https://github.com/facebookincubator/GeoLift/blob/master/vignettes/GeoLift_Walkthrough.md)
+- [GeoLift Multi-Cell Walkthrough](https://github.com/facebookincubator/GeoLift/blob/main/vignettes/GeoLift_MultiCell_Walkthrough.md)
 
 ## Requirements
 GeoLift requires or works with:

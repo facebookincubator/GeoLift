@@ -96,6 +96,8 @@ GeoTestData_PreTest <- GeoDataRead(data = GeoLift_PreTest,
                                    X = c(), #empty list as we have no covariates
                                    format = "yyyy-mm-dd",
                                    summary = TRUE)
+```
+``` r
 #> ##################################
 #> #####       Summary       #####
 #> ##################################
@@ -341,7 +343,7 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           Y_id = "Y",
                                           location_id = "location",
                                           time_id = "time",
-                                          effect_size = seq(-0.25, 0.25, 0.05),
+                                          effect_size = seq(0, 0.2, 0.05),
                                           lookback_window = 1, 
                                           include_markets = c("chicago"),
                                           exclude_markets = c("honolulu"),
@@ -350,38 +352,40 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           alpha = 0.1,
                                           Correlations = TRUE,
                                           fixed_effects = TRUE,
-                                          side_of_test = "one_sided")
-#> Setting up cluster.
-#> Importing functions into cluster.
-#> 
-#> Deterministic setup with 2 locations in treatment.
-#> 
-#> Deterministic setup with 3 locations in treatment.
-#> 
-#> Deterministic setup with 4 locations in treatment.
-#> 
-#> Deterministic setup with 5 locations in treatment.
-#>   ID                                     location duration EffectSize Power
-#> 1  1      atlanta, chicago, las vegas, saint paul       15      -0.05     1
-#> 2  2                            chicago, portland       15      -0.05     1
-#> 3  3      atlanta, chicago, las vegas, saint paul       10      -0.05     1
-#> 4  4       chicago, cincinnati, houston, portland       15      -0.05     1
-#> 5  5            chicago, houston, nashville, reno       15      -0.05     1
-#> 6  6 atlanta, chicago, cleveland, las vegas, reno       10      -0.05     1
-#>   AvgScaledL2Imbalance Investment    AvgATT Average_MDE ProportionTotal_Y
-#> 1            0.5558341   85305.00 -189.8766 -0.05007765        0.08767192
-#> 2            0.1738778   32281.87 -140.4179 -0.04898682        0.03306537
-#> 3            0.5978398   57760.87 -182.5825 -0.04753797        0.08767192
-#> 4            0.1971864   74118.37 -170.0523 -0.05153888        0.07576405
-#> 5            0.3321341   75556.12 -161.7403 -0.04825348        0.07816073
-#> 6            0.4536741   69300.00 -174.5213 -0.04735064        0.10714670
-#>   abs_lift_in_zero    Holdout rank correlation
-#> 1            0.000 0.08767192    1   0.9775394
-#> 2            0.001 0.03306537    2   0.9321104
-#> 3            0.002 0.08767192    3   0.9775394
-#> 4            0.002 0.07576405    3   0.9144814
-#> 5            0.002 0.07816073    3   0.9146693
-#> 6            0.003 0.10714670    6   0.9788758
+                                          side_of_test = "two_sided")
+```
+``` r
+## Setting up cluster.
+## Importing functions into cluster.
+## 
+## Deterministic setup with 2 locations in treatment.
+## 
+## Deterministic setup with 3 locations in treatment.
+## 
+## Deterministic setup with 4 locations in treatment.
+## 
+## Deterministic setup with 5 locations in treatment.
+##   ID                                           location duration EffectSize
+## 1  1             chicago, cincinnati, houston, portland       15       0.05
+## 2  2                                  chicago, portland       15       0.10
+## 3  3             chicago, cincinnati, houston, portland       10       0.10
+## 4  4                                  chicago, portland       10       0.10
+## 5  5                         chicago, houston, portland       10       0.10
+## 6  6 chicago, cincinnati, houston, nashville, san diego       15       0.05
+##   Power AvgScaledL2Imbalance Investment   AvgATT Average_MDE ProportionTotal_Y
+## 1     1            0.1971864   74118.38 159.3627  0.04829913        0.07576405
+## 2     1            0.1738778   64563.75 290.0071  0.10117316        0.03306537
+## 3     1            0.1966996   99027.75 316.6204  0.09552879        0.07576405
+## 4     1            0.1682310   43646.25 300.9401  0.10378013        0.03306537
+## 5     1            0.2305628   75389.25 350.3142  0.10502968        0.05797087
+## 6     1            0.2699167   95755.50 146.7975  0.04282215        0.09801138
+##   abs_lift_in_zero   Holdout rank correlation
+## 1            0.002 0.9242359    1   0.9144814
+## 2            0.001 0.9669346    1   0.9321104
+## 3            0.004 0.9242359    3   0.9144814
+## 4            0.004 0.9669346    3   0.9321104
+## 5            0.005 0.9420291    5   0.9139549
+## 6            0.007 0.9019886    6   0.8992280
 ```
 
 ### Power output - ranking variables
@@ -449,8 +453,7 @@ metrics are:
     variable allows for ties.
 
 The results in `MarketSelection` show that the test markets with the
-best ranks are: `(chicago, cincinnati, houston, portland)`,
-`(atlanta, chicago, cleveland, las vegas, reno)` and
+best ranks are: `(chicago, cincinnati, houston, portland)` and
 `(chicago, portland)`, all of them tied at rank 1. We can `plot()` these
 last two results to inspect them further. This plot will show how the
 results of the `GeoLift()` model would look like with the latest
@@ -459,7 +462,7 @@ simulation.
 
 ``` r
 # Plot for chicago, cincinnati, houston, portland for a 15 day test
-plot(MarketSelections, market_ID = 2, print_summary = FALSE)
+plot(MarketSelections, market_ID = 1, print_summary = FALSE)
 ```
 
 <img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-1.png" style="display: block; margin: auto;" />
@@ -467,7 +470,7 @@ plot(MarketSelections, market_ID = 2, print_summary = FALSE)
 ``` r
 
 # Plot for chicago, portland for a 15 day test
-plot(MarketSelections, market_ID = 3, print_summary = FALSE)
+plot(MarketSelections, market_ID = 2, print_summary = FALSE)
 ```
 
 <img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;" />
@@ -485,26 +488,31 @@ plot their results.
 #### NOTE: You could repeat this process for the top 5 treatment combinations that come out of GeoLiftMarketSelection, with increased lookback windows and compare their power curves. We will do it only for Chicago and Portland here.
 
 ``` r
-market_id = 3
+market_id = 2
 market_row <- MarketSelections$BestMarkets %>% dplyr::filter(ID == market_id)
 treatment_locations <- stringr::str_split(market_row$location, ", ")[[1]]
 treatment_duration <- market_row$duration
-lookback_window <- 10
+lookback_window <- 7
 
 power_data <- GeoLiftPower(
   data = GeoTestData_PreTest,
   locations = treatment_locations,
-  effect_size = seq(-0.15, 0.15, 0.01),
+  effect_size = seq(-0.25, 0.25, 0.01),
   lookback_window = lookback_window,
   treatment_periods = treatment_duration,
   cpic = 7.5,
-  side_of_test = "one_sided"
+  side_of_test = "two_sided"
 )
+```
+``` r
 #> Setting up cluster.
 #> Importing functions into cluster.
 
-plot(power_data, show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +
-    labs(caption = unique(power_data$location))
+plot(power_data, 
+    show_mde = TRUE, 
+    smoothed_values = FALSE, 
+    breaks_x_axis = 10, 
+    notes = unique(power_data$location))
 ```
 
 <img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftPower top contenders-1.png" style="display: block; margin: auto;" />
@@ -519,55 +527,56 @@ additional information about this market selection.
 
 ``` r
 # Plot for chicago, portland for a 15 day test
-plot(MarketSelections, market_ID = 3, print_summary = TRUE)
-#> ##################################
-#> #####   GeoLift Simulation   #####
-#> ####  Simulating: -5% Lift  ####
-#> ##################################
-#> 
-#> GeoLift Results Summary
-#> ##################################
-#> #####     Test Statistics    #####
-#> ##################################
-#> 
-#> * Average ATT: -182.582
-#> * Percent Lift: -4.8%
-#> * Incremental Y: -7303
-#> * P-value: 0.04
-#> 
-#> ##################################
-#> #####   Balance Statistics   #####
-#> ##################################
-#> 
-#> * L2 Imbalance: 1146.615
-#> * Scaled L2 Imbalance: 0.5978
-#> * Percent improvement from naive model: 40.22%
-#> * Average Estimated Bias: NA
-#> 
-#> ##################################
-#> #####     Model Weights      #####
-#> ##################################
-#> 
-#> * Prognostic Function: NONE
-#> 
-#> * Model Weights:
-#>  * nashville: 0.3299
-#>  * milwaukee: 0.1507
-#>  * reno: 0.1133
-#>  * columbus: 0.0644
-#>  * new orleans: 0.0548
-#>  * san diego: 0.0521
-#>  * san antonio: 0.0493
-#>  * miami: 0.0408
-#>  * cincinnati: 0.0371
-#>  * phoenix: 0.034
-#>  * san francisco: 0.0315
-#>  * orlando: 0.0212
-#>  * oakland: 0.0208
-#>  * denver: 1e-04
+plot(MarketSelections, market_ID = 2, print_summary = TRUE)
+```
+``` r
+## ##################################
+## #####   GeoLift Simulation   #####
+## ####  Simulating: 10% Lift  ####
+## ##################################
+## 
+## GeoLift Results Summary
+## ##################################
+## #####     Test Statistics    #####
+## ##################################
+## 
+## * Average ATT: 290.007
+## * Percent Lift: 10.1%
+## * Incremental Y: 8700
+## * P-value: 0
+## 
+## ##################################
+## #####   Balance Statistics   #####
+## ##################################
+## 
+## * L2 Imbalance: 868.598
+## * Scaled L2 Imbalance: 0.1739
+## * Percent improvement from naive model: 82.61%
+## * Average Estimated Bias: NA
+## 
+## ##################################
+## #####     Model Weights      #####
+## ##################################
+## 
+## * Prognostic Function: NONE
+## 
+## * Model Weights:
+##  * cincinnati: 0.2429
+##  * miami: 0.2056
+##  * baton rouge: 0.1511
+##  * honolulu: 0.0669
+##  * dallas: 0.0644
+##  * nashville: 0.0641
+##  * minneapolis: 0.0619
+##  * san diego: 0.0394
+##  * houston: 0.0292
+##  * austin: 0.0237
+##  * new york: 0.0216
+##  * los angeles: 0.0179
+##  * reno: 0.0113
 ```
 
-<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plot2-1.png" style="display: block; margin: auto;" />
+<img src="GeoLift_Walkthrough_files/figure-markdown_github/GeoLiftMarketSelection_Plots-2.png" style="display: block; margin: auto;" />
 
 #### **Note:** Given that we are not using the complete pre-treatment data to calculate the weights in our power analysis simulations, the ones displayed by the plotting function above are not the *final* values. However, you can easily obtain them with the `GetWeights()` function.
 
@@ -579,10 +588,16 @@ weights <- GetWeights(Y_id = "Y",
                       locations = c("chicago", "portland"),
                       pretreatment_end_time = 90,
                       fixed_effects = TRUE)
+```
+``` r
 #> One outcome and one treatment time found. Running single_augsynth.
 
 # Top weights
+```
+``` r
 head(dplyr::arrange(weights, desc(weight)))
+```
+``` r
 #>      location     weight
 #> 1  cincinnati 0.22717797
 #> 2       miami 0.20276981
@@ -626,6 +641,8 @@ GeoTestData_Test <- GeoDataRead(data = GeoLift_Test,
                                 X = c(), #empty list as we have no covariates
                                 format = "yyyy-mm-dd",
                                 summary = TRUE)
+```
+``` r
 #> ##################################
 #> #####       Summary       #####
 #> ##################################
@@ -633,6 +650,8 @@ GeoTestData_Test <- GeoDataRead(data = GeoLift_Test,
 #> * Raw Number of Locations: 40
 #> * Time Periods: 105
 #> * Final Number of Locations (Complete): 40
+```
+``` r
 head(GeoTestData_Test)
 #>   location time    Y
 #> 1  atlanta    1 3384
@@ -676,8 +695,14 @@ GeoTest <- GeoLift(Y_id = "Y",
                    locations = c("chicago", "portland"),
                    treatment_start_time = 91,
                    treatment_end_time = 105)
+```
+``` r
 #> Running model with no prognostic function.
+```
+``` r
 GeoTest
+```
+``` r
 #> 
 #> GeoLift Output
 #> 
@@ -711,6 +736,8 @@ can run the `summary()` of our `GeoLift` object.
 
 ``` r
 summary(GeoTest)
+```
+``` r
 #> 
 #> GeoLift Results Summary
 #> ##################################
@@ -852,11 +879,17 @@ GeoTestBest <- GeoLift(Y_id = "Y",
                        treatment_start_time = 91,
                        treatment_end_time = 105,
                        model = "best")
+```
+``` r
 #> Running model with no prognostic function.
 #> Running model with ridge prognostic function.
 #> Running model with GSYN prognostic function.
 #> Selected Ridge as best model.
+```
+``` r
 GeoTestBest
+```
+``` r
 #> 
 #> GeoLift Output
 #> 
@@ -876,7 +909,11 @@ GeoTestBest
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
 #> There is a 1.3% chance of observing an effect this large or larger assuming treatment effect is zero.
+```
+``` r
 summary(GeoTestBest)
+```
+``` r
 #> 
 #> GeoLift Results Summary
 #> ##################################
@@ -938,6 +975,8 @@ summary(GeoTestBest)
 #>  * jacksonville: -1e-04
 #>  * columbus: 1e-04
 #>  * baltimore: 1e-04
+```
+``` r
 plot(GeoTestBest, type = "Lift")
 #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```

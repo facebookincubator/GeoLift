@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[6101],{9356:function(e){e.exports=JSON.parse('{"allTagsPath":"/GeoLift/blog/tags","slug":"/GeoLift/blog/tags/ascm","name":"ASCM","count":1,"permalink":"/GeoLift/blog/tags/ascm"}')}}]);

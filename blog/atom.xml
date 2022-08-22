@@ -2,11 +2,24 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://facebookincubator.github.io/GeoLift/blog</id>
     <title>GeoLift Blog</title>
-    <updated>2022-06-24T00:00:00.000Z</updated>
+    <updated>2022-08-10T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://facebookincubator.github.io/GeoLift/blog"/>
     <subtitle>GeoLift Blog</subtitle>
     <icon>https://facebookincubator.github.io/GeoLift/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Multi-Cell Experiments with GeoLift]]></title>
+        <id>MultiCell</id>
+        <link href="https://facebookincubator.github.io/GeoLift/blog/MultiCell"/>
+        <updated>2022-08-10T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Introducing Multi-Cell GeoLift Tests]]></summary>
+        <content type="html"><![CDATA[<h2>Introducing Multi-Cell GeoLift Tests</h2><p>We&#x27;re introducing Multi-Cell capabilities to the GeoLift code that can empower users to easily measure multiple treatments in a single experiment through different cells. These new capabilities unlock the potential to plan and execute tests to measure across strategies and channels! Launched with <code>GeoLift v2.5</code>, you now can:</p><ul><li><p>Easily set-up Multi-Cell tests through a Statistical Power-based Market Selection.</p></li><li><p>Calculate and plot the Power Curves for Multi-Cell tests.</p></li><li><p>Determine the test design required to find a Winner Cell.</p></li><li><p>Inference of Multi-Cell tests.</p></li><li><p>Get inspired with some of our external success cases of Multi-Cell tests showing how to <a href="https://www.facebook.com/business/success/ruffles-mexico?locale=es_LA">optimize a channel</a> or how to measure <a href="https://www.facebook.com/business/success/3-liverpool?locale=es_LA">incrementality across digitial channels</a>.</p></li><li><p>Learn how to run Multi-Cell tests with our <a href="https://facebookincubator.github.io/GeoLift/docs/GettingStarted/MultiCellWalkthrough">new Multi-Cell walkthrough</a> and <a href="https://github.com/facebookincubator/GeoLift/">GeoLift v2.5 now</a>!</p></li></ul><h2>Multi-Cell Tests</h2><p>We&#x27;ve introduced a set of new capabilities to GeoLift focused at Multi-Cell tests. Specifically, we added four new functions to set-up and execute these tests in a simple yet powerful way.</p><h3>1. MultiCellMarketSelection</h3><p><code>MultiCellMarketSelection()</code> will help the user identify and select their Test Markets based on their desired number of cells for either Standard or Inverse/Negative GeoLifts.</p><p><img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/MultiCellBlog1.jpg?raw=true" alt="MarketSelection"/></p><p><img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/MultiCellBlog2.jpg?raw=true" alt="MarketSelectionLiftPlots"/></p><h3>2. MultiCellPower</h3><p>After finding the optimal test and control locations for the Multi-Cell test, the user is able to estimate and plot the Power Curves for each of his Test Markets through the <code>MultiCellPower()</code> function.</p><p><img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/MultiCellBlog3.jpg?raw=true" alt="PowerCurves"/></p><h3>3. MultiCellWinner</h3><p>When the test&#x27;s objective is to identify a winner strategy or channel, the user has the option to use <code>MultiCellWinner()</code> which will identify how much better the performance of Cell A compared to Cell B should be in order to declare a winner through a statistical test. If more than two cells are provided, the test will perform all pairwise comparisons.</p><p><img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/MultiCellBlog4.jpg?raw=true" alt="Winner"/></p><h3>4. GeoLiftMultiCell</h3><p>Finally, after the test finishes <code>GeoLiftMultiCell()</code> will compute the inference and will show whether there was a winning cell based on the test results!</p><p><img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/MultiCellBlog5.jpg?raw=true" alt="Results"/>
+<img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/MultiCellBlog6.jpg?raw=true" alt="ResultsPlot"/></p><h2>Start Your Multi-Cell Testing Now!</h2><p>Learn more about how to run Multi-Cell tests through our <a href="https://facebookincubator.github.io/GeoLift/docs/GettingStarted/MultiCellWalkthrough">Multi-Cell GeoLift Walkthrough</a>, get the latest version of GeoLift from the <a href="https://github.com/facebookincubator/GeoLift/">GitHub repository</a> and start testing!</p>]]></content>
+        <author>
+            <name>Arturo Esquerra</name>
+            <uri>https://github.com/ArturoEsquerra/</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Measuring Lagged Effects using GeoLift]]></title>
         <id>LaggedEffects</id>

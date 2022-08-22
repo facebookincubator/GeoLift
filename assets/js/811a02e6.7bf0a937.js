@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[9751],{7718:function(t){t.exports=JSON.parse('{"allTagsPath":"/GeoLift/blog/tags","slug":"/GeoLift/blog/tags/optimization","name":"Optimization","count":1,"permalink":"/GeoLift/blog/tags/optimization"}')}}]);

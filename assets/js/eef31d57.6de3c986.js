@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[5275],{7043:function(e){e.exports=JSON.parse('{"allTagsPath":"/GeoLift/blog/tags","slug":"/GeoLift/blog/tags/hello","name":"hello","count":1,"permalink":"/GeoLift/blog/tags/hello"}')}}]);

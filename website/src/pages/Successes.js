@@ -19,7 +19,7 @@ import styles from './styles.module.css';
 const features = [
   {
     title: 'Redefining App Measurement for the Gaming Industry through Meta Open Source Solutions',
-    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/SierraNevada.png?raw=true',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/SierraNevada2.png?raw=true',
     description: (
       <>
         Sierra Nevada Brewing Company leveraged Meta’s GeoLift solution to measure the lift in their In-Store Sales,

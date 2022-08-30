@@ -2,7 +2,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-# Includes function GeoDataRead, TrimControls.
+# Includes function GeoDataRead, TrimControls, SplitTreatmentEstimation,
+# ReplaceTreatmentSplit.
 
 
 #' Data reading function for GeoLift.
@@ -226,6 +227,181 @@ GeoDataRead <- function(data,
   }
 
   return(as.data.frame(data))
+}
+
+
+#' GeoLift fit for each Treatment location within Treatment group.
+#'
+#' @description
+#'
+#' `SplitTreatmentEstimation` fits a control group to each location within a 
+#' Treatment group and calculates their imbalance metrics.
+#' @param treatment_locations Vector of locations where the treatment was applied.
+#' @param data DataFrame that GeoLfit will use to determine a result.
+#' Should be the output of `GeoDataRead`.
+#' @param treatment_start_time Time index of the start of the treatment.
+#' @param treatment_end_time Time index of the end of the treatment.
+#' @param model A string indicating the outcome model used to augment the Augmented
+#' Synthetic Control Method. Augmentation through a prognostic function can improve
+#' fit and reduce L2 imbalance metrics.
+#' \itemize{
+#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
+#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+#'                          to improve fit for larger panels (more than 40 locations and 100
+#'                          time-stamps. }
+#'          }
+#' @param verbose boolean that determines if processing messages will be shown.
+#' 
+#' @return Dataframe with L2 imbalance ranking and these columns:
+#'          \itemize{
+#'          \item{"treatment_location":}{ Single Treatment location being considered.}
+#'          \item{"l2_imbalance":}{ L2 imbalance for treatment_location estimation.}
+#'          \item{"scaled_l2_imbalance":}{ Scaled L2 imbalance for treatment_location estimation.}
+#'          \item{"treatment_group_size":}{ Size of treatment group for each iteration.}
+#'          \item{"model":}{ Outcome model being used for Augmented Synthetic Control.}
+#'        }
+#' 
+#' @export
+SplitTreatmentEstimation <- function(
+    treatment_locations,
+    data,
+    treatment_start_time,
+    treatment_end_time,
+    model,
+    verbose=FALSE
+){
+  if (verbose){
+    message(
+      "Estimating control for each treatment location within treatment group.")
+  }
+  l2_imbalance_df <- data.frame()
+  for (i in 1:length(treatment_locations)){
+    treated_location <- treatment_locations[i]
+    geo_data_treated <- data[
+      !data$location %in% treatment_locations[
+        !treatment_locations %in% treated_location], ]
+    augsynth_model <- suppressMessages(
+      augsynth::augsynth(
+        form = as.formula("Y ~ D"),
+        unit = location,
+        time = time,
+        data = geo_data_treated,
+        t_int = treatment_start_time,
+        progfunc = model,
+        scm = TRUE,
+        fixedeff = TRUE
+      )
+    )
+    treatment_df <- data.frame(
+      treatment_location = treated_location,
+      l2_imbalance = augsynth_model$l2_imbalance,
+      scaled_l2_imbalance = augsynth_model$scaled_l2_imbalance,
+      treatment_group_size = length(treatment_locations),
+      model = model
+    )
+    
+    l2_imbalance_df <- rbind(l2_imbalance_df, treatment_df)
+  }
+  return(l2_imbalance_df)
+}
+
+
+#' Replace Treatment locations to be able to use them for continuous GeoLift studies.
+#'
+#' @description
+#'
+#' `ReplaceTreatmentSplit` chooses the best treatment location to replace with their
+#' control, given the L2 imbalance that each individual treatment has. Then 
+#' re-estimates the remaining treatment locations using the replaced treatment as
+#' part of the control donor pool.
+#' @param treatment_locations Vector of locations where the treatment was applied.
+#' @param data DataFrame that GeoLfit will use to determine a result.
+#' Should be the output of `GeoDataRead`.
+#' @param treatment_start_time Time index of the start of the treatment.
+#' @param treatment_end_time Time index of the end of the treatment.
+#' @param model A string indicating the outcome model used to augment the Augmented
+#' Synthetic Control Method. Augmentation through a prognostic function can improve
+#' fit and reduce L2 imbalance metrics.
+#' \itemize{
+#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
+#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+#'                          to improve fit for larger panels (more than 40 locations and 100
+#'                          time-stamps. }
+#'          }
+#' @param verbose boolean that determines if processing messages will be shown.
+#' 
+#' @return
+#' list that contains:
+#'          \itemize{
+#'          \item{"data":}{ Data with replaced values for treatment locations during treatment period.}
+#'          \item{"l2_imbalance_df":}{ Ranking of treatment locations based on L2 imbalance for each iteration.}
+#'        }
+#' @export
+ReplaceTreatmentSplit <- function(
+    treatment_locations,
+    data,
+    treatment_start_time,
+    treatment_end_time,
+    model,
+    verbose=FALSE){
+  data_up_to_treatment <- data[data$time <= treatment_end_time, ]
+  data_after_treatment <- data[data$time > treatment_end_time, ]
+  
+  geo_data <- fn_treatment(
+    data_up_to_treatment,
+    locations = treatment_locations,
+    treatment_start_time,
+    treatment_end_time)
+  
+  l2_imbalance_df <- data.frame()
+  
+  for (i in 1:length(treatment_locations)){
+    iter_l2_imbalance_df <- SplitTreatmentEstimation(
+      treatment_locations = treatment_locations,
+      data = geo_data,
+      treatment_start_time = treatment_start_time,
+      treatment_end_time = treatment_end_time,
+      model = model,
+      verbose = verbose
+    )
+    l2_imbalance_df <- rbind(l2_imbalance_df, iter_l2_imbalance_df)
+    
+    treatment_to_replace <- iter_l2_imbalance_df[
+      iter_l2_imbalance_df$l2_imbalance == min(iter_l2_imbalance_df$l2_imbalance), "treatment_location"]
+    
+    if (verbose){
+      message("Replacing treatment location with lowest imbalance: ", 
+              treatment_to_replace)
+    }
+    geo_data_treated <- geo_data[
+      !geo_data$location %in% treatment_locations[
+        !treatment_locations %in% treatment_to_replace], ]
+    augsynth_model <- suppressMessages(augsynth::augsynth(
+      form = as.formula("Y ~ D"),
+      unit = location,
+      time = time,
+      data = geo_data_treated,
+      t_int = treatment_start_time,
+      progfunc = model,
+      scm = TRUE,
+      fixedeff = TRUE
+    ))
+    y_hat <- predict(augsynth_model, att=FALSE)
+    geo_data[
+      geo_data$location == treatment_to_replace &
+        geo_data$time >= treatment_start_time, "Y"] <- y_hat[treatment_start_time:treatment_end_time]
+    geo_data[geo_data$location == treatment_to_replace, "D"] <- 0
+    treatment_locations <- treatment_locations[treatment_locations != treatment_to_replace]
+  }
+  
+  geo_data <- geo_data %>% dplyr::mutate(D = NULL)
+  data <- rbind(geo_data, data_after_treatment)
+  
+  return(list(data = data, l2_imbalance_df = l2_imbalance_df))
 }
 
 

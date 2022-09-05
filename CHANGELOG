@@ -1,3 +1,9 @@
+GeoLift v2.5.1 (Release date: 2022-09-10)
+=========================================
+
+Changes:
+* Added functions to address data replacement in treatment period for continuous GeoLifts.
+
 GeoLift v2.5.0 (Release date: 2022-07-19)
 =========================================
 
@@ -14,7 +20,6 @@ Changes:
 * Added post-treatment and Region of Practical Equivalence (ROPE) analyses to the ATT plot
 (absolute_value.plot).
 * Fixed issue with TreatmentSchedule plot.
-
 
 GeoLift v2.4.31 (Release date: 2022-05-09)
 =========================================

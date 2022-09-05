@@ -670,5 +670,105 @@ ConfIntervals <- function(augsynth,
 }
 
 
-
+#' Determine start time of pre-treatment period.
+#'
+#' @description
+#'
+#' `BestStartTimePeriod` chooses the best moment to start the pre-treatment period.
+#' Different pre-treatment period lengths will give you different results.  We will
+#' keep the minimum pre-treatment period length that has an estimator as close to 
+#' the true effect as possible.
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param treatment_locations List of test locations.
+#' @param treatment_start_time Time index of the start of the treatment.
+#' @param treatment_end_time Time index of the end of the treatment.
+#' @param period_intervals Frequency of periods to test pre-treatment lengths.
+#' Set to each 7 days by default.
+#' @param min_pre_treatment_length Minimum amount of periods in pre-treatment. 
+#' @param stat_test A string indicating the test statistic.
+#' \itemize{
+#'          \item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
+#'          \item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
+#'          Recommended for Negative Lift tests.}
+#'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
+#'          Recommended for Positive Lift tests.}
+#' }
+#' @param model A string indicating the outcome model used to augment the Augmented
+#' Synthetic Control Method. Augmentation through a prognostic function can improve
+#' fit and reduce L2 imbalance metrics.
+#' \itemize{
+#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
+#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+#'                          to improve fit for larger panels (more than 40 locations and 100
+#'                          time-stamps. }
+#'          \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
+#'          }
+#' @param fixed_effects A logic flag indicating whether to include unit fixed
+#' effects in the model. Set to TRUE by default.
+#' @param verbose boolean that determines if processing messages will be shown.
+#' @return DataFrame object that contains values for inference per start date.
+#' @export
+BestStartTimePeriod <- function(
+  treatment_locations,
+  data,
+  treatment_start_time,
+  treatment_end_time,
+  stat_test='Total',
+  period_intervals = 7,
+  min_pre_treatment_length = 90,
+  model='ridge',
+  fixed_effects=TRUE,
+  verbose=FALSE
+){
+  treatment_duration <- treatment_end_time - treatment_start_time
+  data <- data[data$time < treatment_start_time, ]
+  fake_treatment_end_time <- max(data$time)
+  fake_treatment_start_time <- fake_treatment_end_time - treatment_duration
+  if (max(data$time) < (min_pre_treatment_length + treatment_duration + period_intervals)){
+    stop(
+      "Pre-treatment length is below 90 + ", 
+      period_intervals, 
+      " period intervals.
+      Running this optimization with less than 90 periods in pre-treatment is not recommended.")
+  }
+  time_expansion <- seq(
+    0, 
+    max(data$time) - treatment_duration - min_pre_treatment_length, 
+    period_intervals)
+  
+  message("Running iterations to determine beginning of pre-treatment period.")
+  final_results <- data.frame()
+  for (first_day in time_expansion){
+    if (verbose){
+      message("Using time=", first_day, " as first day of pre-treatment period.")
+    }
+    geo_data <- data[data$time >= first_day, ]
+    geo_data$time <- geo_data$time - first_day
+    iter_fake_treatment_end_time <- fake_treatment_end_time - first_day
+    iter_fake_treatment_start_time <- iter_fake_treatment_end_time - treatment_duration
+    geo_object <- suppressMessages(GeoLift(
+      data = geo_data,
+      locations = treatment_locations,
+      treatment_start_time = iter_fake_treatment_start_time,
+      treatment_end_time = iter_fake_treatment_end_time,
+      stat_test = stat_test,
+      fixed_effects = fixed_effects,
+      model = model
+    ))
+    inf_df <- geo_object$inference
+    inf_df$incremental <- inf_df$ATT * length(treatment_locations) * treatment_duration
+    inf_df$first_day <- first_day
+    final_results <- rbind(final_results, inf_df)
+  }
+  final_results$suggested_first_day <- ifelse(
+    final_results$incremental == min(abs(final_results$incremental)),
+    TRUE, FALSE
+  )
+  return(final_results)
+}
 

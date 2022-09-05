@@ -1,4 +1,10 @@
-GeoLift v2.5.1 (Release date: 2022-09-10)
+GeoLift v2.5.2 (Release date: 2022-09-16)
+=========================================
+
+Changes:
+* Added functions & plots to determine best pre-treatment start period.
+
+GeoLift v2.5.1 (Release date: 2022-09-16)
 =========================================
 
 Changes:

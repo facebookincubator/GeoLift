@@ -731,13 +731,13 @@ BestStartTimePeriod <- function(
   fake_treatment_start_time <- fake_treatment_end_time - treatment_duration
   if (max(data$time) < (min_pre_treatment_length + treatment_duration + period_intervals)){
     stop(
-      "Pre-treatment length is below 90 + ", 
+      "Pre-treatment length is below t = (", min_pre_treatment_length, " + ", 
       period_intervals, 
-      " period intervals.
+      ") period intervals.
       Running this optimization with less than 90 periods in pre-treatment is not recommended.")
   }
   time_expansion <- seq(
-    0, 
+    1, 
     max(data$time) - treatment_duration - min_pre_treatment_length, 
     period_intervals)
   
@@ -766,9 +766,11 @@ BestStartTimePeriod <- function(
     final_results <- rbind(final_results, inf_df)
   }
   final_results$suggested_first_day <- ifelse(
-    final_results$incremental == min(abs(final_results$incremental)),
+    final_results$first_day == max(final_results[abs(final_results$Perc.Lift) == min(abs(final_results$Perc.Lift)), 
+                                                 "first_day"]),
     TRUE, FALSE
   )
+  class(final_results) <- c("BestStartTimePeriod", class(final_results))
   return(final_results)
 }
 

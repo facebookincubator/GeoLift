@@ -713,7 +713,7 @@ ConfIntervals <- function(augsynth,
 #' @param verbose boolean that determines if processing messages will be shown.
 #' @return DataFrame object that contains values for inference per start date.
 #' @export
-BestStartTimePeriod <- function(
+BestPreTreatmentLength <- function(
   treatment_locations,
   data,
   treatment_start_time,
@@ -770,7 +770,7 @@ BestStartTimePeriod <- function(
                                                  "first_day"]),
     TRUE, FALSE
   )
-  class(final_results) <- c("BestStartTimePeriod", class(final_results))
+  class(final_results) <- c("BestPreTreatmentLength", class(final_results))
   return(final_results)
 }
 

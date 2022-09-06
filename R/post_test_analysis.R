@@ -783,6 +783,13 @@ BestPreTreatmentLength <- function(
     TRUE,
     FALSE
   )
+  if (verbose){
+    message(
+      "The optimal pre-treatment start period is t = ", 
+      final_results[final_results$suggested_first_day==TRUE, "first_day"], 
+      ".\nMake sure to adjust your dataset to match this criteria."
+    )
+  }
   class(final_results) <- c("BestPreTreatmentLength", class(final_results))
   return(final_results)
 }

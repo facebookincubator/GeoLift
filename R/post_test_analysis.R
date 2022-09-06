@@ -674,7 +674,7 @@ ConfIntervals <- function(augsynth,
 #'
 #' @description
 #'
-#' `BestStartTimePeriod` chooses the best moment to start the pre-treatment period.
+#' `BestPreTreatmentLength` chooses the best moment to start the pre-treatment period.
 #' Different pre-treatment period lengths will give you different results.  We will
 #' keep the minimum pre-treatment period length that has an estimator as close to 
 #' the true effect as possible.
@@ -688,14 +688,6 @@ ConfIntervals <- function(augsynth,
 #' @param period_intervals Frequency of periods to test pre-treatment lengths.
 #' Set to each 7 days by default.
 #' @param min_pre_treatment_length Minimum amount of periods in pre-treatment. 
-#' @param stat_test A string indicating the test statistic.
-#' \itemize{
-#'          \item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
-#'          \item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
-#'          Recommended for Negative Lift tests.}
-#'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
-#'          Recommended for Positive Lift tests.}
-#' }
 #' @param model A string indicating the outcome model used to augment the Augmented
 #' Synthetic Control Method. Augmentation through a prognostic function can improve
 #' fit and reduce L2 imbalance metrics.
@@ -706,7 +698,6 @@ ConfIntervals <- function(augsynth,
 #'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
 #'                          to improve fit for larger panels (more than 40 locations and 100
 #'                          time-stamps. }
-#'          \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
@@ -714,16 +705,15 @@ ConfIntervals <- function(augsynth,
 #' @return DataFrame object that contains values for inference per start date.
 #' @export
 BestPreTreatmentLength <- function(
-  treatment_locations,
-  data,
-  treatment_start_time,
-  treatment_end_time,
-  stat_test='Total',
-  period_intervals = 7,
-  min_pre_treatment_length = 90,
-  model='ridge',
-  fixed_effects=TRUE,
-  verbose=FALSE
+    treatment_locations,
+    data,
+    treatment_start_time,
+    treatment_end_time,
+    period_intervals = 7,
+    min_pre_treatment_length = 90,
+    model='ridge',
+    fixed_effects=TRUE,
+    verbose=FALSE
 ){
   treatment_duration <- treatment_end_time - treatment_start_time
   data <- data[data$time < treatment_start_time, ]
@@ -751,24 +741,47 @@ BestPreTreatmentLength <- function(
     geo_data$time <- geo_data$time - first_day
     iter_fake_treatment_end_time <- fake_treatment_end_time - first_day
     iter_fake_treatment_start_time <- iter_fake_treatment_end_time - treatment_duration
-    geo_object <- suppressMessages(GeoLift(
-      data = geo_data,
+    
+    geo_data_aux <- fn_treatment(
+      geo_data,
       locations = treatment_locations,
-      treatment_start_time = iter_fake_treatment_start_time,
-      treatment_end_time = iter_fake_treatment_end_time,
-      stat_test = stat_test,
-      fixed_effects = fixed_effects,
-      model = model
+      iter_fake_treatment_start_time,
+      iter_fake_treatment_end_time)
+    
+    augsynth_model <- suppressMessages(augsynth::augsynth(
+      form = as.formula("Y ~ D"),
+      unit = location,
+      time = time,
+      data = geo_data_aux,
+      t_int = iter_fake_treatment_start_time,
+      progfunc = model,
+      scm = TRUE,
+      fixedeff = fixed_effects
     ))
-    inf_df <- geo_object$inference
-    inf_df$incremental <- inf_df$ATT * length(treatment_locations) * treatment_duration
-    inf_df$first_day <- first_day
+    
+    pred_start_time <- augsynth_model$t_int + 1
+    pred_end_time <- augsynth_model$t_int + ncol(augsynth_model$data$y)
+    y_hat <- predict(
+      augsynth_model, 
+      att=FALSE)[pred_start_time:pred_end_time]
+    att_series <- predict(
+      augsynth_model, 
+      att=TRUE)[pred_start_time:pred_end_time]
+    
+    inf_df <- data.frame(
+      "ATT" = mean(att_series),
+      "lift" = round(sum(att_series) / abs(sum(y_hat)), 3),
+      "incremental" = mean(att_series) * length(treatment_locations) * treatment_duration,
+      "first_day" = first_day
+    )
     final_results <- rbind(final_results, inf_df)
   }
   final_results$suggested_first_day <- ifelse(
-    final_results$first_day == max(final_results[abs(final_results$Perc.Lift) == min(abs(final_results$Perc.Lift)), 
-                                                 "first_day"]),
-    TRUE, FALSE
+    final_results$first_day == max(
+      final_results[abs(final_results$lift) == min(abs(final_results$lift)),
+                    "first_day"]),
+    TRUE,
+    FALSE
   )
   class(final_results) <- c("BestPreTreatmentLength", class(final_results))
   return(final_results)

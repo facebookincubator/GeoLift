@@ -1121,15 +1121,14 @@ plot.GeoLiftMultiCell <- function(x,
 #' @export
 plot.BestPreTreatmentLength <- function(
     x, ...){
-  best_period_plot <- ggplot(x, aes(x=first_day)) +
-    geom_line(aes(y=as.double(Perc.Lift / 100), group=1, color="Detected Lift (%)")) +
-    geom_line(aes(y=pvalue/15, group=1, color="Pvalue")) +
+  best_period_plot <- ggplot(
+    x, 
+    aes(x=first_day, y=as.double(lift), group=1)) +
+    geom_line(color="#7030A0") +
     theme_minimal() +
     scale_y_continuous(
-      labels = scales::percent_format(accuracy = 1),
-      name = "Detected Lift (%)",
-      sec.axis = sec_axis(~.*15,
-                          name="Pvalue")) +
+      labels = scales::percent_format(),
+      name = "Detected Lift (%)") +
     labs(title="Conversions: Deteced Lift when True Lift is zero",
          subtitle="Same testing periods, different training start dates",
          x="First day of training",
@@ -1137,13 +1136,10 @@ plot.BestPreTreatmentLength <- function(
          smallest absolute detected effect in the days prior to the actual 
          treatment being implemented") +
     theme(plot.title = element_text(hjust=0.5),
-          plot.subtitle = element_text(hjust=0.5),
-          legend.title=element_blank()) +
+          plot.subtitle = element_text(hjust=0.5)) +
     geom_vline(xintercept=x[x$suggested_first_day==TRUE, "first_day"],
                linetype="dashed", alpha=0.4) +
-    geom_hline(yintercept=0, linetype="dashed", alpha=0.4, color="red") +
-    scale_colour_manual(values = c(
-      "Detected Lift%" = "#7030A0",
-      "PValue" = "#52854C"))
+    geom_hline(yintercept=0, linetype="dashed", alpha=0.4, color="red")
   return(best_period_plot)
 }
+

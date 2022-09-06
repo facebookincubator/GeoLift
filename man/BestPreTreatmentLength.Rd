@@ -9,7 +9,6 @@ BestPreTreatmentLength(
   data,
   treatment_start_time,
   treatment_end_time,
-  stat_test = "Total",
   period_intervals = 7,
   min_pre_treatment_length = 90,
   model = "ridge",
@@ -29,15 +28,6 @@ of the time period (starting at 1), and covariates.}
 
 \item{treatment_end_time}{Time index of the end of the treatment.}
 
-\item{stat_test}{A string indicating the test statistic.
-\itemize{
-\item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
-\item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
-Recommended for Negative Lift tests.}
-\item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
-Recommended for Positive Lift tests.}
-}}
-
 \item{period_intervals}{Frequency of periods to test pre-treatment lengths.
 Set to each 7 days by default.}
 
@@ -53,7 +43,6 @@ for smaller panels (less than 40 locations and 100 time-stamps.))}
 \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
 to improve fit for larger panels (more than 40 locations and 100
 time-stamps. }
-\item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
 }}
 
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
@@ -65,7 +54,7 @@ effects in the model. Set to TRUE by default.}
 DataFrame object that contains values for inference per start date.
 }
 \description{
-\code{BestStartTimePeriod} chooses the best moment to start the pre-treatment period.
+\code{BestPreTreatmentLength} chooses the best moment to start the pre-treatment period.
 Different pre-treatment period lengths will give you different results.  We will
 keep the minimum pre-treatment period length that has an estimator as close to
 the true effect as possible.

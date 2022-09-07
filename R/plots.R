@@ -1121,10 +1121,12 @@ plot.GeoLiftMultiCell <- function(x,
 #' @export
 plot.BestPreTreatmentLength <- function(
     x, ...){
+  x <- x$pre_treatment_lift_df
   best_period_plot <- ggplot(
     x, 
     aes(x=first_day, y=as.double(lift), group=1)) +
     geom_line(color="#7030A0") +
+    geom_point(shape=21, color="#7030A0", fill='white') +
     theme_minimal() +
     scale_y_continuous(
       labels = scales::percent_format(),

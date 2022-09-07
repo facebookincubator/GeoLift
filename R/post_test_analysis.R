@@ -716,10 +716,10 @@ BestPreTreatmentLength <- function(
     verbose=FALSE
 ){
   treatment_duration <- treatment_end_time - treatment_start_time
-  data <- data[data$time < treatment_start_time, ]
-  fake_treatment_end_time <- max(data$time)
+  filtered_data <- data[data$time < treatment_start_time, ]
+  fake_treatment_end_time <- max(filtered_data$time)
   fake_treatment_start_time <- fake_treatment_end_time - treatment_duration
-  if (max(data$time) < (min_pre_treatment_length + treatment_duration + period_intervals)){
+  if (max(filtered_data$time) < (min_pre_treatment_length + treatment_duration + period_intervals)){
     stop(
       "Pre-treatment length is below t = (", min_pre_treatment_length, " + ", 
       period_intervals, 
@@ -728,16 +728,16 @@ BestPreTreatmentLength <- function(
   }
   time_expansion <- seq(
     1, 
-    max(data$time) - treatment_duration - min_pre_treatment_length, 
+    max(filtered_data$time) - treatment_duration - min_pre_treatment_length, 
     period_intervals)
   
   message("Running iterations to determine beginning of pre-treatment period.")
-  final_results <- data.frame()
+  pre_treatment_lift_df <- data.frame()
   for (first_day in time_expansion){
     if (verbose){
       message("Using time=", first_day, " as first day of pre-treatment period.")
     }
-    geo_data <- data[data$time >= first_day, ]
+    geo_data <- filtered_data[filtered_data$time >= first_day, ]
     geo_data$time <- geo_data$time - first_day
     iter_fake_treatment_end_time <- fake_treatment_end_time - first_day
     iter_fake_treatment_start_time <- iter_fake_treatment_end_time - treatment_duration
@@ -774,23 +774,34 @@ BestPreTreatmentLength <- function(
       "incremental" = mean(att_series) * length(treatment_locations) * treatment_duration,
       "first_day" = first_day
     )
-    final_results <- rbind(final_results, inf_df)
+    pre_treatment_lift_df <- rbind(pre_treatment_lift_df, inf_df)
   }
-  final_results$suggested_first_day <- ifelse(
-    final_results$first_day == max(
-      final_results[abs(final_results$lift) == min(abs(final_results$lift)),
+  pre_treatment_lift_df$suggested_first_day <- ifelse(
+    pre_treatment_lift_df$first_day == max(
+      pre_treatment_lift_df[abs(pre_treatment_lift_df$lift) == min(abs(pre_treatment_lift_df$lift)),
                     "first_day"]),
     TRUE,
     FALSE
   )
+  best_start_day <- pre_treatment_lift_df[
+    pre_treatment_lift_df$suggested_first_day==TRUE, "first_day"]
   if (verbose){
     message(
       "The optimal pre-treatment start period is t = ", 
-      final_results[final_results$suggested_first_day==TRUE, "first_day"], 
+      best_start_day,
       ".\nMake sure to adjust your dataset to match this criteria."
     )
   }
-  class(final_results) <- c("BestPreTreatmentLength", class(final_results))
-  return(final_results)
+  processed_data <- data[data$time >= best_start_day, ]
+  processed_data$time <- processed_data$time - best_start_day + 1
+  
+  results <- list(
+    pre_treatment_lift_df = pre_treatment_lift_df,
+    processed_data = processed_data,
+    adjusted_treatment_start_time = treatment_start_time - best_start_day,
+    adjusted_treatment_end_time = treatment_end_time - best_start_day
+  )
+  class(results) <- c("BestPreTreatmentLength", class(results))
+  return(results)
 }
 

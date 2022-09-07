@@ -5,24 +5,28 @@
 \title{Determine start time of pre-treatment period.}
 \usage{
 BestPreTreatmentLength(
-  treatment_locations,
   data,
+  treatment_locations,
   treatment_start_time,
   treatment_end_time,
   period_intervals = 7,
   min_pre_treatment_length = 90,
   model = "ridge",
   fixed_effects = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  Y_id = "Y",
+  time_id = "time",
+  location_id = "location",
+  X = c()
 )
 }
 \arguments{
-\item{treatment_locations}{List of test locations.}
-
 \item{data}{A data.frame containing the historical conversions by
 geographic unit. It requires a "locations" column with the geo name,
 a "Y" column with the outcome data (units), a time column with the indicator
 of the time period (starting at 1), and covariates.}
+
+\item{treatment_locations}{Vector of treatment locations.}
 
 \item{treatment_start_time}{Time index of the start of the treatment.}
 
@@ -40,18 +44,29 @@ fit and reduce L2 imbalance metrics.
 \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
 \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
 for smaller panels (less than 40 locations and 100 time-stamps.))}
-\item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
-to improve fit for larger panels (more than 40 locations and 100
-time-stamps. }
 }}
 
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
 effects in the model. Set to TRUE by default.}
 
 \item{verbose}{boolean that determines if processing messages will be shown.}
+
+\item{Y_id}{Name of the outcome variable (String).}
+
+\item{time_id}{Name of the time variable (String).}
+
+\item{location_id}{Name of the location variable (String).}
+
+\item{X}{Vector with covariates names.}
 }
 \value{
-DataFrame object that contains values for inference per start date.
+List object that contains:
+\itemize{
+\item{"pre_treatment_lift_df":}{ DataFrame with detected effects per pre-treatment length.}
+\item{"processed_data":}{ Input dataframe that was adjusted to new best pre-treatment start date.}
+\item{"adjusted_treatment_start_time":}{ Time index of the start of the treatment, adjusted by new best pre-treatment start date.}
+\item{"adjusted_treatment_end_time":}{ Time index of the end of the treatment, adjusted by new best pre-treatment start date.}
+}
 }
 \description{
 \code{BestPreTreatmentLength} chooses the best moment to start the pre-treatment period.

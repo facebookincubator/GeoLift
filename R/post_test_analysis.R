@@ -3,7 +3,7 @@
 # LICENSE file in the root directory of this source tree.
 
 # Includes function GeoLift, print.GeoLift, cumulative_lift, summary.GeoLift,
-# print.summary.GeoLift.
+# print.summary.GeoLift, BestPreTreatmentLength.
 
 
 #' GeoLift inference calculation.

@@ -10,7 +10,12 @@ SplitTreatmentEstimation(
   treatment_start_time,
   treatment_end_time,
   model,
-  verbose = FALSE
+  verbose = FALSE,
+  Y_id = "Y",
+  time_id = "time",
+  location_id = "location",
+  X = c(),
+  fixed_effects = TRUE
 )
 }
 \arguments{
@@ -36,6 +41,17 @@ time-stamps. }
 }}
 
 \item{verbose}{boolean that determines if processing messages will be shown.}
+
+\item{Y_id}{Name of the outcome variable (String).}
+
+\item{time_id}{Name of the time variable (String).}
+
+\item{location_id}{Name of the location variable (String).}
+
+\item{X}{Vector with covariates names.}
+
+\item{fixed_effects}{A logic flag indicating whether to include unit fixed
+effects in the model. Set to TRUE by default.}
 }
 \value{
 Dataframe with L2 imbalance ranking and these columns:

@@ -253,6 +253,12 @@ GeoDataRead <- function(data,
 #'                          time-stamps. }
 #'          }
 #' @param verbose boolean that determines if processing messages will be shown.
+#' @param Y_id Name of the outcome variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param X Vector with covariates names.
+#' @param fixed_effects A logic flag indicating whether to include unit fixed
+#' effects in the model. Set to TRUE by default.
 #' 
 #' @return Dataframe with L2 imbalance ranking and these columns:
 #'          \itemize{
@@ -270,7 +276,12 @@ SplitTreatmentEstimation <- function(
     treatment_start_time,
     treatment_end_time,
     model,
-    verbose=FALSE
+    verbose=FALSE,
+    Y_id = "Y",
+    time_id = "time",
+    location_id = "location",
+    X = c(),
+    fixed_effects = TRUE
 ){
   if (verbose){
     message(
@@ -279,21 +290,24 @@ SplitTreatmentEstimation <- function(
   l2_imbalance_df <- data.frame()
   for (i in 1:length(treatment_locations)){
     treated_location <- treatment_locations[i]
-    geo_data_treated <- data[
+    data_treated <- data[
       !data$location %in% treatment_locations[
         !treatment_locations %in% treated_location], ]
-    augsynth_model <- suppressMessages(
-      augsynth::augsynth(
-        form = as.formula("Y ~ D"),
-        unit = location,
-        time = time,
-        data = geo_data_treated,
-        t_int = treatment_start_time,
-        progfunc = model,
-        scm = TRUE,
-        fixedeff = TRUE
-      )
-    )
+    
+    augsynth_result_list <- AugsynthExecution(
+      data = data_treated,
+      treatment_locations = treated_location,
+      treatment_start_time = treatment_start_time,
+      treatment_end_time = treatment_end_time,
+      Y_id = Y_id,
+      time_id = time_id,
+      location_id = location_id,
+      X = X,
+      model = model,
+      fixed_effects = fixed_effects)
+    
+    augsynth_model <- augsynth_result_list$augsynth_model
+    
     treatment_df <- data.frame(
       treatment_location = treated_location,
       l2_imbalance = augsynth_model$l2_imbalance,
@@ -333,6 +347,12 @@ SplitTreatmentEstimation <- function(
 #'                          time-stamps. }
 #'          }
 #' @param verbose boolean that determines if processing messages will be shown.
+#' @param Y_id Name of the outcome variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param X Vector with covariates names.
+#' @param fixed_effects A logic flag indicating whether to include unit fixed
+#' effects in the model. Set to TRUE by default.
 #' 
 #' @return
 #' list that contains:
@@ -347,16 +367,16 @@ ReplaceTreatmentSplit <- function(
     treatment_start_time,
     treatment_end_time,
     model,
-    verbose=FALSE){
-  data_up_to_treatment <- data[data$time <= treatment_end_time, ]
+    verbose=FALSE,
+    Y_id = "Y",
+    time_id = "time",
+    location_id = "location",
+    X = c(),
+    fixed_effects = TRUE){
+  geo_data <- data[data$time <= treatment_end_time, ]
   data_after_treatment <- data[data$time > treatment_end_time, ]
   
-  geo_data <- fn_treatment(
-    data_up_to_treatment,
-    locations = treatment_locations,
-    treatment_start_time,
-    treatment_end_time)
-  
+  treatment_locations <- tolower(treatment_locations)
   l2_imbalance_df <- data.frame()
   
   for (i in 1:length(treatment_locations)){
@@ -380,28 +400,38 @@ ReplaceTreatmentSplit <- function(
     geo_data_treated <- geo_data[
       !geo_data$location %in% treatment_locations[
         !treatment_locations %in% treatment_to_replace], ]
-    augsynth_model <- suppressMessages(augsynth::augsynth(
-      form = as.formula("Y ~ D"),
-      unit = location,
-      time = time,
+    
+    augsynth_result_list <- AugsynthExecution(
       data = geo_data_treated,
-      t_int = treatment_start_time,
-      progfunc = model,
-      scm = TRUE,
-      fixedeff = TRUE
-    ))
+      treatment_locations = treatment_to_replace,
+      treatment_start_time = treatment_start_time,
+      treatment_end_time = treatment_end_time,
+      Y_id = Y_id,
+      time_id = time_id,
+      location_id = location_id,
+      X = X,
+      model = model,
+      fixed_effects = fixed_effects)
+    
+    augsynth_model <- augsynth_result_list$augsynth_model
+    
     y_hat <- predict(augsynth_model, att=FALSE)
     geo_data[
       geo_data$location == treatment_to_replace &
         geo_data$time >= treatment_start_time, "Y"] <- y_hat[treatment_start_time:treatment_end_time]
-    geo_data[geo_data$location == treatment_to_replace, "D"] <- 0
     treatment_locations <- treatment_locations[treatment_locations != treatment_to_replace]
   }
   
   geo_data <- geo_data %>% dplyr::mutate(D = NULL)
   data <- rbind(geo_data, data_after_treatment)
   
-  return(list(data = data, l2_imbalance_df = l2_imbalance_df))
+  return(list(
+    data = data, 
+    l2_imbalance_df = l2_imbalance_df %>% dplyr::arrange(treatment_location, 
+                                                         -treatment_group_size
+                                                         )
+    )
+  )
 }
 
 

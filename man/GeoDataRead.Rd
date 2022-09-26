@@ -18,8 +18,13 @@ GeoDataRead(
 \arguments{
 \item{data}{A data.frame containing the historical conversions by
 geographic unit. It requires a "locations" column with the geo name,
-a "Y" column with the outcome data (units), a time column with the indicator
-of the time period (starting at 1), and covariates.}
+a "Y" column with the outcome data (units), a time column with the date, and covariates.
+Valid date formats are: "mm/dd/yyyy", "mm-dd-yyyy", "mm.dd.yyyy", "mmddyyyy",
+"dd/mm/yyyy", "dd-mm-yyyy", "dd.mm.yyyy", "ddmmyyyy",
+"yyyy/mm/dd", "yyyy-mm-dd", "yyyy.mm.dd", "yyyymmdd", "ww/yyyy", "ww-yyyy",
+"ww.yyyy", "wwyyyy", "yyyy/ww", "yyyy-ww", "yyyy.ww", "yyyyww",
+"mm/yyyy", "mm-yyyy", "mm.yyyy", "mmyyyy", "yyyy/mm", "yyyy-mm",
+"yyyy.mm", "yyyymm"}
 
 \item{date_id}{Name of the date variable (String).}
 

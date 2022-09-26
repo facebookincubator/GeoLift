@@ -1,0 +1,4 @@
+pandas
+rpy2
+ipython
+jupyter

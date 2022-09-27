@@ -9,7 +9,7 @@ Check out the files below for a more detailed description of the main functional
 
 - GeoLiftPythonWalkthrough.ipynb: the completed GeoLift walkthrough in python including GeoLift single and multicell.
 
-- Demo.py: a simple GeoLift walkthrough in Python including only GeoLift single cell.
+- demo.py: a simple GeoLift walkthrough in Python including only GeoLift single cell.
 
 
 ## Requirements 
@@ -25,11 +25,38 @@ GeoLift in Python version requires or works with:
 
 The installation of GeoLift in Python version assumes that you will use pip3 as your Python package manager. If you do not use pip3, before running anything, edit the commands in setup.sh and change pip3 to your Python package manager to avoid package management issues.
 
-Step 1: Donwload GeoLiftPython folder hosted on GeoLift's Github.
+### Option 1 - Work environment
+
+Step 1: Download GeoLiftPython folder hosted on GeoLift's Github.
+
+Step 2 (On Terminal): Located in the GeoLiftPython folder, run the commands below in your environment: 
+
+```
+pip3 install -r requirements.txt
+python3 r_lang_requirements.py
+```
+
+Step 2 (On Jupyter): Located in the GeoLiftPython folder, run the commands below in your environment: 
+
+```
+!pip3 install -r requirements.txt
+%run r_lang_requirements.py
+```
+
+These commands will:
+1.1 install the `pandas`, `rpy2`, `ipython`, `jupyter` packages under `requirement.txt`.
+1.2 install `augsynth` and `Geolift` R packages in `r_lang_requirements.txt`.
+
+NOTE: 
+If you don't want to install Jupyter, you can remove jupyter from requirements.txt
+
+### Option 2 - Virtual environment (MacOS only)
+
+Step 1: Download GeoLiftPython folder hosted on GeoLift's Github.
 
 Step 2: In your terminal, go to the GeoLiftPython folder and run the following:
 ```
-$ bash setup.sh
+bash setup.sh
 ```
 This command will:
 1.1 install `virtualenv` python package and activate a virutal environment. 
@@ -37,47 +64,20 @@ This command will:
 1.3 install `augsynth` and `Geolift` R packages in `r_lang_requirements.txt`.
 1.4 open Jupyter Notebook.
 
-
 Step 3: Open the `GeoLiftPython.ipynb` directly from your Jupyter Notebook interface.
+
+NOTE: 
+If you have closed your notebook, there is no need to reinstall everything.  All you need to do is reactivate your virtualenv with:
+
+```
+source path/to/GeoLiftPython/venv_geolift_python/bin/activate
+jupyter notebook
+```
+If your GeoLift files are in a different folder than the one activated, you need to go to the folder where your GeoLift files are located before running `jupyter notebook`.
+
 
 Happy GeoLifting!
 
-
-## FAQ
-
-FAQ 1:
-- Have you closed your notebook and want to reopen it?
-
-No need to reinstall everything.  All you need to do is reactivate your virtualenv with:
-
-On macOS
-```
-$ source path/to/GeoLiftPython/venv_geolift_python/bin/activate
-$ jupyter notebook
-```
-On Windows
-```
-$ source path/to/GeoLiftPython/venv_geolift_python/Scripts/activate
-$ jupyter notebook
-```
-Check the [Virtualenv website](https://virtualenv.pypa.io/en/latest/user_guide.html#activators) for more information.
-
-NOTE: if your GeoLift files are in a different folder than the one activated, you need to go to that folder before running `jupyter notebook`.
-
-FAQ 2:
-- Don't you want to install Jupyter?
-
-You can remove jupyter from requirements.txt
-
-FAQ 3:
-- Would you like to run GeoLift outside of a virtualenv?
-
-Run the commands below in your Python environment: 
-
-```
-$ pip3 install -r requirements.txt
-$ python3 r_lang_requirements.py
-```
 
 ## GeoLiftPython folder
 
@@ -85,9 +85,9 @@ In the GeoLiftPython folder you'll find:
 
 - `GeoLiftPythonWalkthrough.ipynb`: the completed GeoLift walkthrough in python including GeoLift single and multicell.
 
-- `Demo.py`: a simple GeoLift walkthrough in Python including only GeoLift single cell.
+- `demo.py`: a simple GeoLift walkthrough in Python including only GeoLift single cell.
 
-- `setup.sh`: all necessary commands to simplify the setup of Python's environment and packages installation to run GeoLift in Python. This will setup a virtual environmenta and install the packages specified in requirements.txt, in r_lang_requirements.py files and it will open the Jupyter notebook.
+- `setup.sh`: all necessary commands to simplify the setup of Python's environment and packages installation to run GeoLift in Python. This will setup a virtual environment and install the packages specified in requirements.txt, in r_lang_requirements.py files and it will open the Jupyter notebook.
 
 - `requirements.txt`: contains the rpy2, ipython, pandas and jupyter pacakges.
 

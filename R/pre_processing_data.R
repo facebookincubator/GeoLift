@@ -295,7 +295,7 @@ SplitTreatmentEstimation <- function(
       !data$location %in% treatment_locations[
         !treatment_locations %in% treated_location], ]
     
-    augsynth_result_list <- AugsynthExecution(
+    augsynth_result_list <- ASCMExecution(
       data = data_treated,
       treatment_locations = treated_location,
       treatment_start_time = treatment_start_time,
@@ -416,7 +416,7 @@ ReplaceTreatmentSplit <- function(
       !geo_data$location %in% treatment_locations[
         !treatment_locations %in% treatment_to_replace], ]
     
-    augsynth_result_list <- AugsynthExecution(
+    augsynth_result_list <- ASCMExecution(
       data = geo_data_treated,
       treatment_locations = treatment_to_replace,
       treatment_start_time = treatment_start_time,

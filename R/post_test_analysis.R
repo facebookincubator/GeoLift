@@ -2,14 +2,14 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-# Includes function AugsynthExecution, GeoLift, print.GeoLift, cumulative_lift, 
-# summary.GeoLift, print.summary.GeoLift, BestPreTreatmentLength.
+# Includes function ASCMExecution, GeoLift, print.GeoLift, cumulative_lift, 
+# summary.GeoLift, print.summary.GeoLift
 
 #' Augsynth execution.
 #'
 #' @description
 #'
-#' `AugsynthExecution` executes the augmented synthetic controls package.
+#' `ASCMExecution` executes the augmented synthetic controls package.
 #'
 #' @param data A data.frame containing the historical conversions by
 #' geographic unit. It requires a "locations" column with the geo name,
@@ -45,7 +45,7 @@
 #'          \item{"treatment_locations":}{ Treatment locations being used in lower case.}
 #'          }
 #' @export
-AugsynthExecution <- function(
+ASCMExecution <- function(
   data,
   treatment_locations,
   treatment_start_time,
@@ -203,7 +203,7 @@ GeoLift <- function(Y_id = "Y",
       } else {
         ascm <- tryCatch(
           expr = {
-            AugsynthExecution(
+            ASCMExecution(
               data = data,
               treatment_locations = locations,
               treatment_start_time = treatment_start_time,
@@ -235,7 +235,7 @@ GeoLift <- function(Y_id = "Y",
       model <- "none"
     }
   }
-  augsynth_result_list <- AugsynthExecution(
+  augsynth_result_list <- ASCMExecution(
     data = data,
     treatment_locations = locations,
     treatment_start_time = treatment_start_time,

@@ -61,6 +61,8 @@ list that contains:
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 \code{ReplaceTreatmentSplit} chooses the best treatment location to replace with their
 control, given the L2 imbalance that each individual treatment has. Then
 re-estimates the remaining treatment locations using the replaced treatment as

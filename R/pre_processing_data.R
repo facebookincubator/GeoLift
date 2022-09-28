@@ -233,6 +233,7 @@ GeoDataRead <- function(data,
 #' GeoLift fit for each Treatment location within Treatment group.
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' `SplitTreatmentEstimation` fits a control group to each location within a 
 #' Treatment group and calculates their imbalance metrics.
@@ -308,9 +309,13 @@ SplitTreatmentEstimation <- function(
     
     augsynth_model <- augsynth_result_list$augsynth_model
     
+    y_hat <- predict(augsynth_model, att=FALSE)
+    sum_pre_treatment_y_hat <- sum(y_hat[1:augsynth_model$t_int])
+    
     treatment_df <- data.frame(
       treatment_location = treated_location,
       l2_imbalance = augsynth_model$l2_imbalance,
+      l2_imbalance_to_y_hat = augsynth_model$l2_imbalance / sum_pre_treatment_y_hat,
       scaled_l2_imbalance = augsynth_model$scaled_l2_imbalance,
       treatment_group_size = length(treatment_locations),
       model = model
@@ -325,6 +330,7 @@ SplitTreatmentEstimation <- function(
 #' Replace Treatment locations to be able to use them for continuous GeoLift studies.
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' `ReplaceTreatmentSplit` chooses the best treatment location to replace with their
 #' control, given the L2 imbalance that each individual treatment has. Then 
@@ -378,6 +384,7 @@ ReplaceTreatmentSplit <- function(
   
   treatment_locations <- tolower(treatment_locations)
   l2_imbalance_df <- data.frame()
+  problematic_treatments <- c()
   
   for (i in 1:length(treatment_locations)){
     iter_l2_imbalance_df <- SplitTreatmentEstimation(
@@ -396,6 +403,14 @@ ReplaceTreatmentSplit <- function(
     if (verbose){
       message("Replacing treatment location with lowest imbalance: ", 
               treatment_to_replace)
+    }
+    
+    if (
+      iter_l2_imbalance_df[
+        iter_l2_imbalance_df$treatment_location == treatment_to_replace, 
+        "l2_imbalance_to_y_hat"
+      ] > 0.01){
+      problematic_treatments <- c(problematic_treatments, treatment_to_replace)
     }
     geo_data_treated <- geo_data[
       !geo_data$location %in% treatment_locations[
@@ -425,13 +440,15 @@ ReplaceTreatmentSplit <- function(
   geo_data <- geo_data %>% dplyr::mutate(D = NULL)
   data <- rbind(geo_data, data_after_treatment)
   
-  return(list(
-    data = data, 
-    l2_imbalance_df = l2_imbalance_df %>% dplyr::arrange(treatment_location, 
-                                                         -treatment_group_size
-                                                         )
-    )
-  )
+  if (length(problematic_treatments) != 0){
+    warning(
+      paste0(
+        "The following treatment locations could be problematic to replace:\n",
+        " - ", paste0(problematic_treatments, collapse="\n - "),
+        "\n Consider using an alternative replacement method for that series."))
+  }
+  
+  return(list(data = data, l2_imbalance_df = l2_imbalance_df))
 }
 
 

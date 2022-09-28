@@ -233,6 +233,7 @@ GeoDataRead <- function(data,
 #' GeoLift fit for each Treatment location within Treatment group.
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' `SplitTreatmentEstimation` fits a control group to each location within a 
 #' Treatment group and calculates their imbalance metrics.
@@ -311,6 +312,7 @@ SplitTreatmentEstimation <- function(
 #' Replace Treatment locations to be able to use them for continuous GeoLift studies.
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' `ReplaceTreatmentSplit` chooses the best treatment location to replace with their
 #' control, given the L2 imbalance that each individual treatment has. Then 

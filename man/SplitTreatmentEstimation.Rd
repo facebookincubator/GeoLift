@@ -48,6 +48,8 @@ Dataframe with L2 imbalance ranking and these columns:
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 \code{SplitTreatmentEstimation} fits a control group to each location within a
 Treatment group and calculates their imbalance metrics.
 }

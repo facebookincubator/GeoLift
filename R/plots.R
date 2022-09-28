@@ -1109,39 +1109,3 @@ plot.GeoLiftMultiCell <- function(x,
   }
 
 }
-
-
-#' Plot to observe Best Start Time Period 
-#'
-#' @param x BestPreTreatmentLength object.
-#' @param ... additional arguments
-#' @return
-#' Best Pre Treatment Length plot.
-#'
-#' @export
-plot.BestPreTreatmentLength <- function(
-    x, ...){
-  x <- x$pre_treatment_lift_df
-  best_period_plot <- ggplot(
-    x, 
-    aes(x=first_day, y=as.double(lift), group=1)) +
-    geom_line(color="#7030A0") +
-    geom_point(shape=21, color="#7030A0", fill='white') +
-    theme_minimal() +
-    scale_y_continuous(
-      labels = scales::percent_format(),
-      name = "Detected Lift (%)") +
-    labs(title="Conversions: Deteced Lift when True Lift is zero",
-         subtitle="Same testing periods, different training start dates",
-         x="First day of training",
-         caption="Pre-treatment length is defined as minimum length that has the 
-         smallest absolute detected effect in the days prior to the actual 
-         treatment being implemented") +
-    theme(plot.title = element_text(hjust=0.5),
-          plot.subtitle = element_text(hjust=0.5)) +
-    geom_vline(xintercept=x[x$suggested_first_day==TRUE, "first_day"],
-               linetype="dashed", alpha=0.4) +
-    geom_hline(yintercept=0, linetype="dashed", alpha=0.4, color="red")
-  return(best_period_plot)
-}
-

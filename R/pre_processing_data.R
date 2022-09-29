@@ -390,7 +390,7 @@ ReplaceTreatmentSplit <- function(
       iter_l2_imbalance_df[
         iter_l2_imbalance_df$treatment_location == treatment_to_replace, 
         "l2_imbalance_to_y_hat"
-      ] > 0.01){
+      ] > 0.1){
       problematic_treatments <- c(problematic_treatments, treatment_to_replace)
     }
     geo_data_treated <- geo_data[
@@ -422,7 +422,7 @@ ReplaceTreatmentSplit <- function(
       paste0(
         "The following treatment locations could be problematic to replace:\n",
         " - ", paste0(problematic_treatments, collapse="\n - "),
-        "\n Consider using an alternative replacement method for that series."))
+        "\n Consider using an alternative replacement method for these series."))
   }
   
   return(list(data = data, l2_imbalance_df = l2_imbalance_df))

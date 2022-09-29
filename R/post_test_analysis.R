@@ -219,7 +219,6 @@ GeoLift <- function(Y_id = "Y",
             list("scaled_l2_imbalance" = 1)
           }
         )
-        print(round(ascm$scaled_l2_imbalance, 3))
         ascm_imbalances[[eval(progfunc)]] <- round(ascm$scaled_l2_imbalance, 3)
       }
     }

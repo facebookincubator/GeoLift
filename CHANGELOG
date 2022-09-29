@@ -1,4 +1,10 @@
-GeoLift v2.5.1 (Release date: 2022-09-10)
+GeoLift v2.5.2 (Release date: 2022-09-16)
+=========================================
+
+Changes:
+* Refactored GeoLift method into AugsynthExecution to be reused in other functions.
+
+GeoLift v2.5.1 (Release date: 2022-09-16)
 =========================================
 
 Changes:

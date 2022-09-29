@@ -2,9 +2,108 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-# Includes function GeoLift, print.GeoLift, cumulative_lift, summary.GeoLift,
-# print.summary.GeoLift.
+# Includes function ASCMExecution, GeoLift, print.GeoLift, cumulative_lift, 
+# summary.GeoLift, print.summary.GeoLift
 
+#' Augsynth execution.
+#'
+#' @description
+#'
+#' `ASCMExecution` executes the augmented synthetic controls package.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit. It requires a "locations" column with the geo name,
+#' a "Y" column with the outcome data (units), a time column with the indicator
+#' of the time period (starting at 1), and covariates.
+#' @param treatment_locations Vector of treatment locations.
+#' @param treatment_start_time Time index of the start of the treatment.
+#' @param treatment_end_time Time index of the end of the treatment.
+#' @param Y_id Name of the outcome variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param X Vector with covariates names.
+#' @param model A string indicating the outcome model used to augment the Augmented
+#' Synthetic Control Method. Augmentation through a prognostic function can improve
+#' fit and reduce L2 imbalance metrics.
+#' \itemize{
+#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
+#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+#'                          to improve fit for larger panels (more than 40 locations and 100
+#'                          time-stamps. }
+#'          \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
+#'          }
+#' @param fixed_effects A logic flag indicating whether to include unit fixed
+#' effects in the model. Set to TRUE by default.
+#'
+#' @return
+#' List object that contains:
+#'          \itemize{
+#'          \item{"augsynth_model":}{ Generalized Augmented Sunthetic Controls results.}
+#'          \item{"data":}{ Properly formatted data to fit GeoLift.}
+#'          \item{"treatment_locations":}{ Treatment locations being used in lower case.}
+#'          }
+#' @export
+ASCMExecution <- function(
+  data,
+  treatment_locations,
+  treatment_start_time,
+  treatment_end_time,  
+  Y_id = "Y",
+  time_id = "time",
+  location_id = "location",
+  X = c(),
+  model = "none",
+  fixed_effects = TRUE){
+  
+  data <- data %>% 
+    dplyr::rename(
+      time = time_id,
+      Y = Y_id,
+      location = location_id) %>%
+    dplyr::mutate(
+      location = tolower(location)
+    ) %>%
+    dplyr::filter(
+      time <= treatment_end_time
+    )
+  
+  treatment_locations <- tolower(treatment_locations)
+  
+  geo_data <- fn_treatment(data,
+                           locations = treatment_locations,
+                           treatment_start_time,
+                           treatment_end_time)
+  
+  if (length(X) == 0) {
+    formula <- as.formula("Y ~ D")
+  } else if (length(X) > 0) {
+    formula <- as.formula(paste(
+      "Y ~ D |",
+      sapply(list(X),
+             paste,
+             collapse = "+"
+      )
+    ))
+  }
+
+  augsynth_model <- suppressMessages(augsynth::augsynth(
+    form = formula,
+    unit = location,
+    time = time,
+    data = geo_data,
+    t_int = treatment_start_time,
+    progfunc = model,
+    scm = TRUE,
+    fixedeff = fixed_effects
+  ))
+  
+  return(list(
+    augsynth_model = augsynth_model,
+    data = data,
+    treatment_locations = treatment_locations))
+}
 
 #' GeoLift inference calculation.
 #'
@@ -95,34 +194,6 @@ GeoLift <- function(Y_id = "Y",
                     grid_size = 250,
                     stat_test = "Total") {
 
-  # Rename variables to standard names used by GeoLift
-  data <- data %>% dplyr::rename(
-    time = time_id,
-    Y = Y_id,
-    location = location_id
-  )
-
-  data$location <- tolower(data$location)
-  locations <- tolower(locations)
-
-  data_aux <- fn_treatment(data,
-    locations = locations,
-    treatment_start_time,
-    treatment_end_time
-  )
-
-  if (length(X) == 0) {
-    fmla <- as.formula("Y ~ D")
-  } else if (length(X) > 0) {
-    fmla <- as.formula(paste(
-      "Y ~ D |",
-      sapply(list(X),
-        paste,
-        collapse = "+"
-      )
-    ))
-  }
-
   # Optimizing model based on Scaled L2 Score
   if (model == "best") {
     ascm_imbalances <- list()
@@ -132,14 +203,17 @@ GeoLift <- function(Y_id = "Y",
       } else {
         ascm <- tryCatch(
           expr = {
-            suppressMessages(augsynth::augsynth(fmla,
-              unit = location, time = time,
-              data = data_aux,
-              t_int = treatment_start_time,
-              progfunc = progfunc,
-              scm = T,
-              fixedeff = fixed_effects
-            ))
+            ASCMExecution(
+              data = data,
+              treatment_locations = locations,
+              treatment_start_time = treatment_start_time,
+              treatment_end_time = treatment_end_time,
+              Y_id = Y_id,
+              time_id = time_id,
+              location_id = location_id,
+              X = X,
+              model = progfunc,
+              fixed_effects = fixed_effects)$augsynth_model
           },
           error = function(e) {
             list("scaled_l2_imbalance" = 1)
@@ -151,34 +225,31 @@ GeoLift <- function(Y_id = "Y",
 
     if (ascm_imbalances$none > ascm_imbalances$GSYN & ascm_imbalances$ridge > ascm_imbalances$GSYN) {
       message("Selected GSYN as best model.")
-      progfunc <- "GSYN"
+      model <- "GSYN"
     } else if (ascm_imbalances$none > ascm_imbalances$ridge & ascm_imbalances$GSYN > ascm_imbalances$ridge) {
       message("Selected Ridge as best model.")
-      progfunc <- "ridge"
+      model <- "ridge"
     } else {
       message("Selected model without prognostic function as best model.")
-      progfunc <- "none"
+      model <- "none"
     }
-    augsyn <- suppressMessages(augsynth::augsynth(
-      fmla,
-      unit = location, time = time,
-      data = data_aux,
-      t_int = treatment_start_time,
-      progfunc = progfunc,
-      scm = T,
-      fixedeff = fixed_effects
-    ))
-  } else {
-    augsyn <- suppressMessages(augsynth::augsynth(fmla,
-      unit = location, time = time,
-      data = data_aux,
-      t_int = treatment_start_time,
-      progfunc = model,
-      scm = T,
-      fixedeff = fixed_effects
-    ))
   }
-
+  augsynth_result_list <- ASCMExecution(
+    data = data,
+    treatment_locations = locations,
+    treatment_start_time = treatment_start_time,
+    treatment_end_time = treatment_end_time,
+    Y_id = Y_id,
+    time_id = time_id,
+    location_id = location_id,
+    X = X,
+    model = model,
+    fixed_effects = fixed_effects)
+  
+  augsyn <- augsynth_result_list$augsynth_model
+  data_aux <- augsynth_result_list$data
+  locations <- augsynth_result_list$treatment_locations
+  
   inference_df <- data.frame(matrix(ncol = 5, nrow = 0))
   colnames(inference_df) <- c(
     "ATT",
@@ -668,7 +739,3 @@ ConfIntervals <- function(augsynth,
 
   return(ci)
 }
-
-
-
-

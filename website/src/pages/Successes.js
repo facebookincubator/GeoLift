@@ -73,7 +73,7 @@ const features = [
         22% uplift in Meta's share of wallet.<br></br>
         <a href="https://www.facebook.com/business/measurement/case-studies/unified-measurement-for-app-based-businesses">
         - Learn More -
-        </a>
+        </a> <br></br><br></br>
       </>
     ),
   },
@@ -134,7 +134,7 @@ const features = [
         for Narrow Audiences).<br></br>
         <a href="https://www.facebook.com/business/success/ruffles-mexico?locale=es_LA">
         -  Learn More -
-        </a>
+        </a><br></br><br></br>
       </>
     ),
   },

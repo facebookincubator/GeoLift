@@ -18,17 +18,29 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: 'In-Store Sales Lift and iROAS Measurement for Sierra Nevada with GeoLift',
-    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/SierraNevada2.png?raw=true',
+    title: 'Measuring the Addition of Upper Funnel Optimization for Mixtiles with GeoLift',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/MixtilesLogo.png?raw=true',
     description: (
       <>
-        Sierra Nevada Brewing Company leveraged Meta’s GeoLift solution to measure the lift in their In-Store Sales,
-        driven by Meta marketing campaigns, revealing a 4.2% incremental sales lift that translates to an iROAS of 4.8x
-        in the set of test markets included in the study.
+        Israel-based direct-to-consumer home design startup Mixtiles leveraged GeoLift to measure a full-funnel approach
+        by using a combination of reach/upper funnel and conversion optimization campaigns. The test results showed that
+        a full-funnel approach had 10% lift in new users’ purchases, 4 million net-new reach, 9% reduction in CPIC, and
+        all a CPA on par with business-as-usual costs.<br></br>
 
-        <a href="https://www.facebook.com/business/success/sierra-nevada-brewing-co">
+        <a href="https://www.facebook.com/business/measurement/case-studies/mixtiles">
         - Learn More -
         </a>
+      </>
+    ),
+  },
+  {
+    title: 'How MWMOvercame Signal Loss with GeoLift',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/mwmLogo.png?raw=true',
+    description: (
+      <>
+        Due to iOS changes, the world’s leading creative apps publisher MWM no longer had visibility into the incremental
+        impact of Facebook and Instagram campaigns on its business. GeoLift was chosen to measure the incremental free trials
+        caused by Meta campaigns.Results showed that Facebook and Instagram campaigns generated 17% of incremental free trials.
       </>
     ),
   },

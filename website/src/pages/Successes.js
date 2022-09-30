@@ -33,6 +33,21 @@ const features = [
     ),
   },
   {
+    title: 'In-Store Sales Lift and iROAS Measurement for Sierra Nevada with GeoLift',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/SierraNevada2.png?raw=true',
+    description: (
+      <>
+        Sierra Nevada Brewing Company leveraged Meta’s GeoLift solution to measure the lift in their In-Store Sales,
+        driven by Meta marketing campaigns, revealing a 4.2% incremental sales lift that translates to an iROAS of 4.8x
+        in the set of test markets included in the study.
+
+        <a href="https://www.facebook.com/business/success/sierra-nevada-brewing-co">
+        - Learn More -
+        </a>
+      </>
+    ),
+  },
+  {
     title: 'Redefining App Measurement for the Gaming Industry through Meta Open Source Solutions',
     imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/robyn_geolift.png?raw=true',
     description: (

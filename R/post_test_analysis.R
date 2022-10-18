@@ -101,7 +101,7 @@ ASCMExecution <- function(
   
   return(list(
     augsynth_model = augsynth_model,
-    data = data,
+    data = geo_data,
     treatment_locations = treatment_locations))
 }
 

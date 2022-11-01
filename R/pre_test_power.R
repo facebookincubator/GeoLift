@@ -382,7 +382,8 @@ pvalueCalc <- function(data,
 #' @param cpic Number indicating the Cost Per Incremental Conversion.
 #' @param parallel A logic flag indicating whether to use parallel computing to
 #' speed up calculations. Set to TRUE by default.
-#' @param pb ProgressBar object. NULL by default.
+#' @param ProgressBar A logic flag indicating whether to display a progress bar
+#' to track progress. Set to FALSE by default.
 #' @param X List of names of covariates.
 #' @param normalize A logic flag indicating whether to scale the outcome which is
 #' useful to accelerate computing speed when the magnitude of the data is large. The
@@ -423,7 +424,7 @@ run_simulations <- function(data,
                             side_of_test = "two_sided",
                             lookback_window = 1,
                             parallel = TRUE,
-                            pb = NULL,
+                            ProgressBar = FALSE,
                             cpic = 0,
                             X = c(),
                             normalize = FALSE,
@@ -457,12 +458,26 @@ run_simulations <- function(data,
     'treatment_combination_row'
   )
   
+  combine_function <- function(iterator){
+      pb <- txtProgressBar(min = 1, max = iterator - 1, style = 3)
+      count <- 0
+      function(...) {
+        count <<- count + length(list(...)) - 1
+        setTxtProgressBar(pb, count)
+        flush.console()
+        cbind(...) # this can feed into .combine option of foreach
+      }
+    }
   simulation_results <- foreach(
     effect_size = param_combination$effect_size,
     treatment_duration = param_combination$treatment_duration,
     sim = param_combination$lookback_window,
     test = param_combination$treatment_combination_row,
-    .combine = cbind,
+    .combine = ifelse(
+      ProgressBar, 
+      combine_function(nrow(param_combination)), 
+      cbind
+    ),
     .errorhandling = "stop",
     .verbose = FALSE
   ) %parallel_connector% {
@@ -687,7 +702,7 @@ GeoLiftPowerFinder <- function(data,
       side_of_test = side_of_test,
       lookback_window = 1,
       parallel = parallel,
-      pb = pb,
+      ProgressBar = ProgressBar,
       cpic = 0,
       X = X,
       normalize = normalize,
@@ -1001,7 +1016,7 @@ GeoLiftPower.search <- function(data,
       side_of_test = "two_sided",
       lookback_window = lookback_window,
       parallel = parallel,
-      pb = pb,
+      ProgressBar = ProgressBar,
       cpic = 0,
       X = X,
       normalize = normalize,
@@ -1460,18 +1475,6 @@ GeoLiftPower <- function(data,
     lookback_window <- 1
   }
 
-  if (ProgressBar == TRUE) {
-    num_sim <- length(effect_size) * length(treatment_periods)
-    pb <- progress::progress_bar$new(
-      format = "  Running Simulations [:bar] :percent",
-      total = num_sim,
-      clear = FALSE,
-      width = 60
-    )
-  } else {
-    pb <- NULL
-  }
-
   results <- run_simulations(
     data = data,
     treatment_combinations = matrix(locations, nrow = 1),
@@ -1480,7 +1483,7 @@ GeoLiftPower <- function(data,
     side_of_test = side_of_test,
     lookback_window = lookback_window,
     parallel = parallel,
-    pb = pb,
+    ProgressBar = ProgressBar,
     cpic = cpic,
     X = X,
     normalize = normalize,
@@ -1742,18 +1745,6 @@ GeoLiftMarketSelection <- function(data,
     dplyr::group_by(location) %>%
     dplyr::summarize(Total_Y = sum(Y))
 
-  if (ProgressBar == TRUE) {
-    num_sim <- length(N) * length(treatment_periods) * length(effect_size)
-    pb <- progress::progress_bar$new(
-      format = "  Running Simulations [:bar] :percent",
-      total = num_sim,
-      clear = FALSE,
-      width = 60
-    )
-  } else {
-    pb <- NULL
-  }
-
   for (n in N) {
     BestMarkets_aux <- stochastic_market_selector(
       n,
@@ -1789,7 +1780,7 @@ GeoLiftMarketSelection <- function(data,
       side_of_test = side_of_test,
       lookback_window = lookback_window,
       parallel = parallel,
-      pb = pb,
+      ProgressBar = ProgressBar,
       cpic = cpic,
       X = X,
       normalize = normalize,

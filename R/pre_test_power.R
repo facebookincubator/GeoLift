@@ -429,6 +429,7 @@ run_simulations <- function(data,
                             normalize = FALSE,
                             fixed_effects = TRUE,
                             model = "none") {
+  `%parallel_connector%` <- ifelse(parallel, `%dopar%`, `%do%`)
   results <- data.frame(matrix(ncol = 10, nrow = 0))
   colnames(results) <- c(
     "location",
@@ -442,94 +443,72 @@ run_simulations <- function(data,
     "att_estimator",
     "detected_lift"
   )
-
-  for (effect_size in effect_sizes) {
-    stat_func <- type_of_test(
-      side_of_test = side_of_test,
-      alternative_hypothesis = ifelse(effect_size > 0, "positive", "negative")
-    )
-
-    for (treatment_duration in treatment_durations) {
-      if (!is.null(pb)) {
-        pb$tick()
-      }
-
-      for (sim in 1:(lookback_window)) {
-        if (parallel == TRUE) {
-          simulation_results <- foreach(
-            test = 1:nrow(as.matrix(treatment_combinations)),
-            .combine = cbind,
-            .errorhandling = "stop",
-            .verbose = FALSE
-          ) %dopar% {
-            suppressMessages(pvalueCalc(
-              data = data,
-              sim = sim,
-              max_time = max(data$time),
-              tp = treatment_duration,
-              es = effect_size,
-              locations = as.list(as.matrix(treatment_combinations)[test, ]),
-              cpic = cpic,
-              X,
-              type = "pValue",
-              normalize = normalize,
-              fixed_effects = fixed_effects,
-              model = model,
-              stat_func = stat_func
-            ))
-          }
-        } else {
-          simulation_results <- NULL
-          for (test in 1:nrow(as.matrix(treatment_combinations))) {
-            partial_simulation_results <- suppressMessages(
-              pvalueCalc(
-                data = data,
-                sim = sim,
-                max_time = max(data$time),
-                tp = treatment_duration,
-                es = effect_size,
-                locations = as.list(as.matrix(treatment_combinations)[test, ]),
-                cpic = cpic,
-                X,
-                type = "pValue",
-                normalize = normalize,
-                fixed_effects = fixed_effects,
-                model = model,
-                stat_func = stat_func
-              )
-            )
-            simulation_results <- cbind(simulation_results, partial_simulation_results)
-          }
-        }
-
-        if (is.null(dim(simulation_results))) {
-          simulation_results <- matrix(
-            simulation_results,
-            nrow = length(names(simulation_results))
-          )
-        }
-
-        for (i in 1:ncol(simulation_results)) {
-          results <- rbind(
-            results,
-            data.frame(
-              location = simulation_results[[1, i]],
-              pvalue = as.numeric(simulation_results[[2, i]]),
-              duration = as.numeric(simulation_results[[3, i]]),
-              EffectSize = as.numeric(simulation_results[[4, i]]),
-              treatment_start = as.numeric(simulation_results[[5, i]]),
-              Investment = as.numeric(simulation_results[[6, i]]),
-              cpic = cpic,
-              ScaledL2Imbalance = as.numeric(simulation_results[[7, i]]),
-              att_estimator = as.numeric(simulation_results[[8, i]]),
-              detected_lift = as.numeric(simulation_results[[9, i]])
-            )
-          )
-        }
-      }
-    }
+  param_combination <- expand.grid(
+    effect_sizes,
+    treatment_durations,
+    1:lookback_window,
+    1:nrow(as.matrix(treatment_combinations))
+  )
+  
+  colnames(param_combination) <- c(
+    'effect_size',
+    'treatment_duration',
+    'lookback_window',
+    'treatment_combination_row'
+  )
+  
+  simulation_results <- foreach(
+    effect_size = param_combination$effect_size,
+    treatment_duration = param_combination$treatment_duration,
+    sim = param_combination$lookback_window,
+    test = param_combination$treatment_combination_row,
+    .combine = cbind,
+    .errorhandling = "stop",
+    .verbose = FALSE
+  ) %parallel_connector% {
+    suppressMessages(pvalueCalc(
+      data = data,
+      sim = sim,
+      max_time = max(data$time),
+      tp = treatment_duration,
+      es = effect_size,
+      locations = as.list(as.matrix(treatment_combinations)[test, ]),
+      cpic = cpic,
+      X,
+      type = "pValue",
+      normalize = normalize,
+      fixed_effects = fixed_effects,
+      model = model,
+      stat_func = type_of_test(
+        side_of_test = side_of_test,
+        alternative_hypothesis = ifelse(
+          effect_size > 0, "positive", "negative"))
+    ))
   }
-
+  
+  if (is.null(dim(simulation_results))) {
+    simulation_results <- matrix(
+      simulation_results,
+      nrow = length(names(simulation_results))
+    )
+  }
+  for (i in 1:ncol(simulation_results)) {
+    results <- rbind(
+      results,
+      data.frame(
+        location = simulation_results[[1, i]],
+        pvalue = as.numeric(simulation_results[[2, i]]),
+        duration = as.numeric(simulation_results[[3, i]]),
+        EffectSize = as.numeric(simulation_results[[4, i]]),
+        treatment_start = as.numeric(simulation_results[[5, i]]),
+        Investment = as.numeric(simulation_results[[6, i]]),
+        cpic = cpic,
+        ScaledL2Imbalance = as.numeric(simulation_results[[7, i]]),
+        att_estimator = as.numeric(simulation_results[[8, i]]),
+        detected_lift = as.numeric(simulation_results[[9, i]])
+      )
+    )
+  }
   return(results)
 }
 
@@ -1464,6 +1443,8 @@ GeoLiftPower <- function(data,
     )
   }
 
+  message("Calculating Power for the following treatment group: ", 
+          paste0(locations, collapse='; '), ".")
   # Part 1: Treatment and pre-treatment periods
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)
@@ -1657,6 +1638,7 @@ GeoLiftMarketSelection <- function(data,
     )
   }
 
+  message("Calculating which the best treatment groups are.")
   # Part 1: Treatment and pre-treatment periods
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)

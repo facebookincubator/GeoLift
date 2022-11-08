@@ -2,11 +2,23 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://facebookincubator.github.io/GeoLift/blog</id>
     <title>GeoLift Blog</title>
-    <updated>2022-08-10T00:00:00.000Z</updated>
+    <updated>2022-08-11T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://facebookincubator.github.io/GeoLift/blog"/>
     <subtitle>GeoLift Blog</subtitle>
     <icon>https://facebookincubator.github.io/GeoLift/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Introducing GeoLift in Python]]></title>
+        <id>Python</id>
+        <link href="https://facebookincubator.github.io/GeoLift/blog/Python"/>
+        <updated>2022-08-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Introduction]]></summary>
+        <content type="html"><![CDATA[<h2>Introduction</h2><p>Today we released a <a href="https://github.com/facebookincubator/GeoLift/tree/GeoLiftPython">tutorial</a> explaining how to run an end-to-end implementation of GeoLift in Python leveraging the <code>rpy2</code> package.  This has been a frequently requested feature by the GeoLift community. Moreover, it is one that we believe is very important for the continued scaling of GeoLift in data-savvy organizations.</p><p>The goal of this tutorial is to empower Python users to run the GeoLift R functions in Python using the <a href="https://rpy2.github.io"><code>rpy2</code></a> package. The rpy2 is an open source library which enables calling R from Python. It’s designed to facilitate the use of R by Python programmers.</p><h2>GeoLift in Python</h2><p>GeoLift is an end-to-end solution to measure Lift at a Geo-level using the latest developments in Synthetic Control Methods. Through this tutorial it is possible to run GeoLift R functions such as: Power Calculations, Inference, and Plots in Python.</p><p>There are 3 functions in Python under utils.py:</p><ul><li><p><code>GeoLiftData</code>: Load and return the dataset included in the GeoLift package.</p></li><li><p><code>ConvertDf</code>: Convert R dataframe into Pandas if <code>conv_type = &quot;ToPandas&quot;</code> or convert Pandas dataframe into R if <code>conv_type = &quot;ToR&quot;</code>.</p></li></ul><p><img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/GeoLiftPython_1.jpg?raw=true" alt="ConvertDf"/></p><ul><li><code>GeoLiftPlot</code>: Receive a specific GeoLift Plot function (defined by the <code>func</code> parameter), its arguments and display the plot.</li></ul><p><img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/GeoLiftPython_2.jpg?raw=true" alt="GeoLiftPlot"/></p><p>To run the R GeoLift functions in Python, you need to add <code>GeoLift.</code> in front of it as in <code>GeoLift.GeoLiftMarketSelection()</code>. For example:</p><p><img src="https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/GeoLiftPython_3.jpg?raw=true" alt="GeoLiftPython"/></p><h2>Start Your GeoLift in Python Now!​</h2><p>You can access the GeoLift in Python tutorial in the GeoLiftPython folder hosted in the GeoLift github repository through <a href="https://github.com/facebookincubator/GeoLift/tree/GeoLiftPython">this link</a>. The <code>README</code> file contains all the necessary information to start working with the Python version of GeoLift.</p>]]></content>
+        <author>
+            <name>Jussan Da Silva</name>
+            <uri>https://github.com/JussanN/</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Multi-Cell Experiments with GeoLift]]></title>
         <id>MultiCell</id>

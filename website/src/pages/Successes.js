@@ -18,6 +18,23 @@ import styles from './styles.module.css';
 
 const features = [
   {
+    title: 'GOAT: Measuring App Instals and In-App Purchases with GeoLift',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/GOAT_logo.jpg?raw=true',
+    description: (
+      <>
+ GOAT, a leading technology platform for authentic sneakers, apparel, and accessories from contemporary and luxury brands,
+ wanted to boost installs of its App, drive purchases at the most efficient possible cost, and gain better insights into
+ the true value of its ad campaigns on Facebook and Instagram. However, changes in the ads ecosystem  made it harder to
+ measure the value of its marketing efforts. To overcome these challenges, GOAT leveraged a GeoLift study. The results
+ showed that Meta ads drove an incremental sales lift of 3.2% (4x iROAS)!<br></br>
+
+        <a href="https://www.facebook.com/business/success/goat">
+        - Learn More -
+        </a>
+      </>
+    ),
+  },
+  {
     title: 'Measuring the Addition of Upper Funnel Optimization for Mixtiles with GeoLift',
     imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/MixtilesLogo.png?raw=true',
     description: (

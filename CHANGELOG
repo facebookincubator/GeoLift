@@ -1,3 +1,10 @@
+GeoLift v2.6 (Release date: 2022-11-08)
+=========================================
+
+Changes:
+* Refactored for loops in run_simulations to adapt to foreach structure.
+* Cut down time in GeoLiftPower by 3.5x.
+
 GeoLift v2.5.21 (Release date: 2022-09-16)
 =========================================
 

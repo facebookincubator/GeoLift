@@ -95,6 +95,7 @@ utils::globalVariables(
     "time",
     "Time",
     "Total_Y",
+    "treatment_duration",
     "treatment_group_size",
     "treatment_location",
     "treatment_start",

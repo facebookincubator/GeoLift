@@ -12,7 +12,7 @@ run_simulations(
   side_of_test = "two_sided",
   lookback_window = 1,
   parallel = TRUE,
-  pb = NULL,
+  ProgressBar = FALSE,
   cpic = 0,
   X = c(),
   normalize = FALSE,
@@ -50,7 +50,8 @@ will only execute the most recent test based on the data.}
 \item{parallel}{A logic flag indicating whether to use parallel computing to
 speed up calculations. Set to TRUE by default.}
 
-\item{pb}{ProgressBar object. NULL by default.}
+\item{ProgressBar}{A logic flag indicating whether to display a progress bar
+to track progress. Set to FALSE by default.}
 
 \item{cpic}{Number indicating the Cost Per Incremental Conversion.}
 

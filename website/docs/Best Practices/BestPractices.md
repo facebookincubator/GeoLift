@@ -9,7 +9,7 @@ sidebar_position: 1
 ## Data
 * Daily granularity in the data is strongly recommended over weekly.
 * It is recommended to use the highest level of geographical granularity at which we can target Facebook campaigns in the study's region (Zip Codes, Cities, etc.).
-* We recommend having at least 4 - 5x the test duration of pre-campaign historical data of stable data (must not contain structural changes or any other impactful deviation from their data-generating process.).
+* We recommend having at least 4 - 5x the test duration of pre-campaign historical data of stable data (must not contain structural changes or any other impactful deviation from their data-generating process).
 * At minimum we recommend having 25 pre-treatment periods of 20 or more geo-units.
 * Under normal circumstances we advise having historical information to be over the last 52 weeks, this may take into consideration any seasonal variations across brand product sales as well as account for other factors that may not be taken into consideration over a shorter duration.
 * The test duration should cover at least one purchase cycle for the product.
@@ -32,5 +32,5 @@ sidebar_position: 1
 ---
 
 ## National Marketing Efforts
-* Take into consideration any significant variations across national media such as TV, Print etc. during pre-test or test period will make it hard to really isolate the impact of Facebook on the outcome of interest.
+* Taking into consideration any significant variations across national media such as TV, Print, etc. during pre-test or test period will make it hard to really isolate the impact of Facebook on the outcome of interest.
 * For sales to be truly attributed to Facebook variations, all other media should be held constant across the markets and if there are significant variations, make sure to address these before the test.

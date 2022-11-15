@@ -7,7 +7,7 @@ id: About
 ---
 
 ## What is GeoLift?
-GeoLift is an open-source and end-to-end solution to calculate Lift through geo-experiments. Based on some of the latest developments on **Synthetic Control Models**, the tool helps users plan, implement, and analyze complex geographic causal tests in a simple and easy-to-use way. Through GeoLift tests, users are able to measure the true value of their marketing campaigns, revamp their strategies, estimate their omni-channel perfomance, and even perform cross-channel optimzations all while using the common currency of incrementality. Moreover, GeoLift offers all of these features in a privacy-secure way through the exclusive use of aggregated data.
+GeoLift is an open-source and end-to-end solution to calculate Lift through geo-experiments. Based on some of the latest developments on **Synthetic Control Models**, the tool helps users plan, implement, and analyze complex geographic causal tests in a simple and easy-to-use way. Through GeoLift tests, users are able to measure the true value of their marketing campaigns, revamp their strategies, estimate their omni-channel perfomance, and even perform cross-channel optimizations all while using the common currency of incrementality. Moreover, GeoLift offers all of these features in a privacy-secure way through the exclusive use of aggregated data.
 
 ---
 

@@ -90,7 +90,7 @@ The key parameters needed to run this function are:
 
 * `X` (Optional): List of the names of the covariates in the data. In our example we don’t have any covariates so we’ll leave it empty.
 
-* `Y_id`, `location_id`, and `time_id`: Names of the outcome, location, and time variables. These parameters will let our function know are the names of these variables in our data frame. If left empty, this parameter will default to the standard values provided by `GeoDataRead()` which are: `Y`, `location`, and `time`.
+* `Y_id`, `location_id`, and `time_id`: Names of the outcome, location, and time variables. These parameters will let our function know what are the names of these variables in our data frame. If left empty, this parameter will default to the standard values provided by `GeoDataRead()` which are: `Y`, `location`, and `time`.
 
 * `effect_size`: This parameter contains a vector of different effect sizes (or lifts) we want to simulate. For simplicity of analysis, we **strongly recommend focusing on either all positive or negative values for this parameter**. For this example, we will set this parameter to a sequence of lifts between 0 and 25 percent with 2.5% increments, that is, seq(0,0.25,0.025).
 
@@ -113,7 +113,7 @@ The key parameters needed to run this function are:
   * `side_of_test = "two_sided"`: The test statistic is the sum of all treatment effects.
   * `side_of_test = "one_sided"`: One-sided test against positive or negative effects.
 
-Taking this inputs into consideration, we find:
+Taking these inputs into consideration, we find:
 
 ``` r
 set.seed(8) #To replicate the results
@@ -204,7 +204,7 @@ Markets
 
 The resulting table contains optimal test designs for this two-cell test as well as some model-fit metrics for each selection. The columns in the results represent:
 
-* **cell**: Numeric identifier for each cell. In our case, we have two cells: cell one for Social Media and cell 2 for Paid Search.
+* **cell**: Numeric identifier for each cell. In our case, we have two cells: cell 1 for Social Media and cell 2 for Paid Search.
 * **ID**: Numeric identifier of a test market for a given duration. The combination of **cell** and **ID** completely defines a Multi-Cell market selection.
 * **location**: Identifies the test location(s).
 * **duration**: Shows how many time-stamps the test will last for. Since the data in our example had daily values, we will analyze a 15 day test.
@@ -215,7 +215,7 @@ The resulting table contains optimal test designs for this two-cell test as well
 * **Investment**: The average investment needed to obtain a well-powered test given each cell's CPIC.
 * **ProportionTotal_Y**: This proportion reflects the fraction of all conversions that happen in our test regions compared to the aggregation of all markets. For example, a value of 0.10 would indicate that our test markets represent 10% of all conversions for our KPI. **It is highly recommended to look for locations across cells with similar values of this metric to make the results easier to compare and contrast**.
 * **Holdout**: The percent of total conversions in the control markets. This value is complementary to ProportionTotal_Y.
-* rank: Ranking variable per cell that summarizes the values of EffectSize, Power, AvgScaledL2Imbalance, Average_MDE, and abs_lift_in_zero to help you select the best combination of test markets. The ranking variable allows for ties.
+* **rank**: Ranking variable per cell that summarizes the values of EffectSize, Power, AvgScaledL2Imbalance, Average_MDE, and abs_lift_in_zero to help you select the best combination of test markets. The ranking variable allows for ties.
 
 Exploring the results of `MultiCellMarketSelection` we find that locations "chicago, cincinnati" for Cell 1 and "honolulu, indianapolis" in Cell 2 provide excelent values across all model-fit metrics such as a low EffectSize, small AvgScaledL2Imbalance, an abs_lift_in_zero close to zero, and a very similar value of ProportionTotal_Y.
 
@@ -244,7 +244,7 @@ plot(Markets,
 
 ## 3. Detailed Power Curves
 
-Perhaps the most important piece of part of any Market Selection process is to obtain and analyze the test's Power Curve. These curves tell us how sensible our test is at detecting a given Lift, it's statistical power, and give us a good estimate of the necessary budget needed to run the Multi-Cell test. The `MultiCellPower` function can be used to calculate the Power Curves for a given set of cells through simulations on the historical data.
+Perhaps the most important piece of part of any Market Selection process is to obtain and analyze the test's Power Curve. These curves tell us how sensible our test is at detecting a given Lift, its statistical power, and give us a good estimate of the necessary budget needed to run the Multi-Cell test. The `MultiCellPower` function can be used to calculate the Power Curves for a given set of cells through simulations on the historical data.
 
 The `MultiCellPower` function is very easy to use as it will leverage the set-up and results we obtained from `MultiCellMarketSelection`. The most important parameters to calculate the Power Curves are:
 
@@ -252,7 +252,7 @@ The `MultiCellPower` function is very easy to use as it will leverage the set-up
 
 * `test_markets`: A list of the selected `market_ID` per `cell_ID`. It is important to make sure that this list contains exactly `k` numeric values corresponding to the results of `MultiCellMarketSelection`. The recommended layout is `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`, for our example we will set it to the previously defined list: `test_locs`.
 
-* `effect_size`: This parameter contains the different Lifts that we will simulate for our test. For each value in this parameter, the algorithm will simulate a GeoLift test with that Lift and will assess the statistical significance of the results to determine the test's Statistical Power. For this parameter, it is important to make sure that the sequence includes zero. For our example, we will set both positive and negative effect sizes to observe the curve's form and to see how symetrical it is.
+* `effect_size`: This parameter contains the different Lifts that we will simulate for our test. For each value in this parameter, the algorithm will simulate a GeoLift test with that Lift and will assess the statistical significance of the results to determine the test's Statistical Power. For this parameter, it is important to make sure that the sequence includes zero. For our example, we will set both positive and negative effect sizes to observe the curve's form and to see how symmetrical it is.
 
 * `lookback_window`: This parameter indicates how long back in history the simulations will go. Setting a `lookback_window` to a value greater than one is particularly important to correctly assess the Power and estimate the budget of tests with significant seasonality or which aren't very stable. For this example, we will simulate an entire week, thus `lookback_window = 7`.
 
@@ -291,7 +291,7 @@ The most important parameters of the `MultiCellWinner` function are:
 
 * `x`: A `MultiCellPower` object created by the `MultiCellPower` function. By using this object, the winner analysis will be conducted on the cells defined previously. Specifically, Cell 1: Chicago and Cincinnati and Cell B: Honolulu and Indianapolis.
 
-* `effect_size`:    A numeric value representing the Lift that will be simulated across all cells. If not specified (default), the algorithm will use the largest lift found in `MultiCellPower` that provides a well-powered test across all cells. For this example, we will se the baseline Lift at 10%.
+* `effect_size`:    A numeric value representing the Lift that will be simulated across all cells. If not specified (default), the algorithm will use the largest lift found in `MultiCellPower` that provides a well-powered test across all cells. For this example, we will set the baseline Lift at 10%.
 
 * `geolift_type`: Specifies the type of GeoLift test to be performed which can be: "standard" (test regions will receive the treatment) or "inverse" (test regions will be holded-out from the treatment). More information on standard and inverse tests can be found [here](https://facebookincubator.github.io/GeoLift/blog/inverse-geolift).
 
@@ -371,7 +371,7 @@ GeoPlot(GeoTestData_Test,
 
 The final step in the process is to calculate the Lift generated by our Social Media and Paid Search campaigns. We can leverage the `GeoLiftMultiCell` function to easily perform statistical inference on our test. The key parameters of this function are:
 
-* `data`: A data.frame containing the historical conversions by geographic unit. It requires at least a "locations" column with the geo name, a "Y" column with the outcome data (units), a time column with the indicator of the time period (starting at 1), and covariates (optional). In this example, we will use the `GeoTestData_Test` data frame we just obtained through `GeoDataRead`.
+* `data`: A data frame containing the historical conversions by geographic unit. It requires at least a "locations" column with the geo name, a "Y" column with the outcome data (units), a time column with the indicator of the time period (starting at 1), and covariates (optional). In this example, we will use the `GeoTestData_Test` data frame we just obtained through `GeoDataRead`.
 
 * `locations`:A list of lists of test markets per cell. The recommended layout is `list(cell_1 = list("locA"), cell2 = list("locB"), cell3 = list("locC"),...)`.
 

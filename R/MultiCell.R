@@ -802,12 +802,12 @@ GeoLiftMultiCell <- function(Y_id = "Y",
   }
 
   # Check treatment_start_time                                                  
-  if(treatment_start_time==as.integer(treatment_start_time)){                   
+  if(!(treatment_start_time==as.integer(treatment_start_time))){
     stop("\nPlease specify a valid integer treatment_start_time.")              
   }                                                                             
 
   # Check treatment_end_time                                                    
-  if(treatment_end_time==as.integer(treatment_end_time)){                                                                                                      
+  if(!(treatment_end_time==as.integer(treatment_end_time))){
     stop("\nPlease specify a valid integer treatment_end_time.")                
   }
 

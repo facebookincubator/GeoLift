@@ -19,17 +19,17 @@ import styles from './styles.module.css';
 const features = [
   {
     title: 'Liverpool: Measuring the Long-Term Effect of Branding with GeoLift',
-    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/liverpool_pocket.jpg?raw=true',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/liverpool_pocket.png?raw=true',
     description: (
       <>
 
 In order to understand the impact that their branding campaigns on Facebook and Instagram had on omni-channel sales,
 Liverpool executed the first-ever long-term GeoLift for upper-funnel campaigns. Through this experiment, they were
-able to confirm the importance of a correct branding execution to improve their Return On Advertising Investment and Sales
-in the medium and long term!
+able to confirm and quantify the importance that a correct branding execution has to improve their Sales and overall
+Advertising Return On Investment (ROI) in the medium and long term!
 <br></br>
 
-        <a href="https://www.facebook.com/business/success/goat">
+        <a href="https://www.facebook.com/business/success/5-liverpool?locale=es_LA">
         - Learn More -
         </a>
       </>

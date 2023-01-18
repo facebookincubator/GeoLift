@@ -60,6 +60,12 @@
             label: 'Documentation',
           },
           {
+            type: 'doc',
+            docId: 'GettingStarted/Walkthrough',
+            position: 'left',
+            label: 'Walkthroughs',
+            },
+          {
             to: 'Successes',
             position: 'left',
             label: 'Success Cases',

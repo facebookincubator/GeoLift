@@ -35,6 +35,11 @@
           // Please change this to your repo.
           editUrl:
             'https://github.com/facebookincubator/GeoLift/',
+            blogSidebarTitle: 'All posts',
+            blogSidebarCount: 'ALL',
+            blogTitle: 'GeoLift Blog',
+            blogDescription: 'A blog for all things GeoLift!',
+
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

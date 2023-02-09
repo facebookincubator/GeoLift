@@ -7,8 +7,8 @@ tags: [GeoLift, Geo Measurement, lookback_window, R, Power Analysis]
 
 
 _<div align="right">“Aunque me fuercen yo nunca voy a decir</div>_
-_<div align="right">“Que todo tiempo, por pasado fue mejor</div>_
-_<div align="right">“Luis Alberto Spinetta</div>_
+_<div align="right">Que todo tiempo, por pasado fue mejor"</div>_
+_<div align="right"> - Luis Alberto Spinetta</div>_
 
 
 ## TL;DR

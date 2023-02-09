@@ -1,3 +1,9 @@
+GeoLift v2.6.01 (Release date: 2023-01-11)
+=========================================
+
+Changes:
+* Fix issue with Lift plot pointwise Confidence Interval calculations.
+
 GeoLift v2.6 (Release date: 2022-11-08)
 =========================================
 

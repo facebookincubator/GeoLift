@@ -305,8 +305,8 @@ Lift.plot <- function(GeoLift,
   df <- data.frame(
     t_obs = treatment_obs$t_obs,
     c_obs = GeoLift$y_hat * q_treatment_locations,
-    c_obs_lower_bound = treatment_obs$t_obs - GeoLift$summary$att$upper_bound * q_treatment_locations,
-    c_obs_upper_bound = treatment_obs$t_obs - GeoLift$summary$att$lower_bound * q_treatment_locations,
+    c_obs_lower_bound = (GeoLift$y_hat - (GeoLift$summary$att$Estimate - GeoLift$summary$att$lower_bound)) * q_treatment_locations,
+    c_obs_upper_bound = (GeoLift$y_hat + (GeoLift$summary$att$upper_bound - GeoLift$summary$att$Estimate)) * q_treatment_locations,
     Time = 1:length(treatment_obs$t_obs)
   )
 

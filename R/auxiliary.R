@@ -215,13 +215,19 @@ get_date_from_test_periods <- function(GeoLift,
 #' of the time period (starting at 1), and covariates.
 #' @param locs list of test locations. If none are provided, only the aggregated
 #' KPI (total) will be calculated and appended. Set to NULL by default.
+#' @param control_corr A logic flag indicating how correlations will be computed.
+#' If set to TRUE (default), correlations between the test group and pool of 
+#' controls are computed. If set to FALSE, correlations between test units and 
+#' the locations in the entire data set are calculated.
 #'
 #' @return
 #' A data frame with additional values for the test regions (combined_test)
 #' and total KPI (total).
 #'
 #' @export
-AppendAgg <- function(data, locs = NULL) {
+AppendAgg <- function(data, 
+                      locs = NULL,
+                      control_corr = TRUE) {
   if (is.null(locs)) {
     aux <- data %>%
       dplyr::group_by(time) %>%
@@ -242,8 +248,19 @@ AppendAgg <- function(data, locs = NULL) {
       dplyr::group_by(location, time) %>%
       dplyr::summarise(Y = sum(Y), .groups = "drop")
   }
-
-  return(as.data.frame(aux))
+  
+  if(control_corr){
+    return(as.data.frame(aux))
+  } else{
+    aux2 <- aux %>% dplyr::filter(location == "test_markets")
+    aux$location <- "control_markets"
+    aux <- rbind(aux,aux2)
+    aux <- aux %>% dplyr::group_by(location, time) %>%
+      dplyr::summarise(Y = sum(Y), .groups = "drop")
+    
+    return(as.data.frame(aux))
+  }
+  
 }
 
 #' Calculate correlations between input markets.
@@ -257,17 +274,27 @@ AppendAgg <- function(data, locs = NULL) {
 #' a "Y" column with the outcome data (units), a time column with the indicator
 #' of the time period (starting at 1), and covariates.
 #' @param locs List of markets to use in the calculation of the correlations.
+#' @param control_corr A logic flag indicating how correlations will be computed.
+#' If set to TRUE (default), correlations between the test group and pool of 
+#' controls are computed. If set to FALSE, correlations between test units and 
+#' the locations in the entire data set are calculated.
 #'
 #' @return
 #' Correlation coefficient.
 #'
 #' @export
-CorrelationCoefficient <- function(data, locs = c()) {
-  data_aux <- AppendAgg(data, locs = locs)
+CorrelationCoefficient <- function(data, 
+                                   locs = c(),
+                                   control_corr = TRUE) {
+
+  data_aux <- AppendAgg(data, locs = locs, control_corr = control_corr)
   data_aux <- data_aux[data_aux$location %in% c("control_markets", "test_markets"), ] %>%
     tidyr::pivot_wider(names_from = location, values_from = Y, id_cols = time)
+  
   cor_coefficient <- cor(data_aux$control_markets, data_aux$test_markets)
+  
   return(cor_coefficient)
+  
 }
 
 #' Function to obtain the synthetic control weights.

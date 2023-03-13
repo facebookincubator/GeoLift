@@ -4,7 +4,7 @@
 \alias{AppendAgg}
 \title{Calculate the total and test market's aggregated KPI by time and location.}
 \usage{
-AppendAgg(data, locs = NULL)
+AppendAgg(data, locs = NULL, control_corr = TRUE)
 }
 \arguments{
 \item{data}{A data.frame containing the historical conversions by
@@ -14,6 +14,11 @@ of the time period (starting at 1), and covariates.}
 
 \item{locs}{list of test locations. If none are provided, only the aggregated
 KPI (total) will be calculated and appended. Set to NULL by default.}
+
+\item{control_corr}{A logic flag indicating how correlations will be computed.
+If set to TRUE (default), correlations between the test group and pool of
+controls are computed. If set to FALSE, correlations between test units and
+the locations in the entire data set are calculated.}
 }
 \value{
 A data frame with additional values for the test regions (combined_test)

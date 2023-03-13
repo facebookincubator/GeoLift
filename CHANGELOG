@@ -1,3 +1,11 @@
+GeoLift v2.6.02 (Release date: 2023-03-15)
+=========================================
+
+Changes:
+* Fix issue with single time-stamp tests.
+* Added option to compute overall correlations (not just test vs. control)
+* Fixed issues with plotCorrels()
+
 GeoLift v2.6.01 (Release date: 2023-01-11)
 =========================================
 

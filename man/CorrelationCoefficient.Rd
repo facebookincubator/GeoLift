@@ -4,7 +4,7 @@
 \alias{CorrelationCoefficient}
 \title{Calculate correlations between input markets.}
 \usage{
-CorrelationCoefficient(data, locs = c())
+CorrelationCoefficient(data, locs = c(), control_corr = TRUE)
 }
 \arguments{
 \item{data}{A data.frame containing the historical conversions by
@@ -13,6 +13,11 @@ a "Y" column with the outcome data (units), a time column with the indicator
 of the time period (starting at 1), and covariates.}
 
 \item{locs}{List of markets to use in the calculation of the correlations.}
+
+\item{control_corr}{A logic flag indicating how correlations will be computed.
+If set to TRUE (default), correlations between the test group and pool of
+controls are computed. If set to FALSE, correlations between test units and
+the locations in the entire data set are calculated.}
 }
 \value{
 Correlation coefficient.

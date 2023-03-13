@@ -796,9 +796,10 @@ plot.GeoLiftMarketSelection <- function(x,
 #' @param scaled A logic flag indicating whether to plot the scaled values of
 #' the KPI metric (standardized by the largest historical value). Set to FALSE
 #' by default to plot the observed KPI levels.
-#' @param KPI_id Outcome variable.
-#' @param dtw Emphasis on Dynamic Time Warping (DTW), dtw = 1 focuses exclusively
-#' on this metric while dtw = 0 (default) relies on correlations only.
+#' @param control_corr A logic flag indicating how correlations will be computed.
+#' If set to TRUE (default), correlations between the test group and pool of 
+#' controls are computed. If set to FALSE, correlations between test units and 
+#' the locations in the entire data set are calculated.
 #'
 #' @return
 #' A plot of the historical values of the test market and the aggregation of
@@ -808,11 +809,11 @@ plot.GeoLiftMarketSelection <- function(x,
 plotCorrels <- function(data,
                         locs = c(),
                         scaled = TRUE,
-                        KPI_id = "",
-                        dtw = 0) {
-  data_aux <- AppendAgg(data, locs = locs)
-  correl <- CorrelationCoefficient(data, locs = locs)
-
+                        control_corr = TRUE) {
+  
+  data_aux <- AppendAgg(data, locs = locs, control_corr = control_corr)
+  correl <- CorrelationCoefficient(data, locs = locs, control_corr = control_corr)
+  
   if (scaled == TRUE) {
     data_aux$Yscaled <- 0
     data_aux$Yscaled[data_aux$location == "control_markets"] <- data_aux$Y[data_aux$location == "control_markets"] / max(data_aux[data_aux$location == "control_markets", ]$Y)
@@ -821,13 +822,17 @@ plotCorrels <- function(data,
   } else {
     Y_id <- "Y"
   }
-
+  
+  if(control_corr == FALSE){
+    data_aux$location[data_aux$location == "control_markets"] <- "all_markets"
+  }
+  
+  
   GeoPlot(data_aux,
-    Y_id = Y_id,
-    time_id = "time",
-    location_id = "location",
-    KPI_id = KPI_id,
-    notes = paste0("Correlation: ", round(correl, 4))
+          Y_id = Y_id,
+          time_id = "time",
+          location_id = "location",
+          notes = paste0("Correlation: ", round(correl, 4))
   )
 }
 

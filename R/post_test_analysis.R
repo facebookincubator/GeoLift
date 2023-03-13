@@ -313,9 +313,13 @@ GeoLift <- function(Y_id = "Y",
     if (length(locations) == 1) {
       lift <- (sum(augsyn$data$y[loc_id, ]) - sum(pred_conversions)) /
         abs(sum(pred_conversions))
-    } else if (length(locations) > 1) {
+    } else if (length(locations) > 1 && treatment_start_time < treatment_end_time) {
       lift <- (sum(colMeans(augsyn$data$y[loc_id, ])) -
-        sum(pred_conversions)) /
+                 sum(pred_conversions)) /
+        abs(sum(pred_conversions))
+    } else{
+      lift <- (sum(mean(augsyn$data$y[loc_id])) -
+                 sum(pred_conversions)) /
         abs(sum(pred_conversions))
     }
 

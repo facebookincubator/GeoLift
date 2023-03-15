@@ -550,3 +550,79 @@ TrimControls <- function(data,
 
   return(data)
 }
+
+
+#' Define if location is in cluster, via lat and long.
+is_location_in_cluster <- function(
+    location_points, cluster_polygon){
+  sf::st_crs(cluster_polygon) <- 4326
+  spdf <- sf::as_Spatial(cluster_polygon)
+  sp::coordinates(location_points) <- ~ Longitude + Latitude
+  sp::proj4string(location_points) <- sf::st_crs(cluster_polygon)$proj4string
+  
+  overlap <- sp::over(location_points, spdf) %>%
+    data.frame() %>%
+    dplyr::mutate(
+      included_in_cluster = ifelse(is.na(country), FALSE, TRUE)
+    ) %>% 
+    cbind(location_points) %>%
+    dplyr::select(
+      region,
+      country,
+      fbcz_id,
+      fbcz_id_num,
+      Longitude,
+      Latitude,
+      included_in_cluster
+    )
+  return(overlap)
+}
+
+
+#' Match all locations to the cluster they belong.
+location_to_cluster_matching <- function(
+    location_points, 
+    clusters,
+    longitude_col_name='Longitude',
+    latitude_col_name='Latitude'){
+  
+  all_point_match_to_cluster <- data.frame()
+  max_fbcz_id_num <- max(clusters$fbcz_id_num)
+  
+  for (row in 1:nrow(clusters)){
+    cluster_df <- clusters[row,]
+    point_match_to_cluster <- is_location_in_cluster(
+      location_points, cluster_df) %>%
+      dplyr::filter(included_in_cluster == TRUE)
+    all_point_match_to_cluster <- rbind(
+      all_point_match_to_cluster,
+      point_match_to_cluster
+    )
+  }
+  
+  all_point_match_to_cluster <- all_point_match_to_cluster %>%
+    merge(
+      location_points, 
+      by=c(longitude_col_name, latitude_col_name), 
+      all.y=TRUE) %>%
+    dplyr::mutate(
+      included_in_cluster = ifelse(
+        is.na(included_in_cluster), 
+        FALSE, 
+        included_in_cluster))
+  all_point_match_to_cluster <- all_point_match_to_cluster %>%
+    dplyr::mutate(
+      null_obs = ifelse(
+        is.na(fbcz_id_num),
+        1:nrow(all_point_match_to_cluster[is.na(all_point_match_to_cluster$country), ]),
+        0),
+      fbcz_id_num = ifelse(
+        is.na(fbcz_id_num),
+        max_fbcz_id_num + null_obs,
+        fbcz_id_num
+      ),
+      null_obs = NULL
+    )
+  
+  return(all_point_match_to_cluster)
+}

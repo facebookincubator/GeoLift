@@ -477,8 +477,8 @@ print.MultiCellPower <- function(x, ...) {
 #'          pairwise comparisons. }
 #'          }
 #'
+#' @order 1
 #' @export
-
 MultiCellWinner <- function(x,
                             effect_size = NULL,
                             geolift_type = "standard",
@@ -649,32 +649,22 @@ MultiCellWinner <- function(x,
 
 }
 
-#' Print pretty MultiCellWinner output.
-#'
-#' @description
-#'
-#' Print MultiCellWinner output.
-#'
-#' @param x MultiCellWinner object.
+#' @param obj \code{MultiCellWinner()}
 #' @param ... Optional arguments
 #'
-#' @return
-#' MultiCellWinner output message
-#'
+#' @rdname MultiCellWinner
+#' @order 2
 #' @export
-
-print.MultiCellWinner <- function(x, ...) {
-  if (!inherits(x, "MultiCellWinner")) {
+print.MultiCellWinner <- function(obj, ...) {
+  if (!inherits(obj, "MultiCellWinner")) {
     stop("object must be class MultiCellWinner")
   }
 
-  if(nrow(x$results) > 0){
-    print(x$results)
+  if(nrow(obj$results) > 0){
+    print(obj$results)
   } else{
     message("No Winners were found. Please change the locations, baseline effect_size, or ROAS sequence to find a Winner.")
   }
-
-
 }
 
 

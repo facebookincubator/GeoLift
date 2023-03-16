@@ -2,6 +2,7 @@
 % Please edit documentation in R/MultiCell.R
 \name{MultiCellWinner}
 \alias{MultiCellWinner}
+\alias{print.MultiCellWinner}
 \title{Multi-Cell Winner Declaration Method for Market Selection.}
 \usage{
 MultiCellWinner(
@@ -13,6 +14,8 @@ MultiCellWinner(
   method = "conformal",
   stat_test = "Total"
 )
+
+\method{print}{MultiCellWinner}(obj, ...)
 }
 \arguments{
 \item{x}{A \code{MultiCellPower} object.}
@@ -48,6 +51,10 @@ Recommended for Negative Lift tests.}
 \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 Recommended for Positive Lift tests.}
 }}
+
+\item{obj}{\code{MultiCellWinner()}}
+
+\item{...}{Optional arguments}
 }
 \value{
 A list with two objects:

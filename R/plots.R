@@ -933,16 +933,7 @@ plot.MultiCellMarketSelection <- function(x,
 }
 
 
-#' Plotting function for MultiCellPower
-#'
-#' @description
-#'
-#' Plotting function for `MultiCellPower`. This function plots the
-#' Power Curves for all given test markets
-#' latest possible test given the data and duration as well as the power curve
-#' across historical simulations for a given merket_id and cell_id.
-#'
-#' @param x A MultiCellMarketSelection object.
+#' @param x \code{MultiCellMarketSelection()}
 #' @param actual_values Logic flag indicating whether to include in the plot
 #' the actual values. TRUE by default.
 #' @param smoothed_values Logic flag indicating whether to include in the plot
@@ -957,11 +948,9 @@ plot.MultiCellMarketSelection <- function(x,
 #' default.
 #' @param ... additional arguments
 #'
-#' @return
-#' MultiCellPower plot.
-#'
+#' @rdname MultiCellPower
+#' @order 3
 #' @export
-
 plot.MultiCellPower <- function(x,
                                 actual_values = TRUE,
                                 smoothed_values = FALSE,

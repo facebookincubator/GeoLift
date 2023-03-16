@@ -334,8 +334,8 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #'          \item{"test_details":}{ The test details.}
 #'          }
 #'
+#' @order 1
 #' @export
-
 MultiCellPower <- function(x,
                            test_markets = list(),
                            effect_size = seq(-0.25,0.25,0.05),
@@ -412,20 +412,15 @@ MultiCellPower <- function(x,
 }
 
 
-#' Print pretty MultiCellPower output.
-#'
-#' @description
-#'
-#' Print MultiCellPower output.
-#'
-#' @param x MultiCellPower object.
+#' @param x \code{MultiCellPower()}
 #' @param ... Optional arguments
 #'
 #' @return
 #' MultiCellPower output message
 #'
+#' @rdname MultiCellPower
+#' @order 2
 #' @export
-
 print.MultiCellPower <- function(x, ...) {
   if (!inherits(x, "MultiCellPower")) {
     stop("object must be class MultiCellPower")

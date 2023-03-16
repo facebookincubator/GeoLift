@@ -27,6 +27,8 @@
 #' @import stats
 #' @import utils
 #' @import rlang
+#' @import sf
+#' @import sp
 "_PACKAGE"
 
 # Suppress 'no visible binding for global variable' warnings

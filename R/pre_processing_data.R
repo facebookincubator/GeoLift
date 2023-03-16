@@ -550,3 +550,119 @@ TrimControls <- function(data,
 
   return(data)
 }
+
+
+#' Define if location is in cluster, via lat and long.
+#' 
+#' @description
+#' Match all location points to a single cluster defined by user movement between
+#' cities.
+#' @param location_points data.frame object that holds the location name,
+#' latitude and longitude for all locations.
+#' @param cluster_polygon sf::POLYGON object that has the points that are joined
+#' to form a single cluster.
+#' @param longitude_col_name name of the longitude column in the location_points
+#' data.frame.
+#' @param latitude_col_name name of the latitude column in the location_points
+#' data.frame.
+#' 
+#' @return
+#' A data frame holding a match between each location and the specific cluster.
+#' 
+#' @export
+is_location_in_cluster <- function(
+    location_points, 
+    cluster_polygon,
+    longitude_col_name='Longitude',
+    latitude_col_name='Latitude'
+){
+  if (!all(c('region',
+             'country',
+             'fbcz_id',
+             'fbcz_id_num') %in% colnames(cluster_polygon))){
+    stop('Missing necessary columns in cluster_polygon.
+         Include region, country, fbcz_id & fbcz_id_num.')
+  }
+  sf::st_crs(cluster_polygon) <- 4326
+  spdf <- sf::as_Spatial(cluster_polygon)
+  sp::coordinates(location_points) <- c(longitude_col_name, latitude_col_name)
+  sp::proj4string(location_points) <- sf::st_crs(cluster_polygon)$proj4string
+  
+  overlap <- sp::over(location_points, spdf) %>%
+    data.frame()
+  overlap$included_in_cluster <- ifelse(is.na(overlap$country), FALSE, TRUE)
+  overlap <- cbind(overlap, location_points)
+  return(overlap[, c(
+    'region',
+    'country',
+    'fbcz_id',
+    'fbcz_id_num',
+    longitude_col_name,
+    latitude_col_name,
+    'included_in_cluster'
+  )])
+}
+
+
+#' Match all locations to the cluster they belong.
+#' 
+#' @description 
+#' Use clusters defined by how users move between cities to decide how cities 
+#' should be aggregated to reduce contamination.
+#' @param location_points data.frame object that holds the location name,
+#' latitude and longitude for all locations.
+#' @param clusters data.frame object with all polygons.  Each row represents a 
+#' different cluster with an sf::POLYGON object that has the points that are joined
+#' to form that cluster.
+#' @param longitude_col_name name of the longitude column in the location_points
+#' data.frame.
+#' @param latitude_col_name name of the latitude column in the location_points
+#' data.frame.
+#' 
+#' @return
+#' A data frame holding a match between each location and all clusters.
+#' 
+#' @export
+location_to_cluster_matching <- function(
+    location_points, 
+    clusters,
+    longitude_col_name='Longitude',
+    latitude_col_name='Latitude'){
+  
+  all_point_match_to_cluster <- data.frame()
+  max_fbcz_id_num <- max(clusters$fbcz_id_num)
+  
+  for (row in 1:nrow(clusters)){
+    cluster_df <- clusters[row, ]
+    point_match_to_cluster <- is_location_in_cluster(
+      location_points, cluster_df)
+    point_match_to_cluster <- point_match_to_cluster[point_match_to_cluster$included_in_cluster == TRUE, ]
+    all_point_match_to_cluster <- rbind(
+      all_point_match_to_cluster,
+      point_match_to_cluster
+    )
+  }
+  
+  all_point_match_to_cluster <- all_point_match_to_cluster %>%
+    merge(
+      location_points, 
+      by=c(longitude_col_name, latitude_col_name), 
+      all.y=TRUE)
+  all_point_match_to_cluster$included_in_cluster <- ifelse(
+    is.na(all_point_match_to_cluster$included_in_cluster),
+    FALSE,
+    all_point_match_to_cluster$included_in_cluster
+  )
+  all_point_match_to_cluster$null_obs <- ifelse(
+    is.na(all_point_match_to_cluster$fbcz_id_num),
+    1:nrow(all_point_match_to_cluster[is.na(all_point_match_to_cluster$country), ]),
+    0)
+  
+  all_point_match_to_cluster$fbcz_id_num = ifelse(
+    is.na(all_point_match_to_cluster$fbcz_id_num),
+    max_fbcz_id_num + all_point_match_to_cluster$null_obs,
+    all_point_match_to_cluster$fbcz_id_num)
+  all_point_match_to_cluster$null_obs <- NULL
+  
+  return(all_point_match_to_cluster)
+}

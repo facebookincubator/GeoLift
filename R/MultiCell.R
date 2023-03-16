@@ -753,8 +753,8 @@ print.MultiCellWinner <- function(x, ...) {
 #'          \item{"Winner":}{ List of winner locations for the total comparison (if any).}
 #'          }
 #'
+#' @order 1
 #' @export
-
 GeoLiftMultiCell <- function(Y_id = "Y",
                              time_id = "time",
                              location_id = "location",
@@ -909,20 +909,12 @@ GeoLiftMultiCell <- function(Y_id = "Y",
 }
 
 
-#' Print pretty GeoLiftMultiCell output.
-#'
-#' @description
-#'
-#' Print GeoLiftMultiCell output.
-#'
-#' @param x GeoLiftMultiCell object.
+#' @param x \code{GeoLiftMultiCell()}
 #' @param ... Optional arguments
 #'
-#' @return
-#' GeoLiftMultiCell output message
-#'
+#' @rdname GeoLiftMultiCell
+#' @order 2
 #' @export
-
 print.GeoLiftMultiCell <- function(x, ...) {
   if (!inherits(x, "GeoLiftMultiCell")) {
     stop("object must be class GeoLiftMultiCell")
@@ -988,19 +980,14 @@ print.GeoLiftMultiCell <- function(x, ...) {
 }
 
 
-#' Summary method for GeoLiftMultiCell
-#'
-#' @description
-#'
-#' GeoLiftMultiCell summary output with additional information about the
-#' test.
-#'
-#' @param object GeoLiftMultiCell object.
+#' @param object \code{GeoLiftMultiCell()}
 #' @param table Logic flag indicating whether to plot only a table
 #' summarizing the results or the entire verbose output of each cell's
 #' GeoLift object summary. FALSE by default.
 #' @param ... Optional arguments
 #'
+#' @rdname GeoLiftMultiCell
+#' @order 3
 #' @export
 summary.GeoLiftMultiCell <- function(object,
                                      table = FALSE,

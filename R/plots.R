@@ -1002,13 +1002,7 @@ plot.MultiCellPower <- function(x,
 }
 
 
-#' Plot for GeoLiftMultiCell
-#'
-#' @description
-#'
-#' Plot for GeoLiftMultiCell objects.
-#'
-#' @param x GeoLiftMultiCell object.
+#' @param x \code{GeoLiftMultiCell()}
 #' @param type Type of plot. By default "Lift" which plots the
 #' incrementality on the outcome variable. If type is set to "ATT",
 #' the average ATT is plotted. If type is set to "Incrementality",
@@ -1024,11 +1018,9 @@ plot.MultiCellPower <- function(x,
 #' default.
 #' @param ... additional arguments
 #'
-#' @return
-#' GeoLiftMultiCell plots.
-#'
+#' @rdname GeoLiftMultiCell
+#' @order 4
 #' @export
-
 plot.GeoLiftMultiCell <- function(x,
                                   type = "Lift",
                                   treatment_end_date = NULL,

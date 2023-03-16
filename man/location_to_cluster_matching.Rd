@@ -11,6 +11,20 @@ location_to_cluster_matching(
   latitude_col_name = "Latitude"
 )
 }
+\arguments{
+\item{location_points}{data.frame object that holds the location name,
+latitude and longitude for all locations.}
+
+\item{clusters}{data.frame object with all polygons.  Each row represents a
+different cluster with an sf::POLYGON object that has the points that are joined
+to form that cluster.}
+
+\item{longitude_col_name}{name of the longitude column in the location_points
+data.frame.}
+
+\item{latitude_col_name}{name of the latitude column in the location_points
+data.frame.}
+}
 \description{
 Match all locations to the cluster they belong.
 }

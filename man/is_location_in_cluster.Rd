@@ -4,7 +4,25 @@
 \alias{is_location_in_cluster}
 \title{Define if location is in cluster, via lat and long.}
 \usage{
-is_location_in_cluster(location_points, cluster_polygon)
+is_location_in_cluster(
+  location_points,
+  cluster_polygon,
+  longitude_col_name = "Longitude",
+  latitude_col_name = "Latitude"
+)
+}
+\arguments{
+\item{location_points}{data.frame object that holds the location name,
+latitude and longitude for all locations.}
+
+\item{cluster_polygon}{sf::POLYGON object that has the points that are joined
+to form a single cluster.}
+
+\item{longitude_col_name}{name of the longitude column in the location_points
+data.frame.}
+
+\item{latitude_col_name}{name of the latitude column in the location_points
+data.frame.}
 }
 \description{
 Define if location is in cluster, via lat and long.

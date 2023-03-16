@@ -571,7 +571,7 @@ summary.GeoLift <- function(object, ...) {
 }
 
 
-#' @param x \code{GeoLift()}
+#' @param x \code{summary.GeoLift()}
 #' @param ... Optional arguments.
 #'
 #' @rdname GeoLift

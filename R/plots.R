@@ -643,15 +643,7 @@ cumulative_value.plot <- function(data,
 }
 
 
-#' Plotting function for GeoLiftMarketSelection
-#'
-#' @description
-#'
-#' Plotting function for `GeoLiftMarketSelection`. This function plots the
-#' latest possible test given the data and duration as well as the power curve
-#' across historical simulations.
-#'
-#' @param x A GeoLiftMarketSelection object.
+#' @param x \code{GeoLiftMarketSelection()}
 #' @param market_ID Numeric value indicating the market to be plotted. This
 #' value should reflect a valid ID from the BestMarkets data frame of the
 #' `GeoLiftMarketSelection` output.
@@ -668,8 +660,8 @@ cumulative_value.plot <- function(data,
 #' requested based on `breaks_pretty()`. Set to 10 by default.
 #' @param ... additional arguments
 #'
-#' @return
-#' GeoLiftMarketSelection plot.
+#' @rdname GeoLiftMarketSelection
+#' @order 3
 #'
 #' @export
 plot.GeoLiftMarketSelection <- function(x,

@@ -65,6 +65,7 @@ GeoPlot <- function(data,
 #' x-axis of the power plot. You may get slightly more or fewer breaks that
 #' requested based on `breaks_pretty()`. Set to 10 by default.
 #' @param notes String with additional notes to add as caption.
+#' @param ... additional arguments
 #'
 #' @rdname GeoLiftPower
 #' @order 2

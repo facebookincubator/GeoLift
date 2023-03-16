@@ -502,7 +502,7 @@ cumulative_lift <- function(data,
 }
 
 
-#' @param x \code{GeoLift()}
+#' @param object \code{GeoLift()}
 #' @param ... Optional arguments
 #'
 #' @return

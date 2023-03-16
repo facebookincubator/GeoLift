@@ -111,6 +111,8 @@ Recommended for Positive Lift tests.}
 
 \item{...}{additional arguments}
 
+\item{object}{\code{GeoLift()}}
+
 \item{type}{Type of plot. By default "Lift" which plots the
 incrementality on the outcome variable. If type is set to "ATT",
 the average ATT is plotted. If type is set to "Incrementality",

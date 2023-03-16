@@ -441,7 +441,7 @@ print.MultiCellPower <- function(x, ...) {
 #' determine how much larger the incremental ROAS (iROAS) must be for a cell to be
 #' declared the winner based on a statistical significance test.
 #'
-#' @param x A `MultiCellPower` object.
+#' @param multicell_power_obj A `MultiCellPower` object.
 #' @param effect_size A numeric value representing the lift to be simulated
 #' across all cells. If not specified (default), the algorithm will use the
 #' largest lift needed to obtain a well-powered test across all cells.
@@ -479,7 +479,7 @@ print.MultiCellPower <- function(x, ...) {
 #'
 #' @order 1
 #' @export
-MultiCellWinner <- function(x,
+MultiCellWinner <- function(multicell_power_obj,
                             effect_size = NULL,
                             geolift_type = "standard",
                             ROAS = seq(0,5,0.05),
@@ -488,7 +488,7 @@ MultiCellWinner <- function(x,
                             stat_test = "Total"
 ){
 
-  if (!inherits(x, "MultiCellPower")) {
+  if (!inherits(multicell_power_obj, "MultiCellPower")) {
     stop("object must be class MultiCellPower")
   }
 
@@ -520,17 +520,17 @@ MultiCellWinner <- function(x,
   }
 
   #Set variables
-  test_params <- as.data.frame(matrix(0, ncol=5, nrow = length(x$PowerCurves)))
+  test_params <- as.data.frame(matrix(0, ncol=5, nrow = length(multicell_power_obj$PowerCurves)))
   names(test_params) <- c("locations", "effect_size", "duration", "cpic", "investment")
   test_locs <- c()
 
-  for(cell in 1:length(x$PowerCurves)){
+  for(cell in 1:length(multicell_power_obj$PowerCurves)){
     if(tolower(geolift_type) == "standard"){
-      aux <- x$PowerCurves[[cell]] %>%
+      aux <- multicell_power_obj$PowerCurves[[cell]] %>%
         dplyr::filter(power > 0.8, EffectSize > 0 ) %>%
         dplyr::slice_min(EffectSize, n = 1)
     } else{
-      aux <- x$PowerCurves[[cell]] %>%
+      aux <- multicell_power_obj$PowerCurves[[cell]] %>%
         dplyr::filter(power > 0.8, EffectSize < 0 ) %>%
         dplyr::slice_max(EffectSize, n = 1)
     }
@@ -540,7 +540,7 @@ MultiCellWinner <- function(x,
     test_params[cell,4] <- mean(aux$cpic) #cpic
     test_params[cell,5] <- mean(aux$Investment) #investment
 
-    test_locs <- append(test_locs, list(stringr::str_split(x$PowerCurves[[cell]]$location[1], ", ")[[1]]))
+    test_locs <- append(test_locs, list(stringr::str_split(multicell_power_obj$PowerCurves[[cell]]$location[1], ", ")[[1]]))
   }
 
   # Set test parameters
@@ -564,46 +564,46 @@ MultiCellWinner <- function(x,
                       "ROAS",
                       "DID")
 
-  combinations <- combn(seq(1:length(x$PowerCurves)),2)
+  combinations <- combn(seq(1:length(multicell_power_obj$PowerCurves)),2)
 
   for (combo in 1:ncol(combinations)){
     DID_aux <- 0
     i <- 1
     for (roas in ROAS){
       test_locs_aux <- c(test_locs[[combinations[,combo][1]]],test_locs[[combinations[,combo][2]]])
-      data_aux <- x$data %>% dplyr::filter(!(location %in% unlist(test_locs)[!(unlist(test_locs) %in% test_locs_aux)]))
+      data_aux <- multicell_power_obj$data %>% dplyr::filter(!(location %in% unlist(test_locs)[!(unlist(test_locs) %in% test_locs_aux)]))
 
       data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] * (1 + effect_size*roas)
       data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] * (1 + effect_size)
 
 
       gl_a <- suppressMessages(GeoLift(Y_id = "Y",
-                                       time_id = x$test_details$time_id,
-                                       location_id = x$test_details$location_id,
-                                       X = x$test_details$X,
+                                       time_id = multicell_power_obj$test_details$time_id,
+                                       location_id = multicell_power_obj$test_details$location_id,
+                                       X = multicell_power_obj$test_details$X,
                                        data = data_aux[!(data_aux$location %in% test_locs[[combinations[,combo][2]]]),],
                                        locations = test_locs[[combinations[,combo][1]]],
                                        treatment_start_time = max(data_aux$time) - duration + 1,
                                        treatment_end_time = max(data_aux$time),
                                        alpha = alpha,
-                                       model = x$test_details$model,
-                                       fixed_effects = x$test_details$fixed_effects,
+                                       model = multicell_power_obj$test_details$model,
+                                       fixed_effects = multicell_power_obj$test_details$fixed_effects,
                                        ConfidenceIntervals = TRUE,
                                        method = method,
                                        grid_size = 250,
                                        stat_test = stat_test))
 
       gl_b <- suppressMessages(GeoLift(Y_id = "Y",
-                                       time_id = x$test_details$time_id,
-                                       location_id = x$test_details$location_id,
-                                       X = x$test_details$X,
+                                       time_id = multicell_power_obj$test_details$time_id,
+                                       location_id = multicell_power_obj$test_details$location_id,
+                                       X = multicell_power_obj$test_details$X,
                                        data = data_aux[!(data_aux$location %in% test_locs[[combinations[,combo][1]]]),],
                                        locations = test_locs[[combinations[,combo][2]]],
                                        treatment_start_time = max(data_aux$time) - duration + 1,
                                        treatment_end_time = max(data_aux$time),
                                        alpha = alpha,
-                                       model = x$test_details$model,
-                                       fixed_effects = x$test_details$fixed_effects,
+                                       model = multicell_power_obj$test_details$model,
+                                       fixed_effects = multicell_power_obj$test_details$fixed_effects,
                                        ConfidenceIntervals = TRUE,
                                        method = method,
                                        grid_size = 250,
@@ -649,19 +649,19 @@ MultiCellWinner <- function(x,
 
 }
 
-#' @param obj \code{MultiCellWinner()}
+#' @param x \code{MultiCellWinner()}
 #' @param ... Optional arguments
 #'
 #' @rdname MultiCellWinner
 #' @order 2
 #' @export
-print.MultiCellWinner <- function(obj, ...) {
-  if (!inherits(obj, "MultiCellWinner")) {
+print.MultiCellWinner <- function(x, ...) {
+  if (!inherits(x, "MultiCellWinner")) {
     stop("object must be class MultiCellWinner")
   }
 
-  if(nrow(obj$results) > 0){
-    print(obj$results)
+  if(nrow(x$results) > 0){
+    print(x$results)
   } else{
     message("No Winners were found. Please change the locations, baseline effect_size, or ROAS sequence to find a Winner.")
   }

@@ -1999,6 +1999,7 @@ GeoLiftMarketSelection <- function(data,
 
 
 #' @param x \code{GeoLiftMarketSelection()}
+#' @param ... Optional arguments.
 #'
 #' @rdname GeoLiftMarketSelection
 #' @order 2

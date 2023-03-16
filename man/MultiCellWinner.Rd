@@ -6,7 +6,7 @@
 \title{Multi-Cell Winner Declaration Method for Market Selection.}
 \usage{
 MultiCellWinner(
-  x,
+  multicell_power_obj,
   effect_size = NULL,
   geolift_type = "standard",
   ROAS = seq(0, 5, 0.05),
@@ -15,10 +15,10 @@ MultiCellWinner(
   stat_test = "Total"
 )
 
-\method{print}{MultiCellWinner}(obj, ...)
+\method{print}{MultiCellWinner}(x, ...)
 }
 \arguments{
-\item{x}{A \code{MultiCellPower} object.}
+\item{multicell_power_obj}{A \code{MultiCellPower} object.}
 
 \item{effect_size}{A numeric value representing the lift to be simulated
 across all cells. If not specified (default), the algorithm will use the
@@ -52,7 +52,7 @@ Recommended for Negative Lift tests.}
 Recommended for Positive Lift tests.}
 }}
 
-\item{obj}{\code{MultiCellWinner()}}
+\item{x}{\code{MultiCellWinner()}}
 
 \item{...}{Optional arguments}
 }

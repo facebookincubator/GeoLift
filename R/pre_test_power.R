@@ -1428,6 +1428,7 @@ NumberLocations <- function(data,
 #'          \item{"ScaledL2Imbalance":}{ Scaled L2 Imbalance metric}
 #'      }
 #'
+#' @order 1
 #' @export
 GeoLiftPower <- function(data,
                          locations,

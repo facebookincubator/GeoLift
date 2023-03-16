@@ -54,14 +54,7 @@ GeoPlot <- function(data,
 }
 
 
-#' Plotting function for GeoLiftPower.
-#'
-#' @description
-#'
-#' Plotting function for `GeoLiftPower`. The function smooths the power curve
-#' for ease of interpretation.
-#'
-#' @param x GeoLiftPower object.
+#' @param x \code{GeoLiftPower()} output.
 #' @param actual_values Logic flag indicating whether to include in the plot
 #' the actual values. TRUE by default.
 #' @param smoothed_values Logic flag indicating whether to include in the plot
@@ -72,11 +65,9 @@ GeoPlot <- function(data,
 #' x-axis of the power plot. You may get slightly more or fewer breaks that
 #' requested based on `breaks_pretty()`. Set to 10 by default.
 #' @param notes String with additional notes to add as caption.
-#' @param ... additional arguments
 #'
-#' @return
-#' GeoLiftPower plot.
-#'
+#' @rdname GeoLiftPower
+#' @order 2
 #' @export
 plot.GeoLiftPower <- function(x,
                               actual_values = TRUE,
@@ -188,13 +179,7 @@ plot.GeoLiftPower <- function(x,
 }
 
 
-#' Plot for GeoLift.
-#'
-#' @description
-#'
-#' Plot for GeoLift objects.
-#'
-#' @param x GeoLift object.
+#' @param x \code{GeoLift()}.
 #' @param type Type of plot. By default "Lift" which plots the
 #' incrementality on the outcome variable. If type is set to "ATT",
 #' the average ATT is plotted. If type is set to "Incrementality",
@@ -209,8 +194,8 @@ plot.GeoLiftPower <- function(x,
 #' @param post_treatment_periods Number of post-treatment periods. Zero by default.
 #' @param ... additional arguments
 #'
-#' @return
-#' GeoLift plot.
+#' @rdname GeoLift
+#' @order 5
 #'
 #' @export
 plot.GeoLift <- function(x,

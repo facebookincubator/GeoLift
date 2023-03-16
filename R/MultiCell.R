@@ -91,8 +91,8 @@
 #'          \item{"test_details":}{ The test details.}
 #'          }
 #'
+#' @order 1
 #' @export
-
 MultiCellMarketSelection <- function(data,
                                      k = 2,
                                      sampling_method = "systematic",
@@ -282,20 +282,12 @@ MultiCellMarketSelection <- function(data,
 }
 
 
-#' Print pretty MultiCellMarketSelection output.
-#'
-#' @description
-#'
-#' Print MultiCellMarketSelection output.
-#'
-#' @param x MultiCellMarketSelection object.
+#' @param x \code{MultiCellMarketSelection()}
 #' @param ... Optional arguments
-#'
-#' @return
-#' MultiCellMarketSelection output message
+#' @rdname MultiCellMarketSelection
+#' @order 2
 #'
 #' @export
-
 print.MultiCellMarketSelection <- function(x, ...) {
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")

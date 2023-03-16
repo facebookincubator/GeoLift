@@ -809,15 +809,7 @@ plotCorrels <- function(data,
 }
 
 
-#' Plotting function for MultiCellMarketSelection
-#'
-#' @description
-#'
-#' Plotting function for `MultiCellMarketSelection`. This function plots the
-#' latest possible test given the data and duration as well as the power curve
-#' across historical simulations for a given market_id and cell_id.
-#'
-#' @param x A MultiCellMarketSelection object.
+#' @param x \code{MultiCellMarketSelection()}
 #' @param test_markets List of market IDs per cell. The list must contain exactly
 #' k numeric values corresponding to the power analysis. The recommended layout is
 #' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
@@ -836,11 +828,9 @@ plotCorrels <- function(data,
 #' default.
 #' @param ... additional arguments
 #'
-#' @return
-#' MultiCellMarketSelection plot.
-#'
+#' @rdname MultiCellMarketSelection
+#' @order 3
 #' @export
-
 plot.MultiCellMarketSelection <- function(x,
                                           test_markets = list(),
                                           type = "Lift",

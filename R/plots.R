@@ -70,6 +70,7 @@ GeoPlot <- function(data,
 #' @rdname GeoLiftPower
 #' @order 2
 #' @export
+#' @importFrom graphics plot
 plot.GeoLiftPower <- function(x,
                               actual_values = TRUE,
                               smoothed_values = TRUE,
@@ -199,6 +200,7 @@ plot.GeoLiftPower <- function(x,
 #' @order 5
 #'
 #' @export
+#' @importFrom graphics plot
 plot.GeoLift <- function(x,
                          type = "Lift",
                          treatment_end_date = NULL,
@@ -665,6 +667,7 @@ cumulative_value.plot <- function(data,
 #' @order 3
 #'
 #' @export
+#' @importFrom graphics plot
 plot.GeoLiftMarketSelection <- function(x,
                                         market_ID = 0,
                                         print_summary = TRUE,
@@ -832,6 +835,7 @@ plotCorrels <- function(data,
 #' @rdname MultiCellMarketSelection
 #' @order 3
 #' @export
+#' @importFrom graphics plot
 plot.MultiCellMarketSelection <- function(x,
                                           test_markets = list(),
                                           type = "Lift",
@@ -952,6 +956,7 @@ plot.MultiCellMarketSelection <- function(x,
 #' @rdname MultiCellPower
 #' @order 3
 #' @export
+#' @importFrom graphics plot
 plot.MultiCellPower <- function(x,
                                 actual_values = TRUE,
                                 smoothed_values = FALSE,
@@ -1011,6 +1016,7 @@ plot.MultiCellPower <- function(x,
 #' @rdname GeoLiftMultiCell
 #' @order 4
 #' @export
+#' @importFrom graphics plot
 plot.GeoLiftMultiCell <- function(x,
                                   type = "Lift",
                                   treatment_end_date = NULL,

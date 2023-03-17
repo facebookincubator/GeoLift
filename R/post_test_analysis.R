@@ -534,6 +534,7 @@ cumulative_lift <- function(data,
 #' @rdname GeoLift
 #' @order 3
 #' @export
+#' @importFrom base summary
 summary.GeoLift <- function(object, ...) {
   if (!inherits(object, "GeoLift")) {
     stop("object must be class GeoLift")

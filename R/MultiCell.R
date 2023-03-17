@@ -974,7 +974,6 @@ print.GeoLiftMultiCell <- function(x, ...) {
 #' @rdname GeoLiftMultiCell
 #' @order 3
 #' @export
-#' @importFrom base summary
 summary.GeoLiftMultiCell <- function(object,
                                      table = FALSE,
                                      ...) {

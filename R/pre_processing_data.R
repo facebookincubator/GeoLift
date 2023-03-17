@@ -585,10 +585,10 @@ is_location_in_cluster <- function(
   }
   sf::st_crs(cluster_polygon) <- 4326
   spdf <- sf::as_Spatial(cluster_polygon)
-  sp::coordinates(location_points) <- c(longitude_col_name, latitude_col_name)
-  sp::proj4string(location_points) <- sf::st_crs(cluster_polygon)$proj4string
+  coordinates(location_points) <- c(longitude_col_name, latitude_col_name)
+  proj4string(location_points) <- sf::st_crs(cluster_polygon)$proj4string
   
-  overlap <- sp::over(location_points, spdf) %>%
+  overlap <- over(location_points, spdf) %>%
     data.frame()
   overlap$included_in_cluster <- ifelse(is.na(overlap$country), FALSE, TRUE)
   overlap <- cbind(overlap, location_points)
@@ -665,4 +665,38 @@ location_to_cluster_matching <- function(
   all_point_match_to_cluster$null_obs <- NULL
   
   return(all_point_match_to_cluster)
+}
+
+
+#' Download Community Zones Clusters from Data For Good.
+#' 
+#' @description This method downloads the Community Zones Clusters CSV to local
+#' and imports the file in a format compatible with the Shapefile library.
+#' 
+#' @param path_to_file_local Complete path where the downloaded file will be 
+#' stored in local.
+#' @param path_to_file_url default url to look for Community Zones Clusters.
+#' @param country_filter specific country in which clusters should be located. 
+#' Default is NULL.
+#' 
+#' @return shapefile data.frame that holds values for region, country, 
+#' fbcz_id (cluster id), fbcz_id_num (cluster number), name, cz_gen_ds (date of 
+#' update), win_population, win_roads_km, area, geography (polygon with points 
+#' that form the cluster).
+#' 
+#' @export 
+download_cluster_file <- function(
+    path_to_file_local,
+    path_to_file_url = 'https://data.humdata.org/dataset/b7aaa3d7-cca2-4364-b7ce-afe3134194a2/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/data-for-good-at-meta-commuting-zones-march-2023.csv',
+    country_filter = NULL
+){
+  utils::download.file(path_to_file_url, path_to_file_local)
+  df <- read.csv(path_to_file_local)
+  s_df <- sf::st_as_sf(df, wkt='geography')
+  
+  if (!is.null(country_filter)){
+    s_df <- s_df %>% dplyr::filter(tolower(country) == tolower(country_filter))
+  }
+  
+  return(s_df)
 }

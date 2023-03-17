@@ -28,7 +28,7 @@
 #' @import utils
 #' @import rlang
 #' @import sf
-#' @import sp
+#' @importFrom sp coordinates proj4string over
 "_PACKAGE"
 
 # Suppress 'no visible binding for global variable' warnings

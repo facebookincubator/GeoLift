@@ -234,7 +234,15 @@ GeoDataRead <- function(data,
   }
   
   if (!is.null(path_to_cluster_file_local)){
-    message('Running Community Zone cluster matching to city.')
+    msg <- 'Running Community Zone cluster matching to city'
+    if (is.null(country_filter)){
+      msg <- paste0(msg, '. No country filter detected.',
+                    'We suggest you specify the parameter',
+                    'country_filter to avoid unnecessary preprocessing.')
+    } else {
+      msg <- paste0(msg, ' in ', country_filter, '.')
+    }
+    message(msg)
     cluster_data <- load_cluster_file(
       path_to_cluster_file_local,
       path_to_file_url=path_to_file_url,
@@ -710,13 +718,18 @@ location_to_cluster_matching <- function(
     FALSE,
     all_point_match_to_cluster$included_in_cluster
   )
-  all_point_match_to_cluster$null_obs <- ifelse(
-    is.na(all_point_match_to_cluster$fbcz_id_num),
-    1:nrow(all_point_match_to_cluster[is.na(all_point_match_to_cluster$country), ]),
-    0)
+  
+  locations_without_cluster <- unique(all_point_match_to_cluster[
+    all_point_match_to_cluster$included_in_cluster == FALSE, "location"])
+  all_point_match_to_cluster <- all_point_match_to_cluster %>%
+    merge(data.frame(
+      location = locations_without_cluster,
+      null_obs = 1:length(locations_without_cluster)
+    ), 
+    all.x=TRUE)
   
   all_point_match_to_cluster$fbcz_id_num = ifelse(
-    is.na(all_point_match_to_cluster$fbcz_id_num),
+    all_point_match_to_cluster$included_in_cluster==FALSE,
     max_fbcz_id_num + all_point_match_to_cluster$null_obs,
     all_point_match_to_cluster$fbcz_id_num)
   all_point_match_to_cluster$null_obs <- NULL

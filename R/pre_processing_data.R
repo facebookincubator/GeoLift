@@ -277,8 +277,8 @@ GeoDataRead <- function(data,
     if (!is.null(path_to_cluster_file_local)){
       msg <- paste0(
         msg,
-        "\n Clustered locations using Community Zones Dataset.",
-        "\n Grouped ", initial_locations,
+        "\n* Clustered locations using Community Zones Dataset.",
+        "\n* Grouped ", initial_locations,
         " locations into ", 
         length(unique(data$location)), " clusters.")
     } else {

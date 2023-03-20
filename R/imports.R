@@ -59,6 +59,7 @@ utils::globalVariables(
     "EffectSize",
     "Estimate",
     "first_day",
+    "fbcz_id_num",
     "Holdout",
     "ID",
     "incremental",

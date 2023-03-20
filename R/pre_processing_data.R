@@ -77,7 +77,7 @@ GeoDataRead <- function(data,
     Y = Y_id,
     location = location_id
   )
-
+    
   # Remove white spaces in date variable
   data$date <- as.character(data$date)
   data$date <- trimws(data$date)
@@ -585,10 +585,10 @@ is_location_in_cluster <- function(
   }
   sf::st_crs(cluster_polygon) <- 4326
   spdf <- sf::as_Spatial(cluster_polygon)
-  coordinates(location_points) <- c(longitude_col_name, latitude_col_name)
-  proj4string(location_points) <- sf::st_crs(cluster_polygon)$proj4string
+  sp::coordinates(location_points) <- c(longitude_col_name, latitude_col_name)
+  sp::proj4string(location_points) <- sf::st_crs(cluster_polygon)$proj4string
   
-  overlap <- over(location_points, spdf) %>%
+  overlap <- sp::over(location_points, spdf) %>%
     data.frame()
   overlap$included_in_cluster <- ifelse(is.na(overlap$country), FALSE, TRUE)
   overlap <- cbind(overlap, location_points)
@@ -599,7 +599,8 @@ is_location_in_cluster <- function(
     'fbcz_id_num',
     longitude_col_name,
     latitude_col_name,
-    'included_in_cluster'
+    'included_in_cluster',
+    'location'
   )])
 }
 
@@ -636,7 +637,9 @@ location_to_cluster_matching <- function(
     cluster_df <- clusters[row, ]
     point_match_to_cluster <- is_location_in_cluster(
       location_points, cluster_df)
-    point_match_to_cluster <- point_match_to_cluster[point_match_to_cluster$included_in_cluster == TRUE, ]
+    point_match_to_cluster <- point_match_to_cluster[
+      point_match_to_cluster$included_in_cluster == TRUE, 
+      !colnames(point_match_to_cluster) %in% c('location')]
     all_point_match_to_cluster <- rbind(
       all_point_match_to_cluster,
       point_match_to_cluster
@@ -664,7 +667,18 @@ location_to_cluster_matching <- function(
     all_point_match_to_cluster$fbcz_id_num)
   all_point_match_to_cluster$null_obs <- NULL
   
-  return(all_point_match_to_cluster)
+  new_geo_data <- all_point_match_to_cluster %>%
+    merge(location_points, by='location') %>%
+    dplyr::group_by(fbcz_id_num, time) %>%
+    dplyr::summarize(
+      location_in_cluster = paste0(location, collapse='; '),
+      Y = sum(Y)) %>%
+    data.frame() %>%
+    dplyr::mutate(
+      location = as.character(fbcz_id_num),
+      fbcz_id_num=NULL)
+  
+  return(new_geo_data)
 }
 
 
@@ -687,7 +701,10 @@ location_to_cluster_matching <- function(
 #' @export 
 download_cluster_file <- function(
     path_to_file_local,
-    path_to_file_url = 'https://data.humdata.org/dataset/b7aaa3d7-cca2-4364-b7ce-afe3134194a2/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/data-for-good-at-meta-commuting-zones-march-2023.csv',
+    path_to_file_url = paste0(
+      'https://data.humdata.org/dataset/b7aaa3d7-cca2-4364-b7ce-afe3134194a2',
+      '/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/',
+      'data-for-good-at-meta-commuting-zones-march-2023.csv'),
     country_filter = NULL
 ){
   utils::download.file(path_to_file_url, path_to_file_local)
@@ -695,7 +712,8 @@ download_cluster_file <- function(
   s_df <- sf::st_as_sf(df, wkt='geography')
   
   if (!is.null(country_filter)){
-    s_df <- s_df %>% dplyr::filter(tolower(country) == tolower(country_filter))
+    country_filter <- tolower(country_filter)
+    s_df <- s_df[tolower(s_df$country) == country_filter, ]
   }
   
   return(s_df)

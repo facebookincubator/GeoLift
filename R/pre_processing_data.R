@@ -690,7 +690,7 @@ location_to_cluster_matching <- function(
 }
 
 
-#' Download Community Zones Clusters from Data For Good.
+#' Load Community Zones Clusters from Data For Good.
 #' 
 #' @description This method downloads the Community Zones Clusters CSV to local
 #' and imports the file in a format compatible with the Shapefile library.
@@ -707,7 +707,7 @@ location_to_cluster_matching <- function(
 #' that form the cluster).
 #' 
 #' @export 
-download_cluster_file <- function(
+load_cluster_file <- function(
     path_to_file_local,
     path_to_file_url = paste0(
       'https://data.humdata.org/dataset/',
@@ -716,7 +716,11 @@ download_cluster_file <- function(
       'data-for-good-at-meta-commuting-zones-march-2023.csv'),
     country_filter = NULL
 ){
-  utils::download.file(path_to_file_url, path_to_file_local)
+  if (!file.exists(path_to_file_local)){
+    message('File does not exist in local path. Downloading.')
+    utils::download.file(path_to_file_url, path_to_file_local)
+  }
+  
   df <- read.csv(path_to_file_local)
   s_df <- sf::st_as_sf(df, wkt='geography')
   

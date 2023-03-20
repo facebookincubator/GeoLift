@@ -619,6 +619,8 @@ is_location_in_cluster <- function(
 #' data.frame.
 #' @param latitude_col_name name of the latitude column in the location_points
 #' data.frame.
+#' @param verbose logical flag indicating whether amount of clusters processed
+#' should be counted.
 #' 
 #' @return
 #' A data frame holding a match between each location and all clusters.
@@ -628,12 +630,17 @@ location_to_cluster_matching <- function(
     location_points, 
     clusters,
     longitude_col_name='Longitude',
-    latitude_col_name='Latitude'){
+    latitude_col_name='Latitude',
+    verbose=FALSE){
   
   all_point_match_to_cluster <- data.frame()
   max_fbcz_id_num <- max(clusters$fbcz_id_num)
   
-  for (row in 1:nrow(clusters)){
+  total_clusters <- nrow(clusters)
+  for (row in 1:total_clusters){
+    if (row %% 100 == 0 & verbose){
+      message(paste0(row, ' out of ', total_clusters, ' clusters processed.'))
+    }
     cluster_df <- clusters[row, ]
     point_match_to_cluster <- is_location_in_cluster(
       location_points, cluster_df)
@@ -668,15 +675,16 @@ location_to_cluster_matching <- function(
   all_point_match_to_cluster$null_obs <- NULL
   
   new_geo_data <- all_point_match_to_cluster %>%
-    merge(location_points, by='location') %>%
     dplyr::group_by(fbcz_id_num, time) %>%
     dplyr::summarize(
-      location_in_cluster = paste0(location, collapse='; '),
-      Y = sum(Y)) %>%
+      location_in_cluster = toString(unique(location)),
+      Y = sum(Y),
+      .groups='drop') %>%
     data.frame() %>%
     dplyr::mutate(
-      location = as.character(fbcz_id_num),
-      fbcz_id_num=NULL)
+      location2 = as.character(fbcz_id_num),
+      fbcz_id_num=NULL) %>%
+    dplyr::ungroup()
   
   return(new_geo_data)
 }
@@ -702,7 +710,8 @@ location_to_cluster_matching <- function(
 download_cluster_file <- function(
     path_to_file_local,
     path_to_file_url = paste0(
-      'https://data.humdata.org/dataset/b7aaa3d7-cca2-4364-b7ce-afe3134194a2',
+      'https://data.humdata.org/dataset/',
+      'b7aaa3d7-cca2-4364-b7ce-afe3134194a2',
       '/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/',
       'data-for-good-at-meta-commuting-zones-march-2023.csv'),
     country_filter = NULL

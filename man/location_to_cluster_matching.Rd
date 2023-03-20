@@ -8,7 +8,8 @@ location_to_cluster_matching(
   location_points,
   clusters,
   longitude_col_name = "Longitude",
-  latitude_col_name = "Latitude"
+  latitude_col_name = "Latitude",
+  verbose = FALSE
 )
 }
 \arguments{
@@ -24,6 +25,9 @@ data.frame.}
 
 \item{latitude_col_name}{name of the latitude column in the location_points
 data.frame.}
+
+\item{verbose}{logical flag indicating whether amount of clusters processed
+should be counted.}
 }
 \value{
 A data frame holding a match between each location and all clusters.

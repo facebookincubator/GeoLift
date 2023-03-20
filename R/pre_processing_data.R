@@ -46,7 +46,17 @@ GeoDataRead <- function(data,
                         format = "mm/dd/yyyy",
                         X = c(),
                         summary = FALSE,
-                        keep_unix_time = FALSE) {
+                        keep_unix_time = FALSE,
+                        path_to_cluster_file_local=NULL,
+                        country_filter=NULL,
+                        path_to_file_url = paste0(
+                          "https://data.humdata.org/dataset/",
+                          "b7aaa3d7-cca2-4364-b7ce-afe3134194a2",
+                          "/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/",
+                          "data-for-good-at-meta-commuting-zones-march-2023.csv"),
+                        longitude_col_name = "Longitude",
+                        latitude_col_name = "Latitude",
+                        verbose=FALSE) {
   format <- tolower(format)
 
   # Acceptable date formats
@@ -197,6 +207,10 @@ GeoDataRead <- function(data,
   # Aggregate Outcomes by time and location
   data_raw <- data
 
+  if (!is.null(path_to_cluster_file_local)){
+    X <- cbind(X, c(longitude_col_name, latitude_col_name))
+  }
+  
   if (keep_unix_time == FALSE) {
     data <- data_raw %>%
       dplyr::group_by(location, time) %>%
@@ -218,17 +232,48 @@ GeoDataRead <- function(data,
       data <- data %>% dplyr::left_join(data_aux, by = c("location", "time", "date_unix"))
     }
   }
+  
+  if (!is.null(path_to_cluster_file_local)){
+    message('Running Community Zone cluster matching to city.')
+    cluster_data <- load_cluster_file(
+      path_to_cluster_file_local,
+      path_to_file_url=path_to_file_url,
+      country_filter=country_filter
+    )
+    
+    data <- location_to_cluster_matching(
+      data, 
+      cluster_data, 
+      verbose=verbose,
+      X=X)
+    data[, longitude_col_name] <- NULL
+    data[, latitude_col_name] <- NULL
+  }
 
   # Print summary of Data Reading
   if (summary == TRUE) {
-    message(paste0(
+    msg <- paste0(
       "##################################",
       "\n#####       Summary       #####\n",
       "##################################\n",
       "\n* Raw Number of Locations: ", initial_locations,
-      "\n* Time Periods: ", total_periods,
-      "\n* Final Number of Locations (Complete): ", length(unique(data$location))
-    ))
+      "\n* Time Periods: ", total_periods
+    )
+    if (!is.null(path_to_cluster_file_local)){
+      msg <- paste0(
+        msg,
+        "\n Clustered locations using Community Zones Dataset.",
+        "\n Grouped ", initial_locations,
+        " locations into ", 
+        length(unique(data$location)), " clusters.")
+    } else {
+      msg <- paste0(
+        msg,
+        "\n* Final Number of Locations (Complete): ", length(unique(data$location))
+      )
+    }
+    message(msg)
+    
   }
 
   return(as.data.frame(data))
@@ -631,7 +676,8 @@ location_to_cluster_matching <- function(
     clusters,
     longitude_col_name='Longitude',
     latitude_col_name='Latitude',
-    verbose=FALSE){
+    verbose=FALSE,
+    X=c()){
   
   all_point_match_to_cluster <- data.frame()
   max_fbcz_id_num <- max(clusters$fbcz_id_num)
@@ -657,7 +703,8 @@ location_to_cluster_matching <- function(
     merge(
       location_points, 
       by=c(longitude_col_name, latitude_col_name), 
-      all.y=TRUE)
+      all.y=TRUE) %>%
+    dplyr::distinct()
   all_point_match_to_cluster$included_in_cluster <- ifelse(
     is.na(all_point_match_to_cluster$included_in_cluster),
     FALSE,
@@ -681,11 +728,26 @@ location_to_cluster_matching <- function(
       Y = sum(Y),
       .groups='drop') %>%
     data.frame() %>%
-    dplyr::mutate(
-      location2 = as.character(fbcz_id_num),
-      fbcz_id_num=NULL) %>%
     dplyr::ungroup()
   
+  if (length(X) != 0){
+    for (var in X){
+      new_geo_data <- all_point_match_to_cluster %>%
+        dplyr::group_by(fbcz_id_num, time) %>%
+        dplyr::summarize(
+          !!var := sum(!!sym(var)),
+          .groups='drop') %>%
+        dplyr::left_join(
+          new_geo_data, 
+          by = c("fbcz_id_num", "time")) %>%
+        data.frame()
+    }
+  }
+  
+  new_geo_data <- new_geo_data %>%
+    dplyr::mutate(
+      location = as.character(fbcz_id_num),
+      fbcz_id_num=NULL)
   return(new_geo_data)
 }
 
@@ -695,8 +757,8 @@ location_to_cluster_matching <- function(
 #' @description This method downloads the Community Zones Clusters CSV to local
 #' and imports the file in a format compatible with the Shapefile library.
 #' 
-#' @param path_to_file_local Complete path where the downloaded file will be 
-#' stored in local.
+#' @param path_to_cluster_file_local Complete path where the downloaded file will 
+#' be stored in local.
 #' @param path_to_file_url default url to look for Community Zones Clusters.
 #' @param country_filter specific country in which clusters should be located. 
 #' Default is NULL.
@@ -708,7 +770,7 @@ location_to_cluster_matching <- function(
 #' 
 #' @export 
 load_cluster_file <- function(
-    path_to_file_local,
+    path_to_cluster_file_local,
     path_to_file_url = paste0(
       'https://data.humdata.org/dataset/',
       'b7aaa3d7-cca2-4364-b7ce-afe3134194a2',
@@ -716,12 +778,14 @@ load_cluster_file <- function(
       'data-for-good-at-meta-commuting-zones-march-2023.csv'),
     country_filter = NULL
 ){
-  if (!file.exists(path_to_file_local)){
+  if (!file.exists(path_to_cluster_file_local)){
     message('File does not exist in local path. Downloading.')
-    utils::download.file(path_to_file_url, path_to_file_local)
+    utils::download.file(path_to_file_url, path_to_cluster_file_local)
+  } else {
+    message(paste0('File was found in local path: ', path_to_cluster_file_local))
   }
   
-  df <- read.csv(path_to_file_local)
+  df <- read.csv(path_to_cluster_file_local)
   s_df <- sf::st_as_sf(df, wkt='geography')
   
   if (!is.null(country_filter)){

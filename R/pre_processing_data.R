@@ -34,6 +34,13 @@
 #' @param summary Display a summary of the data-reading process. FALSE by default.
 #' @param keep_unix_time A logic flag indicating whether to keep a column with
 #' each event's unix time.
+#' @param longitude_col_name name of the longitude column in the location_points
+#' data.frame.
+#' @param latitude_col_name name of the latitude column in the location_points
+#' data.frame.
+#' @param verbose logical flag indicating whether amount of clusters processed
+#' should be counted.
+#' @inheritParams load_cluster_file
 #'
 #' @return
 #' A data frame for GeoLift inference and power calculations.
@@ -674,6 +681,7 @@ is_location_in_cluster <- function(
 #' data.frame.
 #' @param verbose logical flag indicating whether amount of clusters processed
 #' should be counted.
+#' @param X List of names of the covariates.
 #' 
 #' @return
 #' A data frame holding a match between each location and all clusters.

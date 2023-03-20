@@ -5,7 +5,7 @@
 \title{Load Community Zones Clusters from Data For Good.}
 \usage{
 load_cluster_file(
-  path_to_file_local,
+  path_to_cluster_file_local,
   path_to_file_url = paste0("https://data.humdata.org/dataset/",
     "b7aaa3d7-cca2-4364-b7ce-afe3134194a2",
     "/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/",
@@ -14,8 +14,8 @@ load_cluster_file(
 )
 }
 \arguments{
-\item{path_to_file_local}{Complete path where the downloaded file will be
-stored in local.}
+\item{path_to_cluster_file_local}{Complete path where the downloaded file will
+be stored in local.}
 
 \item{path_to_file_url}{default url to look for Community Zones Clusters.}
 

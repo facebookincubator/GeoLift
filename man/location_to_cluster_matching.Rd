@@ -9,7 +9,8 @@ location_to_cluster_matching(
   clusters,
   longitude_col_name = "Longitude",
   latitude_col_name = "Latitude",
-  verbose = FALSE
+  verbose = FALSE,
+  X = c()
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ data.frame.}
 
 \item{verbose}{logical flag indicating whether amount of clusters processed
 should be counted.}
+
+\item{X}{List of names of the covariates.}
 }
 \value{
 A data frame holding a match between each location and all clusters.

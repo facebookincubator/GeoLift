@@ -2,10 +2,11 @@
 % Please edit documentation in R/MultiCell.R
 \name{MultiCellWinner}
 \alias{MultiCellWinner}
+\alias{print.MultiCellWinner}
 \title{Multi-Cell Winner Declaration Method for Market Selection.}
 \usage{
 MultiCellWinner(
-  x,
+  multicell_power_obj,
   effect_size = NULL,
   geolift_type = "standard",
   ROAS = seq(0, 5, 0.05),
@@ -13,9 +14,11 @@ MultiCellWinner(
   method = "conformal",
   stat_test = "Total"
 )
+
+\method{print}{MultiCellWinner}(x, ...)
 }
 \arguments{
-\item{x}{A \code{MultiCellPower} object.}
+\item{multicell_power_obj}{A \code{MultiCellPower} object.}
 
 \item{effect_size}{A numeric value representing the lift to be simulated
 across all cells. If not specified (default), the algorithm will use the
@@ -48,6 +51,10 @@ Recommended for Negative Lift tests.}
 \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 Recommended for Positive Lift tests.}
 }}
+
+\item{x}{\code{MultiCellWinner()}}
+
+\item{...}{Optional arguments}
 }
 \value{
 A list with two objects:

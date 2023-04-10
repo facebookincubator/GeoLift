@@ -91,8 +91,8 @@
 #'          \item{"test_details":}{ The test details.}
 #'          }
 #'
+#' @order 1
 #' @export
-
 MultiCellMarketSelection <- function(data,
                                      k = 2,
                                      sampling_method = "systematic",
@@ -282,20 +282,12 @@ MultiCellMarketSelection <- function(data,
 }
 
 
-#' Print pretty MultiCellMarketSelection output.
-#'
-#' @description
-#'
-#' Print MultiCellMarketSelection output.
-#'
-#' @param x MultiCellMarketSelection object.
+#' @param x \code{MultiCellMarketSelection()}
 #' @param ... Optional arguments
-#'
-#' @return
-#' MultiCellMarketSelection output message
+#' @rdname MultiCellMarketSelection
+#' @order 2
 #'
 #' @export
-
 print.MultiCellMarketSelection <- function(x, ...) {
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
@@ -342,8 +334,8 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #'          \item{"test_details":}{ The test details.}
 #'          }
 #'
+#' @order 1
 #' @export
-
 MultiCellPower <- function(x,
                            test_markets = list(),
                            effect_size = seq(-0.25,0.25,0.05),
@@ -420,20 +412,15 @@ MultiCellPower <- function(x,
 }
 
 
-#' Print pretty MultiCellPower output.
-#'
-#' @description
-#'
-#' Print MultiCellPower output.
-#'
-#' @param x MultiCellPower object.
+#' @param x \code{MultiCellPower()}
 #' @param ... Optional arguments
 #'
 #' @return
 #' MultiCellPower output message
 #'
+#' @rdname MultiCellPower
+#' @order 2
 #' @export
-
 print.MultiCellPower <- function(x, ...) {
   if (!inherits(x, "MultiCellPower")) {
     stop("object must be class MultiCellPower")
@@ -454,7 +441,7 @@ print.MultiCellPower <- function(x, ...) {
 #' determine how much larger the incremental ROAS (iROAS) must be for a cell to be
 #' declared the winner based on a statistical significance test.
 #'
-#' @param x A `MultiCellPower` object.
+#' @param multicell_power_obj A `MultiCellPower` object.
 #' @param effect_size A numeric value representing the lift to be simulated
 #' across all cells. If not specified (default), the algorithm will use the
 #' largest lift needed to obtain a well-powered test across all cells.
@@ -490,9 +477,9 @@ print.MultiCellPower <- function(x, ...) {
 #'          pairwise comparisons. }
 #'          }
 #'
+#' @order 1
 #' @export
-
-MultiCellWinner <- function(x,
+MultiCellWinner <- function(multicell_power_obj,
                             effect_size = NULL,
                             geolift_type = "standard",
                             ROAS = seq(0,5,0.05),
@@ -501,7 +488,7 @@ MultiCellWinner <- function(x,
                             stat_test = "Total"
 ){
 
-  if (!inherits(x, "MultiCellPower")) {
+  if (!inherits(multicell_power_obj, "MultiCellPower")) {
     stop("object must be class MultiCellPower")
   }
 
@@ -533,17 +520,17 @@ MultiCellWinner <- function(x,
   }
 
   #Set variables
-  test_params <- as.data.frame(matrix(0, ncol=5, nrow = length(x$PowerCurves)))
+  test_params <- as.data.frame(matrix(0, ncol=5, nrow = length(multicell_power_obj$PowerCurves)))
   names(test_params) <- c("locations", "effect_size", "duration", "cpic", "investment")
   test_locs <- c()
 
-  for(cell in 1:length(x$PowerCurves)){
+  for(cell in 1:length(multicell_power_obj$PowerCurves)){
     if(tolower(geolift_type) == "standard"){
-      aux <- x$PowerCurves[[cell]] %>%
+      aux <- multicell_power_obj$PowerCurves[[cell]] %>%
         dplyr::filter(power > 0.8, EffectSize > 0 ) %>%
         dplyr::slice_min(EffectSize, n = 1)
     } else{
-      aux <- x$PowerCurves[[cell]] %>%
+      aux <- multicell_power_obj$PowerCurves[[cell]] %>%
         dplyr::filter(power > 0.8, EffectSize < 0 ) %>%
         dplyr::slice_max(EffectSize, n = 1)
     }
@@ -553,7 +540,7 @@ MultiCellWinner <- function(x,
     test_params[cell,4] <- mean(aux$cpic) #cpic
     test_params[cell,5] <- mean(aux$Investment) #investment
 
-    test_locs <- append(test_locs, list(stringr::str_split(x$PowerCurves[[cell]]$location[1], ", ")[[1]]))
+    test_locs <- append(test_locs, list(stringr::str_split(multicell_power_obj$PowerCurves[[cell]]$location[1], ", ")[[1]]))
   }
 
   # Set test parameters
@@ -577,46 +564,46 @@ MultiCellWinner <- function(x,
                       "ROAS",
                       "DID")
 
-  combinations <- combn(seq(1:length(x$PowerCurves)),2)
+  combinations <- combn(seq(1:length(multicell_power_obj$PowerCurves)),2)
 
   for (combo in 1:ncol(combinations)){
     DID_aux <- 0
     i <- 1
     for (roas in ROAS){
       test_locs_aux <- c(test_locs[[combinations[,combo][1]]],test_locs[[combinations[,combo][2]]])
-      data_aux <- x$data %>% dplyr::filter(!(location %in% unlist(test_locs)[!(unlist(test_locs) %in% test_locs_aux)]))
+      data_aux <- multicell_power_obj$data %>% dplyr::filter(!(location %in% unlist(test_locs)[!(unlist(test_locs) %in% test_locs_aux)]))
 
       data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] * (1 + effect_size*roas)
       data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] * (1 + effect_size)
 
 
       gl_a <- suppressMessages(GeoLift(Y_id = "Y",
-                                       time_id = x$test_details$time_id,
-                                       location_id = x$test_details$location_id,
-                                       X = x$test_details$X,
+                                       time_id = multicell_power_obj$test_details$time_id,
+                                       location_id = multicell_power_obj$test_details$location_id,
+                                       X = multicell_power_obj$test_details$X,
                                        data = data_aux[!(data_aux$location %in% test_locs[[combinations[,combo][2]]]),],
                                        locations = test_locs[[combinations[,combo][1]]],
                                        treatment_start_time = max(data_aux$time) - duration + 1,
                                        treatment_end_time = max(data_aux$time),
                                        alpha = alpha,
-                                       model = x$test_details$model,
-                                       fixed_effects = x$test_details$fixed_effects,
+                                       model = multicell_power_obj$test_details$model,
+                                       fixed_effects = multicell_power_obj$test_details$fixed_effects,
                                        ConfidenceIntervals = TRUE,
                                        method = method,
                                        grid_size = 250,
                                        stat_test = stat_test))
 
       gl_b <- suppressMessages(GeoLift(Y_id = "Y",
-                                       time_id = x$test_details$time_id,
-                                       location_id = x$test_details$location_id,
-                                       X = x$test_details$X,
+                                       time_id = multicell_power_obj$test_details$time_id,
+                                       location_id = multicell_power_obj$test_details$location_id,
+                                       X = multicell_power_obj$test_details$X,
                                        data = data_aux[!(data_aux$location %in% test_locs[[combinations[,combo][1]]]),],
                                        locations = test_locs[[combinations[,combo][2]]],
                                        treatment_start_time = max(data_aux$time) - duration + 1,
                                        treatment_end_time = max(data_aux$time),
                                        alpha = alpha,
-                                       model = x$test_details$model,
-                                       fixed_effects = x$test_details$fixed_effects,
+                                       model = multicell_power_obj$test_details$model,
+                                       fixed_effects = multicell_power_obj$test_details$fixed_effects,
                                        ConfidenceIntervals = TRUE,
                                        method = method,
                                        grid_size = 250,
@@ -662,20 +649,12 @@ MultiCellWinner <- function(x,
 
 }
 
-#' Print pretty MultiCellWinner output.
-#'
-#' @description
-#'
-#' Print MultiCellWinner output.
-#'
-#' @param x MultiCellWinner object.
+#' @param x \code{MultiCellWinner()}
 #' @param ... Optional arguments
 #'
-#' @return
-#' MultiCellWinner output message
-#'
+#' @rdname MultiCellWinner
+#' @order 2
 #' @export
-
 print.MultiCellWinner <- function(x, ...) {
   if (!inherits(x, "MultiCellWinner")) {
     stop("object must be class MultiCellWinner")
@@ -686,8 +665,6 @@ print.MultiCellWinner <- function(x, ...) {
   } else{
     message("No Winners were found. Please change the locations, baseline effect_size, or ROAS sequence to find a Winner.")
   }
-
-
 }
 
 
@@ -761,8 +738,8 @@ print.MultiCellWinner <- function(x, ...) {
 #'          \item{"Winner":}{ List of winner locations for the total comparison (if any).}
 #'          }
 #'
+#' @order 1
 #' @export
-
 GeoLiftMultiCell <- function(Y_id = "Y",
                              time_id = "time",
                              location_id = "location",
@@ -917,20 +894,12 @@ GeoLiftMultiCell <- function(Y_id = "Y",
 }
 
 
-#' Print pretty GeoLiftMultiCell output.
-#'
-#' @description
-#'
-#' Print GeoLiftMultiCell output.
-#'
-#' @param x GeoLiftMultiCell object.
+#' @param x \code{GeoLiftMultiCell()}
 #' @param ... Optional arguments
 #'
-#' @return
-#' GeoLiftMultiCell output message
-#'
+#' @rdname GeoLiftMultiCell
+#' @order 2
 #' @export
-
 print.GeoLiftMultiCell <- function(x, ...) {
   if (!inherits(x, "GeoLiftMultiCell")) {
     stop("object must be class GeoLiftMultiCell")
@@ -996,19 +965,14 @@ print.GeoLiftMultiCell <- function(x, ...) {
 }
 
 
-#' Summary method for GeoLiftMultiCell
-#'
-#' @description
-#'
-#' GeoLiftMultiCell summary output with additional information about the
-#' test.
-#'
-#' @param object GeoLiftMultiCell object.
+#' @param object \code{GeoLiftMultiCell()}
 #' @param table Logic flag indicating whether to plot only a table
 #' summarizing the results or the entire verbose output of each cell's
 #' GeoLift object summary. FALSE by default.
 #' @param ... Optional arguments
 #'
+#' @rdname GeoLiftMultiCell
+#' @order 3
 #' @export
 summary.GeoLiftMultiCell <- function(object,
                                      table = FALSE,

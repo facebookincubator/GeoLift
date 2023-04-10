@@ -54,14 +54,7 @@ GeoPlot <- function(data,
 }
 
 
-#' Plotting function for GeoLiftPower.
-#'
-#' @description
-#'
-#' Plotting function for `GeoLiftPower`. The function smooths the power curve
-#' for ease of interpretation.
-#'
-#' @param x GeoLiftPower object.
+#' @param x \code{GeoLiftPower()} output.
 #' @param actual_values Logic flag indicating whether to include in the plot
 #' the actual values. TRUE by default.
 #' @param smoothed_values Logic flag indicating whether to include in the plot
@@ -74,10 +67,10 @@ GeoPlot <- function(data,
 #' @param notes String with additional notes to add as caption.
 #' @param ... additional arguments
 #'
-#' @return
-#' GeoLiftPower plot.
-#'
+#' @rdname GeoLiftPower
+#' @order 2
 #' @export
+#' @importFrom graphics plot
 plot.GeoLiftPower <- function(x,
                               actual_values = TRUE,
                               smoothed_values = TRUE,
@@ -188,13 +181,7 @@ plot.GeoLiftPower <- function(x,
 }
 
 
-#' Plot for GeoLift.
-#'
-#' @description
-#'
-#' Plot for GeoLift objects.
-#'
-#' @param x GeoLift object.
+#' @param x \code{GeoLift()}.
 #' @param type Type of plot. By default "Lift" which plots the
 #' incrementality on the outcome variable. If type is set to "ATT",
 #' the average ATT is plotted. If type is set to "Incrementality",
@@ -209,10 +196,11 @@ plot.GeoLiftPower <- function(x,
 #' @param post_treatment_periods Number of post-treatment periods. Zero by default.
 #' @param ... additional arguments
 #'
-#' @return
-#' GeoLift plot.
+#' @rdname GeoLift
+#' @order 5
 #'
 #' @export
+#' @importFrom graphics plot
 plot.GeoLift <- function(x,
                          type = "Lift",
                          treatment_end_date = NULL,
@@ -658,15 +646,7 @@ cumulative_value.plot <- function(data,
 }
 
 
-#' Plotting function for GeoLiftMarketSelection
-#'
-#' @description
-#'
-#' Plotting function for `GeoLiftMarketSelection`. This function plots the
-#' latest possible test given the data and duration as well as the power curve
-#' across historical simulations.
-#'
-#' @param x A GeoLiftMarketSelection object.
+#' @param x \code{GeoLiftMarketSelection()}
 #' @param market_ID Numeric value indicating the market to be plotted. This
 #' value should reflect a valid ID from the BestMarkets data frame of the
 #' `GeoLiftMarketSelection` output.
@@ -683,10 +663,11 @@ cumulative_value.plot <- function(data,
 #' requested based on `breaks_pretty()`. Set to 10 by default.
 #' @param ... additional arguments
 #'
-#' @return
-#' GeoLiftMarketSelection plot.
+#' @rdname GeoLiftMarketSelection
+#' @order 3
 #'
 #' @export
+#' @importFrom graphics plot
 plot.GeoLiftMarketSelection <- function(x,
                                         market_ID = 0,
                                         print_summary = TRUE,
@@ -832,15 +813,7 @@ plotCorrels <- function(data,
 }
 
 
-#' Plotting function for MultiCellMarketSelection
-#'
-#' @description
-#'
-#' Plotting function for `MultiCellMarketSelection`. This function plots the
-#' latest possible test given the data and duration as well as the power curve
-#' across historical simulations for a given market_id and cell_id.
-#'
-#' @param x A MultiCellMarketSelection object.
+#' @param x \code{MultiCellMarketSelection()}
 #' @param test_markets List of market IDs per cell. The list must contain exactly
 #' k numeric values corresponding to the power analysis. The recommended layout is
 #' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
@@ -859,11 +832,10 @@ plotCorrels <- function(data,
 #' default.
 #' @param ... additional arguments
 #'
-#' @return
-#' MultiCellMarketSelection plot.
-#'
+#' @rdname MultiCellMarketSelection
+#' @order 3
 #' @export
-
+#' @importFrom graphics plot
 plot.MultiCellMarketSelection <- function(x,
                                           test_markets = list(),
                                           type = "Lift",
@@ -966,16 +938,7 @@ plot.MultiCellMarketSelection <- function(x,
 }
 
 
-#' Plotting function for MultiCellPower
-#'
-#' @description
-#'
-#' Plotting function for `MultiCellPower`. This function plots the
-#' Power Curves for all given test markets
-#' latest possible test given the data and duration as well as the power curve
-#' across historical simulations for a given merket_id and cell_id.
-#'
-#' @param x A MultiCellMarketSelection object.
+#' @param x \code{MultiCellMarketSelection()}
 #' @param actual_values Logic flag indicating whether to include in the plot
 #' the actual values. TRUE by default.
 #' @param smoothed_values Logic flag indicating whether to include in the plot
@@ -990,11 +953,10 @@ plot.MultiCellMarketSelection <- function(x,
 #' default.
 #' @param ... additional arguments
 #'
-#' @return
-#' MultiCellPower plot.
-#'
+#' @rdname MultiCellPower
+#' @order 3
 #' @export
-
+#' @importFrom graphics plot
 plot.MultiCellPower <- function(x,
                                 actual_values = TRUE,
                                 smoothed_values = FALSE,
@@ -1035,13 +997,7 @@ plot.MultiCellPower <- function(x,
 }
 
 
-#' Plot for GeoLiftMultiCell
-#'
-#' @description
-#'
-#' Plot for GeoLiftMultiCell objects.
-#'
-#' @param x GeoLiftMultiCell object.
+#' @param x \code{GeoLiftMultiCell()}
 #' @param type Type of plot. By default "Lift" which plots the
 #' incrementality on the outcome variable. If type is set to "ATT",
 #' the average ATT is plotted. If type is set to "Incrementality",
@@ -1057,11 +1013,10 @@ plot.MultiCellPower <- function(x,
 #' default.
 #' @param ... additional arguments
 #'
-#' @return
-#' GeoLiftMultiCell plots.
-#'
+#' @rdname GeoLiftMultiCell
+#' @order 4
 #' @export
-
+#' @importFrom graphics plot
 plot.GeoLiftMultiCell <- function(x,
                                   type = "Lift",
                                   treatment_end_date = NULL,

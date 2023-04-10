@@ -177,6 +177,7 @@ ASCMExecution <- function(
 #'          \item{"upper_bound":}{ Upper confidence interval.}
 #'          }
 #'
+#' @order 1
 #' @export
 GeoLift <- function(Y_id = "Y",
                     time_id = "time",
@@ -359,18 +360,12 @@ GeoLift <- function(Y_id = "Y",
   return(res)
 }
 
-#' Print pretty GeoLift output.
-#'
-#' @description
-#'
-#' Print GeoLift output.
-#'
-#' @param x GeoLift object.
+
+#' @param x \code{GeoLift()}
 #' @param ... Optional arguments
 #'
-#' @return
-#' GeoLift output message
-#'
+#' @rdname GeoLift
+#' @order 2
 #' @export
 print.GeoLift <- function(x, ...) {
   if (!inherits(x, "GeoLift")) {
@@ -507,14 +502,7 @@ cumulative_lift <- function(data,
 }
 
 
-#' Summary method for GeoLift.
-#'
-#' @description
-#'
-#' GeoLift summary output with additional information about the
-#' test.
-#'
-#' @param object GeoLift object.
+#' @param object \code{GeoLift()}
 #' @param ... Optional arguments
 #'
 #' @return
@@ -543,6 +531,8 @@ cumulative_lift <- function(data,
 #'          \item{"upper":}{ Upper Bound Confidence Interval.}
 #'       }
 #'
+#' @rdname GeoLift
+#' @order 3
 #' @export
 summary.GeoLift <- function(object, ...) {
   if (!inherits(object, "GeoLift")) {
@@ -581,21 +571,13 @@ summary.GeoLift <- function(object, ...) {
 }
 
 
-#' Summary plotting method for GeoLift.
-#'
-#' @description
-#'
-#' Summary plotting method for GeoLift.
-#'
-#' @param x GeoLift summary object.
+#' @param x \code{summary.GeoLift()}
 #' @param ... Optional arguments.
 #'
-#' @return
-#'
-#' Plot GeoLift summary.
+#' @rdname GeoLift
+#' @order 4
 #'
 #' @export
-
 print.summary.GeoLift <- function(x, ...) {
   if (!inherits(x, "summary.GeoLift")) {
     stop("object must be class summary.GeoLift")

@@ -1428,6 +1428,7 @@ NumberLocations <- function(data,
 #'          \item{"ScaledL2Imbalance":}{ Scaled L2 Imbalance metric}
 #'      }
 #'
+#' @order 1
 #' @export
 GeoLiftPower <- function(data,
                          locations,
@@ -1604,6 +1605,7 @@ GeoLiftPower <- function(data,
 #'          Includes the data set, model, fixed-effects, and CPIC parameters.}
 #' }
 #'
+#' @order 1
 #' @export
 GeoLiftMarketSelection <- function(data,
                                    treatment_periods,
@@ -1995,19 +1997,12 @@ GeoLiftMarketSelection <- function(data,
   return(output)
 }
 
-#' Printing method for GeoLiftMarketSelection
-#'
-#' @description
-#'
-#' Printing method for `GeoLiftMarketSelection`. The function will print
-#' the best markets when called.
-#'
-#' @param x GeoLiftMarketSelection object.
+
+#' @param x \code{GeoLiftMarketSelection()}
 #' @param ... Optional arguments.
 #'
-#' @return
-#' A data frame.
-#'
+#' @rdname GeoLiftMarketSelection
+#' @order 2
 #' @export
 print.GeoLiftMarketSelection <- function(x, ...) {
   if (!inherits(x, "GeoLiftMarketSelection")) {

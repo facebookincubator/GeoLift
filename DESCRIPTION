@@ -1,6 +1,6 @@
 Package: GeoLift
 Title: Synthetic Control Method to Calculate Lift at a Geo Level
-Version: 2.6.01
+Version: 2.6.02
 Authors@R: c(
     person(given = "Arturo",
            family = "Esquerra",

@@ -29,6 +29,7 @@
 #' @import rlang
 #' @import sf
 #' @importFrom sp coordinates proj4string over
+#' @import ggmap
 "_PACKAGE"
 
 # Suppress 'no visible binding for global variable' warnings
@@ -72,6 +73,7 @@ utils::globalVariables(
     "lift",
     "location",
     "location_2",
+    "location_country_name",
     "Locs",
     "lower",
     "lower_bound",

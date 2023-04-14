@@ -40,6 +40,8 @@
 #' data.frame.
 #' @param verbose logical flag indicating whether amount of clusters processed
 #' should be counted.
+#' @param find_location_lat_long logical flag indicating whether location's 
+#' latitude and longitude should be obtained by using the Google Maps API.
 #' @inheritParams load_cluster_file
 #'
 #' @return
@@ -55,7 +57,7 @@ GeoDataRead <- function(data,
                         summary = FALSE,
                         keep_unix_time = FALSE,
                         path_to_cluster_file_local=NULL,
-                        country_filter=NULL,
+                        country_name=NULL,
                         path_to_file_url = paste0(
                           "https://data.humdata.org/dataset/",
                           "b7aaa3d7-cca2-4364-b7ce-afe3134194a2",
@@ -63,7 +65,8 @@ GeoDataRead <- function(data,
                           "data-for-good-at-meta-commuting-zones-march-2023.csv"),
                         longitude_col_name = "Longitude",
                         latitude_col_name = "Latitude",
-                        verbose=FALSE) {
+                        verbose=FALSE,
+                        find_location_lat_long = FALSE) {
   format <- tolower(format)
 
   # Acceptable date formats
@@ -214,7 +217,9 @@ GeoDataRead <- function(data,
   # Aggregate Outcomes by time and location
   data_raw <- data
 
-  if (!is.null(path_to_cluster_file_local)){
+  if (
+    !is.null(path_to_cluster_file_local)
+    & !find_location_lat_long){
     X <- cbind(X, c(longitude_col_name, latitude_col_name))
   }
   
@@ -240,20 +245,26 @@ GeoDataRead <- function(data,
     }
   }
   
+  if (find_location_lat_long == TRUE){
+    message('Matching location units to their latitude and longitude.')
+    data <- get_location_lat_long(
+      data, country_name=country_name
+    )
+  }
   if (!is.null(path_to_cluster_file_local)){
     msg <- 'Running Community Zone cluster matching to city'
-    if (is.null(country_filter)){
+    if (is.null(country_name)){
       msg <- paste0(msg, '. No country filter detected.',
                     'We suggest you specify the parameter',
-                    'country_filter to avoid unnecessary preprocessing.')
+                    'country_name to avoid unnecessary preprocessing.')
     } else {
-      msg <- paste0(msg, ' in ', country_filter, '.')
+      msg <- paste0(msg, ' in ', country_name, '.')
     }
     message(msg)
     cluster_data <- load_cluster_file(
       path_to_cluster_file_local,
       path_to_file_url=path_to_file_url,
-      country_filter=country_filter
+      country_name=country_name
     )
     
     data <- location_to_cluster_matching(
@@ -781,7 +792,7 @@ location_to_cluster_matching <- function(
 #' @param path_to_cluster_file_local Complete path where the downloaded file will 
 #' be stored in local.
 #' @param path_to_file_url default url to look for Community Zones Clusters.
-#' @param country_filter specific country in which clusters should be located. 
+#' @param country_name specific country in which clusters should be located. 
 #' Default is NULL.
 #' 
 #' @return shapefile data.frame that holds values for region, country, 
@@ -797,7 +808,7 @@ load_cluster_file <- function(
       'b7aaa3d7-cca2-4364-b7ce-afe3134194a2',
       '/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/',
       'data-for-good-at-meta-commuting-zones-march-2023.csv'),
-    country_filter = NULL
+    country_name = NULL
 ){
   if (!file.exists(path_to_cluster_file_local)){
     message('File does not exist in local path. Downloading.')
@@ -809,10 +820,51 @@ load_cluster_file <- function(
   df <- read.csv(path_to_cluster_file_local)
   s_df <- sf::st_as_sf(df, wkt='geography')
   
-  if (!is.null(country_filter)){
-    country_filter <- tolower(country_filter)
-    s_df <- s_df[tolower(s_df$country) == country_filter, ]
+  if (!is.null(country_name)){
+    country_name <- tolower(country_name)
+    s_df <- s_df[tolower(s_df$country) == country_name, ]
+  } else {
+    stop('Please specify country_name to be able to filter the data.')
   }
   
   return(s_df)
+}
+
+
+#' Match location units to spatial location.
+#' @description Find location latitude and longitude using Gmaps API.
+#' 
+#' @param data dataset that holds locations that will be used.
+#' @param country_name country name in english to make lat long match easier.
+#'
+#' @export
+get_location_lat_long <- function(
+    data,  
+    country_name){
+  if (!ggmap::has_google_key()){
+    message(
+      'To use this method, you need to register your GMaps API key.',
+      'See `ggmap::register_google()`'
+    )
+  }
+  
+  if (is.null(country_name)){
+    stop('Please specify country_name to be able to find the right lat and long.')
+  }
+
+  data$location_country_name <- paste0(
+    data$location, ', ', country_name)
+  lat_long_data <- data %>%
+    dplyr::distinct(location) %>%
+    ggmap::mutate_geocode(location_country_name) %>%
+    merge(
+      data, by='location'
+    )
+  lat_long_data$Longitude <- lat_long_data$lon
+  lat_long_data$Latitude <- lat_long_data$lat
+  lat_long_data$location_country_name <- NULL
+  lat_long_data$lon <- NULL
+  lat_long_data$lat <- NULL
+  
+  return(lat_long_data)
 }

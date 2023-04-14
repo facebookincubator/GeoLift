@@ -57,7 +57,8 @@ Imports:
     rlang,
     lifecycle,
     sf,
-    sp
+    sp,
+    ggmap
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1

@@ -10,7 +10,7 @@ load_cluster_file(
     "b7aaa3d7-cca2-4364-b7ce-afe3134194a2",
     "/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/",
     "data-for-good-at-meta-commuting-zones-march-2023.csv"),
-  country_filter = NULL
+  country_name = NULL
 )
 }
 \arguments{
@@ -19,7 +19,7 @@ be stored in local.}
 
 \item{path_to_file_url}{default url to look for Community Zones Clusters.}
 
-\item{country_filter}{specific country in which clusters should be located.
+\item{country_name}{specific country in which clusters should be located.
 Default is NULL.}
 }
 \value{

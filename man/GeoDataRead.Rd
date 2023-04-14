@@ -14,14 +14,15 @@ GeoDataRead(
   summary = FALSE,
   keep_unix_time = FALSE,
   path_to_cluster_file_local = NULL,
-  country_filter = NULL,
+  country_name = NULL,
   path_to_file_url = paste0("https://data.humdata.org/dataset/",
     "b7aaa3d7-cca2-4364-b7ce-afe3134194a2",
     "/resource/3c068b51-5f0d-4ead-80ba-97312ec034e4/download/",
     "data-for-good-at-meta-commuting-zones-march-2023.csv"),
   longitude_col_name = "Longitude",
   latitude_col_name = "Latitude",
-  verbose = FALSE
+  verbose = FALSE,
+  find_location_lat_long = FALSE
 )
 }
 \arguments{
@@ -53,7 +54,7 @@ each event's unix time.}
 \item{path_to_cluster_file_local}{Complete path where the downloaded file will
 be stored in local.}
 
-\item{country_filter}{specific country in which clusters should be located.
+\item{country_name}{specific country in which clusters should be located.
 Default is NULL.}
 
 \item{path_to_file_url}{default url to look for Community Zones Clusters.}
@@ -66,6 +67,9 @@ data.frame.}
 
 \item{verbose}{logical flag indicating whether amount of clusters processed
 should be counted.}
+
+\item{find_location_lat_long}{logical flag indicating whether location's
+latitude and longitude should be obtained by using the Google Maps API.}
 }
 \value{
 A data frame for GeoLift inference and power calculations.

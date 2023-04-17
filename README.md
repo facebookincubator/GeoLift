@@ -15,10 +15,18 @@ GeoLift requires or works with:
 - R version 4.0.0 or newer.
 
 ## Installing GeoLift
-To install the package, first make sure that `remotes` and `augsynth` are installed.
+To install the package, first make sure that `remotes`, `LowRankQP`, `Synth` and 
+`augsynth` are installed.
 
 ```
 install.packages("remotes", repos='http://cran.us.r-project.org')
+
+packageurl <- "https://cran.r-project.org/src/contrib/Archive/LowRankQP/LowRankQP_1.0.5.tar.gz"
+install.packages(packageurl, repos=NULL, type='source')
+
+packageurl <- "https://cran.r-project.org/src/contrib/Archive/Synth/Synth_1.1-6.tar.gz"
+install.packages(packageurl, repos=NULL, type='source')
+
 remotes::install_github("ebenmichael/augsynth")
 ```
 

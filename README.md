@@ -1,4 +1,4 @@
-![GeoLiftLogo](doc/GeoLift_IconText.png)
+    ![GeoLiftLogo](doc/GeoLift_IconText.png)
 
 # GeoLift
 [![Project Status: Active  The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -21,11 +21,11 @@ To install the package, first make sure that `remotes`, `LowRankQP`, `Synth` and
 ```
 install.packages("remotes", repos='http://cran.us.r-project.org')
 
-packageurl <- "https://cran.r-project.org/src/contrib/Archive/LowRankQP/LowRankQP_1.0.5.tar.gz"
-install.packages(packageurl, repos=NULL, type='source')
+install.packages(
+  'LowRankQP',
+  repos='https://cran.microsoft.com/snapshot/2023-03-01/')
 
-packageurl <- "https://cran.r-project.org/src/contrib/Archive/Synth/Synth_1.1-6.tar.gz"
-install.packages(packageurl, repos=NULL, type='source')
+remotes::install_github("cran/synth", dependencies = TRUE)
 
 remotes::install_github("ebenmichael/augsynth")
 ```

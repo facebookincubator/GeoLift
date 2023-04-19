@@ -792,7 +792,8 @@ location_to_cluster_matching <- function(
 #' @param path_to_cluster_file_local Complete path where the downloaded file will 
 #' be stored in local.
 #' @param path_to_file_url default url to look for Community Zones Clusters.
-#' @param country_name specific country in which clusters should be located. 
+#' @param country_name specific countries in which clusters should be located. 
+#' Can be vector of countries.
 #' Default is NULL.
 #' 
 #' @return shapefile data.frame that holds values for region, country, 
@@ -822,7 +823,7 @@ load_cluster_file <- function(
   
   if (!is.null(country_name)){
     country_name <- tolower(country_name)
-    s_df <- s_df[tolower(s_df$country) == country_name, ]
+    s_df <- s_df[tolower(s_df$country) %in% country_name, ]
   } else {
     stop('Please specify country_name to be able to filter the data.')
   }

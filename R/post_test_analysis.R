@@ -96,7 +96,8 @@ ASCMExecution <- function(
     t_int = treatment_start_time,
     progfunc = model,
     scm = TRUE,
-    fixedeff = fixed_effects
+    fixedeff = fixed_effects,
+    
   ))
   
   return(list(
@@ -155,6 +156,9 @@ ASCMExecution <- function(
 #'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 #'          Recommended for Positive Lift tests.}
 #' }
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #'
 #' @return
 #' GeoLift object that contains:
@@ -193,7 +197,9 @@ GeoLift <- function(Y_id = "Y",
                     ConfidenceIntervals = FALSE,
                     method = "conformal",
                     grid_size = 250,
-                    stat_test = "Total") {
+                    stat_test = "Total",
+                    conformal_type = "iid",
+                    ns = 1000) {
 
   # Optimizing model based on Scaled L2 Score
   if (model == "best") {
@@ -274,7 +280,11 @@ GeoLift <- function(Y_id = "Y",
     alternative_hypothesis = alternative_hypothesis
   )
 
-  sum_augsyn <- summary(augsyn, alpha = alpha, stat_func = stat_func)
+  sum_augsyn <- summary(augsyn, 
+                        alpha = alpha, 
+                        stat_func = stat_func,
+                        type = conformal_type,
+                        ns = ns)
 
   # Confidence Intervals
   if(ConfidenceIntervals == FALSE){

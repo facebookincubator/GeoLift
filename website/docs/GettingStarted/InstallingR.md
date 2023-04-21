@@ -22,9 +22,15 @@ Since GeoLift is currently only available on GitHub, the `remotes` package is a 
 install.packages("remotes", repos='http://cran.us.r-project.org')
 ```
 
-Moreover, GeoLift relies on an implementation of Augmented Synthetic Control Models which can be found in the `augsynth` package, which is also hosted on GitHub. It is important to install it before moving on to GeoLift.
+To install the package, first make sure that remotes, `LowRankQP`, `Synth` and `augsynth` are installed.
 
 ```
+install.packages(
+  'LowRankQP',
+  repos='https://cran.microsoft.com/snapshot/2023-03-01/')
+
+remotes::install_github("cran/synth", dependencies = TRUE)
+
 remotes::install_github("ebenmichael/augsynth")
 ```
 

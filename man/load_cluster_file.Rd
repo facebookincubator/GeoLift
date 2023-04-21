@@ -19,7 +19,8 @@ be stored in local.}
 
 \item{path_to_file_url}{default url to look for Community Zones Clusters.}
 
-\item{country_name}{specific country in which clusters should be located.
+\item{country_name}{specific countries in which clusters should be located.
+Can be vector of countries.
 Default is NULL.}
 }
 \value{

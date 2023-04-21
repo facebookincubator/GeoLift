@@ -54,7 +54,8 @@ each event's unix time.}
 \item{path_to_cluster_file_local}{Complete path where the downloaded file will
 be stored in local.}
 
-\item{country_name}{specific country in which clusters should be located.
+\item{country_name}{specific countries in which clusters should be located.
+Can be vector of countries.
 Default is NULL.}
 
 \item{path_to_file_url}{default url to look for Community Zones Clusters.}

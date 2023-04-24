@@ -12,6 +12,7 @@
 #' @import augsynth
 #' @importFrom data.table :=
 #' @import directlabels
+#' @importFrom doParallel registerDoParallel
 #' @importFrom dplyr add_row arrange bind_rows dense_rank desc distinct filter 
 #' group_by left_join mutate rename row_number sample_n select slice slice_max 
 #' slice_min summarise summarize tibble "%>%"
@@ -25,6 +26,7 @@
 #' @import stringr
 #' @import tidyr
 #' @importFrom utils combn flush.console head setTxtProgressBar txtProgressBar
+#' @importFrom tibble rownames_to_column
 "_PACKAGE"
 
 # Suppress 'no visible binding for global variable' warnings

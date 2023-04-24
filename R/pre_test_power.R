@@ -1305,7 +1305,7 @@ NumberLocations <- function(data,
     resultsM <- results %>%
       dplyr::group_by(n) %>%
       dplyr::summarize(mean_pow = mean(pow), mean_L2ScaledImbalance = mean(ScaledL2Imbalance))
-    resultsM <- tibble::add_row(resultsM, n = 0, mean_pow = 0, mean_L2ScaledImbalance = 1, .before = 1)
+    resultsM <- dplyr::add_row(resultsM, n = 0, mean_pow = 0, mean_L2ScaledImbalance = 1, .before = 1)
 
     if (type == "pValue") {
       print("Average Power By Number of Locations")

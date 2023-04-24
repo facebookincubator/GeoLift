@@ -40,6 +40,7 @@ Imports:
     gridExtra,
     MarketMatching,
     data.table,
+    doParallel,
     dplyr,
     stringr,
     directlabels,
@@ -49,7 +50,8 @@ Imports:
     graphics,
     scales,
     stats,
-    utils
+    utils,
+    tibble
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3

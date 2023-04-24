@@ -322,7 +322,7 @@ GeoLift <- function(Y_id = "Y",
 
     incremental <- sum(augsyn$data$y[loc_id, ]) - (sum(pred_conversions) * length(loc_id))
 
-    inference_df <- inference_df %>% tibble::add_row(
+    inference_df <- inference_df %>% dplyr::add_row(
       ATT = mean,
       Perc.Lift = 100 * round(lift, 3),
       pvalue = sum_augsyn$average_att$p_val,

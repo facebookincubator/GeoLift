@@ -17,7 +17,9 @@ pvalueCalc(
   normalize = FALSE,
   fixed_effects = FALSE,
   stat_func = stat_func,
-  model = "none"
+  model = "none",
+  conformal_type = conformal_type,
+  ns = ns
 )
 }
 \arguments{
@@ -57,6 +59,11 @@ effects in the model. Set to FALSE by default.}
 
 \item{model}{A string indicating the outcome model used in the Augmented Synthetic
 Control Method. Set to Generalized Synthetic Controls "none" by default.}
+
+\item{conformal_type}{Type of conformal inference used. Can be either "iid" for Independent and identically
+distributed or "block" for moving block permutations. Set to "iid" by default.}
+
+\item{ns}{Number of resamples for "iid" permutations if \verb{conformal_type = "iid}. Set to 1000 by default.}
 }
 \value{
 List that contains:

@@ -25,7 +25,9 @@ GeoLift(
   ConfidenceIntervals = FALSE,
   method = "conformal",
   grid_size = 250,
-  stat_test = "Total"
+  stat_test = "Total",
+  conformal_type = "iid",
+  ns = 1000
 )
 
 \method{print}{GeoLift}(x, ...)
@@ -106,6 +108,11 @@ Recommended for Negative Lift tests.}
 \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 Recommended for Positive Lift tests.}
 }}
+
+\item{conformal_type}{Type of conformal inference used. Can be either "iid" for Independent and identically
+distributed or "block" for moving block permutations. Set to "iid" by default.}
+
+\item{ns}{Number of resamples for "iid" permutations if \verb{conformal_type = "iid}. Set to 1000 by default.}
 
 \item{x}{\code{GeoLift()}.}
 

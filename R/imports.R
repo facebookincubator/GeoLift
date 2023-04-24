@@ -9,25 +9,22 @@
 #' of an ad campaign.
 #' @docType package
 #' @name GeoLift
+#' @import augsynth
+#' @importFrom data.table :=
+#' @import directlabels
 #' @importFrom dplyr add_row arrange bind_rows dense_rank desc distinct filter 
 #' group_by left_join mutate rename row_number sample_n select slice slice_max 
 #' slice_min summarise summarize tibble "%>%"
-#' @import augsynth
-#' @import gsynth
-#' @import panelView
-#' @import doParallel
-#' @import foreach
-#' @import ggrepel
-#' @import MarketMatching
-#' @import stringr
-#' @import directlabels
+#' @importFrom foreach foreach
 #' @import ggplot2
-#' @import tidyr
-#' @import parallel
+#' @import ggrepel
 #' @import graphics
-#' @import stats
-#' @import utils
-#' @import rlang
+#' @import MarketMatching
+#' @importFrom panelView panelview
+#' @importFrom stats as.formula cor power predict quantile sd
+#' @import stringr
+#' @import tidyr
+#' @importFrom utils combn flush.console head setTxtProgressBar txtProgressBar
 "_PACKAGE"
 
 # Suppress 'no visible binding for global variable' warnings

@@ -430,7 +430,7 @@ run_simulations <- function(data,
                             normalize = FALSE,
                             fixed_effects = TRUE,
                             model = "none") {
-  `%parallel_connector%` <- ifelse(parallel, `%dopar%`, `%do%`)
+  `%parallel_connector%` <- ifelse(parallel, foreach::`%dopar%`, foreach::`%do%`)
   results <- data.frame(matrix(ncol = 10, nrow = 0))
   colnames(results) <- c(
     "location",
@@ -1232,6 +1232,7 @@ NumberLocations <- function(data,
     }
 
     if (parallel == TRUE) {
+      `%dopar%` <- foreach::`%dopar%`
       a <- foreach(
         sim = 1:n_sim,
         .combine = cbind,

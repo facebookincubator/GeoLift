@@ -9,7 +9,9 @@
 #' of an ad campaign.
 #' @docType package
 #' @name GeoLift
-#' @importFrom magrittr "%>%"
+#' @importFrom dplyr add_row arrange bind_rows dense_rank desc distinct filter 
+#' group_by left_join mutate rename row_number sample_n select slice slice_max 
+#' slice_min summarise summarize tibble "%>%"
 #' @import augsynth
 #' @import gsynth
 #' @import panelView
@@ -20,7 +22,6 @@
 #' @import stringr
 #' @import directlabels
 #' @import ggplot2
-#' @import tibble
 #' @import tidyr
 #' @import parallel
 #' @import graphics

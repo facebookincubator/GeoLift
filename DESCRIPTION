@@ -41,7 +41,6 @@ Imports:
     ggrepel,
     gridExtra,
     MarketMatching,
-    magrittr,
     dplyr,
     stringr,
     directlabels,
@@ -54,11 +53,10 @@ Imports:
     scales,
     stats,
     utils,
-    rlang,
-    lifecycle
+    rlang
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: 
     knitr,
     rmarkdown

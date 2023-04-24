@@ -302,7 +302,9 @@ GeoLift <- function(Y_id = "Y",
                           alpha = alpha,
                           stat_func = stat_func,
                           method = tolower(method),
-                          grid_size = grid_size)
+                          grid_size = grid_size,
+                          conformal_type = conformal_type,
+                          ns = ns)
     }
   }
 
@@ -657,6 +659,9 @@ print.summary.GeoLift <- function(x, ...) {
 #' }
 #' @param grid_size Number of grid points to use when inverting the hypothesis
 #' test for Conformal Inference.
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #'
 #' @return List the Confidence Interval for the specified alpha.
 #'
@@ -668,7 +673,9 @@ ConfIntervals <- function(augsynth,
                           alpha,
                           stat_func,
                           method,
-                          grid_size){
+                          grid_size,
+                          conformal_type,
+                          ns){
 
   ci <- c(NA,NA)
 
@@ -708,9 +715,9 @@ ConfIntervals <- function(augsynth,
                                                    ascm = augsynth,
                                                    h0 = null,
                                                    post_length = post_length,
-                                                   type = "block",
+                                                   type = conformal_type,
                                                    q = 1,
-                                                   ns = 1000,
+                                                   ns = ns,
                                                    stat_func = stat_func)}
     )
 

@@ -333,6 +333,9 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #'
 #' @return A 'MultiCellPower' object with three objects:
 #' \itemize{
@@ -347,7 +350,9 @@ MultiCellPower <- function(x,
                            test_markets = list(),
                            effect_size = seq(-0.25,0.25,0.05),
                            lookback_window = NULL,
-                           side_of_test = NULL){
+                           side_of_test = NULL,
+                           conformal_type = "iid",
+                           ns = 1000){
 
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
@@ -401,7 +406,9 @@ MultiCellPower <- function(x,
                                               parallel_setup = x$test_details$parallel_setup,
                                               side_of_test = ifelse(is.null(side_of_test),
                                                                     x$test_details$side_of_test,
-                                                                    side_of_test)))
+                                                                    side_of_test),
+                                              conformal_type = conformal_type,
+                                              ns = ns))
 
     PowerCurves <- append(PowerCurves, list(PowerAux))
     names(PowerCurves)[cell] <- paste0("cell_",eval(cell))

@@ -82,7 +82,10 @@
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#'
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
+#' 
 #' @return A 'MultiCellMarketSelection' object of four objects:
 #' \itemize{
 #'          \item{"TopChoices":}{ Data frame with the top choices by cell.}
@@ -115,7 +118,9 @@ MultiCellMarketSelection <- function(data,
                                      run_stochastic_process = FALSE,
                                      parallel = TRUE,
                                      parallel_setup = "sequential",
-                                     side_of_test = "two_sided"
+                                     side_of_test = "two_sided",
+                                     conformal_type = "iid",
+                                     ns = 1000
 ){
 
   # Rename variables
@@ -223,7 +228,9 @@ MultiCellMarketSelection <- function(data,
                                                                 parallel = parallel,
                                                                 run_stochastic_process = run_stochastic_process,
                                                                 parallel_setup = parallel_setup,
-                                                                side_of_test = side_of_test
+                                                                side_of_test = side_of_test,
+                                                                conformal_type = conformal_type,
+                                                                ns = ns
     ))
 
     MarketSelections$BestMarkets$cell <- cell_id
@@ -720,6 +727,9 @@ print.MultiCellWinner <- function(x, ...) {
 #'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 #'          Recommended for Positive Lift tests.}
 #' }
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #' @param winner_declaration Logic flag indicating whether to compute a winner cell analysis.
 #' If set to TRUE (default), both pairwise and total statistical significance tests will be
 #' performed.
@@ -755,6 +765,8 @@ GeoLiftMultiCell <- function(Y_id = "Y",
                              method = "conformal",
                              grid_size = 250,
                              stat_test = "Total",
+                             conformal_type = "iid",
+                             ns = 1000,
                              winner_declaration = TRUE,
                              geolift_type = "standard"){
 
@@ -803,7 +815,9 @@ GeoLiftMultiCell <- function(Y_id = "Y",
                    ConfidenceIntervals = ConfidenceIntervals,
                    method = method,
                    grid_size = grid_size,
-                   stat_test = stat_test)
+                   stat_test = stat_test,
+                   conformal_type = conformal_type,
+                   ns = ns)
 
     GeoLiftResults <- rbind(GeoLiftResults, list(aux))
   }

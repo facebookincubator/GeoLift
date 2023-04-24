@@ -29,7 +29,9 @@ MultiCellMarketSelection(
   run_stochastic_process = FALSE,
   parallel = TRUE,
   parallel_setup = "sequential",
-  side_of_test = "two_sided"
+  side_of_test = "two_sided",
+  conformal_type = "iid",
+  ns = 1000
 )
 
 \method{print}{MultiCellMarketSelection}(x, ...)
@@ -136,6 +138,11 @@ using a one sided or a two sided test.
 If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 }}
+
+\item{conformal_type}{Type of conformal inference used. Can be either "iid" for Independent and identically
+distributed or "block" for moving block permutations. Set to "iid" by default.}
+
+\item{ns}{Number of resamples for "iid" permutations if \verb{conformal_type = "iid}. Set to 1000 by default.}
 
 \item{x}{\code{MultiCellMarketSelection()}}
 

@@ -1,3 +1,10 @@
+GeoLift v2.6.04 (Release date: 2023-04-24)
+=========================================
+
+Changes:
+* Added additional capabilies in the execution of inference through Conformal Inference, providing the option to customize the 
+method (block permutation or iid) and number of resamples (if iid).
+
 GeoLift v2.6.03 (Release date: 2023-04-10)
 =========================================
 

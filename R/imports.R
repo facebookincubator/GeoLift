@@ -17,6 +17,7 @@
 #' slice_min summarise summarize tibble "%>%"
 #' @importFrom foreach foreach
 #' @import ggplot2
+#' @importFrom directlabels geom_dl dl.combine
 #' @import MarketMatching
 #' @importFrom panelView panelview
 #' @importFrom stats as.formula cor power predict quantile sd

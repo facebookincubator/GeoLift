@@ -11,15 +11,12 @@
 #' @name GeoLift
 #' @import augsynth
 #' @importFrom data.table :=
-#' @import directlabels
 #' @importFrom doParallel registerDoParallel
 #' @importFrom dplyr add_row arrange bind_rows dense_rank desc distinct filter 
 #' group_by left_join mutate rename row_number sample_n select slice slice_max 
 #' slice_min summarise summarize tibble "%>%"
 #' @importFrom foreach foreach
 #' @import ggplot2
-#' @import ggrepel
-#' @import graphics
 #' @import MarketMatching
 #' @importFrom panelView panelview
 #' @importFrom stats as.formula cor power predict quantile sd

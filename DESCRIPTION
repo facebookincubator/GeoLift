@@ -34,7 +34,6 @@ Depends:
     R (>= 4.0.0)
 Imports:
     augsynth,
-    data.table,
     directlabels,
     doParallel,
     dplyr,
@@ -44,6 +43,7 @@ Imports:
     MarketMatching,
     panelView,
     progress,
+    rlang,
     scales,
     stats,
     stringr,

@@ -11,7 +11,9 @@ MultiCellPower(
   test_markets = list(),
   effect_size = seq(-0.25, 0.25, 0.05),
   lookback_window = NULL,
-  side_of_test = NULL
+  side_of_test = NULL,
+  conformal_type = "iid",
+  ns = 1000
 )
 
 \method{print}{MultiCellPower}(x, ...)
@@ -51,6 +53,11 @@ will be populated by the value specified in \code{MultiCellMarketSelection}.
 If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 }}
+
+\item{conformal_type}{Type of conformal inference used. Can be either "iid" for Independent and identically
+distributed or "block" for moving block permutations. Set to "iid" by default.}
+
+\item{ns}{Number of resamples for "iid" permutations if \verb{conformal_type = "iid}. Set to 1000 by default.}
 
 \item{...}{additional arguments}
 

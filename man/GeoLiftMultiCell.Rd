@@ -23,6 +23,8 @@ GeoLiftMultiCell(
   method = "conformal",
   grid_size = 250,
   stat_test = "Total",
+  conformal_type = "iid",
+  ns = 1000,
   winner_declaration = TRUE,
   geolift_type = "standard"
 )
@@ -103,6 +105,11 @@ Recommended for Negative Lift tests.}
 \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 Recommended for Positive Lift tests.}
 }}
+
+\item{conformal_type}{Type of conformal inference used. Can be either "iid" for Independent and identically
+distributed or "block" for moving block permutations. Set to "iid" by default.}
+
+\item{ns}{Number of resamples for "iid" permutations if \verb{conformal_type = "iid}. Set to 1000 by default.}
 
 \item{winner_declaration}{Logic flag indicating whether to compute a winner cell analysis.
 If set to TRUE (default), both pairwise and total statistical significance tests will be

@@ -11,7 +11,9 @@ ConfIntervals(
   alpha,
   stat_func,
   method,
-  grid_size
+  grid_size,
+  conformal_type,
+  ns
 )
 }
 \arguments{
@@ -34,6 +36,11 @@ aggregate ATT Confidence Intervals.
 
 \item{grid_size}{Number of grid points to use when inverting the hypothesis
 test for Conformal Inference.}
+
+\item{conformal_type}{Type of conformal inference used. Can be either "iid" for Independent and identically
+distributed or "block" for moving block permutations. Set to "iid" by default.}
+
+\item{ns}{Number of resamples for "iid" permutations if \verb{conformal_type = "iid}. Set to 1000 by default.}
 }
 \value{
 List the Confidence Interval for the specified alpha.

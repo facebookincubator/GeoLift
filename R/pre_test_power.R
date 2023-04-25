@@ -227,6 +227,9 @@ type_of_test <- function(side_of_test = "two_sided", alternative_hypothesis = NU
 #' @param stat_func Function to compute test statistic. NULL by default.
 #' @param model A string indicating the outcome model used in the Augmented Synthetic
 #' Control Method. Set to Generalized Synthetic Controls "none" by default.
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #'
 #' @return
 #' List that contains:
@@ -253,7 +256,9 @@ pvalueCalc <- function(data,
                        normalize = FALSE,
                        fixed_effects = FALSE,
                        stat_func = stat_func,
-                       model = "none") {
+                       model = "none",
+                       conformal_type = conformal_type,
+                       ns = ns) {
   treatment_start_time <- max_time - tp - sim + 2
   treatment_end_time <- treatment_start_time + tp - 1
   pre_test_duration <- treatment_start_time - 1
@@ -320,9 +325,9 @@ pvalueCalc <- function(data,
       ascm = ascm_obj,
       h0 = 0,
       post_length = ncol(wide_data$y),
-      type = "iid",
+      type = conformal_type,
       q = 1,
-      ns = 1000,
+      ns = ns,
       stat_func = stat_func
     )
     ScaledL2Imbalance <- ascm_obj$scaled_l2_imbalance
@@ -375,6 +380,9 @@ pvalueCalc <- function(data,
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #' @param lookback_window A number indicating how far back in time the simulations
 #' for the power analysis should go. For instance, a value equal to 5 will simulate
 #' power for the last five possible tests. By default lookback_window = 1 which
@@ -422,6 +430,8 @@ run_simulations <- function(data,
                             treatment_durations,
                             effect_sizes = 0,
                             side_of_test = "two_sided",
+                            conformal_type = conformal_type,
+                            ns = ns,
                             lookback_window = 1,
                             parallel = TRUE,
                             ProgressBar = FALSE,
@@ -497,7 +507,9 @@ run_simulations <- function(data,
       stat_func = type_of_test(
         side_of_test = side_of_test,
         alternative_hypothesis = ifelse(
-          effect_size > 0, "positive", "negative"))
+          effect_size > 0, "positive", "negative")),
+      conformal_type = conformal_type,
+      ns = ns
     ))
   }
   
@@ -1411,6 +1423,9 @@ NumberLocations <- function(data,
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
 #' @param import_tidyr_from Points to where the tidyr package
@@ -1450,6 +1465,8 @@ GeoLiftPower <- function(data,
                          parallel = TRUE,
                          parallel_setup = "sequential",
                          side_of_test = "two_sided",
+                         conformal_type = "iid",
+                         ns = 1000,
                          import_augsynth_from = "library(augsynth)",
                          import_tidyr_from = "library(tidyr)") {
   if (parallel == TRUE) {
@@ -1483,6 +1500,8 @@ GeoLiftPower <- function(data,
     treatment_durations = treatment_periods,
     effect_sizes = effect_size,
     side_of_test = side_of_test,
+    conformal_type = conformal_type,
+    ns = ns,
     lookback_window = lookback_window,
     parallel = parallel,
     ProgressBar = ProgressBar,
@@ -1590,6 +1609,9 @@ GeoLiftPower <- function(data,
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' distributed or "block" for moving block permutations. Set to "iid" by default.
+#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #' @param import_augsynth_from Points to where the augsynth package
 #' should be imported from to send to the nodes.
 #' @param import_tidyr_from Points to where the tidyr package
@@ -1634,6 +1656,8 @@ GeoLiftMarketSelection <- function(data,
                                    parallel = TRUE,
                                    parallel_setup = "sequential",
                                    side_of_test = "two_sided",
+                                   conformal_type = "iid",
+                                   ns = 1000,
                                    import_augsynth_from = "library(augsynth)",
                                    import_tidyr_from = "library(tidyr)") {
   if (parallel == TRUE) {
@@ -1781,6 +1805,8 @@ GeoLiftMarketSelection <- function(data,
       treatment_durations = treatment_periods,
       effect_sizes = effect_size,
       side_of_test = side_of_test,
+      conformal_type = conformal_type,
+      ns = ns,
       lookback_window = lookback_window,
       parallel = parallel,
       ProgressBar = ProgressBar,

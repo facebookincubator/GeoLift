@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[7582],{5016:function(e){e.exports=JSON.parse('{"permalink":"/GeoLift/blog/tags/r","page":1,"postsPerPage":10,"totalPages":1,"totalCount":3,"blogDescription":"A blog for all things GeoLift!","blogTitle":"GeoLift Blog"}')}}]);

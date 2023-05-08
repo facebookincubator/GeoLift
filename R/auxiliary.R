@@ -374,6 +374,78 @@ GetWeights <- function(Y_id = "Y",
   return(results)
 }
 
+#' Function to obtain the synthetic control weights.
+#'
+#' @description
+#'
+#' `GetMultiCellWeights` returns the synthetic control weights as a data frame
+#' for a given test set-up.
+#'
+#' @param x A `MultiCellMarketSelection` object.
+#' @param test_markets List of market IDs per cell. The list must contain exactly
+#' k numeric values corresponding to the power analysis. The recommended layout is
+#' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
+#'
+#' @return
+#' Data-frame with the locations and the synthetic control weights for each cell.
+#'
+#' @export
+GetMultiCellWeights <- function(x,
+                                test_markets = list()) {
+  
+  if (!inherits(x, "MultiCellMarketSelection")) {
+    stop("object must be class MultiCellMarketSelection")
+  }
+  
+  if(length(test_markets) != length(x$Models)){
+    stop("\nMake sure an ID is provided for each cell in the analysis.")
+  }
+  
+  if(!(all(sapply(test_markets, is.numeric)))){
+    stop("\nMake sure all input IDs in test_markets are numeric.")
+  }
+  
+  # Initialize Variables
+  locations <- data.frame(location = unique(x$data$location))
+  other_test_locs <- c()
+  
+  # List of all treatment locations
+  for (cell in 1:length(test_markets)){
+    other_test_locs <- rbind(other_test_locs,list(stringr::str_split(x$Models[[cell]]$BestMarkets$location[test_markets[[cell]]], ", ")[[1]]))
+  }
+
+  # Adjust dataset & obtain weights.
+  for (cell in 1:length(test_markets)){
+
+    data_aux <- x$data %>% dplyr::rename(Y = paste0(x$test_details$Y_id),
+                                         location = paste0(x$test_details$location_id),
+                                         time = paste0(x$test_details$time_id)) %>%
+                      dplyr::filter(!(location %in% unlist(other_test_locs[-cell])))
+    
+    aux <- merge(locations,GetWeights(X = x$test_details$X,
+                                    data = data_aux,
+                                    locations = other_test_locs[[cell]],
+                                    pretreatment_end_time = max(data_aux$time),
+                                    model = x$test_details$model,
+                                    fixed_effects = x$test_details$fixed_effects),
+                 all.x = TRUE)
+    
+    # Create final data frame
+    if(cell == 1){
+      results <- aux
+    } else{
+      results <- dplyr::inner_join(results, aux, by = "location")
+    }
+    
+    # Format final data frame
+    results <- results %>% dplyr::rename_with(.cols = cell+1, ~paste0("Cell_",cell))
+    
+  }
+
+  return(results)
+  
+}
+
 
 #' Get within market correlations for all locations.
 #'

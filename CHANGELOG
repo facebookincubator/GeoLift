@@ -1,3 +1,9 @@
+GeoLift v2.6.04 (Release date: 2023-05-08)
+=========================================
+
+Changes:
+* Added GetMultiCellWeights() to obtain the synthetic control weights of Multi Cell tests.
+
 GeoLift v2.6.04 (Release date: 2023-04-24)
 =========================================
 

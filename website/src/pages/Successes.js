@@ -25,10 +25,10 @@ const features = [
 
 The French personal care company partnered with Meta to launch a GeoLift study to measure the true incremental impact
 that Facebook and Instagram campaigns had on the launch of one of Vichy's newest products in Mexico. These campaigns
-resulted in a 19% Lift on offline sales which translates to a 2.6x incremental Return on Investment (iROAS). Moreover,
+resulted in a 19% Lift on offline sales which translated to a 2.6x incremental Return on Investment (iROAS). Moreover,
 by layering a <a href="https://www.facebook.com/business/help/1693381447650068?id=546437386202686">Meta Brand Lift Study</a> to the
-GeoLift, L'Oreal was also able to measure the campaign's incremental effect on brand metrics, which resulted in a 3% Lift
-in Ad Recall!
+GeoLift, L'Oreal was also able to measure the campaign's incremental effect on brand metrics, which had a 3% Lift
+on Ad Recall!
 <br></br>
 
         <a href="https://www.facebook.com/business/success/vichy-mexico?locale=es_LA">

@@ -10,6 +10,8 @@
 #' @docType package
 #' @name GeoLift
 #' @import augsynth
+#' @importFrom CommutingZones filter_cluster_file get_location_lat_long
+#' location_to_cluster_match
 #' @importFrom directlabels geom_dl dl.combine
 #' @importFrom doParallel registerDoParallel
 #' @importFrom dplyr add_row arrange bind_rows dense_rank desc distinct filter 

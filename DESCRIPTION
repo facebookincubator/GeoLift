@@ -34,6 +34,7 @@ Depends:
     R (>= 4.0.0)
 Imports:
     augsynth,
+    CommutingZones,
     directlabels,
     doParallel,
     dplyr,

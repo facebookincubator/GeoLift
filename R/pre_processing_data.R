@@ -856,7 +856,7 @@ get_location_lat_long <- function(
   data$location_country_name <- paste0(
     data$location, ', ', country_name)
   lat_long_data <- data %>%
-    dplyr::distinct(location) %>%
+    dplyr::distinct(location, location_country_name) %>%
     ggmap::mutate_geocode(location_country_name) %>%
     merge(
       data, by='location'

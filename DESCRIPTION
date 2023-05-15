@@ -40,6 +40,8 @@ Imports:
     foreach,
     ggplot2,
     gridExtra,
+    gsynth,
+    lifecycle,
     MarketMatching,
     panelView,
     progress,

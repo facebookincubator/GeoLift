@@ -147,7 +147,7 @@ MultiCellMarketSelection <- function(data,
   }
 
   # Check Sampling Method
-  if(!(tolower(sampling_method) %in% c("systematic"))){
+  if(!(tolower(sampling_method) %in% c("systematic", "blockrand"))){
     stop("\nEnter a valid sampling_method (check the function documentation for more details).")
   }
 
@@ -200,6 +200,14 @@ MultiCellMarketSelection <- function(data,
 
     for (i in 1:length(r)){
       rank_by_loc$cell[seq(r[i], locs_N, k)] <- i
+    }
+  }
+  # Stratified or 'Block' Randomization
+  else if(tolower(sampling_method) == "blockrand"){
+    rank_by_loc$strata <- ceiling((1:locs_N/k))
+    
+    for (i in 1:max(rank_by_loc$strata)){
+      suppressWarnings(rank_by_loc$cell[rank_by_loc$strata==i] <- sample(1:k,k))
     }
   }
 

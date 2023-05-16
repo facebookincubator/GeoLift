@@ -99,6 +99,7 @@ utils::globalVariables(
     "t_obs",
     "temp_Markets",
     "test",
+    "test_locs",
     "time",
     "Time",
     "Total_Y",

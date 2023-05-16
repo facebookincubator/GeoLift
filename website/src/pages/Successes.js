@@ -18,6 +18,26 @@ import styles from './styles.module.css';
 
 const features = [
   {
+    title: 'L\'Oreal: Full-Funnel & Omni-Channel Measurement with GeoLift for Vichy',
+    imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/Vichy_logo.jpg?raw=true',
+    description: (
+      <>
+
+The French personal care company partnered with Meta to launch a GeoLift study to measure the true incremental impact
+that Facebook and Instagram campaigns had on the launch of one of Vichy's newest products in Mexico. These campaigns
+resulted in a 19% Lift on offline sales which translated to a 2.6x incremental Return on Investment (iROAS). Moreover,
+by layering a <a href="https://www.facebook.com/business/help/1693381447650068?id=546437386202686">Meta Brand Lift Study</a> to the
+GeoLift, L'Oreal was also able to measure the campaign's incremental effect on brand metrics, which had a 3% Lift
+on Ad Recall!
+<br></br>
+
+        <a href="https://www.facebook.com/business/success/vichy-mexico?locale=es_LA">
+        - Learn More -
+        </a>
+      </>
+    ),
+  },
+  {
     title: 'Liverpool: Measuring the Long-Term Effect of Branding with GeoLift',
     imageUrl: 'https://github.com/facebookincubator/GeoLift/blob/main/website/static/img/liverpool_pocket.png?raw=true',
     description: (

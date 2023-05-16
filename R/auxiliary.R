@@ -390,6 +390,8 @@ GetWeights <- function(Y_id = "Y",
 #' Data-frame with the locations and the synthetic control weights for each cell.
 #'
 #' @export
+#' @rdname MultiCellMarketSelection
+#' @order 2
 GetMultiCellWeights <- function(x,
                                 test_markets = list()) {
   
@@ -411,12 +413,12 @@ GetMultiCellWeights <- function(x,
   
   # List of all treatment locations
   for (cell in 1:length(test_markets)){
-    other_test_locs <- rbind(other_test_locs,list(stringr::str_split(x$Models[[cell]]$BestMarkets$location[test_markets[[cell]]], ", ")[[1]]))
+    other_test_locs <- rbind(other_test_locs,list(stringr::str_split(
+      x$Models[[cell]]$BestMarkets$location[test_markets[[cell]]], ", ")[[1]]))
   }
   
   # Adjust dataset & obtain weights.
   for (cell in 1:length(test_markets)){
-    
     data_aux <- x$data %>% dplyr::rename(Y = paste0(x$test_details$Y_id),
                                          location = paste0(x$test_details$location_id),
                                          time = paste0(x$test_details$time_id)) %>%
@@ -438,7 +440,8 @@ GetMultiCellWeights <- function(x,
     }
     
     # Format final data frame
-    results <- results %>% dplyr::rename_with(.cols = cell+1, ~paste0("Cell_",cell))
+    results <- results %>% 
+                dplyr::rename_with(.cols = cell+1, ~paste0("Cell_",cell))
     
   }
   

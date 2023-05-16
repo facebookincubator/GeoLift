@@ -23,7 +23,7 @@
 #' xlab xlim ylab ylim
 #' @importFrom gridExtra grid.arrange
 #' @import gsynth
-#' @import lifecycle
+#' @importFrom lifecycle badge
 #' @importFrom MarketMatching best_matches
 #' @importFrom panelView panelview
 #' @importFrom progress progress_bar

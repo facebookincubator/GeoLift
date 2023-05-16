@@ -1,0 +1,27 @@
+{
+  "unversionedId": "Getting_Started/InstallingR",
+  "id": "Getting_Started/InstallingR",
+  "title": "Getting Started with GeoLift",
+  "description": "---",
+  "source": "@site/docs/Getting_Started/InstallingR.md",
+  "sourceDirName": "Getting_Started",
+  "slug": "/Getting_Started/InstallingR",
+  "permalink": "/GeoLift/docs/Getting_Started/InstallingR",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/Getting_Started/InstallingR.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Welcome to GeoLift",
+    "permalink": "/GeoLift/docs/intro"
+  },
+  "next": {
+    "title": "GeoLift Walkthrough",
+    "permalink": "/GeoLift/docs/Getting_Started/Walkthrough"
+  }
+}

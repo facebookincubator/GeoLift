@@ -1,0 +1,492 @@
+{
+  "/GeoLift/blog-05e": {
+    "__comp": "a6aa9e1f",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "7a20dace"
+      },
+      {
+        "content": "30675542"
+      },
+      {
+        "content": "92e4e9d3"
+      },
+      {
+        "content": "dfe59e83"
+      },
+      {
+        "content": "d047afc1"
+      },
+      {
+        "content": "68af4a57"
+      },
+      {
+        "content": "e32d133e"
+      },
+      {
+        "content": "8f35afc7"
+      },
+      {
+        "content": "ab9dff45"
+      },
+      {
+        "content": "48af26a7"
+      }
+    ],
+    "metadata": "5192b78b"
+  },
+  "/GeoLift/blog/archive-86b": {
+    "__comp": "9e4087bc",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "archive": "1d5d8423"
+  },
+  "/GeoLift/blog/blueprint-geolift-207": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "8fa9c392"
+  },
+  "/GeoLift/blog/continuous_geolifts-efe": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "0d608f09"
+  },
+  "/GeoLift/blog/geo-measurement-review-6fb": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "6c6dede6"
+  },
+  "/GeoLift/blog/geolift-v23-bdf": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "68eb4fc9"
+  },
+  "/GeoLift/blog/inverse-geolift-433": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "776ceea6"
+  },
+  "/GeoLift/blog/LaggedEffects-4c2": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "878b791d"
+  },
+  "/GeoLift/blog/lookback_window-7b5": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "5e0a6579"
+  },
+  "/GeoLift/blog/MultiCell-673": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "eba0ebff"
+  },
+  "/GeoLift/blog/Python-36d": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "773ade5e"
+  },
+  "/GeoLift/blog/tags-e8d": {
+    "__comp": "01a85c17",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "tags": "68720a7f"
+  },
+  "/GeoLift/blog/tags/ascm-026": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "8f35afc7"
+      }
+    ],
+    "tag": "c265f668",
+    "listMetadata": "670849ab"
+  },
+  "/GeoLift/blog/tags/continuous-lift-bbb": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "7a20dace"
+      }
+    ],
+    "tag": "1b27c3ca",
+    "listMetadata": "85da76fa"
+  },
+  "/GeoLift/blog/tags/cross-channel-6cc": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "dfe59e83"
+      }
+    ],
+    "tag": "0dddacef",
+    "listMetadata": "bf6902df"
+  },
+  "/GeoLift/blog/tags/did-1e1": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "ab9dff45"
+      }
+    ],
+    "tag": "8ac3f94e",
+    "listMetadata": "4daa0f37"
+  },
+  "/GeoLift/blog/tags/facebook-aab": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "48af26a7"
+      }
+    ],
+    "tag": "f41c6ba4",
+    "listMetadata": "4a4401d7"
+  },
+  "/GeoLift/blog/tags/geo-lift-8af": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "7a20dace"
+      },
+      {
+        "content": "30675542"
+      },
+      {
+        "content": "92e4e9d3"
+      },
+      {
+        "content": "dfe59e83"
+      },
+      {
+        "content": "d047afc1"
+      },
+      {
+        "content": "68af4a57"
+      },
+      {
+        "content": "e32d133e"
+      },
+      {
+        "content": "8f35afc7"
+      },
+      {
+        "content": "ab9dff45"
+      },
+      {
+        "content": "48af26a7"
+      }
+    ],
+    "tag": "ffa95ad7",
+    "listMetadata": "ffdb936e"
+  },
+  "/GeoLift/blog/tags/geo-measurement-01e": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "7a20dace"
+      },
+      {
+        "content": "30675542"
+      },
+      {
+        "content": "92e4e9d3"
+      },
+      {
+        "content": "dfe59e83"
+      },
+      {
+        "content": "d047afc1"
+      },
+      {
+        "content": "68af4a57"
+      },
+      {
+        "content": "e32d133e"
+      },
+      {
+        "content": "8f35afc7"
+      },
+      {
+        "content": "ab9dff45"
+      }
+    ],
+    "tag": "9c187df7",
+    "listMetadata": "e6edd317"
+  },
+  "/GeoLift/blog/tags/hello-205": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "48af26a7"
+      }
+    ],
+    "tag": "eef31d57",
+    "listMetadata": "7b4348b4"
+  },
+  "/GeoLift/blog/tags/inverse-geo-lift-925": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "e32d133e"
+      }
+    ],
+    "tag": "1f9432e4",
+    "listMetadata": "6ab2b919"
+  },
+  "/GeoLift/blog/tags/lookback-window-325": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "30675542"
+      }
+    ],
+    "tag": "d2f16e22",
+    "listMetadata": "e78f69e5"
+  },
+  "/GeoLift/blog/tags/multi-cell-fbc": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "dfe59e83"
+      }
+    ],
+    "tag": "24414205",
+    "listMetadata": "010ab4ee"
+  },
+  "/GeoLift/blog/tags/optimization-256": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "dfe59e83"
+      }
+    ],
+    "tag": "811a02e6",
+    "listMetadata": "e2e8ddda"
+  },
+  "/GeoLift/blog/tags/power-analysis-ba9": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "7a20dace"
+      },
+      {
+        "content": "30675542"
+      }
+    ],
+    "tag": "5d103de9",
+    "listMetadata": "a456ddee"
+  },
+  "/GeoLift/blog/tags/python-313": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "92e4e9d3"
+      }
+    ],
+    "tag": "a8cd91df",
+    "listMetadata": "94defc58"
+  },
+  "/GeoLift/blog/tags/r-d3f": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "7a20dace"
+      },
+      {
+        "content": "30675542"
+      },
+      {
+        "content": "92e4e9d3"
+      }
+    ],
+    "tag": "861dfaa6",
+    "listMetadata": "3d6c6c6e"
+  },
+  "/GeoLift/blog/tags/scm-854": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "items": [
+      {
+        "content": "8f35afc7"
+      },
+      {
+        "content": "ab9dff45"
+      }
+    ],
+    "tag": "974b472a",
+    "listMetadata": "2d957062"
+  },
+  "/GeoLift/blog/welcome-96f": {
+    "__comp": "ccc49370",
+    "__context": {
+      "plugin": "1859ed42"
+    },
+    "sidebar": "814f3328",
+    "content": "2d524a6a"
+  },
+  "/GeoLift/markdown-page-587": {
+    "__comp": "1f391b9e",
+    "__context": {
+      "plugin": "fa85c0aa"
+    },
+    "content": "393be207"
+  },
+  "/GeoLift/Successes-ef8": {
+    "__comp": "a3eb7fbb",
+    "__context": {
+      "plugin": "fa85c0aa"
+    },
+    "config": "5e9f5e1a"
+  },
+  "/GeoLift/docs-7bf": {
+    "__comp": "1be78505",
+    "__context": {
+      "plugin": "94f71f43"
+    },
+    "versionMetadata": "935f2afb"
+  },
+  "/GeoLift/docs/About-2cf": {
+    "__comp": "17896441",
+    "content": "9747880a"
+  },
+  "/GeoLift/docs/Best Practices/BestPractices-6bb": {
+    "__comp": "17896441",
+    "content": "a509feec"
+  },
+  "/GeoLift/docs/Best Practices/FAQs-1b6": {
+    "__comp": "17896441",
+    "content": "b3d1b077"
+  },
+  "/GeoLift/docs/GettingStarted/CommonDataErrors-373": {
+    "__comp": "17896441",
+    "content": "e443af75"
+  },
+  "/GeoLift/docs/GettingStarted/InstallingR-e75": {
+    "__comp": "17896441",
+    "content": "e33afb3c"
+  },
+  "/GeoLift/docs/GettingStarted/MultiCellWalkthrough-b01": {
+    "__comp": "17896441",
+    "content": "b248ba26"
+  },
+  "/GeoLift/docs/GettingStarted/Walkthrough-6a8": {
+    "__comp": "17896441",
+    "content": "9c19be5d"
+  },
+  "/GeoLift/docs/intro-a9b": {
+    "__comp": "17896441",
+    "content": "0e384e19"
+  },
+  "/GeoLift/docs/Methodology/-8bd": {
+    "__comp": "17896441",
+    "content": "e71192d1"
+  },
+  "/GeoLift/docs/Methodology/ComparisonOthers-a10": {
+    "__comp": "17896441",
+    "content": "e1380eba"
+  },
+  "/GeoLift/-8e7": {
+    "__comp": "c4f5d8e4",
+    "__context": {
+      "plugin": "fa85c0aa"
+    },
+    "config": "5e9f5e1a"
+  }
+}

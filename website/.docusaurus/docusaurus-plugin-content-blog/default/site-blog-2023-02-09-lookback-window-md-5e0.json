@@ -1,0 +1,64 @@
+{
+  "permalink": "/GeoLift/blog/lookback_window",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2023-02-09-LookbackWindow.md",
+  "source": "@site/blog/2023-02-09-LookbackWindow.md",
+  "title": "Enter into the time capsule - Determining Lookback Window",
+  "description": "“Aunque me fuercen yo nunca voy a decir",
+  "date": "2023-02-09T00:00:00.000Z",
+  "formattedDate": "February 9, 2023",
+  "tags": [
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    },
+    {
+      "label": "Geo Measurement",
+      "permalink": "/GeoLift/blog/tags/geo-measurement"
+    },
+    {
+      "label": "lookback_window",
+      "permalink": "/GeoLift/blog/tags/lookback-window"
+    },
+    {
+      "label": "R",
+      "permalink": "/GeoLift/blog/tags/r"
+    },
+    {
+      "label": "Power Analysis",
+      "permalink": "/GeoLift/blog/tags/power-analysis"
+    }
+  ],
+  "readingTime": 7.46,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Nicolas Cruces",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/NicolasMatrices-v2",
+      "imageURL": "https://github.com/NicolasMatrices-v2.png",
+      "key": "nicolas"
+    }
+  ],
+  "frontMatter": {
+    "slug": "lookback_window",
+    "title": "Enter into the time capsule - Determining Lookback Window",
+    "authors": [
+      "nicolas"
+    ],
+    "tags": [
+      "GeoLift",
+      "Geo Measurement",
+      "lookback_window",
+      "R",
+      "Power Analysis"
+    ]
+  },
+  "prevItem": {
+    "title": "Continuous GeoLifts - Need For Speed",
+    "permalink": "/GeoLift/blog/continuous_geolifts"
+  },
+  "nextItem": {
+    "title": "Introducing GeoLift in Python",
+    "permalink": "/GeoLift/blog/Python"
+  }
+}

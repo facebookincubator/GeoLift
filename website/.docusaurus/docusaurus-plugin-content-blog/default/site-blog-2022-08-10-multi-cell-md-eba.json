@@ -1,0 +1,64 @@
+{
+  "permalink": "/GeoLift/blog/MultiCell",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2022-08-10-MultiCell.md",
+  "source": "@site/blog/2022-08-10-MultiCell.md",
+  "title": "Multi-Cell Experiments with GeoLift",
+  "description": "Introducing Multi-Cell GeoLift Tests",
+  "date": "2022-08-10T00:00:00.000Z",
+  "formattedDate": "August 10, 2022",
+  "tags": [
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    },
+    {
+      "label": "Geo Measurement",
+      "permalink": "/GeoLift/blog/tags/geo-measurement"
+    },
+    {
+      "label": "MultiCell",
+      "permalink": "/GeoLift/blog/tags/multi-cell"
+    },
+    {
+      "label": "CrossChannel",
+      "permalink": "/GeoLift/blog/tags/cross-channel"
+    },
+    {
+      "label": "Optimization",
+      "permalink": "/GeoLift/blog/tags/optimization"
+    }
+  ],
+  "readingTime": 1.795,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Arturo Esquerra",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/ArturoEsquerra/",
+      "imageURL": "https://github.com/ArturoEsquerra.png",
+      "key": "arturo"
+    }
+  ],
+  "frontMatter": {
+    "slug": "MultiCell",
+    "title": "Multi-Cell Experiments with GeoLift",
+    "authors": [
+      "arturo"
+    ],
+    "tags": [
+      "GeoLift",
+      "Geo Measurement",
+      "MultiCell",
+      "CrossChannel",
+      "Optimization"
+    ]
+  },
+  "prevItem": {
+    "title": "Introducing GeoLift in Python",
+    "permalink": "/GeoLift/blog/Python"
+  },
+  "nextItem": {
+    "title": "Measuring Lagged Effects using GeoLift",
+    "permalink": "/GeoLift/blog/LaggedEffects"
+  }
+}

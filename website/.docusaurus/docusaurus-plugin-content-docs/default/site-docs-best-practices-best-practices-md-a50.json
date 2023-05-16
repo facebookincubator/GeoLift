@@ -1,0 +1,27 @@
+{
+  "unversionedId": "Best Practices/BestPractices",
+  "id": "Best Practices/BestPractices",
+  "title": "GeoLift Best Practices",
+  "description": "---",
+  "source": "@site/docs/Best Practices/BestPractices.md",
+  "sourceDirName": "Best Practices",
+  "slug": "/Best Practices/BestPractices",
+  "permalink": "/GeoLift/docs/Best Practices/BestPractices",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/Best Practices/BestPractices.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Comparison to other Methodologies",
+    "permalink": "/GeoLift/docs/Methodology/ComparisonOthers"
+  },
+  "next": {
+    "title": "GeoLift FAQs",
+    "permalink": "/GeoLift/docs/Best Practices/FAQs"
+  }
+}

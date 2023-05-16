@@ -1,0 +1,58 @@
+{
+  "permalink": "/GeoLift/blog/welcome",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2021-10-01-welcome/index.md",
+  "source": "@site/blog/2021-10-01-welcome/index.md",
+  "title": "Welcome",
+  "description": "Welcome to GeoLift's blog where we discuss anything related to:",
+  "date": "2021-10-01T00:00:00.000Z",
+  "formattedDate": "October 1, 2021",
+  "tags": [
+    {
+      "label": "facebook",
+      "permalink": "/GeoLift/blog/tags/facebook"
+    },
+    {
+      "label": "hello",
+      "permalink": "/GeoLift/blog/tags/hello"
+    },
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    }
+  ],
+  "readingTime": 0.105,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Arturo Esquerra",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/ArturoEsquerra/",
+      "imageURL": "https://github.com/ArturoEsquerra.png",
+      "key": "arturo"
+    },
+    {
+      "name": "Nicolas Cruces",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/NicolasMatrices-v2",
+      "imageURL": "https://github.com/NicolasMatrices-v2.png",
+      "key": "nicolas"
+    }
+  ],
+  "frontMatter": {
+    "slug": "welcome",
+    "title": "Welcome",
+    "authors": [
+      "arturo",
+      "nicolas"
+    ],
+    "tags": [
+      "facebook",
+      "hello",
+      "GeoLift"
+    ]
+  },
+  "prevItem": {
+    "title": "A Brief Review of Geo Measurement Approaches",
+    "permalink": "/GeoLift/blog/geo-measurement-review"
+  }
+}

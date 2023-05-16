@@ -1,0 +1,54 @@
+{
+  "permalink": "/GeoLift/blog/inverse-geolift",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2022-05-12-InverseGeoLift.md",
+  "source": "@site/blog/2022-05-12-InverseGeoLift.md",
+  "title": "Inverse GeoLift - inference done cheaper",
+  "description": "TL;DR:",
+  "date": "2022-05-12T00:00:00.000Z",
+  "formattedDate": "May 12, 2022",
+  "tags": [
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    },
+    {
+      "label": "Geo Measurement",
+      "permalink": "/GeoLift/blog/tags/geo-measurement"
+    },
+    {
+      "label": "Inverse GeoLift",
+      "permalink": "/GeoLift/blog/tags/inverse-geo-lift"
+    }
+  ],
+  "readingTime": 6.235,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Nicolas Cruces",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/NicolasMatrices-v2",
+      "imageURL": "https://github.com/NicolasMatrices-v2.png",
+      "key": "nicolas"
+    }
+  ],
+  "frontMatter": {
+    "slug": "inverse-geolift",
+    "title": "Inverse GeoLift - inference done cheaper",
+    "authors": [
+      "nicolas"
+    ],
+    "tags": [
+      "GeoLift",
+      "Geo Measurement",
+      "Inverse GeoLift"
+    ]
+  },
+  "prevItem": {
+    "title": "GeoLift Blueprint Course by Meta",
+    "permalink": "/GeoLift/blog/blueprint-geolift"
+  },
+  "nextItem": {
+    "title": "Launching GeoLift v2.3 - Streamlined and Improved Power Calculations",
+    "permalink": "/GeoLift/blog/geolift-v23"
+  }
+}

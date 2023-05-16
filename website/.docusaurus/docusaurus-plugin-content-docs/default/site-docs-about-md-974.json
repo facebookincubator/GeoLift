@@ -1,0 +1,22 @@
+{
+  "unversionedId": "About",
+  "id": "About",
+  "title": "About GeoLift",
+  "description": "---",
+  "source": "@site/docs/About.md",
+  "sourceDirName": ".",
+  "slug": "/About",
+  "permalink": "/GeoLift/docs/About",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/About.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "About"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "GeoLift FAQs",
+    "permalink": "/GeoLift/docs/Best Practices/FAQs"
+  }
+}

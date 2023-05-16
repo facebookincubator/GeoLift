@@ -1,0 +1,78 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/GeoLift/docs",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/GeoLift/docs",
+          "mainDocId": "intro",
+          "docs": [
+            {
+              "id": "About",
+              "path": "/GeoLift/docs/About",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "Best Practices/BestPractices",
+              "path": "/GeoLift/docs/Best Practices/BestPractices",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "Best Practices/FAQs",
+              "path": "/GeoLift/docs/Best Practices/FAQs",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "GettingStarted/CommonDataErrors",
+              "path": "/GeoLift/docs/GettingStarted/CommonDataErrors",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "GettingStarted/InstallingR",
+              "path": "/GeoLift/docs/GettingStarted/InstallingR",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "GettingStarted/MultiCellWalkthrough",
+              "path": "/GeoLift/docs/GettingStarted/MultiCellWalkthrough",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "GettingStarted/Walkthrough",
+              "path": "/GeoLift/docs/GettingStarted/Walkthrough",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "intro",
+              "path": "/GeoLift/docs/intro",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "Methodology/ComparisonOthers",
+              "path": "/GeoLift/docs/Methodology/ComparisonOthers",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "Methodology/Methodology",
+              "path": "/GeoLift/docs/Methodology/",
+              "sidebar": "tutorialSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/GeoLift/docs/intro",
+                "label": "intro"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "unversionedId": "Getting_Started/CommonDataErrors",
+  "id": "Getting_Started/CommonDataErrors",
+  "title": "Common Data Errors in GeoLift",
+  "description": "---",
+  "source": "@site/docs/Getting_Started/CommonDataErrors.md",
+  "sourceDirName": "Getting_Started",
+  "slug": "/Getting_Started/CommonDataErrors",
+  "permalink": "/GeoLift/docs/Getting_Started/CommonDataErrors",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/Getting_Started/CommonDataErrors.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 4,
+  "frontMatter": {
+    "sidebar_position": 4
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Multi-Cell Walkthrough",
+    "permalink": "/GeoLift/docs/Getting_Started/MultiCellWalkthrough"
+  },
+  "next": {
+    "title": "GeoLift Methodology",
+    "permalink": "/GeoLift/docs/Methodology/"
+  }
+}

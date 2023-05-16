@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[2339],{6377:function(e){e.exports=JSON.parse('{"label":"CrossChannel","permalink":"/GeoLift/blog/tags/cross-channel","allTagsPath":"/GeoLift/blog/tags","count":1}')}}]);

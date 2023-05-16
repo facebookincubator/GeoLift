@@ -1,0 +1,27 @@
+{
+  "unversionedId": "Methodology/ComparisonOthers",
+  "id": "Methodology/ComparisonOthers",
+  "title": "Comparison to other Methodologies",
+  "description": "Below is a quick summary of some of the most popular geo testing algorithms currently used in the market. We have kept it at a very high-level intentionally. A more thorough comparison of GeoLift to other pseudo-experimental approaches will be added soon.",
+  "source": "@site/docs/Methodology/ComparisonOthers.md",
+  "sourceDirName": "Methodology",
+  "slug": "/Methodology/ComparisonOthers",
+  "permalink": "/GeoLift/docs/Methodology/ComparisonOthers",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/Methodology/ComparisonOthers.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "GeoLift Methodology",
+    "permalink": "/GeoLift/docs/Methodology/"
+  },
+  "next": {
+    "title": "GeoLift Best Practices",
+    "permalink": "/GeoLift/docs/Best Practices/BestPractices"
+  }
+}

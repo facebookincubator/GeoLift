@@ -1,0 +1,27 @@
+{
+  "unversionedId": "Best Practices/FAQs",
+  "id": "Best Practices/FAQs",
+  "title": "GeoLift FAQs",
+  "description": "Coming soon!",
+  "source": "@site/docs/Best Practices/FAQs.md",
+  "sourceDirName": "Best Practices",
+  "slug": "/Best Practices/FAQs",
+  "permalink": "/GeoLift/docs/Best Practices/FAQs",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/Best Practices/FAQs.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "GeoLift Best Practices",
+    "permalink": "/GeoLift/docs/Best Practices/BestPractices"
+  },
+  "next": {
+    "title": "About GeoLift",
+    "permalink": "/GeoLift/docs/About"
+  }
+}

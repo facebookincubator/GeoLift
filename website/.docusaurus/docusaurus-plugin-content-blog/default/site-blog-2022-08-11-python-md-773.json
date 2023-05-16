@@ -1,0 +1,59 @@
+{
+  "permalink": "/GeoLift/blog/Python",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2022-08-11-Python.md",
+  "source": "@site/blog/2022-08-11-Python.md",
+  "title": "Introducing GeoLift in Python",
+  "description": "Introduction",
+  "date": "2022-08-11T00:00:00.000Z",
+  "formattedDate": "August 11, 2022",
+  "tags": [
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    },
+    {
+      "label": "Geo Measurement",
+      "permalink": "/GeoLift/blog/tags/geo-measurement"
+    },
+    {
+      "label": "Python",
+      "permalink": "/GeoLift/blog/tags/python"
+    },
+    {
+      "label": "R",
+      "permalink": "/GeoLift/blog/tags/r"
+    }
+  ],
+  "readingTime": 1.355,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Jussan Da Silva",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/JussanN/",
+      "imageURL": "https://github.com/JussanN.png",
+      "key": "jussan"
+    }
+  ],
+  "frontMatter": {
+    "slug": "Python",
+    "title": "Introducing GeoLift in Python",
+    "authors": [
+      "jussan"
+    ],
+    "tags": [
+      "GeoLift",
+      "Geo Measurement",
+      "Python",
+      "R"
+    ]
+  },
+  "prevItem": {
+    "title": "Enter into the time capsule - Determining Lookback Window",
+    "permalink": "/GeoLift/blog/lookback_window"
+  },
+  "nextItem": {
+    "title": "Multi-Cell Experiments with GeoLift",
+    "permalink": "/GeoLift/blog/MultiCell"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "unversionedId": "GettingStarted/Walkthrough",
+  "id": "GettingStarted/Walkthrough",
+  "title": "GeoLift Walkthrough",
+  "description": "---",
+  "source": "@site/docs/GettingStarted/Walkthrough.md",
+  "sourceDirName": "GettingStarted",
+  "slug": "/GettingStarted/Walkthrough",
+  "permalink": "/GeoLift/docs/GettingStarted/Walkthrough",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/GettingStarted/Walkthrough.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Getting Started with GeoLift",
+    "permalink": "/GeoLift/docs/GettingStarted/InstallingR"
+  },
+  "next": {
+    "title": "Multi-Cell Walkthrough",
+    "permalink": "/GeoLift/docs/GettingStarted/MultiCellWalkthrough"
+  }
+}

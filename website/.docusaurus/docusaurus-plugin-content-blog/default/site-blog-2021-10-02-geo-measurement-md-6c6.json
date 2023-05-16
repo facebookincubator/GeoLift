@@ -1,0 +1,59 @@
+{
+  "permalink": "/GeoLift/blog/geo-measurement-review",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2021-10-02-GeoMeasurement.md",
+  "source": "@site/blog/2021-10-02-GeoMeasurement.md",
+  "title": "A Brief Review of Geo Measurement Approaches",
+  "description": "Intro to Quasi-Experiments",
+  "date": "2021-10-02T00:00:00.000Z",
+  "formattedDate": "October 2, 2021",
+  "tags": [
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    },
+    {
+      "label": "Geo Measurement",
+      "permalink": "/GeoLift/blog/tags/geo-measurement"
+    },
+    {
+      "label": "SCM",
+      "permalink": "/GeoLift/blog/tags/scm"
+    },
+    {
+      "label": "DID",
+      "permalink": "/GeoLift/blog/tags/did"
+    }
+  ],
+  "readingTime": 1.68,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Arturo Esquerra",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/ArturoEsquerra/",
+      "imageURL": "https://github.com/ArturoEsquerra.png",
+      "key": "arturo"
+    }
+  ],
+  "frontMatter": {
+    "slug": "geo-measurement-review",
+    "title": "A Brief Review of Geo Measurement Approaches",
+    "authors": [
+      "arturo"
+    ],
+    "tags": [
+      "GeoLift",
+      "Geo Measurement",
+      "SCM",
+      "DID"
+    ]
+  },
+  "prevItem": {
+    "title": "Launching GeoLift v2.3 - Streamlined and Improved Power Calculations",
+    "permalink": "/GeoLift/blog/geolift-v23"
+  },
+  "nextItem": {
+    "title": "Welcome",
+    "permalink": "/GeoLift/blog/welcome"
+  }
+}

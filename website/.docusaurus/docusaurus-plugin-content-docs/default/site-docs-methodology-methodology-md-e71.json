@@ -1,0 +1,27 @@
+{
+  "unversionedId": "Methodology/Methodology",
+  "id": "Methodology/Methodology",
+  "title": "GeoLift Methodology",
+  "description": "---",
+  "source": "@site/docs/Methodology/Methodology.md",
+  "sourceDirName": "Methodology",
+  "slug": "/Methodology/",
+  "permalink": "/GeoLift/docs/Methodology/",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/Methodology/Methodology.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Common Data Errors in GeoLift",
+    "permalink": "/GeoLift/docs/GettingStarted/CommonDataErrors"
+  },
+  "next": {
+    "title": "Comparison to other Methodologies",
+    "permalink": "/GeoLift/docs/Methodology/ComparisonOthers"
+  }
+}

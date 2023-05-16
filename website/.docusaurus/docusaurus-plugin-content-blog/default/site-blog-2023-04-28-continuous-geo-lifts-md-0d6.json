@@ -1,0 +1,60 @@
+{
+  "permalink": "/GeoLift/blog/continuous_geolifts",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2023-04-28-ContinuousGeoLifts.md",
+  "source": "@site/blog/2023-04-28-ContinuousGeoLifts.md",
+  "title": "Continuous GeoLifts - Need For Speed",
+  "description": "TL;DR",
+  "date": "2023-04-28T00:00:00.000Z",
+  "formattedDate": "April 28, 2023",
+  "tags": [
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    },
+    {
+      "label": "Geo Measurement",
+      "permalink": "/GeoLift/blog/tags/geo-measurement"
+    },
+    {
+      "label": "continuous lift",
+      "permalink": "/GeoLift/blog/tags/continuous-lift"
+    },
+    {
+      "label": "R",
+      "permalink": "/GeoLift/blog/tags/r"
+    },
+    {
+      "label": "Power Analysis",
+      "permalink": "/GeoLift/blog/tags/power-analysis"
+    }
+  ],
+  "readingTime": 6.42,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Nicolas Cruces",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/NicolasMatrices-v2",
+      "imageURL": "https://github.com/NicolasMatrices-v2.png",
+      "key": "nicolas"
+    }
+  ],
+  "frontMatter": {
+    "slug": "continuous_geolifts",
+    "title": "Continuous GeoLifts - Need For Speed",
+    "authors": [
+      "nicolas"
+    ],
+    "tags": [
+      "GeoLift",
+      "Geo Measurement",
+      "continuous lift",
+      "R",
+      "Power Analysis"
+    ]
+  },
+  "nextItem": {
+    "title": "Enter into the time capsule - Determining Lookback Window",
+    "permalink": "/GeoLift/blog/lookback_window"
+  }
+}

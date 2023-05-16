@@ -1,0 +1,27 @@
+{
+  "unversionedId": "GettingStarted/MultiCellWalkthrough",
+  "id": "GettingStarted/MultiCellWalkthrough",
+  "title": "Multi-Cell Walkthrough",
+  "description": "---",
+  "source": "@site/docs/GettingStarted/MultiCellWalkthrough.md",
+  "sourceDirName": "GettingStarted",
+  "slug": "/GettingStarted/MultiCellWalkthrough",
+  "permalink": "/GeoLift/docs/GettingStarted/MultiCellWalkthrough",
+  "draft": false,
+  "editUrl": "https://github.com/facebookincubator/GeoLift/docs/GettingStarted/MultiCellWalkthrough.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "GeoLift Walkthrough",
+    "permalink": "/GeoLift/docs/GettingStarted/Walkthrough"
+  },
+  "next": {
+    "title": "Common Data Errors in GeoLift",
+    "permalink": "/GeoLift/docs/GettingStarted/CommonDataErrors"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "permalink": "/GeoLift/blog/blueprint-geolift",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2022-06-06-Blueprint.md",
+  "source": "@site/blog/2022-06-06-Blueprint.md",
+  "title": "GeoLift Blueprint Course by Meta",
+  "description": "Blueprint",
+  "date": "2022-06-06T00:00:00.000Z",
+  "formattedDate": "June 6, 2022",
+  "tags": [
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    },
+    {
+      "label": "Geo Measurement",
+      "permalink": "/GeoLift/blog/tags/geo-measurement"
+    }
+  ],
+  "readingTime": 1.215,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Arturo Esquerra",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/ArturoEsquerra/",
+      "imageURL": "https://github.com/ArturoEsquerra.png",
+      "key": "arturo"
+    },
+    {
+      "name": "Nicolas Cruces",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/NicolasMatrices-v2",
+      "imageURL": "https://github.com/NicolasMatrices-v2.png",
+      "key": "nicolas"
+    },
+    {
+      "name": "Michael Khalil",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/michael-khalil",
+      "imageURL": "https://github.com/michael-khalil.png",
+      "key": "michael"
+    }
+  ],
+  "frontMatter": {
+    "slug": "blueprint-geolift",
+    "title": "GeoLift Blueprint Course by Meta",
+    "authors": [
+      "arturo",
+      "nicolas",
+      "michael"
+    ],
+    "tags": [
+      "GeoLift",
+      "Geo Measurement"
+    ]
+  },
+  "prevItem": {
+    "title": "Measuring Lagged Effects using GeoLift",
+    "permalink": "/GeoLift/blog/LaggedEffects"
+  },
+  "nextItem": {
+    "title": "Inverse GeoLift - inference done cheaper",
+    "permalink": "/GeoLift/blog/inverse-geolift"
+  }
+}

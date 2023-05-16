@@ -1,0 +1,49 @@
+{
+  "permalink": "/GeoLift/blog/LaggedEffects",
+  "editUrl": "https://github.com/facebookincubator/GeoLift/blog/2022-06-24-ROPE.md",
+  "source": "@site/blog/2022-06-24-ROPE.md",
+  "title": "Measuring Lagged Effects using GeoLift",
+  "description": "TL;DR",
+  "date": "2022-06-24T00:00:00.000Z",
+  "formattedDate": "June 24, 2022",
+  "tags": [
+    {
+      "label": "GeoLift",
+      "permalink": "/GeoLift/blog/tags/geo-lift"
+    },
+    {
+      "label": "Geo Measurement",
+      "permalink": "/GeoLift/blog/tags/geo-measurement"
+    }
+  ],
+  "readingTime": 5.19,
+  "hasTruncateMarker": false,
+  "authors": [
+    {
+      "name": "Michael Khalil",
+      "title": "Marketing Science @ Meta | GeoLift Team",
+      "url": "https://github.com/michael-khalil",
+      "imageURL": "https://github.com/michael-khalil.png",
+      "key": "michael"
+    }
+  ],
+  "frontMatter": {
+    "slug": "LaggedEffects",
+    "title": "Measuring Lagged Effects using GeoLift",
+    "authors": [
+      "michael"
+    ],
+    "tags": [
+      "GeoLift",
+      "Geo Measurement"
+    ]
+  },
+  "prevItem": {
+    "title": "Multi-Cell Experiments with GeoLift",
+    "permalink": "/GeoLift/blog/MultiCell"
+  },
+  "nextItem": {
+    "title": "GeoLift Blueprint Course by Meta",
+    "permalink": "/GeoLift/blog/blueprint-geolift"
+  }
+}

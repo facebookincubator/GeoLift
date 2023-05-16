@@ -32,7 +32,7 @@ MultiCellPower(
 \item{x}{\code{MultiCellMarketSelection()}}
 
 \item{test_markets}{List of market IDs per cell. The list must contain exactly
-k numeric values corresponding to the power analysis. The recommended layout is
+k numeric values corresponding to the power analysis. The list's layout must be:
 \code{list(cell_1 = 1, cell2 = 1, cell3 = 1,...)}.}
 
 \item{effect_size}{A vector of effect sizes to test by default a

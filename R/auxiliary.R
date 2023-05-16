@@ -383,7 +383,7 @@ GetWeights <- function(Y_id = "Y",
 #'
 #' @param x A `MultiCellMarketSelection` object.
 #' @param test_markets List of market IDs per cell. The list must contain exactly
-#' k numeric values corresponding to the power analysis. The recommended layout is
+#' k numeric values corresponding to the power analysis. The list's layout must be:
 #' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
 #'
 #' @return
@@ -406,6 +406,26 @@ GetMultiCellWeights <- function(x,
   if(!(all(sapply(test_markets, is.numeric)))){
     stop("\nMake sure all input IDs in test_markets are numeric.")
   }
+  
+  # Check test_market
+  for (cell_name in names(test_markets)) {
+    split_cell_name <- strsplit(cell_name, '_')[[1]]
+    if (split_cell_name[1] != 'cell') {
+      stop(
+        paste0(
+          'Test locations test_locs must have names as cell_{numeric}.',
+          '\nCheck ', cell_name, '.'))
+    }
+    if (is.na(as.integer(split_cell_name[2]))) {
+      stop(
+        paste0(
+          'Test locations test_locs must have names as cell_{numeric}.',
+          '\nCheck ', cell_name, '.'))
+    }
+  }
+  
+  # Order input list of test markets
+  test_markets <- test_markets[order(names(test_markets))]
   
   # Initialize Variables
   locations <- data.frame(location = unique(x$data$location))

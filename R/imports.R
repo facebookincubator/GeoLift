@@ -24,6 +24,8 @@
 #' scale_x_continuous scale_y_continuous sec_axis theme theme_minimal
 #' xlab xlim ylab ylim
 #' @importFrom gridExtra grid.arrange
+#' @import gsynth
+#' @import lifecycle
 #' @importFrom MarketMatching best_matches
 #' @importFrom panelView panelview
 #' @importFrom progress progress_bar

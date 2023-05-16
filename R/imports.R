@@ -13,8 +13,8 @@
 #' @importFrom directlabels geom_dl dl.combine
 #' @importFrom doParallel registerDoParallel
 #' @importFrom dplyr add_row arrange bind_rows dense_rank desc distinct filter 
-#' group_by left_join mutate rename row_number sample_n select slice slice_max 
-#' slice_min summarise summarize tibble "%>%"
+#' group_by inner join left_join mutate rename rename_with row_number sample_n 
+#' select slice slice_max slice_min summarise summarize tibble "%>%"
 #' @importFrom foreach foreach
 #' @importFrom ggplot2 aes coord_cartesian element_blank element_text geom_hline 
 #' geom_line geom_ribbon geom_segment geom_smooth geom_vline ggplot ggtitle guides 

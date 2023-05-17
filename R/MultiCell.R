@@ -323,7 +323,7 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #'
 #' @param x A `MultiCellMarketSelection` object.
 #' @param test_markets List of market IDs per cell. The list must contain exactly
-#' k numeric values corresponding to the power analysis. The recommended layout is
+#' k numeric values corresponding to the power analysis. The list's layout must be:
 #' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
 #' @param effect_size A vector of effect sizes to test by default a
 #' sequence between 0 - 25 percent in 5 percent increments: seq(0,0.25,0.05).
@@ -373,6 +373,26 @@ MultiCellPower <- function(x,
   if(!(all(sapply(test_markets, is.numeric)))){
     stop("\nMake sure all input IDs in test_markets are numeric.")
   }
+  
+  # Check test_market
+  for (cell_name in names(test_markets)) {
+    split_cell_name <- strsplit(cell_name, '_')[[1]]
+    if (split_cell_name[1] != 'cell') {
+      stop(
+        paste0(
+          'Test locations test_locs must have names as cell_{numeric}.',
+          '\nCheck ', cell_name, '.'))
+    }
+    if (is.na(as.integer(split_cell_name[2]))) {
+      stop(
+        paste0(
+          'Test locations test_locs must have names as cell_{numeric}.',
+          '\nCheck ', cell_name, '.'))
+    }
+  }
+  
+  # Order input list of test markets
+  test_markets <- test_markets[order(names(test_markets))]
 
   if(is.null(lookback_window)){
     lookback_window <- x$test_details$lookback_window

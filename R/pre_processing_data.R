@@ -9,6 +9,7 @@
 #' Data reading function for GeoLift.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `GeoDataRead` reads a data-frame and processes it for GeoLift.
 #' The function will clean the data, generate a time variable that

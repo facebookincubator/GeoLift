@@ -203,6 +203,8 @@ Includes the data set, model, fixed-effects, and CPIC parameters.}
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{GeoLiftMarketSelection} provides a ranking of test markets  for a
 GeoLift test based on a power analysis.
 }

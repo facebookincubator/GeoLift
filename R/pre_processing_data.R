@@ -9,6 +9,7 @@
 #' Data reading function for GeoLift.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `GeoDataRead` reads a data-frame and processes it for GeoLift.
 #' The function will clean the data, generate a time variable that
@@ -90,11 +91,11 @@ GeoDataRead <- function(data,
   data$location <- gsub(",", "", gsub("([a-zA-Z]),", "\\1", data$location))
 
   # Determine the separator
-  if (str_count(format, pattern = fixed("/")) > 0) {
+  if (stringr::str_count(format, pattern = stringr::fixed("/")) > 0) {
     sep <- "/"
-  } else if (str_count(format, pattern = fixed("-")) > 0) {
+  } else if (stringr::str_count(format, pattern = stringr::fixed("-")) > 0) {
     sep <- "-"
-  } else if (str_count(format, pattern = fixed(".")) > 0) {
+  } else if (stringr::str_count(format, pattern = stringr::fixed(".")) > 0) {
     sep <- "."
   } else {
     sep <- ""

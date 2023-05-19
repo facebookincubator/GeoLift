@@ -30,6 +30,8 @@ Returns a matrix of sampled combinations of treatments.
 Each row represents a different treatment.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{stochastic_market_selector} selects the markets to be tested
 by randomly sampling from the \code{similarity_matrix}.
 It gets groups of 2 elements and samples one of them. It repeats

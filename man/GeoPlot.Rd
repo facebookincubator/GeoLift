@@ -36,6 +36,8 @@ of the time period (starting at 1), and covariates.}
 A plot of each location's time series.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{GeoPlot} takes a data frame used for GeoLift to generate
 a plot of each location's time series.
 }

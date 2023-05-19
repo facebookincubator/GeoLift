@@ -29,6 +29,8 @@ A plot of the historical values of the test market and the aggregation of
 all control markets.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{plotCorrels} takes a data frame used for GeoLift to generate
 a plot that show historical similarities in KPI levels between the
 test markets and the aggregation of all locations (total).

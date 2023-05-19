@@ -34,28 +34,22 @@ Depends:
     R (>= 4.0.0)
 Imports:
     augsynth,
-    gsynth,
-    panelView,
-    doParallel,
-    foreach,
-    ggrepel,
-    gridExtra,
-    MarketMatching,
-    magrittr,
-    dplyr,
-    stringr,
     directlabels,
+    doParallel,
+    dplyr,
+    foreach,
     ggplot2,
-    tibble,
-    tidyr,
-    parallel,
+    gridExtra,
+    gsynth,
+    lifecycle,
+    MarketMatching,
+    panelView,
     progress,
-    graphics,
-    scales,
-    stats,
-    utils,
     rlang,
-    lifecycle
+    scales,
+    stringr,
+    tibble,
+    tidyr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3

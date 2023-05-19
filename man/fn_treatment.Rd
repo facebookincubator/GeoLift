@@ -22,6 +22,8 @@ of the time period (starting at 1), and covariates.}
 Data frame with the additional treatment variable (D).
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{fn_treatment} generates the treatment variable D, where
 D = 1 for test locations in the test period and D = 0 otherwise.
 }

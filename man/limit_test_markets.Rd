@@ -30,6 +30,8 @@ Returns the limited number of treatment sizes if required. If the condition
 is not met, it returns the original treatment sizes.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{limit_test_markets} determines if the user would like
 to find combinations of treatments that is higher than half
 the total amount of locations available while running a random

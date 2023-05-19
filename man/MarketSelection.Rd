@@ -38,6 +38,8 @@ the best to worst market matches for the location in the first
 column.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{MarketSelection} helps calculate the best markets based
 on Dynamic Time Warping between the locations' time-series.
 }

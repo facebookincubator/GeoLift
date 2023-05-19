@@ -8,6 +8,7 @@
 #' Augsynth execution.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `ASCMExecution` executes the augmented synthetic controls package.
 #'
@@ -109,6 +110,7 @@ ASCMExecution <- function(
 #' GeoLift inference calculation.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `GeoLift` performs inference for a geo-test.
 #'
@@ -643,6 +645,7 @@ print.summary.GeoLift <- function(x, ...) {
 #' GeoLift Confidence Intervals
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' Calculate the Aggregate ATT Confidence Intervals
 #'
@@ -666,7 +669,6 @@ print.summary.GeoLift <- function(x, ...) {
 #' @return List the Confidence Interval for the specified alpha.
 #'
 #' @export
-
 ConfIntervals <- function(augsynth,
                           treatment_start_time,
                           treatment_end_time,

@@ -13,7 +13,7 @@
 #' @importFrom directlabels geom_dl dl.combine
 #' @importFrom doParallel registerDoParallel
 #' @importFrom dplyr add_row arrange bind_rows dense_rank desc distinct filter 
-#' group_by inner join left_join mutate rename rename_with row_number sample_n 
+#' group_by inner_join left_join mutate rename rename_with row_number sample_n 
 #' select slice slice_max slice_min summarise summarize tibble "%>%"
 #' @importFrom foreach foreach
 #' @importFrom ggplot2 aes coord_cartesian element_blank element_text geom_hline 

@@ -1,3 +1,10 @@
+GeoLift v2.6.06 (Release date: 2023-05-19)
+=========================================
+
+Changes:
+* Explicitly called the functions we are using from other packages.
+* Removed magrittr, ggrepel, parallel and graphics from imports.R
+
 GeoLift v2.6.05 (Release date: 2023-05-16)
 =========================================
 

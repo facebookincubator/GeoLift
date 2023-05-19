@@ -10,6 +10,7 @@
 #' Market selection tool.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `MarketSelection` helps calculate the best markets based
 #' on Dynamic Time Warping between the locations' time-series.
@@ -94,6 +95,7 @@ MarketSelection <- function(data,
 #' Stochastic Market Selector.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `stochastic_market_selector` selects the markets to be tested
 #' by randomly sampling from the `similarity_matrix`.
@@ -153,6 +155,7 @@ stochastic_market_selector <- function(treatment_size,
 #' Inference.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `type_of_test` returns stat_func being used for GeoLiftPower;
 #' GeoLiftPowerFinder & GeoLift.
@@ -200,6 +203,7 @@ type_of_test <- function(side_of_test = "two_sided", alternative_hypothesis = NU
 #' Calculate p-value for GeoLift.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `pvalueCalc` calculates the p-value for a GeoLift object.
 #'
@@ -361,6 +365,7 @@ pvalueCalc <- function(data,
 #' Run simulations for treatment markets.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `run_simulations` computes simulations for each treatment market.
 #'
@@ -1363,6 +1368,8 @@ NumberLocations <- function(data,
 #' Power Calculation for GeoLift for known test locations.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
+#' 
 #' This function runs power calculations for input historical geo data
 #' for a pre-determined set of test locations.
 #'
@@ -1528,6 +1535,7 @@ GeoLiftPower <- function(data,
 #' GeoLift Market Selection algorithm based on a Power Analysis.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `GeoLiftMarketSelection` provides a ranking of test markets  for a
 #' GeoLift test based on a power analysis.

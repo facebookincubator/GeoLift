@@ -193,6 +193,8 @@ Data-frame with the locations and the synthetic control weights for each cell.
 for a Multi-Cell GeoLift test using a specified sampling methodology to
 split the data set into k similar partitions.
 
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 \code{GetMultiCellWeights} returns the synthetic control weights as a data frame
 for a given test set-up.
 }

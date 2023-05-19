@@ -20,6 +20,8 @@ should be imported from to send to the nodes.}
 Cluster object that will parallelize operations.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 This function builds the cluster and imports the necessary packages
 to run Geolift: augsynth, dplyr and tidyr.
 }

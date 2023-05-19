@@ -78,5 +78,7 @@ List that contains:
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{pvalueCalc} calculates the p-value for a GeoLift object.
 }

@@ -27,6 +27,8 @@ If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; H
 Statistical function being used to sum ATT effects over all treatment periods.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{type_of_test} returns stat_func being used for GeoLiftPower;
 GeoLiftPowerFinder & GeoLift.
 }

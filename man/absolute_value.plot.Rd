@@ -47,5 +47,7 @@ of practical equivalence (ROPE) at a 90\% percentile. FALSE by default.}
 Daily Incremental or ATT plot.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{absolute_value.plot} returns chart for daily absolute values using GeoLift output.
 }

@@ -54,6 +54,8 @@ effects in the model. Set to TRUE by default.}
 Data frame with the locations and weights.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{GetWeights} returns the synthetic control weights as a data frame
 for a given test set-up.
 }

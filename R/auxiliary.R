@@ -10,6 +10,7 @@
 #' Auxiliary function to generate the treatment variable D.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `fn_treatment` generates the treatment variable D, where
 #' D = 1 for test locations in the test period and D = 0 otherwise.
@@ -45,6 +46,8 @@ fn_treatment <- function(df,
 #' Build cluster to parallelize operations across nodes in machine.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
+#' 
 #' This function builds the cluster and imports the necessary packages
 #' to run Geolift: augsynth, dplyr and tidyr.
 #'
@@ -97,6 +100,7 @@ build_cluster <- function(parallel_setup,
 #' Limit the amount of test market potential elements.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `limit_test_markets` determines if the user would like
 #' to find combinations of treatments that is higher than half
@@ -153,6 +157,7 @@ limit_test_markets <- function(similarity_matrix,
 #' Link dates to GeoLift time periods.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' Link dates to GeoLift time periods.
 #'
@@ -205,6 +210,7 @@ get_date_from_test_periods <- function(GeoLift,
 #' Calculate the total and test market's aggregated KPI by time and location.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' Append the aggregated KPI values for the test market and all markets to the
 #' `GeoDataRead` object.
@@ -249,6 +255,7 @@ AppendAgg <- function(data, locs = NULL) {
 #' Calculate correlations between input markets.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' Calculate correlations between input markets
 #'
@@ -273,6 +280,7 @@ CorrelationCoefficient <- function(data, locs = c()) {
 #' Function to obtain the synthetic control weights.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `GetWeights` returns the synthetic control weights as a data frame
 #' for a given test set-up.
@@ -377,6 +385,7 @@ GetWeights <- function(Y_id = "Y",
 #' Function to obtain the synthetic control weights.
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' `GetMultiCellWeights` returns the synthetic control weights as a data frame
 #' for a given test set-up.
@@ -473,6 +482,7 @@ GetMultiCellWeights <- function(x,
 #' Get within market correlations for all locations.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `MarketCorrelations` calculates a notion of similarity between markets
 #' to help inform the combinations of treatments.

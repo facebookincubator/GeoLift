@@ -10,6 +10,7 @@
 #' Auxiliary function to generate the treatment variable D.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `fn_treatment` generates the treatment variable D, where
 #' D = 1 for test locations in the test period and D = 0 otherwise.
@@ -45,6 +46,8 @@ fn_treatment <- function(df,
 #' Build cluster to parallelize operations across nodes in machine.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
+#' 
 #' This function builds the cluster and imports the necessary packages
 #' to run Geolift: augsynth, dplyr and tidyr.
 #'
@@ -97,6 +100,7 @@ build_cluster <- function(parallel_setup,
 #' Limit the amount of test market potential elements.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `limit_test_markets` determines if the user would like
 #' to find combinations of treatments that is higher than half
@@ -153,6 +157,7 @@ limit_test_markets <- function(similarity_matrix,
 #' Link dates to GeoLift time periods.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' Link dates to GeoLift time periods.
 #'
@@ -205,6 +210,7 @@ get_date_from_test_periods <- function(GeoLift,
 #' Calculate the total and test market's aggregated KPI by time and location.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' Append the aggregated KPI values for the test market and all markets to the
 #' `GeoDataRead` object.
@@ -249,6 +255,7 @@ AppendAgg <- function(data, locs = NULL) {
 #' Calculate correlations between input markets.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' Calculate correlations between input markets
 #'
@@ -273,6 +280,7 @@ CorrelationCoefficient <- function(data, locs = c()) {
 #' Function to obtain the synthetic control weights.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `GetWeights` returns the synthetic control weights as a data frame
 #' for a given test set-up.
@@ -374,10 +382,107 @@ GetWeights <- function(Y_id = "Y",
   return(results)
 }
 
+#' Function to obtain the synthetic control weights.
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' `GetMultiCellWeights` returns the synthetic control weights as a data frame
+#' for a given test set-up.
+#'
+#' @param x A `MultiCellMarketSelection` object.
+#' @param test_markets List of market IDs per cell. The list must contain exactly
+#' k numeric values corresponding to the power analysis. The list's layout must be:
+#' `list(cell_1 = 1, cell2 = 1, cell3 = 1,...)`.
+#'
+#' @return
+#' Data-frame with the locations and the synthetic control weights for each cell.
+#'
+#' @export
+#' @rdname MultiCellMarketSelection
+#' @order 2
+GetMultiCellWeights <- function(x,
+                                test_markets = list()) {
+  
+  if (!inherits(x, "MultiCellMarketSelection")) {
+    stop("object must be class MultiCellMarketSelection")
+  }
+  
+  if(length(test_markets) != length(x$Models)){
+    stop("\nMake sure an ID is provided for each cell in the analysis.")
+  }
+  
+  if(!(all(sapply(test_markets, is.numeric)))){
+    stop("\nMake sure all input IDs in test_markets are numeric.")
+  }
+  
+  # Check test_market
+  for (cell_name in names(test_markets)) {
+    split_cell_name <- strsplit(cell_name, '_')[[1]]
+    if (split_cell_name[1] != 'cell') {
+      stop(
+        paste0(
+          'Test locations test_locs must have names as cell_{numeric}.',
+          '\nCheck ', cell_name, '.'))
+    }
+    if (is.na(as.integer(split_cell_name[2]))) {
+      stop(
+        paste0(
+          'Test locations test_locs must have names as cell_{numeric}.',
+          '\nCheck ', cell_name, '.'))
+    }
+  }
+  
+  # Order input list of test markets
+  test_markets <- test_markets[order(names(test_markets))]
+  
+  # Initialize Variables
+  locations <- data.frame(location = unique(x$data$location))
+  other_test_locs <- c()
+  
+  # List of all treatment locations
+  for (cell in 1:length(test_markets)){
+    other_test_locs <- rbind(other_test_locs,list(stringr::str_split(
+      x$Models[[cell]]$BestMarkets$location[test_markets[[cell]]], ", ")[[1]]))
+  }
+  
+  # Adjust dataset & obtain weights.
+  for (cell in 1:length(test_markets)){
+    data_aux <- x$data %>% dplyr::rename(Y = paste0(x$test_details$Y_id),
+                                         location = paste0(x$test_details$location_id),
+                                         time = paste0(x$test_details$time_id)) %>%
+      dplyr::filter(!(location %in% unlist(other_test_locs[-cell])))
+    
+    aux <- merge(locations,GetWeights(X = x$test_details$X,
+                                      data = data_aux,
+                                      locations = other_test_locs[[cell]],
+                                      pretreatment_end_time = max(data_aux$time),
+                                      model = x$test_details$model,
+                                      fixed_effects = x$test_details$fixed_effects),
+                 all.x = TRUE)
+    
+    # Create final data frame
+    if(cell == 1){
+      results <- aux
+    } else{
+      results <- dplyr::inner_join(results, aux, by = "location")
+    }
+    
+    # Format final data frame
+    results <- results %>% 
+                dplyr::rename_with(.cols = cell+1, ~paste0("Cell_",cell))
+    
+  }
+  
+  return(results)
+  
+}
+
 
 #' Get within market correlations for all locations.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `MarketCorrelations` calculates a notion of similarity between markets
 #' to help inform the combinations of treatments.

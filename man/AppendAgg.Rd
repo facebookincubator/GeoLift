@@ -20,6 +20,8 @@ A data frame with additional values for the test regions (combined_test)
 and total KPI (total).
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 Append the aggregated KPI values for the test market and all markets to the
 \code{GeoDataRead} object.
 }

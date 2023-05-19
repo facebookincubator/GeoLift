@@ -66,6 +66,8 @@ should be counted.}
 A data frame for GeoLift inference and power calculations.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 \code{GeoDataRead} reads a data-frame and processes it for GeoLift.
 The function will clean the data, generate a time variable that
 increases by 1 for each time period (day/week/month), and aggregate

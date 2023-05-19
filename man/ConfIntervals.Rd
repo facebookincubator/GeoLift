@@ -46,5 +46,7 @@ distributed or "block" for moving block permutations. Set to "iid" by default.}
 List the Confidence Interval for the specified alpha.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 Calculate the Aggregate ATT Confidence Intervals
 }

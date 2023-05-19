@@ -18,5 +18,7 @@ of the time period (starting at 1), and covariates.}
 Correlation coefficient.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 Calculate correlations between input markets
 }

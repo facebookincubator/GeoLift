@@ -10,6 +10,7 @@
 #' Plotting function for Exploratory Analysis.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `GeoPlot` takes a data frame used for GeoLift to generate
 #' a plot of each location's time series.
@@ -251,6 +252,7 @@ plot.GeoLift <- function(x,
 #' Aggregate Lift plot function for GeoLift.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' Aggregate Lift plot function for GeoLift.
 #'
@@ -389,6 +391,7 @@ Lift.plot <- function(GeoLift,
 #' Daily Incrementality or ATT plot function for GeoLift output.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `absolute_value.plot` returns chart for daily absolute values using GeoLift output.
 #'
@@ -764,6 +767,7 @@ plot.GeoLiftMarketSelection <- function(x,
 #' and total markets KPI.
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
 #'
 #' `plotCorrels` takes a data frame used for GeoLift to generate
 #' a plot that show historical similarities in KPI levels between the

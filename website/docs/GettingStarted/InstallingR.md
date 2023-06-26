@@ -22,6 +22,17 @@ Since GeoLift is currently only available on GitHub, the `remotes` package is a 
 install.packages("remotes", repos='http://cran.us.r-project.org')
 ```
 
+In addition, since Microsoft ended their support for R packages on July 1st, 2023, there are some workarounds necessary to easily build the required package 'LowRankQP'. If you are using macOS, the easiest solution so far is by using the package 'macrtools' to install the compilers demanded by LowRankQP.
+
+```
+install.packages('devtools') # required to run macrtools
+library(devtools)
+remotes::install_github("coatless-mac/macrtools") # install macrtools
+macrtools::macos_rtools_install() # this will attempt to install Xcode CLI, gfortran, and R development libraries
+devtools::install_version('LowRankQP', version='1.0.5') # finally, install LowRankQP that requires gfortran
+```
+
+
 To install the package, first make sure that remotes, `LowRankQP`, `Synth` and `augsynth` are installed.
 
 ```

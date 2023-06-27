@@ -26,7 +26,7 @@ install.packages("remotes", repos='http://cran.us.r-project.org')
 To install the package, first make sure that remotes, `LowRankQP`, `Synth` and `augsynth` are installed.
 
 ```
-devtools::install_version('LowRankQP', version='1.0.5') # finally, install LowRankQP that requires gfortran
+devtools::install_version('LowRankQP', version='1.0.5')
 
 remotes::install_github("cran/synth", dependencies = TRUE)
 

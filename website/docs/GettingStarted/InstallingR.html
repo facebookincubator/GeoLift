@@ -373,25 +373,9 @@ questions</a> before you send an email.</p>
 <code>remotes</code> package is a pre-requisite to install it. If you
 haven’t installed this package yet, first run:</p>
 <pre><code>install.packages(&quot;remotes&quot;, repos=&#39;http://cran.us.r-project.org&#39;)</code></pre>
-<p>To install the package, first make sure that remotes,
-<code>LowRankQP</code>, <code>Synth</code> and <code>augsynth</code> are
-installed.</p>
-<pre><code>devtools::install_version(&#39;LowRankQP&#39;, version=&#39;1.0.5&#39;)
-
-remotes::install_github(&quot;cran/synth&quot;, dependencies = TRUE)
-
-remotes::install_github(&quot;ebenmichael/augsynth&quot;)</code></pre>
-<p>One common issue that appear is LowRankQP failing installation
-because the FORTRAN compiler gfortran is not present. If you are using
-macOS, the current easiest solution is by using the package ‘macrtools’
-to install the compilers demanded by LowRankQP:</p>
-<pre><code>install.packages(&#39;devtools&#39;) # required to run macrtools
-library(devtools)
-remotes::install_github(&quot;coatless-mac/macrtools&quot;) # install macrtools
-macrtools::macos_rtools_install() # this will attempt to install Xcode CLI, gfortran, and R development libraries</code></pre>
-<p>And you are using other Linux based OS, you can use the command below
-to install gfortran:</p>
-<pre><code>sudo apt install gfortran</code></pre>
+<p>To install the package, first make sure that remotes, and
+<code>augsynth</code> are installed.</p>
+<pre><code>remotes::install_github(&quot;ebenmichael/augsynth&quot;)</code></pre>
 <p>Finally, we can install the <code>GeoLift</code> package with the
 following command:</p>
 <pre><code>remotes::install_github(&quot;facebookincubator/GeoLift&quot;)</code></pre>

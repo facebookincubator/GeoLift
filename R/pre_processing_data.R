@@ -249,14 +249,38 @@ GeoDataRead <- function(data,
 
   # Print summary of Data Reading
   if (summary == TRUE) {
-    message(paste0(
+    summary_msg <- paste0(
       "##################################",
       "\n#####       Summary       #####\n",
       "##################################\n",
       "\n* Raw Number of Locations: ", initial_locations,
-      "\n* Time Periods: ", total_periods,
-      "\n* Final Number of Locations (Complete): ", length(unique(data$location))
-    ))
+      "\n* Time Periods: ", total_periods
+    )
+    if (!cluster_locations){
+      summary_msg <- paste0(
+        summary_msg,
+        "\n* Final Number of Locations (Complete): ", 
+        length(unique(data$location))
+      )
+    } else {
+      summary_msg <- paste0(
+        summary_msg,
+        "\n* Total number of CZ clusters: ",
+        length(unique(data$location)),
+        "\n* Total number of locations associated to CZ clusters: ",
+        length(
+          strsplit(
+            paste0(
+              unique(
+                data$location_in_cluster), 
+              collapse=', '), 
+            ', ')
+          [[1]]
+        )
+      )
+    }
+    
+    message(summary_msg)
   }
 
   return(as.data.frame(data))

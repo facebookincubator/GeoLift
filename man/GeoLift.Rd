@@ -196,11 +196,11 @@ Synthetic Control Methods used to measure the true incremental effect (Lift)
 of an ad campaign.
 }
 \author{
-\strong{Maintainer}: Arturo Esquerra \email{aesquerra@fb.com}
+\strong{Maintainer}: Arturo Esquerra \email{aesquerrac@gmail.com}
 
 Authors:
 \itemize{
-  \item Nicolas Cruces \email{nicocru@fb.com}
+  \item Nicolas Cruces \email{nicolascruces1994@gmail.com}
 }
 
 Other contributors:

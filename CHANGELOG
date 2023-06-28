@@ -1,3 +1,9 @@
+GeoLift v2.7.0 (Release date: 2023-07-01)
+=========================================
+
+Changes:
+* Included the CommutingZones package to cluster locations in GeoDataRead.
+
 GeoLift v2.6.06 (Release date: 2023-05-19)
 =========================================
 

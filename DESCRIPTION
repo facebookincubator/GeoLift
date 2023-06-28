@@ -5,11 +5,11 @@ Authors@R: c(
     person(given = "Arturo",
            family = "Esquerra",
            role = c("aut", "cre"),
-           email = "aesquerra@fb.com"),
+           email = "aesquerrac@gmail.com"),
     person(given = "Nicolas",
            family = "Cruces",
            role = c("aut"),
-           email = "nicocru@fb.com"),
+           email = "nicolascruces1994@gmail.com"),
     person(given = "Kanishka",
            family = "Panchal",
            role = c("ctb"),
@@ -34,6 +34,7 @@ Depends:
     R (>= 4.0.0)
 Imports:
     augsynth,
+    CommutingZones,
     directlabels,
     doParallel,
     dplyr,
@@ -55,6 +56,7 @@ LazyData: true
 RoxygenNote: 7.2.3
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    sf
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

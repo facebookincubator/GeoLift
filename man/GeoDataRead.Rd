@@ -12,7 +12,12 @@ GeoDataRead(
   format = "mm/dd/yyyy",
   X = c(),
   summary = FALSE,
-  keep_unix_time = FALSE
+  keep_unix_time = FALSE,
+  cluster_locations = FALSE,
+  country_name = NULL,
+  longitude_col_name = "longitude",
+  latitude_col_name = "latitude",
+  find_location_lat_long = FALSE
 )
 }
 \arguments{
@@ -40,6 +45,22 @@ Valid date formats are: "mm/dd/yyyy", "mm-dd-yyyy", "mm.dd.yyyy", "mmddyyyy",
 
 \item{keep_unix_time}{A logic flag indicating whether to keep a column with
 each event's unix time.}
+
+\item{cluster_locations}{A logic flag indicating whether locations should be
+clustered using the CommutingZones package.}
+
+\item{country_name}{data.frame object with all polygons.  Each row represents a
+different cluster with an sf::POLYGON object that has the points that are joined
+to form that cluster.}
+
+\item{longitude_col_name}{name of the longitude column in the location_points
+data.frame.}
+
+\item{latitude_col_name}{name of the latitude column in the location_points
+data.frame.}
+
+\item{find_location_lat_long}{logical flag indicating whether amount of clusters processed
+should be counted.}
 }
 \value{
 A data frame for GeoLift inference and power calculations.

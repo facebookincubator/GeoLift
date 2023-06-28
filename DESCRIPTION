@@ -56,7 +56,6 @@ LazyData: true
 RoxygenNote: 7.2.3
 Suggests: 
     knitr,
-    rmarkdown,
-    sf
+    rmarkdown
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

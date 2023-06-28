@@ -205,7 +205,9 @@ GeoDataRead <- function(data,
   data_raw <- data
 
   if (!find_location_lat_long) {
-    X <- cbind(X, c(longitude_col_name, latitude_col_name))
+    if (cluster_locations == TRUE){
+      X <- cbind(X, c(longitude_col_name, latitude_col_name))
+    }
   }
 
   if (keep_unix_time == FALSE) {

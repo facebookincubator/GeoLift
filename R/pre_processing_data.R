@@ -589,15 +589,13 @@ TrimControls <- function(data,
 #' latitude and longitude for all locations.
 #' @param location_id Name of the location variable (String).
 #' @param X List of names of the covariates.
-#' @param country_name data.frame object with all polygons.  Each row represents a 
-#' different cluster with an sf::POLYGON object that has the points that are joined
-#' to form that cluster.
-#' @param longitude_col_name name of the longitude column in the location_points
+#' @param country_name name of country where the locations come from.
+#' @param longitude_col_name name of the longitude column in the `data`
 #' data.frame.
-#' @param latitude_col_name name of the latitude column in the location_points
+#' @param latitude_col_name name of the latitude column in the `data`
 #' data.frame.
-#' @param find_location_lat_long logical flag indicating whether amount of clusters processed
-#' should be counted.
+#' @param find_location_lat_long logical flag indicating whether Google Maps API
+#' should be used to find location's latitude and longitude.
 #' 
 #' @return
 #' A data frame holding a match between each location and all clusters.

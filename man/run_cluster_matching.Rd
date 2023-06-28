@@ -22,18 +22,16 @@ latitude and longitude for all locations.}
 
 \item{X}{List of names of the covariates.}
 
-\item{country_name}{data.frame object with all polygons.  Each row represents a
-different cluster with an sf::POLYGON object that has the points that are joined
-to form that cluster.}
+\item{country_name}{name of country where the locations come from.}
 
-\item{longitude_col_name}{name of the longitude column in the location_points
+\item{longitude_col_name}{name of the longitude column in the \code{data}
 data.frame.}
 
-\item{latitude_col_name}{name of the latitude column in the location_points
+\item{latitude_col_name}{name of the latitude column in the \code{data}
 data.frame.}
 
-\item{find_location_lat_long}{logical flag indicating whether amount of clusters processed
-should be counted.}
+\item{find_location_lat_long}{logical flag indicating whether Google Maps API
+should be used to find location's latitude and longitude.}
 }
 \value{
 A data frame holding a match between each location and all clusters.

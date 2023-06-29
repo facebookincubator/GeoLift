@@ -1093,7 +1093,7 @@ summary.GeoLiftMultiCell <- function(object,
                                Winner = unlist(winner_aux)
     )
 
-    message(paste0(knitr::kable(printresults), collapse="\n"))
+    message(paste0(capture.output(printresults), collapse='\n'))
   }
 
 

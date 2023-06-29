@@ -41,6 +41,7 @@ Imports:
     ggplot2,
     gridExtra,
     gsynth,
+    knitr,
     lifecycle,
     MarketMatching,
     panelView,

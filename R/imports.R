@@ -25,6 +25,7 @@
 #' xlab xlim ylab ylim
 #' @importFrom gridExtra grid.arrange
 #' @import gsynth
+#' @importFrom knitr kable opts_chunk
 #' @importFrom lifecycle badge
 #' @importFrom MarketMatching best_matches
 #' @importFrom panelView panelview
@@ -35,7 +36,7 @@
 #' @importFrom stringr fixed str_count str_replace_all str_split
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer pivot_wider
-#' @importFrom utils capture.output combn flush.console head setTxtProgressBar
+#' @importFrom utils combn flush.console head setTxtProgressBar
 #' txtProgressBar
 "_PACKAGE"
 

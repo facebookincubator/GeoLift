@@ -12,7 +12,12 @@ GeoDataRead(
   format = "mm/dd/yyyy",
   X = c(),
   summary = FALSE,
-  keep_unix_time = FALSE
+  keep_unix_time = FALSE,
+  cluster_locations = FALSE,
+  country_name = NULL,
+  longitude_col_name = "longitude",
+  latitude_col_name = "latitude",
+  find_location_lat_long = FALSE
 )
 }
 \arguments{
@@ -40,6 +45,20 @@ Valid date formats are: "mm/dd/yyyy", "mm-dd-yyyy", "mm.dd.yyyy", "mmddyyyy",
 
 \item{keep_unix_time}{A logic flag indicating whether to keep a column with
 each event's unix time.}
+
+\item{cluster_locations}{A logic flag indicating whether locations should be
+clustered using the CommutingZones package.}
+
+\item{country_name}{name of country where the locations come from.}
+
+\item{longitude_col_name}{name of the longitude column in the \code{data}
+data.frame.}
+
+\item{latitude_col_name}{name of the latitude column in the \code{data}
+data.frame.}
+
+\item{find_location_lat_long}{logical flag indicating whether Google Maps API
+should be used to find location's latitude and longitude.}
 }
 \value{
 A data frame for GeoLift inference and power calculations.

@@ -36,8 +36,7 @@
 #' @importFrom stringr fixed str_count str_replace_all str_split
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer pivot_wider
-#' @importFrom utils combn flush.console head setTxtProgressBar
-#' txtProgressBar
+#' @importFrom utils combn flush.console head setTxtProgressBar txtProgressBar
 "_PACKAGE"
 
 # Suppress 'no visible binding for global variable' warnings

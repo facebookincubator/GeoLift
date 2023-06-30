@@ -1,3 +1,9 @@
+GeoLift v2.7.1 (Release date: 2023-07-07)
+=========================================
+
+Changes:
+* Included knitr in imports.R and explicitly declared methods being used.
+
 GeoLift v2.7.0 (Release date: 2023-07-01)
 =========================================
 

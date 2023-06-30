@@ -25,6 +25,7 @@
 #' xlab xlim ylab ylim
 #' @importFrom gridExtra grid.arrange
 #' @import gsynth
+#' @importFrom knitr kable opts_chunk
 #' @importFrom lifecycle badge
 #' @importFrom MarketMatching best_matches
 #' @importFrom panelView panelview

@@ -28,14 +28,15 @@
 #' "mm/yyyy", "mm-yyyy", "mm.yyyy", "mmyyyy", "yyyy/mm", "yyyy-mm",
 #' "yyyy.mm", "yyyymm"
 #' @param date_id Name of the date variable (String).
-#' @param location_id Name of the location variable (String).
 #' @param Y_id Name of the outcome variable (String).
 #' @param format Format of the dates in the data frame.
-#' @param X List of names of the covariates.
 #' @param summary Display a summary of the data-reading process. FALSE by default.
 #' @param keep_unix_time A logic flag indicating whether to keep a column with
 #' each event's unix time.
+#' @param cluster_locations A logic flag indicating whether locations should be
+#' clustered using the CommutingZones package.
 #'
+#' @inheritParams run_cluster_matching
 #' @return
 #' A data frame for GeoLift inference and power calculations.
 #'
@@ -47,7 +48,12 @@ GeoDataRead <- function(data,
                         format = "mm/dd/yyyy",
                         X = c(),
                         summary = FALSE,
-                        keep_unix_time = FALSE) {
+                        keep_unix_time = FALSE,
+                        cluster_locations = FALSE,
+                        country_name = NULL,
+                        longitude_col_name = "longitude",
+                        latitude_col_name = "latitude",
+                        find_location_lat_long = FALSE) {
   format <- tolower(format)
 
   # Acceptable date formats
@@ -198,6 +204,12 @@ GeoDataRead <- function(data,
   # Aggregate Outcomes by time and location
   data_raw <- data
 
+  if (!find_location_lat_long) {
+    if (cluster_locations == TRUE){
+      X <- cbind(X, c(longitude_col_name, latitude_col_name))
+    }
+  }
+
   if (keep_unix_time == FALSE) {
     data <- data_raw %>%
       dplyr::group_by(location, time) %>%
@@ -220,16 +232,55 @@ GeoDataRead <- function(data,
     }
   }
 
+  if (cluster_locations == TRUE) {
+    
+    data <- run_cluster_matching(
+      data,
+      location_id = location_id,
+      X = X,
+      find_location_lat_long = find_location_lat_long,
+      country_name = country_name,
+      longitude_col_name = longitude_col_name,
+      latitude_col_name = latitude_col_name
+    )
+    
+  }
+  
+
   # Print summary of Data Reading
   if (summary == TRUE) {
-    message(paste0(
+    summary_msg <- paste0(
       "##################################",
       "\n#####       Summary       #####\n",
       "##################################\n",
       "\n* Raw Number of Locations: ", initial_locations,
-      "\n* Time Periods: ", total_periods,
-      "\n* Final Number of Locations (Complete): ", length(unique(data$location))
-    ))
+      "\n* Time Periods: ", total_periods
+    )
+    if (!cluster_locations){
+      summary_msg <- paste0(
+        summary_msg,
+        "\n* Final Number of Locations (Complete): ", 
+        length(unique(data$location))
+      )
+    } else {
+      summary_msg <- paste0(
+        summary_msg,
+        "\n* Total number of CZ clusters: ",
+        length(unique(data$location)),
+        "\n* Total number of locations associated to CZ clusters: ",
+        length(
+          strsplit(
+            paste0(
+              unique(
+                data$location_in_cluster), 
+              collapse=', '), 
+            ', ')
+          [[1]]
+        )
+      )
+    }
+    
+    message(summary_msg)
   }
 
   return(as.data.frame(data))
@@ -550,4 +601,129 @@ TrimControls <- function(data,
   data <- data %>% dplyr::filter(location %in% final_locations)
 
   return(data)
+}
+
+
+#' Match all locations to the cluster they belong.
+#' 
+#' @description 
+#' Use clusters defined by how users move between cities to decide how cities 
+#' should be aggregated to reduce contamination.
+#' @param data data.frame object that holds the location name,
+#' latitude and longitude for all locations.
+#' @param location_id Name of the location variable (String).
+#' @param X List of names of the covariates.
+#' @param country_name name of country where the locations come from.
+#' @param longitude_col_name name of the longitude column in the `data`
+#' data.frame.
+#' @param latitude_col_name name of the latitude column in the `data`
+#' data.frame.
+#' @param find_location_lat_long logical flag indicating whether Google Maps API
+#' should be used to find location's latitude and longitude.
+#' 
+#' @return
+#' A data frame holding a match between each location and all clusters.
+#' 
+#' @export
+run_cluster_matching <- function(data,
+                                 location_id = 'location',
+                                 X = c(),
+                                 country_name = NULL,
+                                 longitude_col_name = "longitude",
+                                 latitude_col_name = "latitude",
+                                 find_location_lat_long = FALSE){
+  message("Clustering locations based on Commuting Zones.")
+  
+  location_country_data <- data.frame(
+    location = unique(data[, location_id]),
+    country = country_name
+  )
+  
+  if (find_location_lat_long == TRUE){
+    message("Matching location units to their latitude and longitude.")
+    location_country_data <- CommutingZones::get_location_lat_long(
+      location_country_data,
+      location_col_name = location_id,
+      country_col_name = 'country'
+    )
+  }
+  
+  cluster_file <- CommutingZones::filter_cluster_file(
+    country_name = country_name)
+  
+  matched_data_list <- CommutingZones::location_to_cluster_match(
+    location_country_data, cluster_file)
+  matched_data <- matched_data_list$matched_spdf %>% data.frame()
+  
+  matched_data$included_in_cluster <- ifelse(
+    is.na(matched_data$fbcz_id_num),
+    FALSE,
+    TRUE
+  )
+  
+  if (sum(matched_data$included_in_cluster) < nrow(location_country_data)) {
+
+    assign_cluster_to_orphan_locations <- data.frame(
+      location = unique(matched_data[
+        matched_data$included_in_cluster == FALSE, 
+        "location"]),
+      fbcz_id_num_replaced = max(
+          matched_data[!is.na(matched_data$fbcz_id_num), "fbcz_id_num"]
+        ) + 1:length(
+          unique(matched_data[
+            matched_data$included_in_cluster == FALSE, 
+            "location"])
+      )
+    )
+    
+    matched_data <- matched_data %>%
+      merge(
+        assign_cluster_to_orphan_locations,
+        by = "location",
+        all.x = TRUE
+      )
+  }
+  
+  matched_data <- matched_data %>%
+    merge(
+      data,
+      by = "location"
+    )
+  
+  matched_data$fbcz_id_num <- dplyr::coalesce(
+    matched_data$fbcz_id_num,
+    matched_data$fbcz_id_num_replaced
+  )
+  matched_data$fbcz_id_num_replaced <- NULL
+  
+  new_geo_data <- matched_data %>%
+    dplyr::group_by(fbcz_id_num, time) %>%
+    dplyr::summarize(
+      location_in_cluster = toString(unique(location)),
+      Y = sum(Y),
+      .groups='drop') %>%
+    data.frame() %>%
+    dplyr::ungroup()
+  
+  if (length(X) != 0){
+    for (var in X){
+      new_geo_data <- matched_data %>%
+        dplyr::group_by(fbcz_id_num, time) %>%
+        dplyr::summarize(
+          !!var := sum(!!sym(var)),
+          .groups='drop') %>%
+        dplyr::left_join(
+          new_geo_data, 
+          by = c("fbcz_id_num", "time")) %>%
+        data.frame()
+    }
+  }
+  
+  new_geo_data <- new_geo_data %>%
+    dplyr::mutate(
+      location = as.character(fbcz_id_num),
+      fbcz_id_num=NULL)
+
+  return(new_geo_data)
+
 }

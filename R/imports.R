@@ -10,11 +10,13 @@
 #' @docType package
 #' @name GeoLift
 #' @import augsynth
+#' @importFrom CommutingZones filter_cluster_file
+#' location_to_cluster_match
 #' @importFrom directlabels geom_dl dl.combine
 #' @importFrom doParallel registerDoParallel
-#' @importFrom dplyr add_row arrange bind_rows dense_rank desc distinct filter 
-#' group_by inner_join left_join mutate rename rename_with row_number sample_n 
-#' select slice slice_max slice_min summarise summarize tibble "%>%"
+#' @importFrom dplyr add_row arrange bind_rows coalesce dense_rank desc distinct
+#' filter group_by inner_join left_join mutate rename rename_with row_number
+#' sample_n select slice slice_max slice_min summarise summarize tibble "%>%"
 #' @importFrom foreach foreach
 #' @importFrom ggplot2 aes coord_cartesian element_blank element_text geom_hline 
 #' geom_line geom_ribbon geom_segment geom_smooth geom_vline ggplot ggtitle guides 
@@ -63,6 +65,7 @@ utils::globalVariables(
     "effect_size",
     "EffectSize",
     "Estimate",
+    "fbcz_id_num",
     "first_day",
     "Holdout",
     "ID",

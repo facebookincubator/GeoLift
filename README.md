@@ -15,18 +15,13 @@ GeoLift requires or works with:
 - R version 4.0.0 or newer.
 
 ## Installing GeoLift
-To install the package, first make sure that `remotes`, `LowRankQP`, `Synth` and 
+To install the package, first make sure that `remotes`, `CommutingZones` and
 `augsynth` are installed.
 
 ```
 install.packages("remotes", repos='http://cran.us.r-project.org')
 
-install.packages(
-  'LowRankQP',
-  repos='https://cran.microsoft.com/snapshot/2023-03-01/')
-
-remotes::install_github("cran/synth", dependencies = TRUE)
-
+remotes::install_github("facebookincubator/CommutingZones")
 remotes::install_github("ebenmichael/augsynth")
 ```
 
@@ -37,9 +32,9 @@ remotes::install_github("facebookincubator/GeoLift")
 ```
 
 ## Contacts
-- aesquerra@fb.com, Arturo Esquerra, Facebook Marketing Science Partner
+- aesquerrac@gmail.com, Arturo Esquerra, Facebook Marketing Science Partner
 - kpanchal@fb.com, Kanishka Panchal, Facebook Marketing Science Partner
-- nicocru@fb.com, Nicolas Cruces, Facebook Marketing Science Partner
+- nicolascruces1994@gmail.com, Nicolas Cruces, Facebook Marketing Science Partner
 - michaelkhalil@fb.com, Michael Khalil, Facebook Marketing Science Partner
 
 ## Join the GeoLift community

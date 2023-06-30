@@ -1,11 +1,11 @@
 ---
 title: "GeoLift Walkthrough"
 output: 
-  html_document: default
+  html_document: 
+    keep_md: yes
+  pdf_document: default
   md_document:
     variant: markdown_github
-knit:
-  rmarkdown::render("GeoLift_Walkthrough.Rmd", output_format = "all")
 vignette: >
   %\VignetteIndexEntry{GeoLift_Walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
@@ -181,7 +181,8 @@ MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
                                           alpha = 0.1,
                                           Correlations = TRUE,
                                           fixed_effects = TRUE,
-                                          side_of_test = "one_sided")
+                                          side_of_test = "one_sided",
+                                          parallel = FALSE)
 ```
 
 ### Power output - ranking variables
@@ -234,7 +235,7 @@ We will do this by running the `GeoLiftPower` method and expanding our `lookback
 
 ```{r GeoLiftPower top contenders}
 market_id = 3
-market_row <- MarketSelections$BestMarkets %>% dplyr::filter(ID == market_id)
+market_row <- dplyr::filter(MarketSelections$BestMarkets, ID == market_id)
 treatment_locations <- stringr::str_split(market_row$location, ", ")[[1]]
 treatment_duration <- market_row$duration
 lookback_window <- 10
@@ -246,7 +247,8 @@ power_data <- GeoLiftPower(
   lookback_window = lookback_window,
   treatment_periods = treatment_duration,
   cpic = 7.5,
-  side_of_test = "one_sided"
+  side_of_test = "one_sided",
+  parallel = FALSE
 )
 
 plot(power_data, show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +

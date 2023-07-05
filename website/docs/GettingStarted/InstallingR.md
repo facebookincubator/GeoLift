@@ -22,16 +22,11 @@ Since GeoLift is currently only available on GitHub, the `remotes` package is a 
 install.packages("remotes", repos='http://cran.us.r-project.org')
 ```
 
-To install the package, first make sure that remotes, `LowRankQP`, `Synth` and `augsynth` are installed.
+To install the package, first make sure that remotes, [Commuting Zones](https://github.com/facebookincubator/CommutingZones), and `augsynth` are installed.
 
 ```
-install.packages(
-  'LowRankQP',
-  repos='https://cran.microsoft.com/snapshot/2023-03-01/')
-
-remotes::install_github("cran/synth", dependencies = TRUE)
-
 remotes::install_github("ebenmichael/augsynth")
+remotes::install_github("facebookincubator/CommutingZones")
 ```
 
 Finally, we can install the `GeoLift` package with the following command:
@@ -45,3 +40,4 @@ remotes::install_github("facebookincubator/GeoLift")
 ## 3. GeoLift Walkthrough Example
 
 If you're running GeoLift for the first time, we recommend going through the example in the **[GeoLift Walkthrough](./Walkthrough.md)**.
+

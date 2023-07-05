@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[5080],{3152:function(t){t.exports=JSON.parse('{"allTagsPath":"/GeoLift/blog/tags","slug":"/GeoLift/blog/tags/continuous-lift","name":"continuous lift","count":1,"permalink":"/GeoLift/blog/tags/continuous-lift"}')}}]);

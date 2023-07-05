@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[226],{995:function(o){o.exports=JSON.parse('{"allTagsPath":"/GeoLift/blog/tags","slug":"/GeoLift/blog/tags/lookback-window","name":"lookback_window","count":1,"permalink":"/GeoLift/blog/tags/lookback-window"}')}}]);

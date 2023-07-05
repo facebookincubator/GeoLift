@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[6516],{9065:function(e){e.exports=JSON.parse('{"label":"MultiCell","permalink":"/GeoLift/blog/tags/multi-cell","allTagsPath":"/GeoLift/blog/tags","count":1}')}}]);

@@ -233,6 +233,9 @@ GeoDataRead <- function(data,
   }
 
   if (cluster_locations == TRUE) {
+    if (!requireNamespace("CommutingZones", quietly = TRUE)){
+      stop('Execution aborted. Please, either install CommutingZones package with [remotes::install_github("facebookincubator/CommutingZones")] or set cluster_locations to FALSE')
+    }
     
     data <- run_cluster_matching(
       data,
@@ -633,17 +636,6 @@ run_cluster_matching <- function(data,
                                  latitude_col_name = "latitude",
                                  find_location_lat_long = FALSE){
   message("Clustering locations based on Commuting Zones.")
-  
-  if(!is.element('CommutingZones', installed.packages())){
-    message("The package [CommutingZones] is required for when find_location_lat_long=True")
-    install_commuting_zones <- readline("Would you like to install it? Y or N?")
-    if (install_commuting_zones == 'Y' || install_commuting_zones == 'y'){
-      remotes::install_github("facebookincubator/CommutingZones")
-    }else{
-      stop("Execution aborted. Please, either install CommutingZones package or set find_location_lat_long to FALSE")
-    }
-    
-  }
   
   location_country_data <- data.frame(
     location = unique(data[, location_id]),

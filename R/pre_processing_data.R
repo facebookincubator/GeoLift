@@ -634,6 +634,17 @@ run_cluster_matching <- function(data,
                                  find_location_lat_long = FALSE){
   message("Clustering locations based on Commuting Zones.")
   
+  if(!is.element('CommutingZones', installed.packages())){
+    message("The package [CommutingZones] is required for when find_location_lat_long=True")
+    install_commuting_zones <- readline("Would you like to install it? Y or N?")
+    if (install_commuting_zones == 'Y' || install_commuting_zones == 'y'){
+      remotes::install_github("facebookincubator/CommutingZones")
+    }else{
+      stop("Execution aborted. Please, either install CommutingZones package or set find_location_lat_long to FALSE")
+    }
+    
+  }
+  
   location_country_data <- data.frame(
     location = unique(data[, location_id]),
     country = country_name

@@ -210,26 +210,17 @@ GeoDataRead <- function(data,
     }
   }
 
-  if (keep_unix_time == FALSE) {
-    data <- data_raw %>%
-      dplyr::group_by(location, time) %>%
-      dplyr::summarize(Y = sum(Y))
-    for (var in X) {
-      data_aux <- data_raw %>%
-        dplyr::group_by(location, time) %>%
-        dplyr::summarize(!!var := sum(!!sym(var)))
-      data <- data %>% dplyr::left_join(data_aux, by = c("location", "time"))
-    }
-  } else {
-    data <- data_raw %>%
-      dplyr::group_by(location, time, date_unix) %>%
-      dplyr::summarize(Y = sum(Y))
-    for (var in X) {
-      data_aux <- data_raw %>%
-        dplyr::group_by(location, time, date_unix) %>%
-        dplyr::summarize(!!var := sum(!!sym(var)))
-      data <- data %>% dplyr::left_join(data_aux, by = c("location", "time", "date_unix"))
-    }
+  grouping_variables = c("location", "time")
+  if(keep_unix_time) grouping_variables = c(grouping_variables, "date_unix")
+  
+  data <- data_raw %>%
+    dplyr::group_by_at(grouping_variables) %>%
+    dplyr::summarize(Y = sum(Y))
+  for (var in X) {
+    data_aux <- data_raw %>%
+      dplyr::group_by_at(grouping_variables) %>%
+      dplyr::summarize(!!var := sum(!!sym(var)))
+    data <- data %>% dplyr::left_join(data_aux, by = grouping_variables)
   }
 
   if (cluster_locations == TRUE) {

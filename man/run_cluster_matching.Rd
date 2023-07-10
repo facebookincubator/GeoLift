@@ -11,7 +11,8 @@ run_cluster_matching(
   country_name = NULL,
   longitude_col_name = "longitude",
   latitude_col_name = "latitude",
-  find_location_lat_long = FALSE
+  find_location_lat_long = FALSE,
+  gmaps_key = NULL
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ data.frame.}
 
 \item{find_location_lat_long}{logical flag indicating whether Google Maps API
 should be used to find location's latitude and longitude.}
+
+\item{gmaps_key}{string containing your Google Maps API key.}
 }
 \value{
 A data frame holding a match between each location and all clusters.

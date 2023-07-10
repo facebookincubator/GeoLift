@@ -53,7 +53,8 @@ GeoDataRead <- function(data,
                         country_name = NULL,
                         longitude_col_name = "longitude",
                         latitude_col_name = "latitude",
-                        find_location_lat_long = FALSE) {
+                        find_location_lat_long = FALSE,
+                        gmaps_key = NULL) {
   format <- tolower(format)
 
   # Acceptable date formats
@@ -241,7 +242,8 @@ GeoDataRead <- function(data,
       find_location_lat_long = find_location_lat_long,
       country_name = country_name,
       longitude_col_name = longitude_col_name,
-      latitude_col_name = latitude_col_name
+      latitude_col_name = latitude_col_name,
+      gmaps_key = gmaps_key
     )
     
   }
@@ -620,6 +622,7 @@ TrimControls <- function(data,
 #' data.frame.
 #' @param find_location_lat_long logical flag indicating whether Google Maps API
 #' should be used to find location's latitude and longitude.
+#' @param gmaps_key string containing your Google Maps API key.
 #' 
 #' @return
 #' A data frame holding a match between each location and all clusters.
@@ -631,7 +634,8 @@ run_cluster_matching <- function(data,
                                  country_name = NULL,
                                  longitude_col_name = "longitude",
                                  latitude_col_name = "latitude",
-                                 find_location_lat_long = FALSE){
+                                 find_location_lat_long = FALSE,
+                                 gmaps_key = NULL){
   message("Clustering locations based on Commuting Zones.")
   
   location_country_data <- data.frame(
@@ -644,7 +648,8 @@ run_cluster_matching <- function(data,
     location_country_data <- CommutingZones::get_location_lat_long(
       location_country_data,
       location_col_name = location_id,
-      country_col_name = 'country'
+      country_col_name = 'country',
+      gmaps_key = gmaps_key
     )
   }
   

@@ -9,7 +9,8 @@ utils.install_packages("remotes", repos='http://cran.us.r-project.org')
 # Load remotes package
 remotes = importr('remotes')
 
-# Install augsynth & GeoLift from GitHub
+# Install augsynth, CommutingZones and GeoLift from GitHub
 remotes.install_github("ebenmichael/augsynth")
+remotes.install_github("facebookincubator/CommutingZones")
 remotes.install_github("facebookincubator/GeoLift")
 

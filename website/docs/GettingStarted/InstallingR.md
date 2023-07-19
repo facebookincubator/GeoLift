@@ -22,11 +22,10 @@ Since GeoLift is currently only available on GitHub, the `remotes` package is a 
 install.packages("remotes", repos='http://cran.us.r-project.org')
 ```
 
-To install the package, first make sure that remotes, [Commuting Zones](https://github.com/facebookincubator/CommutingZones), and `augsynth` are installed.
+To install the package, first make sure that remotes and `augsynth` are installed.
 
 ```
 remotes::install_github("ebenmichael/augsynth")
-remotes::install_github("facebookincubator/CommutingZones")
 ```
 
 Finally, we can install the `GeoLift` package with the following command:

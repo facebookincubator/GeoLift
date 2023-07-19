@@ -231,7 +231,7 @@ type_of_test <- function(side_of_test = "two_sided", alternative_hypothesis = NU
 #' @param stat_func Function to compute test statistic. NULL by default.
 #' @param model A string indicating the outcome model used in the Augmented Synthetic
 #' Control Method. Set to Generalized Synthetic Controls "none" by default.
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #'
@@ -385,7 +385,7 @@ pvalueCalc <- function(data,
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #' @param lookback_window A number indicating how far back in time the simulations
@@ -465,32 +465,32 @@ run_simulations <- function(data,
     1:lookback_window,
     1:nrow(as.matrix(treatment_combinations))
   )
-  
+
   colnames(param_combination) <- c(
-    'effect_size',
-    'treatment_duration',
-    'lookback_window',
-    'treatment_combination_row'
+    "effect_size",
+    "treatment_duration",
+    "lookback_window",
+    "treatment_combination_row"
   )
-  
-  combine_function <- function(iterator){
-      pb <- txtProgressBar(min = 1, max = iterator - 1, style = 3)
-      count <- 0
-      function(...) {
-        count <<- count + length(list(...)) - 1
-        setTxtProgressBar(pb, count)
-        flush.console()
-        cbind(...) # this can feed into .combine option of foreach
-      }
+
+  combine_function <- function(iterator) {
+    pb <- txtProgressBar(min = 1, max = iterator - 1, style = 3)
+    count <- 0
+    function(...) {
+      count <<- count + length(list(...)) - 1
+      setTxtProgressBar(pb, count)
+      flush.console()
+      cbind(...) # this can feed into .combine option of foreach
     }
+  }
   simulation_results <- foreach(
     effect_size = param_combination$effect_size,
     treatment_duration = param_combination$treatment_duration,
     sim = param_combination$lookback_window,
     test = param_combination$treatment_combination_row,
     .combine = ifelse(
-      ProgressBar, 
-      combine_function(nrow(param_combination)), 
+      ProgressBar,
+      combine_function(nrow(param_combination)),
       cbind
     ),
     .errorhandling = "stop",
@@ -512,12 +512,14 @@ run_simulations <- function(data,
       stat_func = type_of_test(
         side_of_test = side_of_test,
         alternative_hypothesis = ifelse(
-          effect_size > 0, "positive", "negative")),
+          effect_size > 0, "positive", "negative"
+        )
+      ),
       conformal_type = conformal_type,
       ns = ns
     ))
   }
-  
+
   if (is.null(dim(simulation_results))) {
     simulation_results <- matrix(
       simulation_results,
@@ -826,31 +828,32 @@ GeoLiftPowerFinder <- function(data,
           fixed_effects = fixed_effects
         ))
       }
-      suppressMessages(gridExtra::grid.arrange(plot(bestmodels[[1]], notes = paste(
-        "locations:", BestResults$location[1],
-        "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$EffectSize[1],
-        "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[1], 3), "%"
-      )),
-      plot(bestmodels[[2]], notes = paste(
-        "locations:", BestResults$location[2],
-        "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$EffectSize[2],
-        "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[2], 3), "%"
-      )),
-      plot(bestmodels[[3]], notes = paste(
-        "locations:", BestResults$location[3],
-        "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$EffectSize[3],
-        "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[3], 3), "%"
-      )),
-      plot(bestmodels[[4]], notes = paste(
-        "locations:", BestResults$location[4],
-        "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
-        BestResults$EffectSize[4],
-        "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[4], 3), "%"
-      )),
-      ncol = 2
+      suppressMessages(gridExtra::grid.arrange(
+        plot(bestmodels[[1]], notes = paste(
+          "locations:", BestResults$location[1],
+          "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
+          BestResults$EffectSize[1],
+          "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[1], 3), "%"
+        )),
+        plot(bestmodels[[2]], notes = paste(
+          "locations:", BestResults$location[2],
+          "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
+          BestResults$EffectSize[2],
+          "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[2], 3), "%"
+        )),
+        plot(bestmodels[[3]], notes = paste(
+          "locations:", BestResults$location[3],
+          "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
+          BestResults$EffectSize[3],
+          "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[3], 3), "%"
+        )),
+        plot(bestmodels[[4]], notes = paste(
+          "locations:", BestResults$location[4],
+          "\n Treatment Periods:", tp, "\n Minimum Detectable Effect: ",
+          BestResults$EffectSize[4],
+          "\n Proportion Total Y: ", 100 * round(BestResults$ProportionTotal_Y[4], 3), "%"
+        )),
+        ncol = 2
       ))
     }
   }
@@ -1369,7 +1372,7 @@ NumberLocations <- function(data,
 #'
 #' @description
 #' `r lifecycle::badge("stable")`
-#' 
+#'
 #' This function runs power calculations for input historical geo data
 #' for a pre-determined set of test locations.
 #'
@@ -1430,7 +1433,7 @@ NumberLocations <- function(data,
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #' @param import_augsynth_from Points to where the augsynth package
@@ -1484,8 +1487,10 @@ GeoLiftPower <- function(data,
     )
   }
 
-  message("Calculating Power for the following treatment group: ", 
-          paste0(locations, collapse='; '), ".")
+  message(
+    "Calculating Power for the following treatment group: ",
+    paste0(locations, collapse = "; "), "."
+  )
   # Part 1: Treatment and pre-treatment periods
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)
@@ -1617,7 +1622,7 @@ GeoLiftPower <- function(data,
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #' @param import_augsynth_from Points to where the augsynth package

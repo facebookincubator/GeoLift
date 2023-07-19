@@ -16,9 +16,9 @@
 #' filter group_by inner_join left_join mutate rename rename_with row_number
 #' sample_n select slice slice_max slice_min summarise summarize tibble "%>%"
 #' @importFrom foreach foreach
-#' @importFrom ggplot2 aes coord_cartesian element_blank element_text geom_hline 
-#' geom_line geom_ribbon geom_segment geom_smooth geom_vline ggplot ggtitle guides 
-#' guide_legend labs scale_color_manual scale_colour_manual scale_fill_manual 
+#' @importFrom ggplot2 aes coord_cartesian element_blank element_text geom_hline
+#' geom_line geom_ribbon geom_segment geom_smooth geom_vline ggplot ggtitle guides
+#' guide_legend labs scale_color_manual scale_colour_manual scale_fill_manual
 #' scale_x_continuous scale_y_continuous sec_axis theme theme_minimal
 #' xlab xlim ylab ylim
 #' @importFrom gridExtra grid.arrange

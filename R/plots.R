@@ -518,17 +518,19 @@ absolute_value.plot <- function(GeoLift,
       linetype = post_treatment_linetype, alpha = 0.3
     ) +
     geom_hline(yintercept = 0, alpha = 0.5) +
-    geom_segment(aes(
-      y = rope_quantiles[[1]], yend = rope_quantiles[[1]],
-      x = plot_dates$treatment_start, xend = plot_dates$treatment_end
-    ),
-    linetype = rope_linetype, colour = "darkgrey"
+    geom_segment(
+      aes(
+        y = rope_quantiles[[1]], yend = rope_quantiles[[1]],
+        x = plot_dates$treatment_start, xend = plot_dates$treatment_end
+      ),
+      linetype = rope_linetype, colour = "darkgrey"
     ) +
-    geom_segment(aes(
-      y = rope_quantiles[[2]], yend = rope_quantiles[[2]],
-      x = plot_dates$treatment_start, xend = plot_dates$treatment_end
-    ),
-    linetype = rope_linetype, colour = "darkgrey"
+    geom_segment(
+      aes(
+        y = rope_quantiles[[2]], yend = rope_quantiles[[2]],
+        x = plot_dates$treatment_start, xend = plot_dates$treatment_end
+      ),
+      linetype = rope_linetype, colour = "darkgrey"
     ) +
     geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.2) + # 4B4196
     scale_fill_manual(
@@ -850,35 +852,34 @@ plot.MultiCellMarketSelection <- function(x,
                                           title = "",
                                           stacked = TRUE,
                                           ...) {
-
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
   }
 
-  if(length(test_markets) != length(x$Models)){
+  if (length(test_markets) != length(x$Models)) {
     stop("\nMake sure an ID is provided for each cell in the analysis.")
   }
 
-  if(!(all(sapply(test_markets, is.numeric)))){
+  if (!(all(sapply(test_markets, is.numeric)))) {
     stop("\nMake sure all input IDs in test_markets are numeric.")
   }
 
-  if(!(tolower(type) %in% c("lift", "att", "treatmentschedule"))){
+  if (!(tolower(type) %in% c("lift", "att", "treatmentschedule"))) {
     stop("\nPlease specify a valid geolift_type test ('Lift', 'ATT', 'TreatmentSchedule').")
   }
 
   plots <- list()
 
-  for(cell in 1:length(x$Models)){
+  for (cell in 1:length(x$Models)) {
     Market <- x$Models[[cell]]$BestMarkets %>% dplyr::filter(ID == test_markets[cell])
     locs_aux <- unlist(strsplit(stringr::str_replace_all(Market$location, ", ", ","), split = ","))
     max_time <- max(x$Models[[cell]]$parameters$data$time)
 
     data_lifted <- x$Models[[cell]]$parameters$data
     data_lifted$Y[data_lifted$location %in% locs_aux &
-                    data_lifted$time >= max_time - Market$duration + 1] <-
+      data_lifted$time >= max_time - Market$duration + 1] <-
       data_lifted$Y[data_lifted$location %in% locs_aux &
-                      data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
+        data_lifted$time >= max_time - Market$duration + 1] * (1 + Market$EffectSize)
 
     if (tolower(x$Models[[cell]]$parameters$side_of_test) == "two_sided") {
       stat_test <- "Total"
@@ -904,18 +905,20 @@ plot.MultiCellMarketSelection <- function(x,
     ))
 
     plots <- append(plots, list(lifted))
-
   }
 
-  if (stacked){
-    aux <- lapply(plots, function(x) plot(x,
-                                          type = type,
-                                          treatment_end_date = treatment_end_date,
-                                          frequency = frequency,
-                                          plot_start_date = plot_start_date,
-                                          title = title,
-                                          subtitle = paste0("Cell: ", paste(x$test_id$name, collapse = ", ")),
-                                          post_treatment_periods = post_treatment_periods))
+  if (stacked) {
+    aux <- lapply(plots, function(x) {
+      plot(x,
+        type = type,
+        treatment_end_date = treatment_end_date,
+        frequency = frequency,
+        plot_start_date = plot_start_date,
+        title = title,
+        subtitle = paste0("Cell: ", paste(x$test_id$name, collapse = ", ")),
+        post_treatment_periods = post_treatment_periods
+      )
+    })
 
     suppressMessages(gridExtra::grid.arrange(
       grobs = aux,
@@ -923,22 +926,22 @@ plot.MultiCellMarketSelection <- function(x,
       nrow = length(x$Models),
       bottom = paste("Note: Plots with applied MDE applied in the treatment period.")
     ))
-  } else{
-    for(cell in 1:length(x$Models)){
+  } else {
+    for (cell in 1:length(x$Models)) {
       print(plot(plots[[cell]],
-                 type = type,
-                 treatment_end_date = treatment_end_date,
-                 frequency = frequency,
-                 plot_start_date = plot_start_date,
-                 title = title,
-                 subtitle = paste0("Cell ", cell, ":\n", paste(plots[[cell]]$test_id$name, collapse = ", "),
-                                   ":\nPlots with applied MDE in the Treatment period."),
-                 post_treatment_periods = post_treatment_periods))
+        type = type,
+        treatment_end_date = treatment_end_date,
+        frequency = frequency,
+        plot_start_date = plot_start_date,
+        title = title,
+        subtitle = paste0(
+          "Cell ", cell, ":\n", paste(plots[[cell]]$test_id$name, collapse = ", "),
+          ":\nPlots with applied MDE in the Treatment period."
+        ),
+        post_treatment_periods = post_treatment_periods
+      ))
     }
-
   }
-
-
 }
 
 
@@ -968,36 +971,37 @@ plot.MultiCellPower <- function(x,
                                 breaks_x_axis = 10,
                                 stacked = TRUE,
                                 ...) {
-
   if (!inherits(x, "MultiCellPower")) {
     stop("object must be class MultiCellPower")
   }
 
-  if(stacked){
-    aux <- lapply(x$PowerCurves, function(x) plot(x,
-                                                  actual_values = actual_values,
-                                                  smoothed_values = smoothed_values,
-                                                  show_mde = show_mde,
-                                                  breaks_x_axis = breaks_x_axis,
-                                                  notes = paste0("Cell : ", x[1,1])))
+  if (stacked) {
+    aux <- lapply(x$PowerCurves, function(x) {
+      plot(x,
+        actual_values = actual_values,
+        smoothed_values = smoothed_values,
+        show_mde = show_mde,
+        breaks_x_axis = breaks_x_axis,
+        notes = paste0("Cell : ", x[1, 1])
+      )
+    })
 
     suppressMessages(gridExtra::grid.arrange(
       grobs = aux,
       ncol = 1,
       nrow = length(x$PowerCurves)
     ))
-
-  } else{
-    for (cell in 1:length(x$PowerCurves)){
+  } else {
+    for (cell in 1:length(x$PowerCurves)) {
       print(plot(x$PowerCurves[[cell]],
-                 actual_values = actual_values,
-                 smoothed_values = smoothed_values,
-                 show_mde = show_mde,
-                 breaks_x_axis = breaks_x_axis,
-                 notes = paste0("Cell ", cell, ": ", x$PowerCurves[[cell]][1,1])))
+        actual_values = actual_values,
+        smoothed_values = smoothed_values,
+        show_mde = show_mde,
+        breaks_x_axis = breaks_x_axis,
+        notes = paste0("Cell ", cell, ": ", x$PowerCurves[[cell]][1, 1])
+      ))
     }
   }
-
 }
 
 
@@ -1034,37 +1038,39 @@ plot.GeoLiftMultiCell <- function(x,
     stop("object must be class GeoLiftMultiCell")
   }
 
-  if(!(tolower(type) %in% c("lift", "att", "treatmentschedule", "incrementality"))){
+  if (!(tolower(type) %in% c("lift", "att", "treatmentschedule", "incrementality"))) {
     stop("\nPlease specify a valid geolift_type test ('Lift', 'ATT', 'TreatmentSchedule', 'Incrementality').")
   }
 
-  if (stacked){
-    aux <- lapply(x$results, function(x) plot(x,
-                                              type = type,
-                                              treatment_end_date = treatment_end_date,
-                                              frequency = frequency,
-                                              plot_start_date = plot_start_date,
-                                              title = title,
-                                              subtitle = paste0("Cell: ", paste(x$test_id$name, collapse = ", ")),
-                                              post_treatment_periods = post_treatment_periods))
+  if (stacked) {
+    aux <- lapply(x$results, function(x) {
+      plot(x,
+        type = type,
+        treatment_end_date = treatment_end_date,
+        frequency = frequency,
+        plot_start_date = plot_start_date,
+        title = title,
+        subtitle = paste0("Cell: ", paste(x$test_id$name, collapse = ", ")),
+        post_treatment_periods = post_treatment_periods
+      )
+    })
 
     suppressMessages(gridExtra::grid.arrange(
       grobs = aux,
       ncol = 1,
       nrow = length(x$results)
     ))
-  } else{
-    for(cell in 1:length(x$results)){
+  } else {
+    for (cell in 1:length(x$results)) {
       print(plot(x$results[[cell]],
-                 type = type,
-                 treatment_end_date = treatment_end_date,
-                 frequency = frequency,
-                 plot_start_date = plot_start_date,
-                 title = title,
-                 subtitle = paste0("Cell ", cell, ":\n", paste(x$results[[cell]]$test_id$name, collapse = ", ")),
-                 post_treatment_periods = post_treatment_periods))
+        type = type,
+        treatment_end_date = treatment_end_date,
+        frequency = frequency,
+        plot_start_date = plot_start_date,
+        title = title,
+        subtitle = paste0("Cell ", cell, ":\n", paste(x$results[[cell]]$test_id$name, collapse = ", ")),
+        post_treatment_periods = post_treatment_periods
+      ))
     }
-
   }
-
 }

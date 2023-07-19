@@ -29,10 +29,12 @@ Then, install the package from GitHub:
 remotes::install_github("facebookincubator/GeoLift")
 ```
 
+To use Commuting Zones in GeoLift, please check the guide [here](https://facebookincubator.github.io/GeoLift/docs/GettingStarted/Walkthrough#using-commuting-zones)
+
 ## Contacts
-- aesquerrac@gmail.com, Arturo Esquerra, Facebook Marketing Science Partner
+- aesquerrac@gmail.com, Arturo Esquerra, creator.
+- nicolascruces1994@gmail.com, Nicolas Cruces, maintainer.
 - kpanchal@fb.com, Kanishka Panchal, Facebook Marketing Science Partner
-- nicolascruces1994@gmail.com, Nicolas Cruces, Facebook Marketing Science Partner
 - michaelkhalil@fb.com, Michael Khalil, Facebook Marketing Science Partner
 
 ## Join the GeoLift community

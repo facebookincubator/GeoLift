@@ -14,11 +14,11 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  dev="png",
+  dev = "png",
   collapse = TRUE,
   comment = "#>",
-  fig.width = 8, 
-  fig.height = 6, 
+  fig.width = 8,
+  fig.height = 6,
   fig.align = "center",
   warning = FALSE
 )
@@ -43,7 +43,7 @@ You can install `GeoLift` from our [GitHub repository](https://github.com/facebo
 
 ```{r install, results="hide", message=F, eval=F}
 ## Install remotes if noy already installed
-install.packages("remotes", repos='http://cran.us.r-project.org')
+install.packages("remotes", repos = "http://cran.us.r-project.org")
 ## Install augsynth & GeoLift from GitHub
 remotes::install_github("ebenmichael/augsynth")
 remotes::install_github("facebookincubator/GeoLift")
@@ -74,13 +74,15 @@ Every GeoLift experiment should contain at least these three variables that refl
 The first step to run a `GeoLift` test is to read the data into the proper format using the `GeoDataRead` function.
 
 ```{r GeoDataRead}
-GeoTestData_PreTest <- GeoDataRead(data = GeoLift_PreTest,
-                                   date_id = "date",
-                                   location_id = "location",
-                                   Y_id = "Y",
-                                   X = c(), #empty list as we have no covariates
-                                   format = "yyyy-mm-dd",
-                                   summary = TRUE)
+GeoTestData_PreTest <- GeoDataRead(
+  data = GeoLift_PreTest,
+  date_id = "date",
+  location_id = "location",
+  Y_id = "Y",
+  X = c(), # empty list as we have no covariates
+  format = "yyyy-mm-dd",
+  summary = TRUE
+)
 head(GeoTestData_PreTest)
 ```
 
@@ -92,9 +94,10 @@ A good next step is to plot the panel data with `GeoPlot` to observe it's trend,
 
 ```{r plotting}
 GeoPlot(GeoTestData_PreTest,
-        Y_id = "Y",
-        time_id = "time",
-        location_id = "location")
+  Y_id = "Y",
+  time_id = "time",
+  location_id = "location"
+)
 ```
 
 In this case we see a similar pattern that's shared across all locations. These structural similarities between regions are the key to a successful test!
@@ -166,23 +169,25 @@ The key parameters needed to run this function are:
 Continuing with the example and in order to explore the function's capabilities let's assume we have two restrictions: Chicago must be part of the test markets and we have up to \$100,000 to run the test. We can include these constraints into `GeoLiftMarketSelection()` with the `include_markets` and `budget` parameters and proceed with the market selection. Moreover, after observing that the historical KPI values in `GeoPlot()` have been stable across time we will proceed with a model with Fixed Effects. Finally, given a CPIC = \$7.50 obtained from a previous Lift test, a range between two to five test markets, and a duration between 10 and 15 days we obtain:
 
 ```{r GeoLiftMarketSelection}
-MarketSelections <- GeoLiftMarketSelection(data = GeoTestData_PreTest,
-                                          treatment_periods = c(10,15),
-                                          N = c(2,3,4,5),
-                                          Y_id = "Y",
-                                          location_id = "location",
-                                          time_id = "time",
-                                          effect_size = seq(-0.25, 0.25, 0.05),
-                                          lookback_window = 1, 
-                                          include_markets = c("chicago"),
-                                          exclude_markets = c("honolulu"),
-                                          cpic = 7.50,
-                                          budget = 100000,
-                                          alpha = 0.1,
-                                          Correlations = TRUE,
-                                          fixed_effects = TRUE,
-                                          side_of_test = "one_sided",
-                                          parallel = FALSE)
+MarketSelections <- GeoLiftMarketSelection(
+  data = GeoTestData_PreTest,
+  treatment_periods = c(10, 15),
+  N = c(2, 3, 4, 5),
+  Y_id = "Y",
+  location_id = "location",
+  time_id = "time",
+  effect_size = seq(-0.25, 0.25, 0.05),
+  lookback_window = 1,
+  include_markets = c("chicago"),
+  exclude_markets = c("honolulu"),
+  cpic = 7.50,
+  budget = 100000,
+  alpha = 0.1,
+  Correlations = TRUE,
+  fixed_effects = TRUE,
+  side_of_test = "one_sided",
+  parallel = FALSE
+)
 ```
 
 ### Power output - ranking variables
@@ -234,7 +239,7 @@ We will do this by running the `GeoLiftPower` method and expanding our `lookback
 #### NOTE: You could repeat this process for the top 5 treatment combinations that come out of GeoLiftMarketSelection, with increased lookback windows and compare their power curves.  We will do it only for Chicago and Portland here.
 
 ```{r GeoLiftPower top contenders}
-market_id = 3
+market_id <- 3
 market_row <- dplyr::filter(MarketSelections$BestMarkets, ID == market_id)
 treatment_locations <- stringr::str_split(market_row$location, ", ")[[1]]
 treatment_duration <- market_row$duration
@@ -252,7 +257,7 @@ power_data <- GeoLiftPower(
 )
 
 plot(power_data, show_mde = TRUE, smoothed_values = FALSE, breaks_x_axis = 5) +
-    labs(caption = unique(power_data$location))
+  labs(caption = unique(power_data$location))
 ```
 
 While both market selections perform excellent on all metrics, we will move further with the latter since it allows us to run a successful test with a smaller budget. Also, the power curve is symmetrical with respect to the y axis, it has no power when the true effect is zero, and has a similar behavior with more simulations.  Finally, changing the `print_summary` parameter of `plot()` to `TRUE` can provide us with additional information about this market selection.
@@ -265,17 +270,18 @@ plot(MarketSelections, market_ID = 3, print_summary = TRUE)
 #### **Note:** Given that we are not using the complete pre-treatment data to calculate the weights in our power analysis simulations, the ones displayed by the plotting function above are not the _final_ values. However, you can easily obtain them with the `GetWeights()` function.
 
 ```{r GetWeights}
-weights <- GetWeights(Y_id = "Y",
-                      location_id = "location",
-                      time_id = "time",
-                      data = GeoTestData_PreTest,
-                      locations = c("chicago", "portland"),
-                      pretreatment_end_time = 90,
-                      fixed_effects = TRUE)
+weights <- GetWeights(
+  Y_id = "Y",
+  location_id = "location",
+  time_id = "time",
+  data = GeoTestData_PreTest,
+  locations = c("chicago", "portland"),
+  pretreatment_end_time = 90,
+  fixed_effects = TRUE
+)
 
 # Top weights
 head(dplyr::arrange(weights, desc(weight)))
-
 ```
 
 ## Example - Analyzing the Test Results
@@ -293,13 +299,15 @@ data(GeoLift_Test)
 Similarly to the process executed at the beginning of the Power Analysis phase, we read the data into GeoLift's format using the `GeoDataRead` function. You can observe in the summary output that additional 15 periods are contained in the new GeoLift data object.
 
 ```{r GeoDataRead_Test}
-GeoTestData_Test <- GeoDataRead(data = GeoLift_Test,
-                                date_id = "date",
-                                location_id = "location",
-                                Y_id = "Y",
-                                X = c(), #empty list as we have no covariates
-                                format = "yyyy-mm-dd",
-                                summary = TRUE)
+GeoTestData_Test <- GeoDataRead(
+  data = GeoLift_Test,
+  date_id = "date",
+  location_id = "location",
+  Y_id = "Y",
+  X = c(), # empty list as we have no covariates
+  format = "yyyy-mm-dd",
+  summary = TRUE
+)
 head(GeoTestData_Test)
 ```
 
@@ -307,10 +315,11 @@ The results can also be plotted using the `GeoPlot` function. However, for post-
 
 ```{r plottingTest}
 GeoPlot(GeoTestData_Test,
-        Y_id = "Y",
-        time_id = "time",
-        location_id = "location",
-        treatment_start = 91)
+  Y_id = "Y",
+  time_id = "time",
+  location_id = "location",
+  treatment_start = 91
+)
 ```
 
 ### GeoLift Inference
@@ -318,11 +327,13 @@ GeoPlot(GeoTestData_Test,
 The next step in the process is to calculate the actual Lift caused by the marketing campaigns on our test locations. To do so we make use of the `GeoLift()` function, which will take as input the GeoLift dataframe as well as information about the test such as which were the cities in the treatment group, when the test started, and when it ended through the `locations`, `treatment_start_time`, and `treatment_end_time` parameters respectively.
 
 ```{r GeoLift}
-GeoTest <- GeoLift(Y_id = "Y",
-                   data = GeoTestData_Test,
-                   locations = c("chicago", "portland"),
-                   treatment_start_time = 91,
-                   treatment_end_time = 105)
+GeoTest <- GeoLift(
+  Y_id = "Y",
+  data = GeoTestData_Test,
+  locations = c("chicago", "portland"),
+  treatment_start_time = 91,
+  treatment_end_time = 105
+)
 GeoTest
 ```
 
@@ -355,12 +366,14 @@ Looking at the Average Estimated Treatment Effect's plot can also be extremely u
 While the results obtained from the test are robust and highly significant, a useful feature of GeoLift is its ability to improve the model fit even further and reduce bias through augmentation by a prognostic function. There are several options for augmentation of the standard GeoLift model such as regularization (specifically Ridge) and an application of Generalized Synthetic Control Model (GSC). While each of these approaches provide it's own set of advantages, for instance Ridge regularization usually performs well when the number of units and time-periods isn't large while GSC helps improve fit for situations with many pre-treatment periods, GeoLift offers the option to let the model decide which is the best approach by setting the model parameter to "best".
 
 ```{r GeoLiftBest}
-GeoTestBest <- GeoLift(Y_id = "Y",
-                       data = GeoTestData_Test,
-                       locations = c("chicago", "portland"),
-                       treatment_start_time = 91,
-                       treatment_end_time = 105,
-                       model = "best")
+GeoTestBest <- GeoLift(
+  Y_id = "Y",
+  data = GeoTestData_Test,
+  locations = c("chicago", "portland"),
+  treatment_start_time = 91,
+  treatment_end_time = 105,
+  model = "best"
+)
 GeoTestBest
 summary(GeoTestBest)
 plot(GeoTestBest, type = "Lift")

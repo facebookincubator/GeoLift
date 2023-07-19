@@ -2,7 +2,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-# Includes function ASCMExecution, GeoLift, print.GeoLift, cumulative_lift, 
+# Includes function ASCMExecution, GeoLift, print.GeoLift, cumulative_lift,
 # summary.GeoLift, print.summary.GeoLift
 
 #' Augsynth execution.
@@ -47,44 +47,45 @@
 #'          }
 #' @export
 ASCMExecution <- function(
-  data,
-  treatment_locations,
-  treatment_start_time,
-  treatment_end_time,  
-  Y_id = "Y",
-  time_id = "time",
-  location_id = "location",
-  X = c(),
-  model = "none",
-  fixed_effects = TRUE){
-  
-  data <- data %>% 
+    data,
+    treatment_locations,
+    treatment_start_time,
+    treatment_end_time,
+    Y_id = "Y",
+    time_id = "time",
+    location_id = "location",
+    X = c(),
+    model = "none",
+    fixed_effects = TRUE) {
+  data <- data %>%
     dplyr::rename(
       time = time_id,
       Y = Y_id,
-      location = location_id) %>%
+      location = location_id
+    ) %>%
     dplyr::mutate(
       location = tolower(location)
     ) %>%
     dplyr::filter(
       time <= treatment_end_time
     )
-  
+
   treatment_locations <- tolower(treatment_locations)
-  
+
   geo_data <- fn_treatment(data,
-                           locations = treatment_locations,
-                           treatment_start_time,
-                           treatment_end_time)
-  
+    locations = treatment_locations,
+    treatment_start_time,
+    treatment_end_time
+  )
+
   if (length(X) == 0) {
     formula <- as.formula("Y ~ D")
   } else if (length(X) > 0) {
     formula <- as.formula(paste(
       "Y ~ D |",
       sapply(list(X),
-             paste,
-             collapse = "+"
+        paste,
+        collapse = "+"
       )
     ))
   }
@@ -98,13 +99,13 @@ ASCMExecution <- function(
     progfunc = model,
     scm = TRUE,
     fixedeff = fixed_effects,
-    
   ))
-  
+
   return(list(
     augsynth_model = augsynth_model,
     data = geo_data,
-    treatment_locations = treatment_locations))
+    treatment_locations = treatment_locations
+  ))
 }
 
 #' GeoLift inference calculation.
@@ -158,7 +159,7 @@ ASCMExecution <- function(
 #'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 #'          Recommended for Positive Lift tests.}
 #' }
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #'
@@ -202,7 +203,6 @@ GeoLift <- function(Y_id = "Y",
                     stat_test = "Total",
                     conformal_type = "iid",
                     ns = 1000) {
-
   # Optimizing model based on Scaled L2 Score
   if (model == "best") {
     ascm_imbalances <- list()
@@ -222,7 +222,8 @@ GeoLift <- function(Y_id = "Y",
               location_id = location_id,
               X = X,
               model = progfunc,
-              fixed_effects = fixed_effects)$augsynth_model
+              fixed_effects = fixed_effects
+            )$augsynth_model
           },
           error = function(e) {
             list("scaled_l2_imbalance" = 1)
@@ -253,12 +254,13 @@ GeoLift <- function(Y_id = "Y",
     location_id = location_id,
     X = X,
     model = model,
-    fixed_effects = fixed_effects)
-  
+    fixed_effects = fixed_effects
+  )
+
   augsyn <- augsynth_result_list$augsynth_model
   data_aux <- augsynth_result_list$data
   locations <- augsynth_result_list$treatment_locations
-  
+
   inference_df <- data.frame(matrix(ncol = 5, nrow = 0))
   colnames(inference_df) <- c(
     "ATT",
@@ -282,31 +284,34 @@ GeoLift <- function(Y_id = "Y",
     alternative_hypothesis = alternative_hypothesis
   )
 
-  sum_augsyn <- summary(augsyn, 
-                        alpha = alpha, 
-                        stat_func = stat_func,
-                        type = conformal_type,
-                        ns = ns)
+  sum_augsyn <- summary(augsyn,
+    alpha = alpha,
+    stat_func = stat_func,
+    type = conformal_type,
+    ns = ns
+  )
 
   # Confidence Intervals
-  if(ConfidenceIntervals == FALSE){
-    ci <- c(NA,NA)
-  } else if(ConfidenceIntervals == TRUE){
-    if(!(tolower(method) %in% c("conformal", "jackknife+"))) {
+  if (ConfidenceIntervals == FALSE) {
+    ci <- c(NA, NA)
+  } else if (ConfidenceIntervals == TRUE) {
+    if (!(tolower(method) %in% c("conformal", "jackknife+"))) {
       stop("method must be one of {'conformal', 'jackknife+'}")
     } else {
-      if(tolower(stat_test) != "total"){
-        method <- "conformal" #jackknife+ is exclusively for "Total"
+      if (tolower(stat_test) != "total") {
+        method <- "conformal" # jackknife+ is exclusively for "Total"
       }
-      ci <- ConfIntervals(augsynth = augsyn,
-                          treatment_start_time = treatment_start_time,
-                          treatment_end_time = treatment_end_time,
-                          alpha = alpha,
-                          stat_func = stat_func,
-                          method = tolower(method),
-                          grid_size = grid_size,
-                          conformal_type = conformal_type,
-                          ns = ns)
+      ci <- ConfIntervals(
+        augsynth = augsyn,
+        treatment_start_time = treatment_start_time,
+        treatment_end_time = treatment_end_time,
+        alpha = alpha,
+        stat_func = stat_func,
+        method = tolower(method),
+        grid_size = grid_size,
+        conformal_type = conformal_type,
+        ns = ns
+      )
     }
   }
 
@@ -423,7 +428,7 @@ print.GeoLift <- function(x, ...) {
     "\nPercent Lift: ",
     round(x$inference$Perc.Lift, 3), "%\n\n",
     "Incremental ", paste(x$Y_id), ": ", round(x$incremental, 0), "\n\n",
-    ifelse(x$ConfidenceIntervals,paste0(((1 - x$summary$alpha) * 100), "% Confidence Interval: (", round(x$lower, 3), ", ", round(x$upper, 3), ")", "\n\n"),""),
+    ifelse(x$ConfidenceIntervals, paste0(((1 - x$summary$alpha) * 100), "% Confidence Interval: (", round(x$lower, 3), ", ", round(x$upper, 3), ")", "\n\n"), ""),
     "Average Estimated Treatment Effect (ATT): ", round(x$inference$ATT, 3),
     "\n\n", is_significant, " (", test_type,
     "\n\nThere is a ", round(100 * x$inference$pvalue, 2),
@@ -662,7 +667,7 @@ print.summary.GeoLift <- function(x, ...) {
 #' }
 #' @param grid_size Number of grid points to use when inverting the hypothesis
 #' test for Conformal Inference.
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #'
@@ -677,18 +682,18 @@ ConfIntervals <- function(augsynth,
                           method,
                           grid_size,
                           conformal_type,
-                          ns){
+                          ns) {
+  ci <- c(NA, NA)
 
-  ci <- c(NA,NA)
-
-  if(method == "jackknife+"){
+  if (method == "jackknife+") {
     sum_aux <- summary(augsynth,
-                       alpha = alpha,
-                       inf_type = "jackknife+")
+      alpha = alpha,
+      inf_type = "jackknife+"
+    )
     ci[1] <- sum_aux$average_att$lower_bound
     ci[2] <- sum_aux$average_att$upper_bound
-  } else{
-    #Prepare data
+  } else {
+    # Prepare data
     wide_data <- augsynth$data
     synth_data <- augsynth$data$synth_data
     n <- nrow(wide_data$X)
@@ -698,8 +703,8 @@ ConfIntervals <- function(augsynth,
 
     # Calculate ATTs and SD
     att <- predict(augsynth, att = T)
-    post_att <- att[(t0 +1):t_final]
-    post_sd <- sqrt(mean(post_att ^ 2))
+    post_att <- att[(t0 + 1):t_final]
+    post_sd <- sqrt(mean(post_att^2))
 
     # Add final period with some data
     new_wide_data <- wide_data
@@ -708,34 +713,40 @@ ConfIntervals <- function(augsynth,
 
     # Create grid with zero
     grid <- seq(mean(post_att) - 6 * post_sd, mean(post_att) + 6 * post_sd, length.out = grid_size)
-    grid <- c(0,grid) #Adding 0 to the grid for null troubleshooting
+    grid <- c(0, grid) # Adding 0 to the grid for null troubleshooting
 
     # Calculate p-values for the grid
-    pvalues <- sapply(grid,
-                 function(null){
-                   augsynth:::compute_permute_pval(wide_data =new_wide_data,
-                                                   ascm = augsynth,
-                                                   h0 = null,
-                                                   post_length = post_length,
-                                                   type = conformal_type,
-                                                   q = 1,
-                                                   ns = ns,
-                                                   stat_func = stat_func)}
+    pvalues <- sapply(
+      grid,
+      function(null) {
+        augsynth:::compute_permute_pval(
+          wide_data = new_wide_data,
+          ascm = augsynth,
+          h0 = null,
+          post_length = post_length,
+          type = conformal_type,
+          q = 1,
+          ns = ns,
+          stat_func = stat_func
+        )
+      }
     )
 
-    ci <- c(suppressWarnings(min(grid[pvalues >= alpha])),
-            suppressWarnings(max(grid[pvalues >= alpha])))
+    ci <- c(
+      suppressWarnings(min(grid[pvalues >= alpha])),
+      suppressWarnings(max(grid[pvalues >= alpha]))
+    )
 
-    #Change to resampling if no CI is found via conformal
-    if(ci[1] == Inf || ci[2] == -Inf){
+    # Change to resampling if no CI is found via conformal
+    if (ci[1] == Inf || ci[2] == -Inf) {
       sum_aux <- summary(augsynth,
-                         alpha = alpha,
-                         inf_type = "jackknife+")
+        alpha = alpha,
+        inf_type = "jackknife+"
+      )
       ci[1] <- sum_aux$average_att$lower_bound
       ci[2] <- sum_aux$average_att$upper_bound
       message("Conformal method of Confidence Interval calculation unsuccessful. Changing Confidence Interval calculation method to jackknife+.")
     }
-
   }
 
   return(ci)

@@ -827,7 +827,7 @@ GeoLiftMultiCell <- function(Y_id = "Y",
   GeoLiftResults <- list()
 
   for(cell in 1:k){
-    data_aux <- data %>% dplyr::filter(!(location %in% unlist(locations[-c(cell)]) ))
+    data_aux <- data %>% dplyr::filter(!(location %in% tolower(unlist(locations[-c(cell)])) ))
     aux <- GeoLift(Y_id = Y_id,
                    time_id = time_id,
                    location_id = location_id,

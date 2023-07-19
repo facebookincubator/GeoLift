@@ -34,7 +34,6 @@ Depends:
     R (>= 4.0.0)
 Imports:
     augsynth,
-    CommutingZones,
     directlabels,
     doParallel,
     dplyr,
@@ -56,6 +55,7 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 Suggests:
+    CommutingZones,
     rmarkdown
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

@@ -148,11 +148,12 @@ GeoTestData_PreTest_CZ <- GeoTestData_PreTest %>%
          location_in_cluster = "location") %>% ungroup()
 
 # treat unmatched locations
-df_unmatched <- data.frame(
-  location_in_cluster = GeoTestData_PreTest_CZ %>% 
+unmatched_location <- GeoTestData_PreTest_CZ %>% 
     filter(is.na(location)) %>% 
     pull(location_in_cluster) %>% 
-    unique(),
+    unique()
+df_unmatched <- data.frame(
+  location_in_cluster = unmatched_location,
   location = max(GeoTestData_PreTest_CZ$location, na.rm = TRUE) + 
     seq_along(unmatched_location)
 )

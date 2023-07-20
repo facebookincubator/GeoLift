@@ -42,3 +42,4 @@ remotes::install_github("facebookincubator/GeoLift")
 
 ## License
 GeoLift is MIT licensed, as found in the LICENSE file.
+XXX

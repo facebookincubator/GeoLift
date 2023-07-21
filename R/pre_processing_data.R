@@ -28,15 +28,13 @@
 #' "mm/yyyy", "mm-yyyy", "mm.yyyy", "mmyyyy", "yyyy/mm", "yyyy-mm",
 #' "yyyy.mm", "yyyymm"
 #' @param date_id Name of the date variable (String).
+#' @param location_id Name of the location variable (String).
 #' @param Y_id Name of the outcome variable (String).
 #' @param format Format of the dates in the data frame.
+#' @param X Vector with covariates names.
 #' @param summary Display a summary of the data-reading process. FALSE by default.
 #' @param keep_unix_time A logic flag indicating whether to keep a column with
 #' each event's unix time.
-#' @param cluster_locations A logic flag indicating whether locations should be
-#' clustered using the CommutingZones package.
-#'
-#' @inheritParams run_cluster_matching
 #' @return
 #' A data frame for GeoLift inference and power calculations.
 #'
@@ -48,12 +46,7 @@ GeoDataRead <- function(data,
                         format = "mm/dd/yyyy",
                         X = c(),
                         summary = FALSE,
-                        keep_unix_time = FALSE,
-                        cluster_locations = FALSE,
-                        country_name = NULL,
-                        longitude_col_name = "longitude",
-                        latitude_col_name = "latitude",
-                        find_location_lat_long = FALSE) {
+                        keep_unix_time = FALSE) {
   format <- tolower(format)
 
   # Acceptable date formats
@@ -204,48 +197,15 @@ GeoDataRead <- function(data,
   # Aggregate Outcomes by time and location
   data_raw <- data
 
-  if (!find_location_lat_long) {
-    if (cluster_locations == TRUE){
-      X <- cbind(X, c(longitude_col_name, latitude_col_name))
-    }
-  }
-
   if (keep_unix_time == FALSE) {
     data <- data_raw %>%
       dplyr::group_by(location, time) %>%
       dplyr::summarize(Y = sum(Y))
-    for (var in X) {
-      data_aux <- data_raw %>%
-        dplyr::group_by(location, time) %>%
-        dplyr::summarize(!!var := sum(!!sym(var)))
-      data <- data %>% dplyr::left_join(data_aux, by = c("location", "time"))
-    }
   } else {
     data <- data_raw %>%
       dplyr::group_by(location, time, date_unix) %>%
       dplyr::summarize(Y = sum(Y))
-    for (var in X) {
-      data_aux <- data_raw %>%
-        dplyr::group_by(location, time, date_unix) %>%
-        dplyr::summarize(!!var := sum(!!sym(var)))
-      data <- data %>% dplyr::left_join(data_aux, by = c("location", "time", "date_unix"))
-    }
   }
-
-  if (cluster_locations == TRUE) {
-    
-    data <- run_cluster_matching(
-      data,
-      location_id = location_id,
-      X = X,
-      find_location_lat_long = find_location_lat_long,
-      country_name = country_name,
-      longitude_col_name = longitude_col_name,
-      latitude_col_name = latitude_col_name
-    )
-    
-  }
-  
 
   # Print summary of Data Reading
   if (summary == TRUE) {
@@ -256,30 +216,12 @@ GeoDataRead <- function(data,
       "\n* Raw Number of Locations: ", initial_locations,
       "\n* Time Periods: ", total_periods
     )
-    if (!cluster_locations){
-      summary_msg <- paste0(
-        summary_msg,
-        "\n* Final Number of Locations (Complete): ", 
-        length(unique(data$location))
-      )
-    } else {
-      summary_msg <- paste0(
-        summary_msg,
-        "\n* Total number of CZ clusters: ",
-        length(unique(data$location)),
-        "\n* Total number of locations associated to CZ clusters: ",
-        length(
-          strsplit(
-            paste0(
-              unique(
-                data$location_in_cluster), 
-              collapse=', '), 
-            ', ')
-          [[1]]
-        )
-      )
-    }
-    
+    summary_msg <- paste0(
+      summary_msg,
+      "\n* Final Number of Locations (Complete): ",
+      length(unique(data$location))
+    )
+
     message(summary_msg)
   }
 
@@ -292,7 +234,7 @@ GeoDataRead <- function(data,
 #' @description
 #' `r lifecycle::badge("experimental")`
 #'
-#' `SplitTreatmentEstimation` fits a control group to each location within a 
+#' `SplitTreatmentEstimation` fits a control group to each location within a
 #' Treatment group and calculates their imbalance metrics.
 #' @param treatment_locations Vector of locations where the treatment was applied.
 #' @param data DataFrame that GeoLfit will use to determine a result.
@@ -317,7 +259,7 @@ GeoDataRead <- function(data,
 #' @param X Vector with covariates names.
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
-#' 
+#'
 #' @return Dataframe with L2 imbalance ranking and these columns:
 #'          \itemize{
 #'          \item{"treatment_location":}{ Single Treatment location being considered.}
@@ -326,7 +268,7 @@ GeoDataRead <- function(data,
 #'          \item{"treatment_group_size":}{ Size of treatment group for each iteration.}
 #'          \item{"model":}{ Outcome model being used for Augmented Synthetic Control.}
 #'        }
-#' 
+#'
 #' @export
 SplitTreatmentEstimation <- function(
     treatment_locations,
@@ -334,24 +276,26 @@ SplitTreatmentEstimation <- function(
     treatment_start_time,
     treatment_end_time,
     model,
-    verbose=FALSE,
+    verbose = FALSE,
     Y_id = "Y",
     time_id = "time",
     location_id = "location",
     X = c(),
-    fixed_effects = TRUE
-){
-  if (verbose){
+    fixed_effects = TRUE) {
+  if (verbose) {
     message(
-      "Estimating control for each treatment location within treatment group.")
+      "Estimating control for each treatment location within treatment group."
+    )
   }
   l2_imbalance_df <- data.frame()
-  for (i in 1:length(treatment_locations)){
+  for (i in 1:length(treatment_locations)) {
     treated_location <- treatment_locations[i]
     data_treated <- data[
       !data$location %in% treatment_locations[
-        !treatment_locations %in% treated_location], ]
-    
+        !treatment_locations %in% treated_location
+      ],
+    ]
+
     augsynth_result_list <- ASCMExecution(
       data = data_treated,
       treatment_locations = treated_location,
@@ -362,13 +306,14 @@ SplitTreatmentEstimation <- function(
       location_id = location_id,
       X = X,
       model = model,
-      fixed_effects = fixed_effects)
-    
+      fixed_effects = fixed_effects
+    )
+
     augsynth_model <- augsynth_result_list$augsynth_model
-    
-    y_hat <- predict(augsynth_model, att=FALSE)
+
+    y_hat <- predict(augsynth_model, att = FALSE)
     sum_pre_treatment_y_hat <- sum(y_hat[1:augsynth_model$t_int])
-    
+
     treatment_df <- data.frame(
       treatment_location = treated_location,
       l2_imbalance = augsynth_model$l2_imbalance,
@@ -377,7 +322,7 @@ SplitTreatmentEstimation <- function(
       treatment_group_size = length(treatment_locations),
       model = model
     )
-    
+
     l2_imbalance_df <- rbind(l2_imbalance_df, treatment_df)
   }
   return(l2_imbalance_df)
@@ -390,7 +335,7 @@ SplitTreatmentEstimation <- function(
 #' `r lifecycle::badge("experimental")`
 #'
 #' `ReplaceTreatmentSplit` chooses the best treatment location to replace with their
-#' control, given the L2 imbalance that each individual treatment has. Then 
+#' control, given the L2 imbalance that each individual treatment has. Then
 #' re-estimates the remaining treatment locations using the replaced treatment as
 #' part of the control donor pool.
 #' @param treatment_locations Vector of locations where the treatment was applied.
@@ -416,7 +361,7 @@ SplitTreatmentEstimation <- function(
 #' @param X Vector with covariates names.
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
-#' 
+#'
 #' @return
 #' list that contains:
 #'          \itemize{
@@ -430,20 +375,20 @@ ReplaceTreatmentSplit <- function(
     treatment_start_time,
     treatment_end_time,
     model,
-    verbose=FALSE,
+    verbose = FALSE,
     Y_id = "Y",
     time_id = "time",
     location_id = "location",
     X = c(),
-    fixed_effects = TRUE){
+    fixed_effects = TRUE) {
   geo_data <- data[data$time <= treatment_end_time, ]
   data_after_treatment <- data[data$time > treatment_end_time, ]
-  
+
   treatment_locations <- tolower(treatment_locations)
   l2_imbalance_df <- data.frame()
   problematic_treatments <- c()
-  
-  for (i in 1:length(treatment_locations)){
+
+  for (i in 1:length(treatment_locations)) {
     iter_l2_imbalance_df <- SplitTreatmentEstimation(
       treatment_locations = treatment_locations,
       data = geo_data,
@@ -453,26 +398,31 @@ ReplaceTreatmentSplit <- function(
       verbose = verbose
     )
     l2_imbalance_df <- rbind(l2_imbalance_df, iter_l2_imbalance_df)
-    
+
     treatment_to_replace <- iter_l2_imbalance_df[
-      iter_l2_imbalance_df$l2_imbalance == min(iter_l2_imbalance_df$l2_imbalance), "treatment_location"]
-    
-    if (verbose){
-      message("Replacing treatment location with lowest imbalance: ", 
-              treatment_to_replace)
+      iter_l2_imbalance_df$l2_imbalance == min(iter_l2_imbalance_df$l2_imbalance), "treatment_location"
+    ]
+
+    if (verbose) {
+      message(
+        "Replacing treatment location with lowest imbalance: ",
+        treatment_to_replace
+      )
     }
-    
+
     if (
       iter_l2_imbalance_df[
-        iter_l2_imbalance_df$treatment_location == treatment_to_replace, 
+        iter_l2_imbalance_df$treatment_location == treatment_to_replace,
         "l2_imbalance_to_y_hat"
-      ] > 0.1){
+      ] > 0.1) {
       problematic_treatments <- c(problematic_treatments, treatment_to_replace)
     }
     geo_data_treated <- geo_data[
       !geo_data$location %in% treatment_locations[
-        !treatment_locations %in% treatment_to_replace], ]
-    
+        !treatment_locations %in% treatment_to_replace
+      ],
+    ]
+
     augsynth_result_list <- ASCMExecution(
       data = geo_data_treated,
       treatment_locations = treatment_to_replace,
@@ -483,28 +433,32 @@ ReplaceTreatmentSplit <- function(
       location_id = location_id,
       X = X,
       model = model,
-      fixed_effects = fixed_effects)
-    
+      fixed_effects = fixed_effects
+    )
+
     augsynth_model <- augsynth_result_list$augsynth_model
-    
-    y_hat <- predict(augsynth_model, att=FALSE)
+
+    y_hat <- predict(augsynth_model, att = FALSE)
     geo_data[
       geo_data$location == treatment_to_replace &
-        geo_data$time >= treatment_start_time, "Y"] <- y_hat[treatment_start_time:treatment_end_time]
+        geo_data$time >= treatment_start_time, "Y"
+    ] <- y_hat[treatment_start_time:treatment_end_time]
     treatment_locations <- treatment_locations[treatment_locations != treatment_to_replace]
   }
-  
+
   geo_data <- geo_data %>% dplyr::mutate(D = NULL)
   data <- rbind(geo_data, data_after_treatment)
-  
-  if (length(problematic_treatments) != 0){
+
+  if (length(problematic_treatments) != 0) {
     warning(
       paste0(
         "The following treatment locations could be problematic to replace:\n",
-        " - ", paste0(problematic_treatments, collapse="\n - "),
-        "\n Consider using an alternative replacement method for these series."))
+        " - ", paste0(problematic_treatments, collapse = "\n - "),
+        "\n Consider using an alternative replacement method for these series."
+      )
+    )
   }
-  
+
   return(list(data = data, l2_imbalance_df = l2_imbalance_df))
 }
 
@@ -601,129 +555,4 @@ TrimControls <- function(data,
   data <- data %>% dplyr::filter(location %in% final_locations)
 
   return(data)
-}
-
-
-#' Match all locations to the cluster they belong.
-#' 
-#' @description 
-#' Use clusters defined by how users move between cities to decide how cities 
-#' should be aggregated to reduce contamination.
-#' @param data data.frame object that holds the location name,
-#' latitude and longitude for all locations.
-#' @param location_id Name of the location variable (String).
-#' @param X List of names of the covariates.
-#' @param country_name name of country where the locations come from.
-#' @param longitude_col_name name of the longitude column in the `data`
-#' data.frame.
-#' @param latitude_col_name name of the latitude column in the `data`
-#' data.frame.
-#' @param find_location_lat_long logical flag indicating whether Google Maps API
-#' should be used to find location's latitude and longitude.
-#' 
-#' @return
-#' A data frame holding a match between each location and all clusters.
-#' 
-#' @export
-run_cluster_matching <- function(data,
-                                 location_id = 'location',
-                                 X = c(),
-                                 country_name = NULL,
-                                 longitude_col_name = "longitude",
-                                 latitude_col_name = "latitude",
-                                 find_location_lat_long = FALSE){
-  message("Clustering locations based on Commuting Zones.")
-  
-  location_country_data <- data.frame(
-    location = unique(data[, location_id]),
-    country = country_name
-  )
-  
-  if (find_location_lat_long == TRUE){
-    message("Matching location units to their latitude and longitude.")
-    location_country_data <- CommutingZones::get_location_lat_long(
-      location_country_data,
-      location_col_name = location_id,
-      country_col_name = 'country'
-    )
-  }
-  
-  cluster_file <- CommutingZones::filter_cluster_file(
-    country_name = country_name)
-  
-  matched_data_list <- CommutingZones::location_to_cluster_match(
-    location_country_data, cluster_file)
-  matched_data <- matched_data_list$matched_spdf %>% data.frame()
-  
-  matched_data$included_in_cluster <- ifelse(
-    is.na(matched_data$fbcz_id_num),
-    FALSE,
-    TRUE
-  )
-  
-  if (sum(matched_data$included_in_cluster) < nrow(location_country_data)) {
-
-    assign_cluster_to_orphan_locations <- data.frame(
-      location = unique(matched_data[
-        matched_data$included_in_cluster == FALSE, 
-        "location"]),
-      fbcz_id_num_replaced = max(
-          matched_data[!is.na(matched_data$fbcz_id_num), "fbcz_id_num"]
-        ) + 1:length(
-          unique(matched_data[
-            matched_data$included_in_cluster == FALSE, 
-            "location"])
-      )
-    )
-    
-    matched_data <- matched_data %>%
-      merge(
-        assign_cluster_to_orphan_locations,
-        by = "location",
-        all.x = TRUE
-      )
-  }
-  
-  matched_data <- matched_data %>%
-    merge(
-      data,
-      by = "location"
-    )
-  
-  matched_data$fbcz_id_num <- dplyr::coalesce(
-    matched_data$fbcz_id_num,
-    matched_data$fbcz_id_num_replaced
-  )
-  matched_data$fbcz_id_num_replaced <- NULL
-  
-  new_geo_data <- matched_data %>%
-    dplyr::group_by(fbcz_id_num, time) %>%
-    dplyr::summarize(
-      location_in_cluster = toString(unique(location)),
-      Y = sum(Y),
-      .groups='drop') %>%
-    data.frame() %>%
-    dplyr::ungroup()
-  
-  if (length(X) != 0){
-    for (var in X){
-      new_geo_data <- matched_data %>%
-        dplyr::group_by(fbcz_id_num, time) %>%
-        dplyr::summarize(
-          !!var := sum(!!sym(var)),
-          .groups='drop') %>%
-        dplyr::left_join(
-          new_geo_data, 
-          by = c("fbcz_id_num", "time")) %>%
-        data.frame()
-    }
-  }
-  
-  new_geo_data <- new_geo_data %>%
-    dplyr::mutate(
-      location = as.character(fbcz_id_num),
-      fbcz_id_num=NULL)
-
-  return(new_geo_data)
-
 }

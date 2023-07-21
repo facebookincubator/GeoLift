@@ -98,6 +98,7 @@ In this case we see a similar pattern that’s shared across all
 locations. These structural similarities between regions are the key to
 a successful test!
 
+
 ---
 
 ## 2. Power Analysis

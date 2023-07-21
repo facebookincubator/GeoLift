@@ -9,19 +9,18 @@ GeoLift is an end-to-end solution to measure Lift at a Geo-level using the lates
 Check out the vignette for a more detailed description of the main functionalities of the package:
 - [GeoLift Walkthrough](https://github.com/facebookincubator/GeoLift/blob/master/vignettes/GeoLift_Walkthrough.md)
 - [GeoLift Multi-Cell Walkthrough](https://github.com/facebookincubator/GeoLift/blob/main/vignettes/GeoLift_MultiCell_Walkthrough.md)
+- [Incorporating Commuting Zones](https://github.com/facebookincubator/GeoLift/blob/main/vignettes/Incorporating_CommutingZones.md)
 
 ## Requirements
 GeoLift requires or works with:
 - R version 4.0.0 or newer.
 
 ## Installing GeoLift
-To install the package, first make sure that `remotes`, `CommutingZones` and
+To install the package, first make sure that `remotes` and
 `augsynth` are installed.
 
 ```
 install.packages("remotes", repos='http://cran.us.r-project.org')
-
-remotes::install_github("facebookincubator/CommutingZones")
 remotes::install_github("ebenmichael/augsynth")
 ```
 
@@ -31,10 +30,12 @@ Then, install the package from GitHub:
 remotes::install_github("facebookincubator/GeoLift")
 ```
 
+To use Commuting Zones in GeoLift, please check the guide [here](https://facebookincubator.github.io/GeoLift/docs/GettingStarted/Walkthrough#using-commuting-zones)
+
 ## Contacts
-- aesquerrac@gmail.com, Arturo Esquerra, Facebook Marketing Science Partner
+- aesquerrac@gmail.com, Arturo Esquerra, creator.
+- nicolascruces1994@gmail.com, Nicolas Cruces, maintainer.
 - kpanchal@fb.com, Kanishka Panchal, Facebook Marketing Science Partner
-- nicolascruces1994@gmail.com, Nicolas Cruces, Facebook Marketing Science Partner
 - michaelkhalil@fb.com, Michael Khalil, Facebook Marketing Science Partner
 
 ## Join the GeoLift community

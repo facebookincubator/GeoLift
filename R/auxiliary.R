@@ -47,7 +47,7 @@ fn_treatment <- function(df,
 #'
 #' @description
 #' `r lifecycle::badge("stable")`
-#' 
+#'
 #' This function builds the cluster and imports the necessary packages
 #' to run Geolift: augsynth, dplyr and tidyr.
 #'
@@ -323,7 +323,6 @@ GetWeights <- function(Y_id = "Y",
                        pretreatment_end_time,
                        model = "none",
                        fixed_effects = TRUE) {
-
   # Rename variables to standard names used by GeoLift
   data <- data %>% dplyr::rename(
     time = time_id,
@@ -403,79 +402,87 @@ GetWeights <- function(Y_id = "Y",
 #' @order 2
 GetMultiCellWeights <- function(x,
                                 test_markets = list()) {
-  
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
   }
-  
-  if(length(test_markets) != length(x$Models)){
+
+  if (length(test_markets) != length(x$Models)) {
     stop("\nMake sure an ID is provided for each cell in the analysis.")
   }
-  
-  if(!(all(sapply(test_markets, is.numeric)))){
+
+  if (!(all(sapply(test_markets, is.numeric)))) {
     stop("\nMake sure all input IDs in test_markets are numeric.")
   }
-  
+
   # Check test_market
   for (cell_name in names(test_markets)) {
-    split_cell_name <- strsplit(cell_name, '_')[[1]]
-    if (split_cell_name[1] != 'cell') {
+    split_cell_name <- strsplit(cell_name, "_")[[1]]
+    if (split_cell_name[1] != "cell") {
       stop(
         paste0(
-          'Test locations test_locs must have names as cell_{numeric}.',
-          '\nCheck ', cell_name, '.'))
+          "Test locations test_locs must have names as cell_{numeric}.",
+          "\nCheck ", cell_name, "."
+        )
+      )
     }
     if (is.na(as.integer(split_cell_name[2]))) {
       stop(
         paste0(
-          'Test locations test_locs must have names as cell_{numeric}.',
-          '\nCheck ', cell_name, '.'))
+          "Test locations test_locs must have names as cell_{numeric}.",
+          "\nCheck ", cell_name, "."
+        )
+      )
     }
   }
-  
+
   # Order input list of test markets
   test_markets <- test_markets[order(names(test_markets))]
-  
+
   # Initialize Variables
   locations <- data.frame(location = unique(x$data$location))
   other_test_locs <- c()
-  
+
   # List of all treatment locations
-  for (cell in 1:length(test_markets)){
-    other_test_locs <- rbind(other_test_locs,list(stringr::str_split(
-      x$Models[[cell]]$BestMarkets$location[test_markets[[cell]]], ", ")[[1]]))
+  for (cell in 1:length(test_markets)) {
+    other_test_locs <- rbind(other_test_locs, list(stringr::str_split(
+      x$Models[[cell]]$BestMarkets$location[test_markets[[cell]]], ", "
+    )[[1]]))
   }
-  
+
   # Adjust dataset & obtain weights.
-  for (cell in 1:length(test_markets)){
-    data_aux <- x$data %>% dplyr::rename(Y = paste0(x$test_details$Y_id),
-                                         location = paste0(x$test_details$location_id),
-                                         time = paste0(x$test_details$time_id)) %>%
+  for (cell in 1:length(test_markets)) {
+    data_aux <- x$data %>%
+      dplyr::rename(
+        Y = paste0(x$test_details$Y_id),
+        location = paste0(x$test_details$location_id),
+        time = paste0(x$test_details$time_id)
+      ) %>%
       dplyr::filter(!(location %in% unlist(other_test_locs[-cell])))
-    
-    aux <- merge(locations,GetWeights(X = x$test_details$X,
-                                      data = data_aux,
-                                      locations = other_test_locs[[cell]],
-                                      pretreatment_end_time = max(data_aux$time),
-                                      model = x$test_details$model,
-                                      fixed_effects = x$test_details$fixed_effects),
-                 all.x = TRUE)
-    
+
+    aux <- merge(locations, GetWeights(
+      X = x$test_details$X,
+      data = data_aux,
+      locations = other_test_locs[[cell]],
+      pretreatment_end_time = max(data_aux$time),
+      model = x$test_details$model,
+      fixed_effects = x$test_details$fixed_effects
+    ),
+    all.x = TRUE
+    )
+
     # Create final data frame
-    if(cell == 1){
+    if (cell == 1) {
       results <- aux
-    } else{
+    } else {
       results <- dplyr::inner_join(results, aux, by = "location")
     }
-    
+
     # Format final data frame
-    results <- results %>% 
-                dplyr::rename_with(.cols = cell+1, ~paste0("Cell_",cell))
-    
+    results <- results %>%
+      dplyr::rename_with(.cols = cell + 1, ~ paste0("Cell_", cell))
   }
-  
+
   return(results)
-  
 }
 
 

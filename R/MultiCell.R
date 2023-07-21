@@ -82,10 +82,10 @@
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
-#' 
+#'
 #' @return A 'MultiCellMarketSelection' object of four objects:
 #' \itemize{
 #'          \item{"TopChoices":}{ Data frame with the top choices by cell.}
@@ -120,16 +120,14 @@ MultiCellMarketSelection <- function(data,
                                      parallel_setup = "sequential",
                                      side_of_test = "two_sided",
                                      conformal_type = "iid",
-                                     ns = 1000
-){
-
+                                     ns = 1000) {
   # Rename variables
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)
   data$location <- tolower(data$location)
 
   # Check that all treatment_periods are numeric
-  if(!(all(sapply(treatment_periods, is.numeric)))){
+  if (!(all(sapply(treatment_periods, is.numeric)))) {
     stop("\nMake sure all treatment_periods are numeric.")
   }
 
@@ -142,31 +140,31 @@ MultiCellMarketSelection <- function(data,
   # Input parameter checks
 
   # Check k
-  if(k %% 1 != 0){
+  if (k %% 1 != 0) {
     stop("\nMake sure k is an integer.")
   }
 
   # Check Sampling Method
-  if(!(tolower(sampling_method) %in% c("systematic"))){
+  if (!(tolower(sampling_method) %in% c("systematic"))) {
     stop("\nEnter a valid sampling_method (check the function documentation for more details).")
   }
 
   # Check side_of_test
-  if(!(tolower(side_of_test) %in% c("one_sided", "two_sided"))){
+  if (!(tolower(side_of_test) %in% c("one_sided", "two_sided"))) {
     stop("\nEnter a valid side_of_test ('one_sided', 'two_sided').")
   }
 
   # Populate N if it's not provided
   if (length(N) == 0) {
-    N <- unique(round(quantile(c(1:round(length(unique(data$location))/k)),
-                               probs = seq(0, 0.5, 0.1),
-                               type = 1,
-                               names = FALSE
+    N <- unique(round(quantile(c(1:round(length(unique(data$location)) / k)),
+      probs = seq(0, 0.5, 0.1),
+      type = 1,
+      names = FALSE
     )))
   }
 
   # Check max(N)
-  if (max(N) >= round(length(unique(data$location))/k)) {
+  if (max(N) >= round(length(unique(data$location)) / k)) {
     stop("\nN is too large for this multi-cell test.")
   }
 
@@ -176,10 +174,10 @@ MultiCellMarketSelection <- function(data,
   }
 
   # CPIC for Multiple Cells
-  if(length(cpic) != k && length(cpic) > 1){
+  if (length(cpic) != k && length(cpic) > 1) {
     stop("\nEnter a CPIC for each cell or a single average CPIC for all cells.")
-  } else if(length(cpic == 1)){
-    cpic <- rep(cpic,k)
+  } else if (length(cpic == 1)) {
+    cpic <- rep(cpic, k)
   }
 
   # Create ranking by KPI
@@ -189,16 +187,16 @@ MultiCellMarketSelection <- function(data,
     dplyr::arrange(dplyr::desc(sum_y)) %>%
     dplyr::mutate(rank = dplyr::row_number())
 
-  #Number of locations
+  # Number of locations
   locs_N <- nrow(rank_by_loc)
 
   # Systematic Sampling
-  if(tolower(sampling_method) == "systematic"){
+  if (tolower(sampling_method) == "systematic") {
     r <- sample(1:k, k)
 
     rank_by_loc$cell <- 0
 
-    for (i in 1:length(r)){
+    for (i in 1:length(r)) {
       rank_by_loc$cell[seq(r[i], locs_N, k)] <- i
     }
   }
@@ -207,85 +205,94 @@ MultiCellMarketSelection <- function(data,
   GeoLift_Markets <- list()
   TopChoices <- data.frame(matrix(ncol = 11, nrow = 0))
 
-  for (cell_id in 1:k){
+  for (cell_id in 1:k) {
     locations <- rank_by_loc$location[rank_by_loc$cell == cell_id]
     data_aux <- data %>% dplyr::filter(location %in% locations)
 
-    MarketSelections <- suppressMessages(GeoLiftMarketSelection(data = data_aux,
-                                                                treatment_periods = treatment_periods,
-                                                                N = N,
-                                                                X = X,
-                                                                effect_size = effect_size,
-                                                                lookback_window = lookback_window,
-                                                                cpic = cpic[cell_id],
-                                                                alpha = alpha,
-                                                                normalize = normalize,
-                                                                model = model,
-                                                                fixed_effects = fixed_effects,
-                                                                dtw = dtw,
-                                                                Correlations = Correlations,
-                                                                print = FALSE,
-                                                                parallel = parallel,
-                                                                run_stochastic_process = run_stochastic_process,
-                                                                parallel_setup = parallel_setup,
-                                                                side_of_test = side_of_test,
-                                                                conformal_type = conformal_type,
-                                                                ns = ns
+    MarketSelections <- suppressMessages(GeoLiftMarketSelection(
+      data = data_aux,
+      treatment_periods = treatment_periods,
+      N = N,
+      X = X,
+      effect_size = effect_size,
+      lookback_window = lookback_window,
+      cpic = cpic[cell_id],
+      alpha = alpha,
+      normalize = normalize,
+      model = model,
+      fixed_effects = fixed_effects,
+      dtw = dtw,
+      Correlations = Correlations,
+      print = FALSE,
+      parallel = parallel,
+      run_stochastic_process = run_stochastic_process,
+      parallel_setup = parallel_setup,
+      side_of_test = side_of_test,
+      conformal_type = conformal_type,
+      ns = ns
     ))
 
     MarketSelections$BestMarkets$cell <- cell_id
 
-    #Re-scale ProportionTotal_Y to total DF values
+    # Re-scale ProportionTotal_Y to total DF values
     MarketSelections$BestMarkets$ProportionTotal_Y <- MarketSelections$BestMarkets$ProportionTotal_Y *
       sum(rank_by_loc$sum_y[rank_by_loc$location %in% locations]) /
       sum(sum(rank_by_loc$sum_y))
 
     MarketSelections$BestMarkets$Holdout <- ifelse(MarketSelections$BestMarkets$EffectSize < 0,
-                                                   MarketSelections$BestMarkets$ProportionTotal_Y,
-                                                   1 - MarketSelections$BestMarkets$ProportionTotal_Y)
+      MarketSelections$BestMarkets$ProportionTotal_Y,
+      1 - MarketSelections$BestMarkets$ProportionTotal_Y
+    )
 
 
     GeoLift_Markets <- append(GeoLift_Markets, list(MarketSelections))
-    names(GeoLift_Markets)[cell_id] <- paste0("cell_",eval(cell_id))
+    names(GeoLift_Markets)[cell_id] <- paste0("cell_", eval(cell_id))
 
     # Create top-choices
-    TopChoices <- rbind(TopChoices, MarketSelections$BestMarkets[c("cell",
-                                                                   "ID",
-                                                                   "location",
-                                                                   "duration",
-                                                                   "EffectSize",
-                                                                   "AvgScaledL2Imbalance",
-                                                                   "abs_lift_in_zero",
-                                                                   "Investment",
-                                                                   "ProportionTotal_Y",
-                                                                   "Holdout",
-                                                                   "rank")][1:min(top_choices,
-                                                                                  nrow(MarketSelections$BestMarkets)),])
+    TopChoices <- rbind(TopChoices, MarketSelections$BestMarkets[c(
+      "cell",
+      "ID",
+      "location",
+      "duration",
+      "EffectSize",
+      "AvgScaledL2Imbalance",
+      "abs_lift_in_zero",
+      "Investment",
+      "ProportionTotal_Y",
+      "Holdout",
+      "rank"
+    )][1:min(
+      top_choices,
+      nrow(MarketSelections$BestMarkets)
+    ), ])
   }
 
   TopChoices <- TopChoices %>% dplyr::arrange(ID, cell)
 
-  res <- list(TopChoices = TopChoices,
-              Models = GeoLift_Markets,
-              data = data,
-              test_details = list("X" = X,
-                                  "Y_id" = Y_id,
-                                  "location_id" = location_id,
-                                  "time_id" = time_id,
-                                  "k" = k,
-                                  "cpic" = cpic,
-                                  "alpha" = alpha,
-                                  "model" = model,
-                                  "fixed_effects" = fixed_effects,
-                                  "side_of_test" = side_of_test,
-                                  "lookback_window" = lookback_window,
-                                  "parallel" = parallel,
-                                  "parallel_setup" = parallel_setup))
+  res <- list(
+    TopChoices = TopChoices,
+    Models = GeoLift_Markets,
+    data = data,
+    test_details = list(
+      "X" = X,
+      "Y_id" = Y_id,
+      "location_id" = location_id,
+      "time_id" = time_id,
+      "k" = k,
+      "cpic" = cpic,
+      "alpha" = alpha,
+      "model" = model,
+      "fixed_effects" = fixed_effects,
+      "side_of_test" = side_of_test,
+      "lookback_window" = lookback_window,
+      "parallel" = parallel,
+      "parallel_setup" = parallel_setup
+    )
+  )
 
   class(res) <- c("MultiCellMarketSelection", class(res))
 
   return(res)
-
 }
 
 
@@ -301,7 +308,6 @@ print.MultiCellMarketSelection <- function(x, ...) {
   }
 
   print(x$TopChoices)
-
 }
 
 
@@ -333,7 +339,7 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #'
@@ -348,51 +354,54 @@ print.MultiCellMarketSelection <- function(x, ...) {
 #' @export
 MultiCellPower <- function(x,
                            test_markets = list(),
-                           effect_size = seq(-0.25,0.25,0.05),
+                           effect_size = seq(-0.25, 0.25, 0.05),
                            lookback_window = NULL,
                            side_of_test = NULL,
                            conformal_type = "iid",
-                           ns = 1000){
-
+                           ns = 1000) {
   if (!inherits(x, "MultiCellMarketSelection")) {
     stop("object must be class MultiCellMarketSelection")
   }
 
-  if(length(test_markets) != length(x$Models)){
+  if (length(test_markets) != length(x$Models)) {
     stop("\nMake sure an ID is provided for each cell in the analysis.")
   }
 
-  if(!(all(sapply(test_markets, is.numeric)))){
+  if (!(all(sapply(test_markets, is.numeric)))) {
     stop("\nMake sure all input IDs in test_markets are numeric.")
   }
-  
+
   # Check test_market
   for (cell_name in names(test_markets)) {
-    split_cell_name <- strsplit(cell_name, '_')[[1]]
-    if (split_cell_name[1] != 'cell') {
+    split_cell_name <- strsplit(cell_name, "_")[[1]]
+    if (split_cell_name[1] != "cell") {
       stop(
         paste0(
-          'Test locations test_locs must have names as cell_{numeric}.',
-          '\nCheck ', cell_name, '.'))
+          "Test locations test_locs must have names as cell_{numeric}.",
+          "\nCheck ", cell_name, "."
+        )
+      )
     }
     if (is.na(as.integer(split_cell_name[2]))) {
       stop(
         paste0(
-          'Test locations test_locs must have names as cell_{numeric}.',
-          '\nCheck ', cell_name, '.'))
+          "Test locations test_locs must have names as cell_{numeric}.",
+          "\nCheck ", cell_name, "."
+        )
+      )
     }
   }
-  
+
   # Order input list of test markets
   test_markets <- test_markets[order(names(test_markets))]
 
-  if(is.null(lookback_window)){
+  if (is.null(lookback_window)) {
     lookback_window <- x$test_details$lookback_window
   }
 
   # Check side_of_test
-  if (!is.null(side_of_test)){
-    if(!(tolower(side_of_test) %in% c("one_sided", "two_sided"))){
+  if (!is.null(side_of_test)) {
+    if (!(tolower(side_of_test) %in% c("one_sided", "two_sided"))) {
       stop("\nEnter a valid side_of_test ('one_sided', 'two_sided').")
     }
   }
@@ -401,48 +410,51 @@ MultiCellPower <- function(x,
   test_locs <- c()
 
   # List of test locations
-  for (cell in 1:length(test_markets)){
+  for (cell in 1:length(test_markets)) {
     test_locs <- append(test_locs, list(stringr::str_split(x[[2]][[cell]]$BestMarkets$location[test_markets[[cell]]], ", ")[[1]]))
   }
 
 
-  for (cell in 1:length(test_markets)){
+  for (cell in 1:length(test_markets)) {
     PowerAux <- NULL
-    data_aux <- x$data %>% dplyr::filter(!(location %in% unlist(test_locs[-c(cell)]) ))
+    data_aux <- x$data %>% dplyr::filter(!(location %in% unlist(test_locs[-c(cell)])))
 
-    PowerAux <- suppressMessages(GeoLiftPower(data = data_aux,
-                                              locations = test_locs[[cell]],
-                                              effect_size = effect_size,
-                                              treatment_periods = x[[2]][[cell]]$BestMarkets$duration[test_markets[[cell]]],
-                                              lookback_window = lookback_window,
-                                              cpic = x$test_details$cpic[cell],
-                                              X = x$test_details$X,
-                                              Y_id = x$test_details$Y_id,
-                                              location_id = x$test_details$location_id,
-                                              time_id = x$test_details$time_id,
-                                              alpha = x$test_details$alpha,
-                                              fixed_effects = x$test_details$fixed_effects,
-                                              parallel = x$test_details$parallel,
-                                              parallel_setup = x$test_details$parallel_setup,
-                                              side_of_test = ifelse(is.null(side_of_test),
-                                                                    x$test_details$side_of_test,
-                                                                    side_of_test),
-                                              conformal_type = conformal_type,
-                                              ns = ns))
+    PowerAux <- suppressMessages(GeoLiftPower(
+      data = data_aux,
+      locations = test_locs[[cell]],
+      effect_size = effect_size,
+      treatment_periods = x[[2]][[cell]]$BestMarkets$duration[test_markets[[cell]]],
+      lookback_window = lookback_window,
+      cpic = x$test_details$cpic[cell],
+      X = x$test_details$X,
+      Y_id = x$test_details$Y_id,
+      location_id = x$test_details$location_id,
+      time_id = x$test_details$time_id,
+      alpha = x$test_details$alpha,
+      fixed_effects = x$test_details$fixed_effects,
+      parallel = x$test_details$parallel,
+      parallel_setup = x$test_details$parallel_setup,
+      side_of_test = ifelse(is.null(side_of_test),
+        x$test_details$side_of_test,
+        side_of_test
+      ),
+      conformal_type = conformal_type,
+      ns = ns
+    ))
 
     PowerCurves <- append(PowerCurves, list(PowerAux))
-    names(PowerCurves)[cell] <- paste0("cell_",eval(cell))
-
+    names(PowerCurves)[cell] <- paste0("cell_", eval(cell))
   }
 
-  res <- list(PowerCurves = PowerCurves,
-              data = x$data,
-              test_details = x$test_details)
+  res <- list(
+    PowerCurves = PowerCurves,
+    data = x$data,
+    test_details = x$test_details
+  )
 
   class(res) <- c("MultiCellPower", class(res))
 
   return(res)
-
 }
 
 
@@ -461,7 +473,6 @@ print.MultiCellPower <- function(x, ...) {
   }
 
   print(x$PowerCurves)
-
 }
 
 
@@ -516,171 +527,180 @@ print.MultiCellPower <- function(x, ...) {
 MultiCellWinner <- function(multicell_power_obj,
                             effect_size = NULL,
                             geolift_type = "standard",
-                            ROAS = seq(0,5,0.05),
+                            ROAS = seq(0, 5, 0.05),
                             alpha = 0.1,
                             method = "conformal",
-                            stat_test = "Total"
-){
-
+                            stat_test = "Total") {
   if (!inherits(multicell_power_obj, "MultiCellPower")) {
     stop("object must be class MultiCellPower")
   }
 
   # Check ROAS
-  if (min(ROAS) < 0){
+  if (min(ROAS) < 0) {
     stop("\nMake sure all ROAS values are positive.")
-  } else if(min(ROAS == 0)){
+  } else if (min(ROAS == 0)) {
     ROAS <- c(0, ROAS)
   }
 
   # Check effect_size
-  if(length(effect_size) > 1){
+  if (length(effect_size) > 1) {
     stop("\nPlease specify a single value of effect_size to analyze.")
   }
 
   # Check geolift_type
-  if(!(tolower(geolift_type) %in% c("standard", "inverse"))){
+  if (!(tolower(geolift_type) %in% c("standard", "inverse"))) {
     stop("\nPlease specify a valid geolift_type test ('standard', 'inverse').")
   }
 
   # Check method
-  if(!(tolower(method) %in% c("conformal", "jackknife+"))){
+  if (!(tolower(method) %in% c("conformal", "jackknife+"))) {
     stop("\nPlease specify a valid method test ('conformal', 'jackknife+').")
   }
 
   # Check stat_test
-  if(!(stat_test %in% c("Total", "Negative", "Positive"))){
+  if (!(stat_test %in% c("Total", "Negative", "Positive"))) {
     stop("\nEnter a valid stat_test ('Total', 'Negative', 'Positive').")
   }
 
-  #Set variables
-  test_params <- as.data.frame(matrix(0, ncol=5, nrow = length(multicell_power_obj$PowerCurves)))
+  # Set variables
+  test_params <- as.data.frame(matrix(0, ncol = 5, nrow = length(multicell_power_obj$PowerCurves)))
   names(test_params) <- c("locations", "effect_size", "duration", "cpic", "investment")
   test_locs <- c()
 
-  for(cell in 1:length(multicell_power_obj$PowerCurves)){
-    if(tolower(geolift_type) == "standard"){
+  for (cell in 1:length(multicell_power_obj$PowerCurves)) {
+    if (tolower(geolift_type) == "standard") {
       aux <- multicell_power_obj$PowerCurves[[cell]] %>%
-        dplyr::filter(power > 0.8, EffectSize > 0 ) %>%
+        dplyr::filter(power > 0.8, EffectSize > 0) %>%
         dplyr::slice_min(EffectSize, n = 1)
-    } else{
+    } else {
       aux <- multicell_power_obj$PowerCurves[[cell]] %>%
-        dplyr::filter(power > 0.8, EffectSize < 0 ) %>%
+        dplyr::filter(power > 0.8, EffectSize < 0) %>%
         dplyr::slice_max(EffectSize, n = 1)
     }
-    test_params[cell,1] <- aux$location[1] #location
-    test_params[cell,2] <- mean(aux$EffectSize) #effect_size
-    test_params[cell,3] <- max(aux$duration) #duration
-    test_params[cell,4] <- mean(aux$cpic) #cpic
-    test_params[cell,5] <- mean(aux$Investment) #investment
+    test_params[cell, 1] <- aux$location[1] # location
+    test_params[cell, 2] <- mean(aux$EffectSize) # effect_size
+    test_params[cell, 3] <- max(aux$duration) # duration
+    test_params[cell, 4] <- mean(aux$cpic) # cpic
+    test_params[cell, 5] <- mean(aux$Investment) # investment
 
     test_locs <- append(test_locs, list(stringr::str_split(multicell_power_obj$PowerCurves[[cell]]$location[1], ", ")[[1]]))
   }
 
   # Set test parameters
   duration <- max(test_params$duration)
-  if(is.null(effect_size)){
+  if (is.null(effect_size)) {
     effect_size <- ifelse(geolift_type == "standard", max(test_params$effect_size), min(test_params$effect_size))
   }
 
   # Resulting dataframe
-  sims <- data.frame(matrix(ncol=12,nrow=0))
-  colnames(sims) <- c("cell_A",
-                      "incremental_A",
-                      "lowerCI_Cell_A",
-                      "upperCI_Cell_A",
-                      "cell_B",
-                      "incremental_B",
-                      "lowerCI_Cell_B",
-                      "upperCI_Cell_B",
-                      "duration",
-                      "base_lift",
-                      "ROAS",
-                      "DID")
+  sims <- data.frame(matrix(ncol = 12, nrow = 0))
+  colnames(sims) <- c(
+    "cell_A",
+    "incremental_A",
+    "lowerCI_Cell_A",
+    "upperCI_Cell_A",
+    "cell_B",
+    "incremental_B",
+    "lowerCI_Cell_B",
+    "upperCI_Cell_B",
+    "duration",
+    "base_lift",
+    "ROAS",
+    "DID"
+  )
 
-  combinations <- combn(seq(1:length(multicell_power_obj$PowerCurves)),2)
+  combinations <- combn(seq(1:length(multicell_power_obj$PowerCurves)), 2)
 
-  for (combo in 1:ncol(combinations)){
+  for (combo in 1:ncol(combinations)) {
     DID_aux <- 0
     i <- 1
-    for (roas in ROAS){
-      test_locs_aux <- c(test_locs[[combinations[,combo][1]]],test_locs[[combinations[,combo][2]]])
+    for (roas in ROAS) {
+      test_locs_aux <- c(test_locs[[combinations[, combo][1]]], test_locs[[combinations[, combo][2]]])
       data_aux <- multicell_power_obj$data %>% dplyr::filter(!(location %in% unlist(test_locs)[!(unlist(test_locs) %in% test_locs_aux)]))
 
-      data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][1]]]] * (1 + effect_size*roas)
-      data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[,combo][2]]]] * (1 + effect_size)
+      data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[, combo][1]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[, combo][1]]]] * (1 + effect_size * roas)
+      data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[, combo][2]]]] <- data_aux$Y[data_aux$time >= (max(data_aux$time) - duration + 1) & data_aux$location %in% test_locs[[combinations[, combo][2]]]] * (1 + effect_size)
 
 
-      gl_a <- suppressMessages(GeoLift(Y_id = "Y",
-                                       time_id = multicell_power_obj$test_details$time_id,
-                                       location_id = multicell_power_obj$test_details$location_id,
-                                       X = multicell_power_obj$test_details$X,
-                                       data = data_aux[!(data_aux$location %in% test_locs[[combinations[,combo][2]]]),],
-                                       locations = test_locs[[combinations[,combo][1]]],
-                                       treatment_start_time = max(data_aux$time) - duration + 1,
-                                       treatment_end_time = max(data_aux$time),
-                                       alpha = alpha,
-                                       model = multicell_power_obj$test_details$model,
-                                       fixed_effects = multicell_power_obj$test_details$fixed_effects,
-                                       ConfidenceIntervals = TRUE,
-                                       method = method,
-                                       grid_size = 250,
-                                       stat_test = stat_test))
+      gl_a <- suppressMessages(GeoLift(
+        Y_id = "Y",
+        time_id = multicell_power_obj$test_details$time_id,
+        location_id = multicell_power_obj$test_details$location_id,
+        X = multicell_power_obj$test_details$X,
+        data = data_aux[!(data_aux$location %in% test_locs[[combinations[, combo][2]]]), ],
+        locations = test_locs[[combinations[, combo][1]]],
+        treatment_start_time = max(data_aux$time) - duration + 1,
+        treatment_end_time = max(data_aux$time),
+        alpha = alpha,
+        model = multicell_power_obj$test_details$model,
+        fixed_effects = multicell_power_obj$test_details$fixed_effects,
+        ConfidenceIntervals = TRUE,
+        method = method,
+        grid_size = 250,
+        stat_test = stat_test
+      ))
 
-      gl_b <- suppressMessages(GeoLift(Y_id = "Y",
-                                       time_id = multicell_power_obj$test_details$time_id,
-                                       location_id = multicell_power_obj$test_details$location_id,
-                                       X = multicell_power_obj$test_details$X,
-                                       data = data_aux[!(data_aux$location %in% test_locs[[combinations[,combo][1]]]),],
-                                       locations = test_locs[[combinations[,combo][2]]],
-                                       treatment_start_time = max(data_aux$time) - duration + 1,
-                                       treatment_end_time = max(data_aux$time),
-                                       alpha = alpha,
-                                       model = multicell_power_obj$test_details$model,
-                                       fixed_effects = multicell_power_obj$test_details$fixed_effects,
-                                       ConfidenceIntervals = TRUE,
-                                       method = method,
-                                       grid_size = 250,
-                                       stat_test = stat_test))
+      gl_b <- suppressMessages(GeoLift(
+        Y_id = "Y",
+        time_id = multicell_power_obj$test_details$time_id,
+        location_id = multicell_power_obj$test_details$location_id,
+        X = multicell_power_obj$test_details$X,
+        data = data_aux[!(data_aux$location %in% test_locs[[combinations[, combo][1]]]), ],
+        locations = test_locs[[combinations[, combo][2]]],
+        treatment_start_time = max(data_aux$time) - duration + 1,
+        treatment_end_time = max(data_aux$time),
+        alpha = alpha,
+        model = multicell_power_obj$test_details$model,
+        fixed_effects = multicell_power_obj$test_details$fixed_effects,
+        ConfidenceIntervals = TRUE,
+        method = method,
+        grid_size = 250,
+        stat_test = stat_test
+      ))
 
-      if(gl_a$upper_bound < gl_b$lower_bound){
+      if (gl_a$upper_bound < gl_b$lower_bound) {
         DID_aux <- 1
-      } else if(gl_b$upper_bound < gl_a$lower_bound){
+      } else if (gl_b$upper_bound < gl_a$lower_bound) {
         DID_aux <- 1
       }
 
-      sims <- rbind(sims, list("cell_A" = unlist(lapply(test_locs[combinations[,combo][1]], function(x) paste(x, collapse = ", "))),
-                               "incremental_A" = gl_a$incremental,
-                               "lowerCI_Cell_A" = round(gl_a$lower_bound, 2),
-                               "upperCI_Cell_A" = round(gl_a$upper_bound, 2),
-                               "cell_B" = unlist(lapply(test_locs[combinations[,combo][2]], function(x) paste(x, collapse = ", "))),
-                               "incremental_B" = gl_b$incremental,
-                               "lowerCI_Cell_B" = round(gl_b$lower_bound, 2),
-                               "upperCI_Cell_B" = round(gl_b$upper_bound, 2),
-                               "duration" = duration,
-                               "base_lift" = effect_size,
-                               "ROAS" = roas,
-                               "DID" = DID_aux) )
+      sims <- rbind(sims, list(
+        "cell_A" = unlist(lapply(test_locs[combinations[, combo][1]], function(x) paste(x, collapse = ", "))),
+        "incremental_A" = gl_a$incremental,
+        "lowerCI_Cell_A" = round(gl_a$lower_bound, 2),
+        "upperCI_Cell_A" = round(gl_a$upper_bound, 2),
+        "cell_B" = unlist(lapply(test_locs[combinations[, combo][2]], function(x) paste(x, collapse = ", "))),
+        "incremental_B" = gl_b$incremental,
+        "lowerCI_Cell_B" = round(gl_b$lower_bound, 2),
+        "upperCI_Cell_B" = round(gl_b$upper_bound, 2),
+        "duration" = duration,
+        "base_lift" = effect_size,
+        "ROAS" = roas,
+        "DID" = DID_aux
+      ))
 
-      if(DID_aux == 1){break}
-
+      if (DID_aux == 1) {
+        break
+      }
     }
-
   }
 
-  results <- sims %>% dplyr::filter(DID == 1) %>% dplyr::select(-c(base_lift, DID))
+  results <- sims %>%
+    dplyr::filter(DID == 1) %>%
+    dplyr::select(-c(base_lift, DID))
 
-  res <- list(results = results,
-              simulations = sims)
+  res <- list(
+    results = results,
+    simulations = sims
+  )
 
   class(res) <- c("MultiCellWinner", class(res))
 
-  if(nrow(results) < 1){
+  if (nrow(results) < 1) {
     message("No Winners were found. Please change the locations, baseline effect_size, or ROAS sequence to find a Winner.")
   }
 
   return(res)
-
 }
 
 #' @param x \code{MultiCellWinner()}
@@ -694,9 +714,9 @@ print.MultiCellWinner <- function(x, ...) {
     stop("object must be class MultiCellWinner")
   }
 
-  if(nrow(x$results) > 0){
+  if (nrow(x$results) > 0) {
     print(x$results)
-  } else{
+  } else {
     message("No Winners were found. Please change the locations, baseline effect_size, or ROAS sequence to find a Winner.")
   }
 }
@@ -754,7 +774,7 @@ print.MultiCellWinner <- function(x, ...) {
 #'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
 #'          Recommended for Positive Lift tests.}
 #' }
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically 
+#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
 #' @param winner_declaration Logic flag indicating whether to compute a winner cell analysis.
@@ -795,30 +815,29 @@ GeoLiftMultiCell <- function(Y_id = "Y",
                              conformal_type = "iid",
                              ns = 1000,
                              winner_declaration = TRUE,
-                             geolift_type = "standard"){
-
+                             geolift_type = "standard") {
   # Rename variables
   data <- data %>% dplyr::rename(Y = paste(Y_id), location = paste(location_id), time = paste(time_id))
   max_time <- max(data$time)
   data$location <- tolower(data$location)
 
   # Check that locations is a list
-  if(!(is.list(locations))){
+  if (!(is.list(locations))) {
     stop("\nPlease enter a list of test locations by cell.")
   }
 
   # Check that the locations are characters
-  if(!(all(sapply(unlist(locations), is.character)))){
+  if (!(all(sapply(unlist(locations), is.character)))) {
     stop("\nMake sure all test locations are characters.")
   }
 
   # Check geolift_type
-  if(!(tolower(geolift_type) %in% c("standard", "inverse"))){
+  if (!(tolower(geolift_type) %in% c("standard", "inverse"))) {
     stop("\nPlease specify a valid geolift_type test ('standard', 'inverse').")
   }
 
   # Check stat_test
-  if(!(stat_test %in% c("Total", "Negative", "Positive"))){
+  if (!(stat_test %in% c("Total", "Negative", "Positive"))) {
     stop("\nEnter a valid stat_test ('Total', 'Negative', 'Positive').")
   }
 
@@ -826,112 +845,119 @@ GeoLiftMultiCell <- function(Y_id = "Y",
 
   GeoLiftResults <- list()
 
-  for(cell in 1:k){
-    data_aux <- data %>% dplyr::filter(!(location %in% unlist(locations[-c(cell)]) ))
-    aux <- GeoLift(Y_id = Y_id,
-                   time_id = time_id,
-                   location_id = location_id,
-                   X = X,
-                   data = data_aux,
-                   locations = locations[[cell]],
-                   treatment_start_time = treatment_start_time,
-                   treatment_end_time = treatment_end_time,
-                   alpha = alpha,
-                   model = model,
-                   fixed_effects = fixed_effects,
-                   ConfidenceIntervals = ConfidenceIntervals,
-                   method = method,
-                   grid_size = grid_size,
-                   stat_test = stat_test,
-                   conformal_type = conformal_type,
-                   ns = ns)
+  for (cell in 1:k) {
+    data_aux <- data %>% dplyr::filter(!(location %in% unlist(locations[-c(cell)])))
+    aux <- GeoLift(
+      Y_id = Y_id,
+      time_id = time_id,
+      location_id = location_id,
+      X = X,
+      data = data_aux,
+      locations = locations[[cell]],
+      treatment_start_time = treatment_start_time,
+      treatment_end_time = treatment_end_time,
+      alpha = alpha,
+      model = model,
+      fixed_effects = fixed_effects,
+      ConfidenceIntervals = ConfidenceIntervals,
+      method = method,
+      grid_size = grid_size,
+      stat_test = stat_test,
+      conformal_type = conformal_type,
+      ns = ns
+    )
 
     GeoLiftResults <- rbind(GeoLiftResults, list(aux))
   }
 
-  if(winner_declaration){
-    combinations <- combn(seq(1:k),2)
+  if (winner_declaration) {
+    combinations <- combn(seq(1:k), 2)
     pairwise <- as.data.frame(matrix(ncol = 7, nrow = 0))
 
-    for (combo in 1:ncol(combinations)){
-      aux_locs_a <- locations[combinations[,combo][1]]
-      aux_locs_b <- locations[combinations[,combo][2]]
+    for (combo in 1:ncol(combinations)) {
+      aux_locs_a <- locations[combinations[, combo][1]]
+      aux_locs_b <- locations[combinations[, combo][2]]
       winner_aux <- NA
 
-      if (tolower(geolift_type) == "standard"){
-        if(GeoLiftResults[[combinations[,combo][1]]]$lower_bound >
-           GeoLiftResults[[combinations[,combo][2]]]$upper_bound){
+      if (tolower(geolift_type) == "standard") {
+        if (GeoLiftResults[[combinations[, combo][1]]]$lower_bound >
+          GeoLiftResults[[combinations[, combo][2]]]$upper_bound) {
           winner_aux <- unlist(lapply(aux_locs_a, function(x) paste(x, collapse = ", ")))
-        } else if(GeoLiftResults[[combinations[,combo][2]]]$lower_bound >
-                  GeoLiftResults[[combinations[,combo][1]]]$upper_bound){
+        } else if (GeoLiftResults[[combinations[, combo][2]]]$lower_bound >
+          GeoLiftResults[[combinations[, combo][1]]]$upper_bound) {
           winner_aux <- unlist(lapply(aux_locs_b, function(x) paste(x, collapse = ", ")))
         }
-      } else{
-        if(GeoLiftResults[[combinations[,combo][1]]]$upper_bound <
-           GeoLiftResults[[combinations[,combo][2]]]$lower_bound){
+      } else {
+        if (GeoLiftResults[[combinations[, combo][1]]]$upper_bound <
+          GeoLiftResults[[combinations[, combo][2]]]$lower_bound) {
           winner_aux <- unlist(lapply(aux_locs_a, function(x) paste(x, collapse = ", ")))
-        } else if(GeoLiftResults[[combinations[,combo][2]]]$upper_bound <
-                  GeoLiftResults[[combinations[,combo][1]]]$lower_bound){
+        } else if (GeoLiftResults[[combinations[, combo][2]]]$upper_bound <
+          GeoLiftResults[[combinations[, combo][1]]]$lower_bound) {
           winner_aux <- unlist(lapply(aux_locs_b, function(x) paste(x, collapse = ", ")))
         }
       }
 
-      pairwise <- rbind(pairwise,c("Cell_A" = unlist(lapply(aux_locs_a, function(x) paste(x, collapse = ", "))),
-                                   "Lower_A" = round(GeoLiftResults[[combinations[,combo][1]]]$lower_bound,2),
-                                   "Upper_A" = round(GeoLiftResults[[combinations[,combo][1]]]$upper_bound,2),
-                                   "Cell_B" = unlist(lapply(aux_locs_b, function(x) paste(x, collapse = ", "))),
-                                   "Lower_B" = round(GeoLiftResults[[combinations[,combo][2]]]$lower_bound,2),
-                                   "Upper_B" = round(GeoLiftResults[[combinations[,combo][2]]]$upper_bound,2),
-                                   "Winner" = winner_aux))
+      pairwise <- rbind(pairwise, c(
+        "Cell_A" = unlist(lapply(aux_locs_a, function(x) paste(x, collapse = ", "))),
+        "Lower_A" = round(GeoLiftResults[[combinations[, combo][1]]]$lower_bound, 2),
+        "Upper_A" = round(GeoLiftResults[[combinations[, combo][1]]]$upper_bound, 2),
+        "Cell_B" = unlist(lapply(aux_locs_b, function(x) paste(x, collapse = ", "))),
+        "Lower_B" = round(GeoLiftResults[[combinations[, combo][2]]]$lower_bound, 2),
+        "Upper_B" = round(GeoLiftResults[[combinations[, combo][2]]]$upper_bound, 2),
+        "Winner" = winner_aux
+      ))
 
-      names(pairwise) <- c("Cell_A",
-                           "Lower_A",
-                           "Upper_A",
-                           "Cell_B",
-                           "Lower_B",
-                           "Upper_B",
-                           "Winner")
-
+      names(pairwise) <- c(
+        "Cell_A",
+        "Lower_A",
+        "Upper_A",
+        "Cell_B",
+        "Lower_B",
+        "Upper_B",
+        "Winner"
+      )
     }
 
     message(paste0(
       "\n##################################",
       "\n##### Pairwise  Comparisons #####\n",
-      "##################################\n"))
+      "##################################\n"
+    ))
 
     print(pairwise)
 
     winner <- NA
 
-    for(cell in 1:k){
+    for (cell in 1:k) {
       aux_pairwise <- pairwise %>% dplyr::filter(Winner == unlist(lapply(locations[cell], function(x) paste(x, collapse = ", "))))
       n_wins <- nrow(aux_pairwise)
-      if(n_wins == k-1){
+      if (n_wins == k - 1) {
         winner <- unlist(lapply(locations[cell], function(x) paste(x, collapse = ", ")))
         break
       }
     }
 
-    if(!(is.na(winner))){
+    if (!(is.na(winner))) {
       message(paste0(
         "\n##################################",
         "\n#####   Winner Declaration   #####\n",
         "##################################\n\n",
-      "* Winner Cell:\n",
-      " ", toupper(winner)))
+        "* Winner Cell:\n",
+        " ", toupper(winner)
+      ))
     }
-
   }
 
 
-  res <- list(results = GeoLiftResults,
-              pairwise_comparisons = pairwise,
-              Winner = winner)
+  res <- list(
+    results = GeoLiftResults,
+    pairwise_comparisons = pairwise,
+    Winner = winner
+  )
 
   class(res) <- c("GeoLiftMultiCell", class(res))
 
   return(res)
-
 }
 
 
@@ -946,8 +972,7 @@ print.GeoLiftMultiCell <- function(x, ...) {
     stop("object must be class GeoLiftMultiCell")
   }
 
-  for(cell in 1:length(x$results)){
-
+  for (cell in 1:length(x$results)) {
     if (x$results[[cell]]$inference$pvalue < 0.05) {
       is_significant <- "The results are significant at a 95% level."
     } else if (x$results[[cell]]$inference$pvalue < 0.10) {
@@ -971,7 +996,8 @@ print.GeoLiftMultiCell <- function(x, ...) {
       "\n#####     Cell ",
       cell,
       " Results    #####\n",
-      "##################################\n"))
+      "##################################\n"
+    ))
 
     message(paste0(
       paste0(
@@ -1000,9 +1026,7 @@ print.GeoLiftMultiCell <- function(x, ...) {
       "% chance of observing an effect this large or larger assuming treatment effect is zero.\n\n",
       sep = ""
     ))
-
   }
-
 }
 
 
@@ -1022,26 +1046,21 @@ summary.GeoLiftMultiCell <- function(object,
     stop("object must be class GeoLiftMultiCell")
   }
 
-  if(!table){
-
-    for(cell in 1:length(object$results)){
-
+  if (!table) {
+    for (cell in 1:length(object$results)) {
       message(paste0(
         "##################################",
         "\n#####     Cell ",
         cell,
         " Results    #####\n",
-        "##################################"))
+        "##################################"
+      ))
 
       print(summary(object$results[[cell]]))
 
       message(paste0("\n\n"))
-
     }
-
-  } else{
-
-
+  } else {
     cells_aux <- list()
     locations_aux <- list()
     duration_aux <- list()
@@ -1054,8 +1073,7 @@ summary.GeoLiftMultiCell <- function(object,
     progfunc_aux <- list()
     winner_aux <- list()
 
-    for (cell in 1:length(object$results)){
-
+    for (cell in 1:length(object$results)) {
       if (toupper(object$results[[cell]]$stat_test) == "TOTAL") {
         test_type <- "TWO-SIDED LIFT TEST"
       } else if (toupper(object$results[[cell]]$stat_test) == "POSITIVE") {
@@ -1067,34 +1085,33 @@ summary.GeoLiftMultiCell <- function(object,
       cells_aux <- append(cells_aux, cell)
       locations_aux <- append(locations_aux, toupper(paste0(object$results[[cell]]$test_id$name, collapse = ", ")))
       duration_aux <- append(duration_aux, (object$results[[cell]]$TreatmentEnd - object$results[[cell]]$TreatmentStart + 1))
-      lift_aux <- append(lift_aux, paste0(round(object$results[[cell]]$inference$Perc.Lift, 3),"%"))
+      lift_aux <- append(lift_aux, paste0(round(object$results[[cell]]$inference$Perc.Lift, 3), "%"))
       pvalue_aux <- append(pvalue_aux, round(object$results[[cell]]$inference$pvalue, 2))
       incremental_aux <- append(incremental_aux, round(object$results[[cell]]$incremental, 0))
       ATT_aux <- append(ATT_aux, round(object$results[[cell]]$inference$ATT, 3))
       stattest_aux <- append(stattest_aux, test_type)
-      statsig_aux <- append(statsig_aux, ifelse(object$results[[cell]]$inference$pvalue < object$results[[cell]]$summary$alpha, 1 ,0))
+      statsig_aux <- append(statsig_aux, ifelse(object$results[[cell]]$inference$pvalue < object$results[[cell]]$summary$alpha, 1, 0))
       progfunc_aux <- append(progfunc_aux, toupper(object$results[[cell]]$results$progfunc))
       ifelse(all(object$results[[cell]]$test_id$name %in% unlist(stringr::str_split(object$Winner[[1]], ", "))),
-             winner_aux <- append(winner_aux, "Winner"),
-             winner_aux <- append(winner_aux, ""))
-
+        winner_aux <- append(winner_aux, "Winner"),
+        winner_aux <- append(winner_aux, "")
+      )
     }
 
-    printresults <- data.frame(Cell = unlist(cells_aux),
-                               Location = unlist(locations_aux),
-                               Duration = unlist(duration_aux),
-                               Lift = unlist(lift_aux),
-                               Incremental = unlist(incremental_aux),
-                               ATT = unlist(ATT_aux),
-                               pValue = unlist(pvalue_aux),
-                               Stat_Test = unlist(stattest_aux),
-                               Stat_Sig = unlist(statsig_aux),
-                               Prognostic_Func = unlist(progfunc_aux),
-                               Winner = unlist(winner_aux)
+    printresults <- data.frame(
+      Cell = unlist(cells_aux),
+      Location = unlist(locations_aux),
+      Duration = unlist(duration_aux),
+      Lift = unlist(lift_aux),
+      Incremental = unlist(incremental_aux),
+      ATT = unlist(ATT_aux),
+      pValue = unlist(pvalue_aux),
+      Stat_Test = unlist(stattest_aux),
+      Stat_Sig = unlist(statsig_aux),
+      Prognostic_Func = unlist(progfunc_aux),
+      Winner = unlist(winner_aux)
     )
 
-    message(paste0(knitr::kable(printresults), collapse="\n"))
+    message(paste0(knitr::kable(printresults), collapse = "\n"))
   }
-
-
 }

@@ -1,3 +1,9 @@
+GeoLift v2.7.2 (Release date: 2023-07-19)
+=========================================
+
+Changes:
+* Move CommutingZones to Suggests dependency and add usage guide.
+
 GeoLift v2.7.1 (Release date: 2023-07-07)
 =========================================
 

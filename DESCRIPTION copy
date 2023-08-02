@@ -1,0 +1,61 @@
+Package: GeoLift
+Title: Synthetic Control Method to Calculate Lift at a Geo Level
+Version: 2.7.2
+Authors@R: c(
+    person(given = "Arturo",
+           family = "Esquerra",
+           role = c("aut", "cre"),
+           email = "aesquerrac@gmail.com"),
+    person(given = "Nicolas",
+           family = "Cruces",
+           role = c("aut"),
+           email = "nicolascruces1994@gmail.com"),
+    person(given = "Kanishka",
+           family = "Panchal",
+           role = c("ctb"),
+           email = "kpanchal@fb.com"),
+    person(given = "Michael",
+           family = "Khalil",
+           role = c("ctb"),
+           email = "michaelkhalil@fb.com"))
+Description: GeoLift is an end-to-end solution to measure lift at 
+    a geographical level. It is a flexible and robust implementation
+    of Augmented Generalized Synthetic Controls. The package
+    provides tools to perform power calculations to plan future 
+    studies, market selection,  as well as inference to calculate 
+    the lift of a study. GeoLift allows for flexible geo-grain 
+    definitions but is recommended for geographic aggregation levels 
+    of cities or higher for daily or weekly data. 
+    To run a GeoLift experiment at least 25 pre-treatment
+    periods and over 20 geo-units are recommended.
+License: 
+    GPL (>= 2)
+Depends:
+    R (>= 4.0.0)
+Imports:
+    augsynth,
+    directlabels,
+    doParallel,
+    dplyr,
+    foreach,
+    ggplot2,
+    gridExtra,
+    gsynth,
+    knitr,
+    lifecycle,
+    MarketMatching,
+    panelView,
+    progress,
+    rlang,
+    scales,
+    stringr,
+    tibble,
+    tidyr
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Suggests:
+    CommutingZones,
+    rmarkdown
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)

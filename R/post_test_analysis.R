@@ -463,7 +463,16 @@ cumulative_lift <- function(data,
                             treatment_end_period,
                             location_id = "location",
                             time_id = "time",
-                            Y_id = "Y") {
+                            Y_id = "Y",
+                            X = c(), 
+                            alpha = 0.1, 
+                            model = "none", 
+                            fixed_effects = TRUE, 
+                            method = "conformal", 
+                            grid_size = 250, 
+                            stat_test = "Total", 
+                            conformal_type = "iid", 
+                            ns = 1000 ) {
   max_test_period <- treatment_start_period + 1
   cumulative_list <- list()
   message("Starting to run iterations of GeoLift to capture cumulative effect.")
@@ -483,14 +492,23 @@ cumulative_lift <- function(data,
       location_id = location_id,
       time_id = time_id,
       Y_id = Y_id,
-      ConfidenceIntervals = TRUE
+      ConfidenceIntervals = TRUE,
+      X = X,
+      alpha = 0.1,
+      model = model,
+      fixed_effects = fixed_effects,
+      method = method, 
+      grid_size = grid_size, 
+      stat_test = stat_test,
+      conformal_type = conformal_type, 
+      ns = ns 
     ))
 
-    att <- gl_output$summary$average_att$Estimate
-    att_lb <- gl_output$lower_bound
-    att_ub <- gl_output$upper_bound
+    att <- gl_output$inference$ATT
+    att_lb <- gl_output$inference$Lower.Conf.Int
+    att_ub <- gl_output$inference$Upper.Conf.Int
 
-    incremental_factor <- length(treatment_locations) * (max_test_period - treatment_start_period)
+    incremental_factor <- length(treatment_locations) * (max_test_period - treatment_start_period + 1)
 
     cumulative_list[[max_test_period - treatment_start_period]] <- list(
       Time = max_test_period,

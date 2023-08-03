@@ -504,20 +504,14 @@ cumulative_lift <- function(data,
       ns = ns 
     ))
 
-    att <- gl_output$inference$ATT
-    att_lb <- gl_output$inference$Lower.Conf.Int
-    att_ub <- gl_output$inference$Upper.Conf.Int
-
-    incremental_factor <- length(treatment_locations) * (max_test_period - treatment_start_period + 1)
-
     cumulative_list[[max_test_period - treatment_start_period]] <- list(
       Time = max_test_period,
-      att = att,
-      att_lb = att_lb,
-      att_ub = att_ub,
-      incremental = att * incremental_factor,
-      incremental_lb = att_lb * incremental_factor,
-      incremental_ub = att_ub * incremental_factor
+      att = gl_output$inference$ATT,
+      att_lb = gl_output$inference$Lower.Conf.Int,
+      att_ub = gl_output$inference$Upper.Conf.Int,
+      incremental = gl_output$incremental,
+      incremental_lb = gl_output$lower_bound,
+      incremental_ub = gl_output$upper_bound
     )
     max_test_period <- max_test_period + 1
   }

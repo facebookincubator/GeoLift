@@ -11,7 +11,7 @@ of Commuting Zones
 ## Installing Commuting Zones
 
 Installing CommutingZones can be done directly using the remotes package
-(which is likely already installed if you GeoLift is present)
+(which is likely already installed if GeoLift is present)
 
 ``` r
 install.packages("remotes")

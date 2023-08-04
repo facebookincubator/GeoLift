@@ -667,7 +667,7 @@ The results show that the campaigns led to a 5.4% lift in units sold
 corresponding to 4667 incremental units for this 15-day test. Moreover,
 the Average Estimated Treatment Effect is of 155.556 units every day of
 the test. Most importantly, we observe that these results are
-statistically significant at a 95% level. In fact, there’s only a 1.1%
+statistically significant at a 95% level. In fact, there’s only a 0.6%
 chance of observing an effect of this magnitude or larger if the actual
 treatment effect was zero. In other words, it is extremely unlikely that
 these results are just due to chance. To dig deeper into the results, we

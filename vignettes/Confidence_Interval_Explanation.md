@@ -62,13 +62,13 @@ GeoTest
 #> 
 #> Incremental Y: 4667
 #> 
-#> 90% Confidence Interval: (-2450.735, 11349.93)
+#> 90% Confidence Interval: (-2450.734, 11349.93)
 #> 
 #> Average Estimated Treatment Effect (ATT): 155.556
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 1.3% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.7% chance of observing an effect this large or larger assuming treatment effect is zero.
 ```
 
 We can also visualize the ATT per day using the plot function
@@ -78,7 +78,7 @@ plot(GeoTest, type = "ATT")
 #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```
 
-<img src="/private/var/folders/_1/c79n_fvs2bx1dwv8qf9wj04h0000gn/T/RtmpOorsgO/preview-115a13062d8a3.dir/Confidence_Interval_Explanation_files/figure-markdown_github/plot_ATT-1.png" style="display: block; margin: auto;" />
+<img src="/private/var/folders/_1/c79n_fvs2bx1dwv8qf9wj04h0000gn/T/RtmpOorsgO/preview-115a1515a9f79.dir/Confidence_Interval_Explanation_files/figure-gfm/plot_ATT-1.png" style="display: block; margin: auto;" />
 
 But how did GeoLift estimate these confidence intervals and p-values?
 
@@ -99,26 +99,26 @@ The Conformal Inference method proposed by the authors and used by
 GeoLift mainly consists of the following steps for each day in the
 post-treatment period
 
-1.  Subtract to all treated locations in the Day of interest (DoI) a
+1)  Subtract to all treated locations in the Day of interest (DoI) a
     constant H0
-2.  State the DoI that is originally in the Post-Treatment Period to be
+2)  State the DoI that is originally in the Post-Treatment Period to be
     in the Pre-Treatment Period
-3.  Train a new Augmented Synsthetic Control Model (though it could be
+3)  Train a new Augmented Synsthetic Control Model (though it could be
     any Synthetic Control, Difference-in-Differences, or Factor/Matrix
     Completion model) based on the new data. I.E. on a data where the
     DoI is considered to be in the Pre-Treatment Period for all
     locations
-4.  Collect the residuals (i.e. the error / the ATT) between what the
+4)  Collect the residuals (i.e. the error / the ATT) between what the
     new model predicted
-5.  Apply a ‘cost’ function to the residual of each day (e.g. abs(resi))
-6.  Observe for which % of days in the Pre-Treatment Period (again,
+5)  Apply a ‘cost’ function to the residual of each day (e.g. abs(resi))
+6)  Observe for which % of days in the Pre-Treatment Period (again,
     which includes DoI) the model had a higher ‘cost’ than on the DoY.
     This gives you an estimate of the ‘p-value’ for the DoI and step
     size H0: “The probability of observing a data as absurd or more than
     this, assuming that the effect is H0”
-7.  Repeat steps 1 ~ 6 for a range of values H0 to obtain the ‘p-value’
+7)  Repeat steps 1 ~ 6 for a range of values H0 to obtain the ‘p-value’
     for each magnitude
-8.  To find the limits of a confidence interval of size (1 - alpha),
+8)  To find the limits of a confidence interval of size (1 - alpha),
     select the lowest/greatest value H0 where the p-value was greater or
     equal to alpha to obtain the lower/upper bound
 
@@ -251,30 +251,29 @@ While Conformal Inference is proven to be robust in many scenarios, it
 is not guaranteed to work everytime. Most commonly, Conformal Inferece
 can fail when
 
--   there is not enough days in the Pre-Treatment Period
--   the true impact (called in the paper as Shock Sequence Ut) is not
-    stationary or not weakly dependent
--   the data is not stationary and not weakly dependent when our model
-    is misspecified or inconsistent
+- there is not enough days in the Pre-Treatment Period
+- the true impact (called in the paper as Shock Sequence Ut) is not
+  stationary or not weakly dependent
+- the data is not stationary and not weakly dependent when our model is
+  misspecified or inconsistent
 
 When Conformal Inference fails, GeoLift falls back to the second method
 called ‘jackknife+’, which works similar to Conformal Inference in the
 aspect that we alter what constitutes the Pre-Treatment Period. In
-Jackknife+, for each day *D*<sub>*p**r**e*</sub> in the Pre-Treatment
-Period
+Jackknife+, for each day $D_{pre}$ in the Pre-Treatment Period
 
-1.  We remove it from the Pre-Treatment Period and put it on the
+1)  We remove it from the Pre-Treatment Period and put it on the
     Post-Treatment Period
-2.  We train another Augmented Synthetic Control Model
-3.  We calculate the absolute difference (abs(e)) between what was
-    observed in *D*<sub>*p**r**e*</sub> and what the model estimated
-4.  For each day in the original Post-Treatment Period, we collect the
+2)  We train another Augmented Synthetic Control Model
+3)  We calculate the absolute difference (abs(e)) between what was
+    observed in $D_{pre}$ and what the model estimated
+4)  For each day in the original Post-Treatment Period, we collect the
     difference between what was observed and what the model predicted.
     From this vector we create 2 others, one where we add abs(e) and one
     where we subtract abs(e) creating respectively the upper and lower
     bound for this iteration
-5.  We store these lower and upper bound values
-6.  The confidence interval is then obtained by getting the respective
+5)  We store these lower and upper bound values
+6)  The confidence interval is then obtained by getting the respective
     quantiles from the upper/lower bound
 
 As before, below is a demonstration on how Jackknife works:
@@ -366,7 +365,7 @@ print(post_treament_upper_bound)
 #> 235.131135 378.330998
 print(post_treament_lower_bound)
 #>         91         92         93         94         95         96         97 
-#> -126.25015 -301.95956 -329.52402 -452.65056 -171.83181 -238.57022  113.75991 
+#> -126.25015 -301.95956 -329.52402 -452.65056 -171.83181 -238.57023  113.75990 
 #>         98         99        100        101        102        103        104 
 #>  177.19184   16.16962   16.43517  120.48222  175.10239   48.46091  -11.15596 
 #>        105            
@@ -395,13 +394,13 @@ GeoTest
 #> 
 #> Incremental Y: 4667
 #> 
-#> 90% Confidence Interval: (-2450.735, 11349.93)
+#> 90% Confidence Interval: (-2450.734, 11349.93)
 #> 
 #> Average Estimated Treatment Effect (ATT): 155.556
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 1.3% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.7% chance of observing an effect this large or larger assuming treatment effect is zero.
 print(post_treament_upper_bound[post_period_ends + 1] * length(treated_locations) * (post_period_ends - post_period_start + 1))
 #> <NA> 
 #>   NA

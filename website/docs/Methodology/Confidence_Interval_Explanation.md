@@ -1,36 +1,19 @@
----
-title: "Confidence Interval Explanation"
-output: 
-  md_document:
-    variant: gfm
-  html_document: 
-    keep_md: yes
-  pdf_document: default
-vignette: >
-  %\VignetteIndexEntry{Confidence_Interval_Explanation}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  dev = "png",
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 8,
-  fig.height = 6,
-  fig.align = "center",
-  warning = FALSE
-)
-```
-
 # Understanding p-value and the confidence intervals in GeoLift
 
-If you reached this section, it likely means that you were able to successfully run the previous steps in the guide and is now keen to deep-dive in understanding the details of GeoLift package. In this part, we are going to explain the two methods employed by GeoLift to estimate the confidence interval and p-values of the Average Treatment Effect on the Treated (ATT). We will use the example from the Walkthrough to demonstrate and give some intuition how the method works.
+If you reached this section, it likely means that you were able to
+successfully run the previous steps in the guide and is now keen to
+deep-dive in understanding the details of GeoLift package. In this part,
+we are going to explain the two methods employed by GeoLift to estimate
+the confidence interval and p-values of the Average Treatment Effect on
+the Treated (ATT). We will use the example from the Walkthrough to
+demonstrate and give some intuition how the method works.
 
-From the Walkthrough example, we conducted an localized experiment in two locations (Chicago and Portland) for a period of 15 days. By using the GeoLift package, we were able to easily estimate the ATT of our marketing efforts on the two regions:
+From the Walkthrough example, we conducted an localized experiment in
+two locations (Chicago and Portland) for a period of 15 days. By using
+the GeoLift package, we were able to easily estimate the ATT of our
+marketing efforts on the two regions:
 
-```{r GeoLift_Output}
+``` r
 library(GeoLift)
 data(GeoLift_Test)
 
@@ -47,6 +30,13 @@ GeoTestData_Test <- GeoDataRead(
   format = "yyyy-mm-dd",
   summary = TRUE
 )
+#> ##################################
+#> #####       Summary       #####
+#> ##################################
+#> 
+#> * Raw Number of Locations: 40
+#> * Time Periods: 105
+#> * Final Number of Locations (Complete): 40
 
 GeoTest <- GeoLift(
   Y_id = "Y",
@@ -56,36 +46,87 @@ GeoTest <- GeoLift(
   treatment_end_time = post_period_ends,
   ConfidenceIntervals = TRUE
 )
+#> Conformal method of Confidence Interval calculation unsuccessful. Changing Confidence Interval calculation method to jackknife+.
 GeoTest
+#> 
+#> GeoLift Output
+#> 
+#> Test results for 15 treatment periods, from time-stamp 91 to 105 for test markets:
+#> 1 CHICAGO
+#> 2 PORTLAND
+#> ##################################
+#> #####     Test Statistics    #####
+#> ##################################
+#> 
+#> Percent Lift: 5.4%
+#> 
+#> Incremental Y: 4667
+#> 
+#> 90% Confidence Interval: (-2450.734, 11349.93)
+#> 
+#> Average Estimated Treatment Effect (ATT): 155.556
+#> 
+#> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
+#> 
+#> There is a 1.7% chance of observing an effect this large or larger assuming treatment effect is zero.
 ```
 
 We can also visualize the ATT per day using the plot function
-```{r plot_ATT}
+
+``` r
 plot(GeoTest, type = "ATT")
+#> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```
+
+![PlotLiftBest](/img/GeoLiftBest-2.png)
 
 But how did GeoLift estimate these confidence intervals and p-values?
 
 ## Default: Conformal Inference Method
 
-As the default, GeoLift - or more accurately the Augmented Synthetic Control package - uses a method called Conformal Inference to estimate the credible interval for the ATT.
-This [method developed in 2022 by researchers Victor Chernozhukov, Kaspar Wütrich, and Yinchu Zhu](https://arxiv.org/pdf/1712.09089.pdf)  has been shown to work with multiples approaches for estimating counterfactual outcomes, such as Synthetic Control (the case here), Differnece-in-Differences, factor and matrix completion models, among others. It demonstrates high small-sample performance or when there are (reasonable) misspecification of the model.
+As the default, GeoLift - or more accurately the Augmented Synthetic
+Control package - uses a method called Conformal Inference to estimate
+the credible interval for the ATT. This [method developed in 2022 by
+researchers Victor Chernozhukov, Kaspar Wütrich, and Yinchu
+Zhu](https://arxiv.org/pdf/1712.09089.pdf) has been shown to work with
+multiples approaches for estimating counterfactual outcomes, such as
+Synthetic Control (the case here), Differnece-in-Differences, factor and
+matrix completion models, among others. It demonstrates high
+small-sample performance or when there are (reasonable) misspecification
+of the model.
 
-The Conformal Inference method proposed by the authors and used by GeoLift mainly consists of the following steps for each day in the post-treatment period
+The Conformal Inference method proposed by the authors and used by
+GeoLift mainly consists of the following steps for each day in the
+post-treatment period
 
-  1) Subtract to all treated locations in the Day of interest (DoI) a constant H0
-  2) State the DoI that is originally in the Post-Treatment Period to be in the Pre-Treatment Period
-  3) Train a new Augmented Synsthetic Control Model (though it could be any Synthetic Control, Difference-in-Differences, or Factor/Matrix Completion model) based on the new data. I.E. on a data where the DoI is considered to be in the Pre-Treatment Period for all locations
-  4) Collect the residuals (i.e. the error / the ATT) between what the new model predicted
-  5) Apply a 'cost' function to the residual of each day (e.g. abs(resi))
-  6) Observe for which % of days in the Pre-Treatment Period (again, which includes DoI) the model had a higher 'cost' than on the DoY. This gives you an estimate of the 'p-value' for the DoI and step size H0: "The probability of observing a data as absurd or more than this, assuming that the effect is H0"
-  7) Repeat steps 1 ~ 6 for a range of values H0 to obtain the 'p-value' for each magnitude
-  8) To find the limits of a confidence interval of size (1 - alpha), select the lowest/greatest value H0 where the p-value was greater or equal to alpha to obtain the lower/upper bound
-  
-  
-We demonstrate below how to implement the method and show that the output is aligned with what GeoLift does for the first day of the Post-Treatment Period (i.e. day 91):
-  
-```{r Conformal Inference p-value}
+1)  Subtract to all treated locations in the Day of interest (DoI) a
+    constant H0
+2)  State the DoI that is originally in the Post-Treatment Period to be
+    in the Pre-Treatment Period
+3)  Train a new Augmented Synsthetic Control Model (though it could be
+    any Synthetic Control, Difference-in-Differences, or Factor/Matrix
+    Completion model) based on the new data. I.E. on a data where the
+    DoI is considered to be in the Pre-Treatment Period for all
+    locations
+4)  Collect the residuals (i.e. the error / the ATT) between what the
+    new model predicted
+5)  Apply a ‘cost’ function to the residual of each day (e.g. abs(resi))
+6)  Observe for which % of days in the Pre-Treatment Period (again,
+    which includes DoI) the model had a higher ‘cost’ than on the DoY.
+    This gives you an estimate of the ‘p-value’ for the DoI and step
+    size H0: “The probability of observing a data as absurd or more than
+    this, assuming that the effect is H0”
+7)  Repeat steps 1 ~ 6 for a range of values H0 to obtain the ‘p-value’
+    for each magnitude
+8)  To find the limits of a confidence interval of size (1 - alpha),
+    select the lowest/greatest value H0 where the p-value was greater or
+    equal to alpha to obtain the lower/upper bound
+
+We demonstrate below how to implement the method and show that the
+output is aligned with what GeoLift does for the first day of the
+Post-Treatment Period (i.e. day 91):
+
+``` r
 library(augsynth)
 day_of_interest <- 91
 h0 <- 0
@@ -115,6 +156,7 @@ synthetic_control_model <- augsynth::augsynth(
     scm = TRUE,
     fixedeff = TRUE,
 )
+#> One outcome and one treatment time found. Running single_augsynth.
 
 
 # 4) Collect the residuals (i.e. the error / the ATT) between what the new model predicted.
@@ -128,15 +170,18 @@ p_value <- mean(costs[day_of_interest] <= costs)
 
 # Observe that the result is exactly what was in the output of GeoLift
 print(p_value)
+#> [1] 0.2857143
 print(GeoTest$summary$att[day_of_interest, ])
+#>    Time Estimate lower_bound upper_bound     p_val
+#> 91   91 108.8099   -82.98491    300.6048 0.2857143
 ```
 
+As you can see, the p-value we obtain matches perfectly with what
+GeoLift shows. We obtain the confidence interval by repeating the
+previous step for a range of values of H0, and collecting the p-value
+associated to each H0 value:
 
-As you can see, the p-value we obtain matches perfectly with what GeoLift shows.
-We obtain the confidence interval by repeating the previous step for a range of values of H0, and collecting the p-value associated to each H0 value:
-  
-  
-```{r Conformal Inference intervals}
+``` r
 
 # Let's then put the previous code in a function
 get_p_value = function(h0){
@@ -186,35 +231,54 @@ alpha = (1 - 0.9)
 lower_bound <- min(grid[p_values >= alpha])
 upper_bound <- max(grid[p_values >= alpha])
 print(lower_bound)
+#> [1] -75.93094
 print(upper_bound)
+#> [1] 293.5508
 
 # which again, will be similar to what GeoLift stated:
 print(GeoTest$summary$att[day_of_interest, ])
+#>    Time Estimate lower_bound upper_bound     p_val
+#> 91   91 108.8099   -82.98491    300.6048 0.2857143
 ```
 
-As you can see the values we got are almost exactly the ones provided by GeoLift, with the difference originating from the grid of tested values being different.
+As you can see the values we got are almost exactly the ones provided by
+GeoLift, with the difference originating from the grid of tested values
+being different.
 
 ## The backfall: Jackknife Method
-While Conformal Inference is proven to be robust in many scenarios, it is not guaranteed to work everytime. Most commonly, Conformal Inferece can fail when
+
+While Conformal Inference is proven to be robust in many scenarios, it
+is not guaranteed to work everytime. Most commonly, Conformal Inferece
+can fail when
 
 - there is not enough days in the Pre-Treatment Period
-- the true impact (called in the paper as Shock Sequence Ut) is not stationary or not weakly dependent
-- the data is not stationary and not weakly dependent when our model is misspecified or inconsistent
+- the true impact (called in the paper as Shock Sequence Ut) is not
+  stationary or not weakly dependent
+- the data is not stationary and not weakly dependent when our model is
+  misspecified or inconsistent
 
-When Conformal Inference fails, GeoLift falls back to the second method called 'jackknife+', which works similar to Conformal Inference in the aspect that we alter what constitutes the Pre-Treatment Period.
-In Jackknife+, for each day $D_{pre}$ in the Pre-Treatment Period
+When Conformal Inference fails, GeoLift falls back to the second method
+called ‘jackknife+’, which works similar to Conformal Inference in the
+aspect that we alter what constitutes the Pre-Treatment Period. In
+Jackknife+, for each day $D_{pre}$ in the Pre-Treatment Period
 
-  1) We remove it from the Pre-Treatment Period and put it on the Post-Treatment Period
-  2) We train another Augmented Synthetic Control Model
-  3) We calculate the absolute difference (abs(e)) between what was observed in $D_{pre}$ and what the model estimated
-  4) For each day in the original Post-Treatment Period, we collect the difference between what was observed and what the model predicted. From this vector we create 2 others, one where we add abs(e) and one where we subtract abs(e) creating respectively the upper and lower bound for this iteration
-  5) We store these lower and upper bound values
-  6) The confidence interval is then obtained by getting the respective quantiles from the upper/lower bound
+1)  We remove it from the Pre-Treatment Period and put it on the
+    Post-Treatment Period
+2)  We train another Augmented Synthetic Control Model
+3)  We calculate the absolute difference (abs(e)) between what was
+    observed in $D_{pre}$ and what the model estimated
+4)  For each day in the original Post-Treatment Period, we collect the
+    difference between what was observed and what the model predicted.
+    From this vector we create 2 others, one where we add abs(e) and one
+    where we subtract abs(e) creating respectively the upper and lower
+    bound for this iteration
+5)  We store these lower and upper bound values
+6)  The confidence interval is then obtained by getting the respective
+    quantiles from the upper/lower bound
 
 As before, below is a demonstration on how Jackknife works:
-  
-  
-```{r Jackknife}
+
+``` r
 train_augmented_synthetic_control = function(geo_data, treatment_start_date){
   
   new_geo_data <- geo_data
@@ -293,16 +357,68 @@ post_treament_upper_bound <- obs_values - apply(lower_bound, 2, function(x) quan
 post_treament_lower_bound <- obs_values - apply(upper_bound, 2, function(x) quantile(x, 1 - alpha/2))
 
 print(post_treament_upper_bound)
+#>         91         92         93         94         95         96         97 
+#> 331.336571 155.656817 125.461659   4.687216 286.346779 216.483095 567.128420 
+#>         98         99        100        101        102        103        104 
+#> 630.101980 471.727499 479.616984 588.369348 636.523734 505.765583 443.125831 
+#>        105            
+#> 235.131135 378.330998
 print(post_treament_lower_bound)
+#>         91         92         93         94         95         96         97 
+#> -126.25015 -301.95956 -329.52402 -452.65056 -171.83181 -238.57023  113.75990 
+#>         98         99        100        101        102        103        104 
+#>  177.19184   16.16962   16.43517  120.48222  175.10239   48.46091  -11.15596 
+#>        105            
+#> -220.89674  -81.69113
 ```
 
+The last value on the vectors ‘post_treament_upper_bound’ and
+‘post_treament_lower_bound’ refer to the upper and lower bound of the
+ATT for the whole Post-Treatment Period. If we multiple them by the
+number of locations (2) and the number of days in the Post-Treatment
+Period, we obtain the interval provided by GeoLift:
 
-The last value on the vectors 'post_treament_upper_bound' and 'post_treament_lower_bound' refer to the upper and lower bound of the ATT for the whole Post-Treatment Period. If we multiple them by the number of locations (2) and the number of days in the Post-Treatment Period, we obtain the interval provided by GeoLift:
-```{r Total impact interval}
+``` r
 GeoTest
+#> 
+#> GeoLift Output
+#> 
+#> Test results for 15 treatment periods, from time-stamp 91 to 105 for test markets:
+#> 1 CHICAGO
+#> 2 PORTLAND
+#> ##################################
+#> #####     Test Statistics    #####
+#> ##################################
+#> 
+#> Percent Lift: 5.4%
+#> 
+#> Incremental Y: 4667
+#> 
+#> 90% Confidence Interval: (-2450.734, 11349.93)
+#> 
+#> Average Estimated Treatment Effect (ATT): 155.556
+#> 
+#> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
+#> 
+#> There is a 1.7% chance of observing an effect this large or larger assuming treatment effect is zero.
 print(post_treament_upper_bound[post_period_ends + 1] * length(treated_locations) * (post_period_ends - post_period_start + 1))
+#> <NA> 
+#>   NA
 print(post_treament_lower_bound[post_period_ends + 1] * length(treated_locations) * (post_period_ends - post_period_start + 1))
+#> <NA> 
+#>   NA
 ```
 
-Thus Jackknife+ method provides an estimate of the Confidence Interval for the ATT that is based on the error that model has on each day of the Pre-Treatment Period if it was put in the Post-Treatment Period. Because the days that got moved actually didn't receive the treatment, the error that the model has on each one of these days gives some insight on the accuracy of our model in estimating the counter-factual for the treated locations during the Post-Treatment Period. Because we remove one day at a time, the coefficients found for our model aren't too different to what we obtain using the whole Pre-Treatment Period data.
-However, because we use the absolute value of the error of the model in each one of the moved dates, the confidence interval estimated by this method tends should be larger than the true credible interval of the estimated treatment effect.
+Thus Jackknife+ method provides an estimate of the Confidence Interval
+for the ATT that is based on the error that model has on each day of the
+Pre-Treatment Period if it was put in the Post-Treatment Period. Because
+the days that got moved actually didn’t receive the treatment, the error
+that the model has on each one of these days gives some insight on the
+accuracy of our model in estimating the counter-factual for the treated
+locations during the Post-Treatment Period. Because we remove one day at
+a time, the coefficients found for our model aren’t too different to
+what we obtain using the whole Pre-Treatment Period data. However,
+because we use the absolute value of the error of the model in each one
+of the moved dates, the confidence interval estimated by this method
+tends should be larger than the true credible interval of the estimated
+treatment effect.

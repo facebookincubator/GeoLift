@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Understanding p-value and the confidence intervals in GeoLift
 
 If you reached this section, it likely means that you were able to
@@ -99,26 +104,26 @@ The Conformal Inference method proposed by the authors and used by
 GeoLift mainly consists of the following steps for each day in the
 post-treatment period
 
-1)  Subtract to all treated locations in the Day of interest (DoI) a
+1.  Subtract to all treated locations in the Day of interest (DoI) a
     constant H0
-2)  State the DoI that is originally in the Post-Treatment Period to be
+2.  State the DoI that is originally in the Post-Treatment Period to be
     in the Pre-Treatment Period
-3)  Train a new Augmented Synsthetic Control Model (though it could be
+3.  Train a new Augmented Synsthetic Control Model (though it could be
     any Synthetic Control, Difference-in-Differences, or Factor/Matrix
     Completion model) based on the new data. I.E. on a data where the
     DoI is considered to be in the Pre-Treatment Period for all
     locations
-4)  Collect the residuals (i.e. the error / the ATT) between what the
+4.  Collect the residuals (i.e. the error / the ATT) between what the
     new model predicted
-5)  Apply a ‘cost’ function to the residual of each day (e.g. abs(resi))
-6)  Observe for which % of days in the Pre-Treatment Period (again,
+5.  Apply a ‘cost’ function to the residual of each day (e.g. abs(resi))
+6.  Observe for which % of days in the Pre-Treatment Period (again,
     which includes DoI) the model had a higher ‘cost’ than on the DoY.
     This gives you an estimate of the ‘p-value’ for the DoI and step
     size H0: “The probability of observing a data as absurd or more than
     this, assuming that the effect is H0”
-7)  Repeat steps 1 ~ 6 for a range of values H0 to obtain the ‘p-value’
+7.  Repeat steps 1 ~ 6 for a range of values H0 to obtain the ‘p-value’
     for each magnitude
-8)  To find the limits of a confidence interval of size (1 - alpha),
+8.  To find the limits of a confidence interval of size (1 - alpha),
     select the lowest/greatest value H0 where the p-value was greater or
     equal to alpha to obtain the lower/upper bound
 
@@ -262,18 +267,18 @@ called ‘jackknife+’, which works similar to Conformal Inference in the
 aspect that we alter what constitutes the Pre-Treatment Period. In
 Jackknife+, for each day $D_{pre}$ in the Pre-Treatment Period
 
-1)  We remove it from the Pre-Treatment Period and put it on the
+1.  We remove it from the Pre-Treatment Period and put it on the
     Post-Treatment Period
-2)  We train another Augmented Synthetic Control Model
-3)  We calculate the absolute difference (abs(e)) between what was
+2.  We train another Augmented Synthetic Control Model
+3.  We calculate the absolute difference (abs(e)) between what was
     observed in $D_{pre}$ and what the model estimated
-4)  For each day in the original Post-Treatment Period, we collect the
+4.  For each day in the original Post-Treatment Period, we collect the
     difference between what was observed and what the model predicted.
     From this vector we create 2 others, one where we add abs(e) and one
     where we subtract abs(e) creating respectively the upper and lower
     bound for this iteration
-5)  We store these lower and upper bound values
-6)  The confidence interval is then obtained by getting the respective
+5.  We store these lower and upper bound values
+6.  The confidence interval is then obtained by getting the respective
     quantiles from the upper/lower bound
 
 As before, below is a demonstration on how Jackknife works:

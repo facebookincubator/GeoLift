@@ -1,11 +1,11 @@
 ---
 title: "Confidence Interval Explanation"
 output: 
+  pdf_document: default
   md_document:
     variant: gfm
   html_document: 
     keep_md: yes
-  pdf_document: default
 vignette: >
   %\VignetteIndexEntry{Confidence_Interval_Explanation}
   %\VignetteEncoding{UTF-8}
@@ -32,6 +32,7 @@ From the Walkthrough example, we conducted an localized experiment in two locati
 
 ```{r GeoLift_Output}
 library(GeoLift)
+library(ggplot2)
 data(GeoLift_Test)
 
 treated_locations = c("chicago", "portland")
@@ -69,11 +70,102 @@ But how did GeoLift estimate these confidence intervals and p-values?
 ## Default: Conformal Inference Method
 
 As the default, GeoLift - or more accurately the Augmented Synthetic Control package - uses a method called Conformal Inference to estimate the credible interval for the ATT.
-This [method developed in 2022 by researchers Victor Chernozhukov, Kaspar Wütrich, and Yinchu Zhu](https://arxiv.org/pdf/1712.09089.pdf)  has been shown to work with multiples approaches for estimating counterfactual outcomes, such as Synthetic Control (the case here), Differnece-in-Differences, factor and matrix completion models, among others. It demonstrates high small-sample performance or when there are (reasonable) misspecification of the model.
+This [method developed in 2022 by researchers Victor Chernozhukov, Kaspar Wütrich, and Yinchu Zhu](https://arxiv.org/pdf/1712.09089.pdf)  has been shown to work with multiples approaches for estimating counter-factual outcomes, such as Synthetic Control (the case here), Difference-in-Differences, factor and matrix completion models, among others. It demonstrates high small-sample performance or when there are (reasonable) misspecification of the model.
 
-The Conformal Inference method proposed by the authors and used by GeoLift mainly consists of the following steps for each day in the post-treatment period
+### Estimating the p-value
+From the paper, the p-value (i.e. the probability of observing a data as or more absurd, assuming that the null-hypothesis is true) for a chosen date is given by
 
-  1) Subtract to all treated locations in the Day of interest (DoI) a constant H0
+$\hat{p} = 1 - \hat{F}(S(\hat{u}))$, where $\hat{F}(x) = \frac{1}{|\Pi|}\underset{\pi \epsilon \Pi}{\sum{1\{S(\hat{u}_\pi < x\}}}$
+
+where $\hat{u}$ is the residual (i.e. the error) between what an Augmented Synthetic Control Model (hereafter refereed simply as 'model') estimated and what was observed on the chose date for the treated location (if there are more than 1 treated location, they are grouped and averaged).
+The function $S(\hat{u})$ defines the test statistics, and it can be interpreted as an error functions, such as Mean Squared Error and Mean Absolute Error:
+
+$S(\hat{u})=\left( \frac{1}{\sqrt{T_*}}\underset{t=T_0+1}{\overset{T}{\sum{}|\hat{u}_t|^q}} \right)$
+
+where $T_*$ is the number of 'dates' in the Post-Treatment Period, $T_0$ is the first date of the Post-Treatment Period, and $T$ indicates the last date available for the analysis (so $T_* = T - T_0$). 
+
+Coming back to the first equation, $\pi$ stands for a block permutation, which is a one-to-one mapping that reorder the dates (from both Post-Treatment and Pre-Treatment Periods). One example of a block permutation is "shifting all dates forward by 1*", so that in the simplest example the original data would look like this:
+```{r Block Permutation of 1 example. A}
+data.frame(values = c(40, 10, 20, 30), dates = c(1, 2, 3, 4))
+```
+
+and after our block permutation they become:
+```{r Block Permutation of 1 example. B}
+data.frame(values = c(40, 10, 20, 30), dates = c(4, 1, 2, 3))
+```
+
+
+The case above is an example of *overlapping moving block permutations* $\Pi_{\rightarrow}$, for the case where $j=1$, and is the default block permutation from the Augmented Synthetic Control package to calculate point wise confidence intervals. The elements of $\Pi_{\rightarrow}$ are indexed by $j\ \epsilon \{0, 1, ,2, T-1\}$ and a permutation $\pi_j$ is defined as 
+
+$\pi_j(i) = \begin{cases}
+      i + j, & \text{if}\ i + j \leq T \\
+      i + j - T, & \text{otherwise}
+    \end{cases}$
+
+So reading back the equation and using *overlapping moving block permutations* $\Pi_{\rightarrow}$ for $\Pi$, we can translate the equation as
+"The probability that the residual $\hat{u}$ was caused just by noise is the share of dates where we had an error smaller than $S(\hat{u})$".
+where $\hat{u}$ refers to the a Day of Interest (DoI) in the Post-Treatment Period, and the dates included for the analysis are all dates in the Pre-Treatment Period and the DoI itself.
+
+
+### Estimatined the Confidence Interval
+
+The confidence interval is estimated by repeating the estimation of the p-value for a range of G values $\Theta=\{\theta_0, \theta_1, ..., \theta_G \}$ by subtracting from the observed value of the treated unit at the DoI. The reason why we subtract a value $\theta$, is can be thought as 'removing the real effect that the treatment caused', so that when we remove the treatment effect perfectly, our algorithm above should indicate a high p-value.
+
+Let's take the scenario where we have our target value in the Pre-Treatment Period following a normal distribution of expected value (1.0) and standard deviation 0.1. With the treatment, the expected value of the target increased by 30% while keeping the same standard deviation:
+```{r Conformal Inference Step 1 Intuition}
+  days <- 100
+  post_treament_start_day <- 70
+  expected_values <- rep(1.0, days)
+  expected_values[post_treament_start_day:days] <- expected_values[post_treament_start_day:days] * 1.3
+  observed_values <- rnorm(days, expected_values, 0.1)
+  dummy_data <- data.frame(date = seq(days), Y = observed_values)
+  ggplot(dummy_data, aes(x = date, y = Y)) + 
+    geom_line(color = 'skyblue3') + 
+    geom_vline(aes(xintercept = post_treament_start_day), linetype='dashed', color = 'gray20') +
+    scale_y_continuous(limits = c(0, 2))
+  
+```
+
+Which means that for the null-hypothesis "the probability of observing a data as or more absurd, assuming that *there is no increase*", we expect to obtain a quite low p-value. After all, we can clearly see the different level that Y is in the Post-Treatment Period.
+But what if we wanted to estimate the p-value not for *no increase* but for an increase of 20%? In this case, we *subtract* 0.2  from all the values in the Post-Treatment Period from the treated units:
+
+
+```{r Conformal Inference Step 1.1 Intuition}
+
+  altered_dummy_data <- dummy_data
+  h0 <- 0.2
+  altered_dummy_data$Y[post_treament_start_day:days] <- altered_dummy_data$Y[post_treament_start_day:days] - h0
+  ggplot(altered_dummy_data, aes(x = date, y = Y)) + 
+    geom_line(color = 'skyblue3') + 
+    geom_vline(aes(xintercept = post_treament_start_day), linetype='dashed', color = 'gray20') +
+    scale_y_continuous(limits = c(0, 2))
+  
+```
+
+As we can see with the plots, the target values at the Post-Treatment Period are much closer to the values in the Pre-Treatment Period. As a consequence, we expect the p-value to be much higher than before, but still (from looking only at the plot) the p-value should be below 0.5 as it looks that most often the values in the Post-Treatment are above the values in the Pre-Treatment Period.
+
+Now what would happen if we removed **exactly** the actual increase we got from the treatment?
+```{r Conformal Inference Step 1.2 Intuition}
+
+  altered_dummy_data <- dummy_data
+  h0 <- 0.3
+  altered_dummy_data$Y[post_treament_start_day:days] <- altered_dummy_data$Y[post_treament_start_day:days] - h0
+  ggplot(altered_dummy_data, aes(x = date, y = Y)) + 
+    geom_line(color = 'skyblue3') + 
+    geom_vline(aes(xintercept = post_treament_start_day), linetype='dashed', color = 'gray20') +
+    scale_y_continuous(limits = c(0, 2))
+```
+
+We don't see any difference between before and after the treatment, so the p-value should be quite high.
+So by applying a shift to the target values at the treatment locations at the Post-Treatment Period, we are assessing the likelihood of each one of the shifts. After we execute this process several times, we obtain the p-values for each one of the possible treatment effects considered, resulting in something that looks and works **similar** (It is not!) to a probability density function of the treatment effect. 
+
+
+### Implementation of the algorithm
+
+
+The Conformal Inference method proposed by the authors and used by GeoLift mainly consists of the following steps for each day in the post-treatment period (Algorithm 1 from the paper):
+
+  1) Subtract to all treated locations in the Day of interest (DoI), which is in the Post-Treatment Period, a constant H0.
   2) State the DoI that is originally in the Post-Treatment Period to be in the Pre-Treatment Period
   3) Train a new Augmented Synsthetic Control Model (though it could be any Synthetic Control, Difference-in-Differences, or Factor/Matrix Completion model) based on the new data. I.E. on a data where the DoI is considered to be in the Pre-Treatment Period for all locations
   4) Collect the residuals (i.e. the error / the ATT) between what the new model predicted
@@ -81,8 +173,8 @@ The Conformal Inference method proposed by the authors and used by GeoLift mainl
   6) Observe for which % of days in the Pre-Treatment Period (again, which includes DoI) the model had a higher 'cost' than on the DoY. This gives you an estimate of the 'p-value' for the DoI and step size H0: "The probability of observing a data as absurd or more than this, assuming that the effect is H0"
   7) Repeat steps 1 ~ 6 for a range of values H0 to obtain the 'p-value' for each magnitude
   8) To find the limits of a confidence interval of size (1 - alpha), select the lowest/greatest value H0 where the p-value was greater or equal to alpha to obtain the lower/upper bound
-  
-  
+
+
 We demonstrate below how to implement the method and show that the output is aligned with what GeoLift does for the first day of the Post-Treatment Period (i.e. day 91):
   
 ```{r Conformal Inference p-value}
@@ -94,7 +186,7 @@ cost_funct = function(residuals) return (abs(residuals))
 # We create a copy of the original data we can alter without worries
 new_geo_data <- GeoTestData_Test
 
-# 1) Subtract to all treated locations in the Day of interest (DoI) a constant H01
+# 1) Subtract to all treated locations in the Day of interest (DoI) a constant H0
 new_geo_data$Y[(new_geo_data$time == day_of_interest) & (new_geo_data$location %in% treated_locations)] <- new_geo_data$Y[(new_geo_data$time == day_of_interest) & (new_geo_data$location %in% treated_locations)] - h0
 
 # 2) State the DoI that is originally in the Post-Treatment Period to be in the Pre-Treatment Period

@@ -6,9 +6,9 @@
 \usage{
 cumulative_value.plot(
   data,
-  treatment_locations,
-  treatment_start_period,
-  treatment_end_period,
+  locations,
+  treatment_start_time,
+  treatment_end_time,
   location_id = "location",
   time_id = "time",
   Y_id = "Y",
@@ -31,14 +31,16 @@ cumulative_value.plot(
 )
 }
 \arguments{
-\item{data}{DataFrame that GeoLfit will use to determine a result.
-Should be the output of \code{GeoDataRead}.}
+\item{data}{A data.frame containing the historical conversions by
+geographic unit. It requires a "locations" column with the geo name,
+a "Y" column with the outcome data (units), a time column with the indicator
+of the time period (starting at 1), and covariates.}
 
-\item{treatment_locations}{Vector of locations where the treatment was applied.}
+\item{locations}{List of test locations.}
 
-\item{treatment_start_period}{Integer representing period where test started.}
+\item{treatment_start_time}{Time index of the start of the treatment.}
 
-\item{treatment_end_period}{Integer representing period where test finished.}
+\item{treatment_end_time}{Time index of the end of the treatment.}
 
 \item{location_id}{Name of the location variable (String).}
 
@@ -46,7 +48,7 @@ Should be the output of \code{GeoDataRead}.}
 
 \item{Y_id}{Name of the outcome variable (String).}
 
-\item{X}{List of names of covariates - used in GeoLift function}
+\item{X}{List of names of covariates.}
 
 \item{alpha}{Significance level. Set to 0.1 by default.}
 
@@ -63,7 +65,8 @@ time-stamps. }
 \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
 }}
 
-\item{fixed_effects}{A logic flag indicating whether to include unit fixed}
+\item{fixed_effects}{A logic flag indicating whether to include unit fixed
+effects in the model. Set to TRUE by default.}
 
 \item{method}{A string indicating the method used to calculate the
 aggregate ATT Confidence Intervals.

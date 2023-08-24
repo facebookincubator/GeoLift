@@ -444,57 +444,16 @@ print.GeoLift <- function(x, ...) {
 #'
 #' This method will calculate the cumulative lift with each passing day.
 #'
-#' @param data DataFrame that GeoLfit will use to determine a result.
-#' Should be the output of `GeoDataRead`.
-#' @param treatment_locations Vector of locations where the treatment was applied.
-#' @param treatment_start_period Integer representing period where test started.
-#' @param treatment_end_period Integer representing period where test finished.
-#' @param Y_id Name of the outcome variable (String).
-#' @param location_id Name of the location variable (String).
-#' @param time_id Name of the time variable (String).
-#' @param X List of names of covariates - used in GeoLift function
-#' @param alpha Significance level. Set to 0.1 by default.
-#' @param model A string indicating the outcome model used to augment the Augmented
-#' Synthetic Control Method. Augmentation through a prognostic function can improve
-#' fit and reduce L2 imbalance metrics.
-#' \itemize{
-#'          \item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
-#'          \item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
-#'                           for smaller panels (less than 40 locations and 100 time-stamps.))}
-#'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
-#'                          to improve fit for larger panels (more than 40 locations and 100
-#'                          time-stamps. }
-#'          \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
-#'          }
-#' @param fixed_effects A logic flag indicating whether to include unit fixed
-#' @param method A string indicating the method used to calculate the
-#' aggregate ATT Confidence Intervals.
-#' \itemize{
-#'          \item{"conformal":}{ Conformal Inference. Defualt.}
-#'          \item{"jackknife+":}{ Jackknife+ (exclusively for stat_test = "Total").}
-#' }
-#' @param grid_size Number of grid points to use when inverting the hypothesis
-#' test for Conformal Inference. Set to 250 by default.
-#' @param stat_test A string indicating the test statistic.
-#' \itemize{
-#'          \item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
-#'          \item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
-#'          Recommended for Negative Lift tests.}
-#'          \item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
-#'          Recommended for Positive Lift tests.}
-#' }
-#' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
-#' distributed or "block" for moving block permutations. Set to "iid" by default.
-#' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
+#' @inheritParams GeoLift
 #'
 #' @return
 #' A dataframe that holds the accumulated lift effect throughout the entire treatment period.
 #'
 #' @export
 cumulative_lift <- function(data,
-                            treatment_locations,
-                            treatment_start_period,
-                            treatment_end_period,
+                            locations,
+                            treatment_start_time,
+                            treatment_end_time,
                             location_id = "location",
                             time_id = "time",
                             Y_id = "Y",
@@ -507,28 +466,28 @@ cumulative_lift <- function(data,
                             stat_test = "Total", 
                             conformal_type = "iid", 
                             ns = 1000 ) {
-  max_test_period <- treatment_start_period + 1
+  max_test_period <- treatment_start_time + 1
   cumulative_list <- list()
   message("Starting to run iterations of GeoLift to capture cumulative effect.")
-  while (max_test_period <= treatment_end_period) {
+  while (max_test_period <= treatment_end_time) {
     if (max_test_period %% 5 == 0) {
       message(paste0(
-        "Currently missing ", treatment_end_period - max_test_period, " iterations."
+        "Currently missing ", treatment_end_time - max_test_period, " iterations."
       ))
     }
     filtered_data <- data[data$time <= max_test_period, ]
 
     gl_output <- suppressMessages(GeoLift(
       data = data,
-      locations = treatment_locations,
-      treatment_start_time = treatment_start_period,
+      locations = locations,
+      treatment_start_time = treatment_start_time,
       treatment_end_time = max_test_period,
       location_id = location_id,
       time_id = time_id,
       Y_id = Y_id,
       ConfidenceIntervals = TRUE,
       X = X,
-      alpha = 0.1,
+      alpha = alpha,
       model = model,
       fixed_effects = fixed_effects,
       method = method, 
@@ -538,7 +497,7 @@ cumulative_lift <- function(data,
       ns = ns 
     ))
 
-    cumulative_list[[max_test_period - treatment_start_period]] <- list(
+    cumulative_list[[max_test_period - treatment_start_time]] <- list(
       Time = max_test_period,
       att = gl_output$inference$ATT,
       att_lb = gl_output$inference$Lower.Conf.Int,

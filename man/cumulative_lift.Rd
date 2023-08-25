@@ -6,29 +6,84 @@
 \usage{
 cumulative_lift(
   data,
-  treatment_locations,
-  treatment_start_period,
-  treatment_end_period,
+  locations,
+  treatment_start_time,
+  treatment_end_time,
   location_id = "location",
   time_id = "time",
-  Y_id = "Y"
+  Y_id = "Y",
+  X = c(),
+  alpha = 0.1,
+  model = "none",
+  fixed_effects = TRUE,
+  method = "conformal",
+  grid_size = 250,
+  stat_test = "Total",
+  conformal_type = "iid",
+  ns = 1000
 )
 }
 \arguments{
-\item{data}{DataFrame that GeoLfit will use to determine a result.
-Should be the output of \code{GeoDataRead}.}
+\item{data}{A data.frame containing the historical conversions by
+geographic unit. It requires a "locations" column with the geo name,
+a "Y" column with the outcome data (units), a time column with the indicator
+of the time period (starting at 1), and covariates.}
 
-\item{treatment_locations}{Vector of locations where the treatment was applied.}
+\item{locations}{List of test locations.}
 
-\item{treatment_start_period}{Integer representing period where test started.}
+\item{treatment_start_time}{Time index of the start of the treatment.}
 
-\item{treatment_end_period}{Integer representing period where test finished.}
+\item{treatment_end_time}{Time index of the end of the treatment.}
 
 \item{location_id}{Name of the location variable (String).}
 
 \item{time_id}{Name of the time variable (String).}
 
 \item{Y_id}{Name of the outcome variable (String).}
+
+\item{X}{List of names of covariates.}
+
+\item{alpha}{Significance level. Set to 0.1 by default.}
+
+\item{model}{A string indicating the outcome model used to augment the Augmented
+Synthetic Control Method. Augmentation through a prognostic function can improve
+fit and reduce L2 imbalance metrics.
+\itemize{
+\item{"None":}{ ASCM is not augmented by a prognostic function. Defualt.}
+\item{"Ridge":}{ Augments with a Ridge regression. Recommended to improve fit
+for smaller panels (less than 40 locations and 100 time-stamps.))}
+\item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
+to improve fit for larger panels (more than 40 locations and 100
+time-stamps. }
+\item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
+}}
+
+\item{fixed_effects}{A logic flag indicating whether to include unit fixed
+effects in the model. Set to TRUE by default.}
+
+\item{method}{A string indicating the method used to calculate the
+aggregate ATT Confidence Intervals.
+\itemize{
+\item{"conformal":}{ Conformal Inference. Defualt.}
+\item{"jackknife+":}{ Jackknife+ (exclusively for stat_test = "Total").}
+}}
+
+\item{grid_size}{Number of grid points to use when inverting the hypothesis
+test for Conformal Inference. Set to 250 by default.}
+
+\item{stat_test}{A string indicating the test statistic.
+\itemize{
+\item{"Total":}{ The test statistic is the sum of all treatment effects, i.e. sum(abs(x)). Default.}
+\item{"Negative":}{ One-sided test against positive effects i.e. -sum(x).
+Recommended for Negative Lift tests.}
+\item{"Positive":}{ One-sided test against negative effects i.e. sum(x).
+Recommended for Positive Lift tests.}
+}}
+
+\item{conformal_type}{Type of conformal inference used. Can be either "iid" for Independent and identically
+distributed or "block" for moving block permutations. Set to "iid" by default.}
+
+\item{ns}{Number of resamples for "iid" permutations if \verb{conformal_type = "iid}. Set to 1000 by default.}
 }
 \value{
 A dataframe that holds the accumulated lift effect throughout the entire treatment period.

@@ -561,14 +561,7 @@ absolute_value.plot <- function(GeoLift,
 #'
 #' Plot the accumulated lift effect.
 #'
-#' @param data DataFrame that GeoLfit will use to determine a result.
-#' Should be the output of `GeoDataRead`.
-#' @param treatment_locations Vector of locations where the treatment was applied.
-#' @param treatment_start_period Integer representing period where test started.
-#' @param treatment_end_period Integer representing period where test finished.
-#' @param Y_id Name of the outcome variable (String).
-#' @param location_id Name of the location variable (String).
-#' @param time_id Name of the time variable (String).
+#' @inheritParams GeoLift
 #' @param treatment_end_date Character that represents a date in year-month-day format.
 #' @param frequency Character that represents periodicity of time stamps. Can be either
 #' weekly or daily. Defaults to daily.
@@ -583,12 +576,21 @@ absolute_value.plot <- function(GeoLift,
 #'
 #' @export
 cumulative_value.plot <- function(data,
-                                  treatment_locations,
-                                  treatment_start_period,
-                                  treatment_end_period,
+                                  locations,
+                                  treatment_start_time,
+                                  treatment_end_time,
                                   location_id = "location",
                                   time_id = "time",
                                   Y_id = "Y",
+                                  X = c(), 
+                                  alpha = 0.1, 
+                                  model = "none", 
+                                  fixed_effects = TRUE, 
+                                  method = "conformal", 
+                                  grid_size = 250, 
+                                  stat_test = "Total",
+                                  conformal_type = "iid", 
+                                  ns = 1000, 
                                   treatment_end_date = NULL,
                                   frequency = "daily",
                                   plot_start_date = NULL,
@@ -598,18 +600,27 @@ cumulative_value.plot <- function(data,
                                   ...) {
   cumulative_lift_df <- cumulative_lift(
     data = data,
-    treatment_locations = treatment_locations,
-    treatment_start_period = treatment_start_period,
-    treatment_end_period = treatment_end_period,
+    locations = locations,
+    treatment_start_time = treatment_start_time,
+    treatment_end_time = treatment_end_time,
     location_id = location_id,
     time_id = time_id,
-    Y_id = Y_id
+    Y_id = Y_id,
+    X = X, 
+    alpha = alpha, 
+    model = model, 
+    fixed_effects = fixed_effects, 
+    method = method, 
+    grid_size = grid_size, 
+    stat_test = stat_test, 
+    conformal_type = conformal_type, 
+    ns = ns 
   )
 
   if (nchar(title) == 0) {
     title <- "Accumulated Incremental Value"
   }
-  GeoLift <- list(TreatmentEnd = treatment_end_period, TreatmentStart = treatment_start_period)
+  GeoLift <- list(TreatmentEnd = treatment_end_time, TreatmentStart = treatment_start_time)
   if (!is.null(treatment_end_date)) {
     plot_dates <- get_date_from_test_periods(GeoLift, treatment_end_date, frequency = frequency)
     cumulative_lift_df$Time <- plot_dates$date_vector

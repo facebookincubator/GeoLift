@@ -444,62 +444,67 @@ print.GeoLift <- function(x, ...) {
 #'
 #' This method will calculate the cumulative lift with each passing day.
 #'
-#' @param data DataFrame that GeoLfit will use to determine a result.
-#' Should be the output of `GeoDataRead`.
-#' @param treatment_locations Vector of locations where the treatment was applied.
-#' @param treatment_start_period Integer representing period where test started.
-#' @param treatment_end_period Integer representing period where test finished.
-#' @param Y_id Name of the outcome variable (String).
-#' @param location_id Name of the location variable (String).
-#' @param time_id Name of the time variable (String).
+#' @inheritParams GeoLift
 #'
 #' @return
 #' A dataframe that holds the accumulated lift effect throughout the entire treatment period.
 #'
 #' @export
 cumulative_lift <- function(data,
-                            treatment_locations,
-                            treatment_start_period,
-                            treatment_end_period,
+                            locations,
+                            treatment_start_time,
+                            treatment_end_time,
                             location_id = "location",
                             time_id = "time",
-                            Y_id = "Y") {
-  max_test_period <- treatment_start_period + 1
+                            Y_id = "Y",
+                            X = c(), 
+                            alpha = 0.1, 
+                            model = "none", 
+                            fixed_effects = TRUE, 
+                            method = "conformal", 
+                            grid_size = 250, 
+                            stat_test = "Total", 
+                            conformal_type = "iid", 
+                            ns = 1000 ) {
+  max_test_period <- treatment_start_time + 1
   cumulative_list <- list()
   message("Starting to run iterations of GeoLift to capture cumulative effect.")
-  while (max_test_period <= treatment_end_period) {
+  while (max_test_period <= treatment_end_time) {
     if (max_test_period %% 5 == 0) {
       message(paste0(
-        "Currently missing ", treatment_end_period - max_test_period, " iterations."
+        "Currently missing ", treatment_end_time - max_test_period, " iterations."
       ))
     }
     filtered_data <- data[data$time <= max_test_period, ]
 
     gl_output <- suppressMessages(GeoLift(
       data = data,
-      locations = treatment_locations,
-      treatment_start_time = treatment_start_period,
+      locations = locations,
+      treatment_start_time = treatment_start_time,
       treatment_end_time = max_test_period,
       location_id = location_id,
       time_id = time_id,
       Y_id = Y_id,
-      ConfidenceIntervals = TRUE
+      ConfidenceIntervals = TRUE,
+      X = X,
+      alpha = alpha,
+      model = model,
+      fixed_effects = fixed_effects,
+      method = method, 
+      grid_size = grid_size, 
+      stat_test = stat_test,
+      conformal_type = conformal_type, 
+      ns = ns 
     ))
 
-    att <- gl_output$summary$average_att$Estimate
-    att_lb <- gl_output$lower_bound
-    att_ub <- gl_output$upper_bound
-
-    incremental_factor <- length(treatment_locations) * (max_test_period - treatment_start_period)
-
-    cumulative_list[[max_test_period - treatment_start_period]] <- list(
+    cumulative_list[[max_test_period - treatment_start_time]] <- list(
       Time = max_test_period,
-      att = att,
-      att_lb = att_lb,
-      att_ub = att_ub,
-      incremental = att * incremental_factor,
-      incremental_lb = att_lb * incremental_factor,
-      incremental_ub = att_ub * incremental_factor
+      att = gl_output$inference$ATT,
+      att_lb = gl_output$inference$Lower.Conf.Int,
+      att_ub = gl_output$inference$Upper.Conf.Int,
+      incremental = gl_output$incremental,
+      incremental_lb = gl_output$lower_bound,
+      incremental_ub = gl_output$upper_bound
     )
     max_test_period <- max_test_period + 1
   }

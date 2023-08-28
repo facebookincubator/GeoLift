@@ -45,7 +45,7 @@ Step 2 (On Jupyter): Located in the GeoLiftPython folder, run the commands below
 
 These commands will:
 1.1 install the `pandas`, `rpy2`, `ipython`, `jupyter` packages under `requirement.txt`.
-1.2 install `augsynth`, `CommutingZones` and `Geolift` R packages in `r_lang_requirements.txt`.
+1.2 install `augsynth` and `Geolift` R packages in `r_lang_requirements.txt`.
 
 NOTE: 
 If you don't want to install Jupyter, you can remove jupyter from requirements.txt
@@ -61,7 +61,7 @@ bash setup.sh
 This command will:
 1.1 install `virtualenv` python package and activate a virutal environment. 
 1.2 install the `pandas`, `rpy2`, `ipython`, `jupyter` packages under `requirement.txt`.
-1.3 install `augsynth`, `CommutingZones` and `Geolift` R packages in `r_lang_requirements.txt`.
+1.3 install `augsynth` and `Geolift` R packages in `r_lang_requirements.txt`.
 1.4 open Jupyter Notebook.
 
 Step 3: Open the `GeoLiftPython.ipynb` directly from your Jupyter Notebook interface.
@@ -91,7 +91,7 @@ In the GeoLiftPython folder you'll find:
 
 - `requirements.txt`: contains the rpy2, ipython, pandas and jupyter pacakges.
 
-- `r_lang_requirements.py`: contains the commands to install augsynth, CommutingZones and GeoLift R packages.
+- `r_lang_requirements.py`: contains the commands to install augsynth and GeoLift R packages.
 
 - `utils.py`: Wrapper functions for GeoLift. 
 

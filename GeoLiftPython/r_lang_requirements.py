@@ -11,6 +11,5 @@ remotes = importr('remotes')
 
 # Install augsynth, CommutingZones and GeoLift from GitHub
 remotes.install_github("ebenmichael/augsynth")
-remotes.install_github("facebookincubator/CommutingZones")
 remotes.install_github("facebookincubator/GeoLift")
 

@@ -63,13 +63,13 @@ GeoTest
 #> 
 #> Incremental Y: 4667
 #> 
-#> 90% Confidence Interval: (-2450.735, 11349.93)
+#> 90% Confidence Interval: (-2450.734, 11349.93)
 #> 
 #> Average Estimated Treatment Effect (ATT): 155.556
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 0.8% chance of observing an effect this large or larger assuming treatment effect is zero.
+#> There is a 1.2% chance of observing an effect this large or larger assuming treatment effect is zero.
 ```
 
 We can also visualize the ATT per day using the plot function
@@ -79,7 +79,7 @@ plot(GeoTest, type = "ATT")
 #> You can include dates in your chart if you supply the end date of the treatment. Just specify the treatment_end_date parameter.
 ```
 
-<img src="/private/var/folders/_1/c79n_fvs2bx1dwv8qf9wj04h0000gn/T/RtmpIevd4N/preview-5d5a354fdf85.dir/Confidence_Interval_Explanation_files/figure-gfm/plot_ATT-1.png" style="display: block; margin: auto;" />
+![PlotLiftBest](/img/GeoLiftBest-2.png)
 
 But how did GeoLift estimate these confidence intervals and p-values?
 
@@ -191,7 +191,7 @@ deviation:
     scale_y_continuous(limits = c(0, 2))
 ```
 
-<img src="/private/var/folders/_1/c79n_fvs2bx1dwv8qf9wj04h0000gn/T/RtmpIevd4N/preview-5d5a354fdf85.dir/Confidence_Interval_Explanation_files/figure-gfm/Conformal Inference Step 1 Intuition-1.png" style="display: block; margin: auto;" />
+![](/img/ConfidenceIntervalWalkthrou_Lift_high_explanation.png)
 
 Which means that for the null-hypothesis “the probability of observing a
 data as or more absurd, assuming that *there is no increase*”, we expect
@@ -212,7 +212,7 @@ Post-Treatment Period from the treated units:
     scale_y_continuous(limits = c(0, 2))
 ```
 
-<img src="/private/var/folders/_1/c79n_fvs2bx1dwv8qf9wj04h0000gn/T/RtmpIevd4N/preview-5d5a354fdf85.dir/Confidence_Interval_Explanation_files/figure-gfm/Conformal Inference Step 1.1 Intuition-1.png" style="display: block; margin: auto;" />
+![](/img/ConfidenceIntervalWalkthrou_Lift_low_explanation.png)
 
 As we can see with the plots, the target values at the Post-Treatment
 Period are much closer to the values in the Pre-Treatment Period. As a
@@ -235,7 +235,7 @@ got from the treatment?
     scale_y_continuous(limits = c(0, 2))
 ```
 
-<img src="/private/var/folders/_1/c79n_fvs2bx1dwv8qf9wj04h0000gn/T/RtmpIevd4N/preview-5d5a354fdf85.dir/Confidence_Interval_Explanation_files/figure-gfm/Conformal Inference Step 1.2 Intuition-1.png" style="display: block; margin: auto;" />
+![](/img/ConfidenceIntervalWalkthrou_Lift_none_explanation.png)
 
 We don’t see any difference between before and after the treatment, so
 the p-value should be quite high. So by applying a shift to the target
@@ -265,7 +265,7 @@ post-treatment period (Algorithm 1 from the paper):
     new model predicted
 5)  Apply a ‘cost’ function to the residual of each day (e.g. abs(resi))
 6)  Observe for which % of days in the Pre-Treatment Period (again,
-    which includes DoI) the model had a higher ‘cost’ than on the DoY.
+    which includes DoI) the model had a higher ‘cost’ than on the DoI.
     This gives you an estimate of the ‘p-value’ for the DoI and step
     size H0: “The probability of observing a data as absurd or more than
     this, assuming that the effect is H0”
@@ -318,7 +318,7 @@ residuals <- predict(synthetic_control_model, att = T)[1:post_period_start] # he
 # 5) Apply a 'cost' function to the residual of each day (e.g. abs(resi))
 costs <- cost_funct(residuals)
 
-# 6) Observe for which % of days in the Pre-Treatment Period (again, which includes DoI) the model had a higher 'cost' than on the DoY. This gives you an estimate of the 'p-value' for the DoI and step size H0: "The probability of observing a data as absurd or more than this, assuming that the effect is H0"
+# 6) Observe for which % of days in the Pre-Treatment Period (again, which includes DoI) the model had a higher 'cost' than on the DoI. This gives you an estimate of the 'p-value' for the DoI and step size H0: "The probability of observing a data as absurd or more than this, assuming that the effect is H0"
 p_value <- mean(costs[day_of_interest] <= costs) 
 
 # Observe that the result is exactly what was in the output of GeoLift
@@ -336,6 +336,7 @@ associated to each H0 value:
 
 ``` r
 
+# 7) Repeat steps 1 ~ 6 for a range of values H0 to obtain the 'p-value' for each magnitude
 # Let's then put the previous code in a function
 get_p_value = function(h0){
   new_geo_data <- GeoTestData_Test
@@ -369,7 +370,7 @@ get_p_value = function(h0){
 }
 
 # As we got for day 91 an estimated ATT of 108.810 let's try  a wide range of values from there.
-# Let's try a wide range of values based on the expected ATT for the DoI. We are going to use 4 standard deviations which would be more than enough if the distribution were normal
+# Let's try a wide range of values based on the expected ATT for the DoI. We are going to use 6 standard deviations which would be more than enough if the distribution were normal
 # We use the same parameters as the default of GeoLift for comparability
 grid_size = 250
 sd = sqrt(mean(GeoTest$ATT[post_period_start:post_period_ends]**2))
@@ -547,19 +548,19 @@ GeoTest
 #> 
 #> Incremental Y: 4667
 #> 
-#> 90% Confidence Interval: (-2450.735, 11349.93)
+#> 90% Confidence Interval: (-2450.734, 11349.93)
 #> 
 #> Average Estimated Treatment Effect (ATT): 155.556
 #> 
 #> The results are significant at a 95% level. (TWO-SIDED LIFT TEST)
 #> 
-#> There is a 0.8% chance of observing an effect this large or larger assuming treatment effect is zero.
-print(post_treament_upper_bound[post_period_ends + 1] * length(treated_locations) * (post_period_ends - post_period_start + 1))
-#> <NA> 
-#>   NA
-print(post_treament_lower_bound[post_period_ends + 1] * length(treated_locations) * (post_period_ends - post_period_start + 1))
-#> <NA> 
-#>   NA
+#> There is a 1.2% chance of observing an effect this large or larger assuming treatment effect is zero.
+print(tail(post_treament_upper_bound, 1) * length(treated_locations) * (post_period_ends - post_period_start + 1))
+#>          
+#> 11349.93
+print(tail(post_treament_lower_bound, 1) * length(treated_locations) * (post_period_ends - post_period_start + 1))
+#>           
+#> -2450.734
 ```
 
 Thus Jackknife+ method provides an estimate of the Confidence Interval
@@ -604,18 +605,6 @@ not satisfied, with one of the most common being that the observations
 on each day are not ‘iid’, which is usually solved by changing the
 `conformal_type` input to `"block"`.
 
-**Sometimes I get a confidence interval (e.g. 90%) for daily lift that
-is negative, even though the p-value for the Average Treatment Effect
-(ATT) is low (e.g. 1%)**
-
-This usually happens because the more data points we have on the
-Post-Treatment Period, the more information we have about the ATT for
-the whole Post-Treatment Period. If we were to suppose that the ATT is
-normally distributed, then the ATT for the whole Post-Treatment Period
-should follow $Normal(\mu, \sigma/\sqrt{T_*})$, where $\sigma$ is the
-standard deviation on the ATT of one date from the Post-Treatment
-Period.
-
 **There are cases where the ATT for the Post-Treatment Period indicates
 for a 90% confidence interval a lower bound below 0, even though the
 p-value is low (e.g. 5%). Why does this happen?**
@@ -623,11 +612,24 @@ p-value is low (e.g. 5%). Why does this happen?**
 This often happens because either
 
 1.  You used different `conformal_type` for the p-value and for the
-    confidence interval, or
+    confidence interval,
 2.  you used Jackknife+ for one of the metrics and Conformal Inference
     for the other. This usually happens when Conformal Inference method
     fails to estimate the confidence interval and fallbacks to the
-    Jackknife+
+    Jackknife+, or
+3.  the estimation of the p-value using the Conformal Inference method
+    is inaccurate for the specific case you are using (see step (7) in
+    the Conformal Inference explanation above).
+
+For the last point, you can verify that is the source of the problem by
+plotting the estimated p-values for each assumed lift (given by the
+variable `grid` on step (7)). When you `plot(grid, p_values)`, you
+should see a curve resembling a normal distribution. It doesn’t have to
+be normal, as it can be asymmetric and long-tailed, but it shouldn’t
+deviate much from what a normal distribution looks like. Cases that
+don’t look like a normal distribution is when the curve is bi-modal or
+the p-value for points close to each other in the `grid` to are much
+different.
 
 **Should I expect the confidence intervals estimated by the Jackknife+
 and Conformal Inference to be the same?**

@@ -170,7 +170,7 @@ The Conformal Inference method proposed by the authors and used by GeoLift mainl
   3) Train a new Augmented Synthetic Control Model (though it could be any Synthetic Control, Difference-in-Differences, or Factor/Matrix Completion model) based on the new data. I.E. on a data where the DoI is considered to be in the Pre-Treatment Period for all locations
   4) Collect the residuals (i.e. the error / the ATT) between what the new model predicted
   5) Apply a 'cost' function to the residual of each day (e.g. abs(resi))
-  6) Observe for which % of days in the Pre-Treatment Period (again, which includes DoI) the model had a higher 'cost' than on the DoY. This gives you an estimate of the 'p-value' for the DoI and step size H0: "The probability of observing a data as absurd or more than this, assuming that the effect is H0"
+  6) Observe for which % of days in the Pre-Treatment Period (again, which includes DoI) the model had a higher 'cost' than on the DoI. This gives you an estimate of the 'p-value' for the DoI and step size H0: "The probability of observing a data as absurd or more than this, assuming that the effect is H0"
   7) Repeat steps 1 ~ 6 for a range of values H0 to obtain the 'p-value' for each magnitude
   8) To find the limits of a confidence interval of size (1 - alpha), select the lowest/greatest value H0 where the p-value was greater or equal to alpha to obtain the lower/upper bound
 
@@ -215,7 +215,7 @@ residuals <- predict(synthetic_control_model, att = T)[1:post_period_start] # he
 # 5) Apply a 'cost' function to the residual of each day (e.g. abs(resi))
 costs <- cost_funct(residuals)
 
-# 6) Observe for which % of days in the Pre-Treatment Period (again, which includes DoI) the model had a higher 'cost' than on the DoY. This gives you an estimate of the 'p-value' for the DoI and step size H0: "The probability of observing a data as absurd or more than this, assuming that the effect is H0"
+# 6) Observe for which % of days in the Pre-Treatment Period (again, which includes DoI) the model had a higher 'cost' than on the DoI. This gives you an estimate of the 'p-value' for the DoI and step size H0: "The probability of observing a data as absurd or more than this, assuming that the effect is H0"
 p_value <- mean(costs[day_of_interest] <= costs) 
 
 # Observe that the result is exactly what was in the output of GeoLift
@@ -230,6 +230,7 @@ We obtain the confidence interval by repeating the previous step for a range of 
   
 ```{r Conformal Inference intervals}
 
+# 7) Repeat steps 1 ~ 6 for a range of values H0 to obtain the 'p-value' for each magnitude
 # Let's then put the previous code in a function
 get_p_value = function(h0){
   new_geo_data <- GeoTestData_Test
@@ -263,7 +264,7 @@ get_p_value = function(h0){
 }
 
 # As we got for day 91 an estimated ATT of 108.810 let's try  a wide range of values from there.
-# Let's try a wide range of values based on the expected ATT for the DoI. We are going to use 4 standard deviations which would be more than enough if the distribution were normal
+# Let's try a wide range of values based on the expected ATT for the DoI. We are going to use 6 standard deviations which would be more than enough if the distribution were normal
 # We use the same parameters as the default of GeoLift for comparability
 grid_size = 250
 sd = sqrt(mean(GeoTest$ATT[post_period_start:post_period_ends]**2))
@@ -392,8 +393,8 @@ print(post_treament_lower_bound)
 The last value on the vectors 'post_treament_upper_bound' and 'post_treament_lower_bound' refer to the upper and lower bound of the ATT for the whole Post-Treatment Period. If we multiply them by the number of locations (2) and the number of days in the Post-Treatment Period, we obtain the interval provided by GeoLift:
 ```{r Total impact interval}
 GeoTest
-print(post_treament_upper_bound[post_period_ends + 1] * length(treated_locations) * (post_period_ends - post_period_start + 1))
-print(post_treament_lower_bound[post_period_ends + 1] * length(treated_locations) * (post_period_ends - post_period_start + 1))
+print(tail(post_treament_upper_bound, 1) * length(treated_locations) * (post_period_ends - post_period_start + 1))
+print(tail(post_treament_lower_bound, 1) * length(treated_locations) * (post_period_ends - post_period_start + 1))
 ```
 
 Thus Jackknife+ method provides an estimate of the Confidence Interval for the ATT that is based on the error that model has on each day of the Pre-Treatment Period if it was put in the Post-Treatment Period. Because the days that got moved actually didn't receive the treatment, the error that the model has on each one of these days gives some insight on the accuracy of our model in estimating the counter-factual for the treated locations during the Post-Treatment Period. Because we remove one day at a time, the coefficients found for our model aren't too different to what we obtain using the whole Pre-Treatment Period data.
@@ -412,17 +413,16 @@ The estimation of the Confidence Intervals and the p-value using Conformal Infer
 This happens because when trying to estimate the p-values for the different possible lifts, all the p-values estimated were too low. As a consequence of all p-values being too small, when we execute step (8) `lower_bound <- min(grid[p_values >= alpha])`, we can't find any case where a p-value was greater than the alpha we require for the confidence interval (remember that alpha = 1 - confidence interval size). This happens if one or more conditions for the Conformal Inference method are not satisfied, with one of the most common being that the observations on each day are not 'iid', which is usually solved by changing the `conformal_type` input to `"block"`.
 
 
-**Sometimes I get a confidence interval (e.g. 90%) for daily lift that is negative, even though the p-value for the Average Treatment Effect (ATT) is low (e.g. 1%)**
-
-This usually happens because the more data points we have on the Post-Treatment Period, the more information we have about the ATT for the whole Post-Treatment Period. If we were to suppose that the ATT is normally distributed, then the ATT for the whole Post-Treatment Period should follow $Normal(\mu, \sigma/\sqrt{T_*})$, where $\sigma$ is the standard deviation on the ATT of one date from the Post-Treatment Period. 
-
 
 **There are cases where the ATT for the Post-Treatment Period indicates for a 90% confidence interval a lower bound below 0, even though the p-value is low (e.g. 5%). Why does this happen?**
 
 This often happens because either
  
-  1. You used different `conformal_type` for the p-value and for the confidence interval, or
-  2. you used Jackknife+ for one of the metrics and Conformal Inference for the other. This usually happens when Conformal Inference method fails to estimate the confidence interval and fallbacks to the Jackknife+
+  1. You used different `conformal_type` for the p-value and for the confidence interval, 
+  2. you used Jackknife+ for one of the metrics and Conformal Inference for the other. This usually happens when Conformal Inference method fails to estimate the confidence interval and fallbacks to the Jackknife+, or
+  3. the estimation of the p-value using the Conformal Inference method is inaccurate for the specific case you are using (see step (7) in the Conformal Inference explanation above).
+  
+For the last point, you can verify that is the source of the problem by plotting the estimated p-values for each assumed lift (given by the variable `grid` on step (7)). When you `plot(grid, p_values)`, you should see a curve resembling a normal distribution. It doesn't have to be normal, as it can be asymmetric and long-tailed, but it shouldn't deviate much from what a normal distribution looks like. Cases that don't look like a normal distribution is when the curve is bi-modal or the p-value for points close to each other in the `grid` to are much different.
 
   
 **Should I expect the confidence intervals estimated by the Jackknife+ and Conformal Inference to be the same?**

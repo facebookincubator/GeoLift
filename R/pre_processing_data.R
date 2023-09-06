@@ -201,10 +201,22 @@ GeoDataRead <- function(data,
     data <- data_raw %>%
       dplyr::group_by(location, time) %>%
       dplyr::summarize(Y = sum(Y))
+    for (var in X) {
+      data_aux <- data_raw %>%
+        dplyr::group_by(location, time) %>%
+        dplyr::summarize(!!var := sum(!!sym(var)))
+      data <- data %>% dplyr::left_join(data_aux, by = c("location", "time"))
+    }
   } else {
     data <- data_raw %>%
       dplyr::group_by(location, time, date_unix) %>%
       dplyr::summarize(Y = sum(Y))
+    for (var in X) {
+      data_aux <- data_raw %>%
+        dplyr::group_by(location, time, date_unix) %>%
+        dplyr::summarize(!!var := sum(!!sym(var)))
+      data <- data %>% dplyr::left_join(data_aux, by = c("location", "time", "date_unix"))
+    }
   }
 
   # Print summary of Data Reading

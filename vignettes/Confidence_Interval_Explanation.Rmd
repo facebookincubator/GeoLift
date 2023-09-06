@@ -1,11 +1,11 @@
 ---
 title: "Confidence Interval Explanation"
 output: 
-  pdf_document: default
   md_document:
     variant: gfm
   html_document: 
     keep_md: yes
+  pdf_document: default
 vignette: >
   %\VignetteIndexEntry{Confidence_Interval_Explanation}
   %\VignetteEncoding{UTF-8}
@@ -69,7 +69,7 @@ But how did GeoLift estimate these confidence intervals and p-values?
 
 ## Default: Conformal Inference Method
 
-As the default, GeoLift - or more accurately the Augmented Synthetic Control package - uses a method called Conformal Inference to estimate the credible interval for the ATT.
+As the default, GeoLift - or more accurately the Augmented Synthetic Control package - uses a method called Conformal Inference to estimate the confidence interval for the ATT.
 This [method developed in 2022 by researchers Victor Chernozhukov, Kaspar Wütrich, and Yinchu Zhu](https://arxiv.org/pdf/1712.09089.pdf)  has been shown to work with multiples approaches for estimating counterfactual outcomes, such as Synthetic Control (the case here), Difference-in-Differences, factor and matrix completion models, among others. It demonstrates high small-sample performance or when there are (reasonable) misspecifications of the model.
 
 ### Estimating the p-value
@@ -397,7 +397,7 @@ print(post_treament_lower_bound[post_period_ends + 1] * length(treated_locations
 ```
 
 Thus Jackknife+ method provides an estimate of the Confidence Interval for the ATT that is based on the error that model has on each day of the Pre-Treatment Period if it was put in the Post-Treatment Period. Because the days that got moved actually didn't receive the treatment, the error that the model has on each one of these days gives some insight on the accuracy of our model in estimating the counter-factual for the treated locations during the Post-Treatment Period. Because we remove one day at a time, the coefficients found for our model aren't too different to what we obtain using the whole Pre-Treatment Period data.
-However, because we use the absolute value of the error of the model in each one of the moved dates, the confidence interval estimated by this method tends to be larger than the true credible interval of the estimated treatment effect.
+However, because we use the absolute value of the error of the model in each one of the moved dates, the confidence interval estimated by this method tends to be larger than the true confidence interval of the estimated treatment effect.
 
 
 # Frequently Asked Questions
@@ -409,17 +409,17 @@ The estimation of the Confidence Intervals and the p-value using Conformal Infer
 
 **When I ask GeoLift to provide confidence intervals for the ATT it raises a warning saying that the Conformal Inference method failed. Why does this happen?**
 
-This happens almost always because we use `conformal_type` as `"iid"`, which assumes that the values observed at each date are independent of the values from all other dates (and identically distributed). This assumption is usually false for most use-cases, as the values are usually weakly connected to each other. The consequence of this wrong assumption is that the estimated p-value for basically any possible ATT value becomes close to 0, meaning that we can really differentiate the likelihood of one lift value to the other. This is usually solved by changing the `conformal_type` input to `"block"`.
+This happens because when trying to estimate the p-values for the different possible lifts, all the p-values estimated were too low. As a consequence of all p-values being too small, when we execute step (8) `lower_bound <- min(grid[p_values >= alpha])`, we can't find any case where a p-value was greater than the alpha we require for the confidence interval (remember that alpha = 1 - confidence interval size). This happens if one or more conditions for the Conformal Inference method are not satisfied, with one of the most common being that the observations on each day are not 'iid', which is usually solved by changing the `conformal_type` input to `"block"`.
 
 
-**Sometimes I get a Confidence Interval for my lift in a given date that is negative, even though the p-value for the Average Treatment Effect (ATT) is very lowe (e.g. 1%)**
+**Sometimes I get a confidence interval (e.g. 90%) for daily lift that is negative, even though the p-value for the Average Treatment Effect (ATT) is low (e.g. 1%)**
 
-This usually happens because the more data points we have on the Post-Treatment Period, the more information we have about the ATT for the whole Post-Treatment Period. If we were to suppose that the ATT is normally distributed, then the ATT for the whole Post-Treatment Period should follow $Normal(\mu, \sigma/\sqrt{T_*})$, where $\sigma$ is the standard deviation on the ATT of one date from the Post-Treatment Period
+This usually happens because the more data points we have on the Post-Treatment Period, the more information we have about the ATT for the whole Post-Treatment Period. If we were to suppose that the ATT is normally distributed, then the ATT for the whole Post-Treatment Period should follow $Normal(\mu, \sigma/\sqrt{T_*})$, where $\sigma$ is the standard deviation on the ATT of one date from the Post-Treatment Period. 
 
 
 **There are cases where the ATT for the Post-Treatment Period indicates for a 90% confidence interval a lower bound below 0, even though the p-value is low (e.g. 5%). Why does this happen?**
 
-This usually happens because either
+This often happens because either
  
   1. You used different `conformal_type` for the p-value and for the confidence interval, or
   2. you used Jackknife+ for one of the metrics and Conformal Inference for the other. This usually happens when Conformal Inference method fails to estimate the confidence interval and fallbacks to the Jackknife+

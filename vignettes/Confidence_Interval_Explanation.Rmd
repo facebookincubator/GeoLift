@@ -1,10 +1,10 @@
 ---
 title: "Confidence Interval Explanation"
 output: 
-  md_document:
-    variant: gfm
   html_document: 
     keep_md: yes
+  md_document:
+    variant: gfm
   pdf_document: default
 vignette: >
   %\VignetteIndexEntry{Confidence_Interval_Explanation}

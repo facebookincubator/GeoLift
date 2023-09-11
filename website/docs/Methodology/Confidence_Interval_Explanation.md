@@ -102,24 +102,27 @@ From the paper, the p-value (i.e. the probability of observing a data as
 or more absurd, assuming that the null-hypothesis is true) for a chosen
 date is given by
 
-$\hat{p} = 1 - \hat{F}(S(\hat{u}))$, where
-$\hat{F}(x) = \frac{1}{|\Pi|}\underset{\pi \epsilon \Pi}{\sum{1\{S(\hat{u}_\pi < x\}}}$
+![Equation 1](/img/ConfidenceIntervalWalkthrough_Eq1.png)
 
-where $\hat{u}$ is the residual (i.e. the error) between what an
+where
+
+![Equation 2](/img/ConfidenceIntervalWalkthrough_Eq2.0.png)
+
+and ![](/img/ConfidenceIntervalWalkthrough_Eq1.1.png) is the residual (i.e. the error) between what an
 Augmented Synthetic Control Model (hereafter referred simply as ‘model’)
 estimated and what was observed on the chose date for the treated
 location (if there are more than 1 treated location, they are grouped
-and averaged). The function $S(\hat{u})$ defines the test statistics,
+and averaged). The function ![](/img/ConfidenceIntervalWalkthrough_Eq4.6.png) defines the test statistics,
 and it can be interpreted as an error functions, such as Mean Squared
 Error and Mean Absolute Error:
 
-$S(\hat{u})=\left( \frac{1}{\sqrt{T_*}}\underset{t=T_0+1}{\overset{T}{\sum{}|\hat{u}_t|^q}} \right)$
+![Equation 3](/img/ConfidenceIntervalWalkthrough_Eq3.0.png)
 
-where $T_*$ is the number of ‘dates’ in the Post-Treatment Period, $T_0$
-is the first date of the Post-Treatment Period, and $T$ indicates the
-last date available for the analysis (so $T_* = T - T_0$).
+where ![](/img/ConfidenceIntervalWalkthrough_Eq3.1.png) is the number of ‘dates’ in the Post-Treatment Period, ![](/img/ConfidenceIntervalWalkthrough_Eq3.2.png)
+is the number of dates date in the Pre-Treatment Period, and ![](/img/ConfidenceIntervalWalkthrough_Eq3.3.png) indicates the
+last date available for the analysis (so ![](/img/ConfidenceIntervalWalkthrough_Eq3.5.png)).
 
-Coming back to the first equation, $\pi$ stands for a block permutation,
+Coming back to the first equation, ![](/img/ConfidenceIntervalWalkthrough_Eq3.4.png) stands for a block permutation,
 which is a one-to-one mapping that reorder the dates (from both
 Post-Treatment and Pre-Treatment Periods). One example of a block
 permutation is “shifting all dates forward by 1\*“, so that in the
@@ -146,19 +149,19 @@ data.frame(values = c(40, 10, 20, 30), dates = c(4, 1, 2, 3))
 ```
 
 The case above is an example of *overlapping moving block permutations*
-$\Pi_{\rightarrow}$, for the case where $j=1$, and is the default block
+![](/img/ConfidenceIntervalWalkthrough_Eq4.1.png), for the case where ![](/img/ConfidenceIntervalWalkthrough_Eq4.4.png), and is the default block
 permutation from the Augmented Synthetic Control package to calculate
-point wise confidence intervals. The elements of $\Pi_{\rightarrow}$ are
-indexed by $j\ \epsilon \{0, 1, ,2, T-1\}$ and a permutation $\pi_j$ is
+point wise confidence intervals. The elements of ![](/img/ConfidenceIntervalWalkthrough_Eq4.1.png) are
+indexed by ![](/img/ConfidenceIntervalWalkthrough_Eq4.3.png) and a permutation ![](/img/ConfidenceIntervalWalkthrough_Eq4.2.png) is
 defined as
 
-$\pi_j(i) = \begin{cases}  i + j, & \text{if}\ i + j \leq T \\  i + j - T, & \text{otherwise}  \end{cases}$
+![Equation 4](/img/ConfidenceIntervalWalkthrough_Eq4.0.png)
 
 So reading back the equation and using *overlapping moving block
-permutations* $\Pi_{\rightarrow}$ for $\Pi$, we can translate the
-equation as “The probability that the residual $\hat{u}$ was caused just
+permutations* ![](/img/ConfidenceIntervalWalkthrough_Eq4.2.png)  for ![](/img/ConfidenceIntervalWalkthrough_Eq4.5.png) , we can translate the
+equation as “The probability that the residual ![](/img/ConfidenceIntervalWalkthrough_Eq1.1.png)  was caused just
 by noise is the share of dates where we had an error smaller than
-$S(\hat{u})$”. where $\hat{u}$ refers to a Day of Interest (DoI) in the
+![](/img/ConfidenceIntervalWalkthrough_Eq4.6.png). where ![](/img/ConfidenceIntervalWalkthrough_Eq1.1.png) refers to a Day of Interest (DoI) in the
 Post-Treatment Period, and the dates included for the analysis are all
 dates in the Pre-Treatment Period and the DoI itself.
 
@@ -166,9 +169,9 @@ dates in the Pre-Treatment Period and the DoI itself.
 
 The confidence interval is estimated by repeating the estimation of the
 p-value for a range of G values
-$\Theta=\{\theta_0, \theta_1, ..., \theta_G \}$ by subtracting from the
+![](/img/ConfidenceIntervalWalkthrough_Eq4.7.png) by subtracting from the
 observed value of the treated unit at the DoI. The reason why we
-subtract a value $\theta$, can be thought of as ‘removing the real
+subtract a value ![](/img/ConfidenceIntervalWalkthrough_Eq4.8.png), can be thought of as ‘removing the real
 effect that the treatment caused’, so that when we remove the treatment
 effect perfectly, our algorithm above should indicate a high p-value.
 
@@ -252,26 +255,26 @@ The Conformal Inference method proposed by the authors and used by
 GeoLift mainly consists of the following steps for each day in the
 post-treatment period (Algorithm 1 from the paper):
 
-1)  Subtract to all treated locations in the Day of interest (DoI),
+1.  Subtract to all treated locations in the Day of interest (DoI),
     which is in the Post-Treatment Period, a constant H0.
-2)  State the DoI that is originally in the Post-Treatment Period to be
+2.  State the DoI that is originally in the Post-Treatment Period to be
     in the Pre-Treatment Period
-3)  Train a new Augmented Synthetic Control Model (though it could be
+3.  Train a new Augmented Synthetic Control Model (though it could be
     any Synthetic Control, Difference-in-Differences, or Factor/Matrix
     Completion model) based on the new data. I.E. on a data where the
     DoI is considered to be in the Pre-Treatment Period for all
     locations
-4)  Collect the residuals (i.e. the error / the ATT) between what the
+4.  Collect the residuals (i.e. the error / the ATT) between what the
     new model predicted
-5)  Apply a ‘cost’ function to the residual of each day (e.g. abs(resi))
-6)  Observe for which % of days in the Pre-Treatment Period (again,
+5.  Apply a ‘cost’ function to the residual of each day (e.g. abs(resi))
+6.  Observe for which % of days in the Pre-Treatment Period (again,
     which includes DoI) the model had a higher ‘cost’ than on the DoI.
     This gives you an estimate of the ‘p-value’ for the DoI and step
     size H0: “The probability of observing a data as absurd or more than
     this, assuming that the effect is H0”
-7)  Repeat steps 1 ~ 6 for a range of values H0 to obtain the ‘p-value’
+7.  Repeat steps 1 ~ 6 for a range of values H0 to obtain the ‘p-value’
     for each magnitude
-8)  To find the limits of a confidence interval of size (1 - alpha),
+8.  To find the limits of a confidence interval of size (1 - alpha),
     select the lowest/greatest value H0 where the p-value was greater or
     equal to alpha to obtain the lower/upper bound
 
@@ -414,20 +417,20 @@ can fail when
 When Conformal Inference fails, GeoLift falls back to the second method
 called ‘jackknife+’, which works similar to Conformal Inference in the
 aspect that we alter what constitutes the Pre-Treatment Period. In
-Jackknife+, for each day $D_{pre}$ in the Pre-Treatment Period
+Jackknife+, for each day ![](/img/ConfidenceIntervalWalkthrough_Eq4.9.png) in the Pre-Treatment Period
 
-1)  We remove it from the Pre-Treatment Period and put it on the
+1.  We remove it from the Pre-Treatment Period and put it on the
     Post-Treatment Period
-2)  We train another Augmented Synthetic Control Model
-3)  We calculate the absolute difference (abs(e)) between what was
-    observed in $D_{pre}$ and what the model estimated
-4)  For each day in the original Post-Treatment Period, we collect the
+2.  We train another Augmented Synthetic Control Model
+3.  We calculate the absolute difference (abs(e)) between what was
+    observed in ![](/img/ConfidenceIntervalWalkthrough_Eq4.9.png) and what the model estimated
+4.  For each day in the original Post-Treatment Period, we collect the
     difference between what was observed and what the model predicted.
     From this vector we create 2 others, one where we add abs(e) and one
     where we subtract abs(e) creating respectively the upper and lower
     bound for this iteration
-5)  We store these lower and upper bound values
-6)  The confidence interval is then obtained by getting the respective
+5.  We store these lower and upper bound values
+6.  The confidence interval is then obtained by getting the respective
     quantiles from the upper/lower bound
 
 As before, below is a demonstration on how Jackknife works:
@@ -637,4 +640,4 @@ and Conformal Inference to be the same?**
 They should be similar, though Jackknife+ should indicate a wider
 interval than Conformal Inference. The cause originates in step (4) of
 the Jackknife algorithm described above, where we add/subtract the
-absolute error $e$ to estimate the upper/lower bound in one iteration.
+absolute error ![](/img/ConfidenceIntervalWalkthrough_Eq5.1.png) to estimate the upper/lower bound in one iteration.

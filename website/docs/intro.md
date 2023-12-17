@@ -6,7 +6,7 @@ sidebar_position: 1
 
 ---
 ## What is GeoLift?
-GeoLift is Meta's open-source solution uses to measure Lift at a geographic level. This methodology leverages the latest developments in Synthetic Control Methods (SCM) to generate geographic quasi-experiments that measure the true incremental value of your marketing campaigns.
+GeoLift is Meta's open-source solution used to measure Lift at a geographic level. This methodology leverages the latest developments in Synthetic Control Methods (SCM) to generate geographic quasi-experiments that measure the true incremental value of your marketing campaigns.
 
 ---
 

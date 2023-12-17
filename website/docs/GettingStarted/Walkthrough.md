@@ -164,7 +164,7 @@ The key parameters needed to run this function are:
 
 -   `Y_id`, `location_id`, and `time_id`: Names of the outcome,
     location, and time variables (String). These parameters will let our
-    function know are the names of these variables in our data frame. If
+    function know what are the names of these variables in our data frame. If
     left empty, this parameter will default to the defaults of
     `GeoDataRead()` which are: `Y`, `location`, and `time`.
 
@@ -205,7 +205,7 @@ The key parameters needed to run this function are:
 -   `holdout`: A vector with two values: the first one the smallest
     desirable holdout and the second the largest desirable holdout. The
     holdout represents the share of conversions from markets that will
-    not see our ad campaign. In our example, will specify that we’re OK
+    not see our ad campaign. In our example, we'll specify that we’re OK
     with a large holdout and will therefore set `holdout = c(0.5, 1)`.
     If this parameter is left empty, all market selections will be
     analyzed regardless of their size.
@@ -263,7 +263,7 @@ The key parameters needed to run this function are:
     can inform other analyses such as Marketing Mix Model calibration.
     By default this parameter is set to `Correlations = FALSE`.
 
--   `print`: print A logic flag indicating whether to print the top
+-   `print`: A logic flag indicating whether to print the top
     results. Set to TRUE by default.
 
 -   `parallel`: A logic flag indicating whether to use parallel
@@ -278,9 +278,9 @@ The key parameters needed to run this function are:
     following valid values for this parameter:
 
     -   `side_of_test = "two_sided"`: The test statistic is the sum of
-        all treatment effects, i.e. sum(abs(x)). Defualt.
+        all treatment effects, i.e., sum(abs(x)). Default.
     -   `side_of_test = "one_sided"`: One-sided test against positive or
-        negative effects i.e. If the effect being applied is negative,
+        negative effects i.e., if the effect being applied is negative,
         then defaults to -sum(x). If the effect being applied is
         positive, then defaults to sum(x).
 
@@ -552,7 +552,7 @@ this market selection.
 
 ## 3. Analyzing the Test Results
 
-Based on the results of the Power Calculations, a test is set-up in
+Based on the results of the Power Calculations, a test is set up in
 which a 15-day marketing campaign will be executed in the cities of
 Chicago and Portland while the rest of the locations will be put on
 holdout. Following the completion from this marketing campaign, we
@@ -726,10 +726,10 @@ Statistics which display data about our model’s fit. The main metric of
 model fit used in GeoLift is the L2 Imbalance which represents how far
 our synthetic control was from the actual observed values in the
 pre-treatment period. That is, how similar the synthetic Chicago +
-Portland unit we crated is from the observed values of these cities in
+Portland unit we created is from the observed values of these cities in
 the period before the intervention. A small L2 Imbalance score means
 that our model did a great job replicating our test locations while a
-large one would indicate a poor fit. However, the L2 Imabalnce metric is
+large one would indicate a poor fit. However, the L2 Imbalance metric is
 scale-dependent, meaning that it can’t be compared between models with
 different KPIs or number of testing periods. For instance, the L2
 Imbalance of a model run on grams of units sold will be significantly

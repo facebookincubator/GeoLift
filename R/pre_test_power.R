@@ -1803,6 +1803,10 @@ GeoLiftMarketSelection <- function(data,
       BestMarkets_aux <- temp_Markets
     }
 
+    if (is.null(BestMarkets_aux) && length(N) == 1) {
+      stop("\nNo markets meet the criteria you provided. Consider modifying market exclusion/inclusion hyperparameters")
+    }
+
     # Skip iteration if no Markets are feasible
     if (is.null(BestMarkets_aux)) {
       next

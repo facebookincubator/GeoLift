@@ -11,12 +11,11 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 (module.exports = {
   title: 'GeoLift',
-  tagline: 'The Open Source solution from Meta Open Source to calculate Lift at a geo-level.',
+  tagline: 'The Open Source solution from Meta Open Source to calculate Lift at a geo-level. GeoLift is not an official Meta product. For research purposes only',
   url: 'https://facebookincubator.github.io/',
   baseUrl: '/GeoLift/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
   organizationName: 'facebookincubator', // Usually your GitHub org/user name.
   projectName: 'GeoLift', // Usually your repo name.
 
@@ -53,33 +52,12 @@
     ({
       navbar: {
         title: 'GeoLift',
-        logo: {
-          alt: 'GeoLift Logo',
-          src: 'img/logo.svg',
-        },
         items: [
           {
             type: 'doc',
             docId: 'intro',
             position: 'left',
             label: 'Documentation',
-          },
-          {
-            type: 'doc',
-            docId: 'GettingStarted/Walkthrough',
-            position: 'left',
-            label: 'Walkthroughs',
-            },
-          {
-            to: 'Successes',
-            position: 'left',
-            label: 'Success Cases',
-          },
-          {
-            type: 'doc',
-            docId: 'About',
-            position: 'left',
-            label: 'About',
           },
           {to: 'blog', label: 'Blog', position: 'left'},
           // Please keep GitHub link to the right for consistency.
@@ -100,14 +78,6 @@
                 label: 'Documentation',
                 to: 'docs/intro',
               },
-              {
-                label: 'Blueprint Course',
-                href: 'https://www.facebookblueprint.com/student/path/253063-geolift-marketing-measurement?sid=cd9a46bc-9685-4af4-8ac3-4482e858fba9&sid_i=5',
-              },
-              {
-                label: 'Success Cases',
-                to: 'Successes',
-              },
             ],
           },
           {
@@ -117,10 +87,6 @@
                 label: 'Facebook',
                 href: 'https://www.facebook.com/groups/fbgeolift',
               },
-              {
-                label: 'YouTube',
-                href: 'https://www.youtube.com/channel/UCzkuhQFBCHz9TxzUXlNUINg',
-              }
             ],
           },
           {

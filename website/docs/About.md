@@ -7,16 +7,10 @@ id: About
 ---
 
 ## What is GeoLift?
-GeoLift is an open-source and end-to-end solution to calculate Lift through geo-experiments. Based on some of the latest developments on **Synthetic Control Models**, the tool helps users plan, implement, and analyze complex geographic causal tests in a simple and easy-to-use way. Through GeoLift tests, users are able to measure the true value of their marketing campaigns, revamp their strategies, estimate their omni-channel perfomance, and even perform cross-channel optiimzations all while using the common currency of incrmentality. Moreover, GeoLift offers all of these features in a privacy-secure way through the exclusive use of aggregated data.
 
----
+GeoLift is a research tool developed my Marketing Science team to run geo-based marketing experiments in cases where people-based measurement (Conversion Lift) is not feasible - for example, Healthcare advertisers.
 
-## Why did we build GeoLift?
-
-- We want to help **businesses of all sizes grow** by transforming their marketing practices based on data and science.
-- We want to shed light on Lift and democratize the use of **incrementality-based through a transparent, easy-to-use, and replicable** tool.
-- The GeoLift team stongly believes in the **importance of privacy-conscious technologies** and want to make sure that our measurement tools reflect that principle.
-- We want to **collaborate with the industry** and together build the next generation of measurement tools!
+Meta recommends its advertisers to use people-based experimentation where possible because it has a higher statistical power compared to geo-based experimentation.
 
 ---
 

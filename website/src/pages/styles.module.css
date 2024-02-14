@@ -25,20 +25,6 @@
   }
 }
 
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.features {
-  display: flex;
-  align-items: center;
-  padding: 2rem 0;
-  width: 100%;
-  background-color: var(--ifm-color-emphasis-100);
-}
-
 .footerfeatures {
   display: flex;
   align-items: center;
@@ -62,5 +48,5 @@
   justify-content:left ;
   display: flex;
   flex-direction: column;
-  font-size: 1.175rem;
+  font-size: 30.175rem;
 }

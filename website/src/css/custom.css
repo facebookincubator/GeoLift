@@ -14,15 +14,30 @@
  */
 
 /* You can override the default Infima variables here. */
+
 :root {
-  --ifm-color-primary: #4b4196;
-  --ifm-color-primary-dark: #443a87;
+  --ifm-color-primary: #000000;
+  --ifm-color-primary-dark: #000000;
   --ifm-color-primary-darker: #403780;
   --ifm-color-primary-darkest: #352d69;
-  --ifm-color-primary-light: #5348a5;
+  --ifm-color-primary-light: #ffffff;
   --ifm-color-primary-lighter: #564bac;
   --ifm-color-primary-lightest: #695eb9;
+  --custom-background-color: #ffffff;
   --ifm-code-font-size: 95%;
+}
+
+
+.navbar__title {
+  color: #000000;
+}
+
+.navbar__item {
+  color: #000000; /* Change to your desired font color */
+}
+
+.navbar__link:hover {
+  color: #3b3939; /* Change to your desired hover color */
 }
 
 .docusaurus-highlight-code-line {
@@ -30,4 +45,9 @@
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
+}
+
+h1, h2, h3, h4, h5, h6, body, p, header {
+  color: #000000; /* Change to your desired heading color */
+  background-color: var(--custom-background-color) !important;
 }

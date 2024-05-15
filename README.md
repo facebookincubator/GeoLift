@@ -1,4 +1,3 @@
-![GeoLiftLogo](doc/GeoLift_IconText.png)
 
 # GeoLift
 [![Project Status: Active  The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -34,9 +33,10 @@ To use Commuting Zones in GeoLift, please check the guide [here](https://faceboo
 
 ## Contacts
 - aesquerrac@gmail.com, Arturo Esquerra, creator.
-- nicolascruces1994@gmail.com, Nicolas Cruces, maintainer.
-- kpanchal@fb.com, Kanishka Panchal, Facebook Marketing Science Partner
-- michaelkhalil@fb.com, Michael Khalil, Facebook Marketing Science Partner
+- nicolascruces1994@gmail.com, Nicolas Cruces
+- kpanchal@meta.com, Kanishka Panchal, Meta Marketing Science Partner
+- michaelkhalil@meta.com, Michael Khalil, Meta Marketing Science Partner
+- jussan@meta.com, Jussan Nascimento, Meta Marketing Science Partner
 
 ## Join the GeoLift community
 - [Facebook page](https://www.facebook.com/groups/fbgeolift/)

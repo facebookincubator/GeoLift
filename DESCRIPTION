@@ -13,22 +13,26 @@ Authors@R: c(
     person(given = "Kanishka",
            family = "Panchal",
            role = c("ctb"),
-           email = "kpanchal@fb.com"),
+           email = "kpanchal@meta.com"),
     person(given = "Michael",
            family = "Khalil",
            role = c("ctb"),
-           email = "michaelkhalil@fb.com"))
-Description: GeoLift is an end-to-end solution to measure lift at 
+           email = "michaelkhalil@meta.com")
+    person(given = "Jussan",
+           family = "Nascimento",
+           role = c("ctb"),
+           email = "jussan@meta.com"))
+Description: GeoLift is an end-to-end solution to measure lift at
     a geographical level. It is a flexible and robust implementation
     of Augmented Generalized Synthetic Controls. The package
-    provides tools to perform power calculations to plan future 
-    studies, market selection,  as well as inference to calculate 
-    the lift of a study. GeoLift allows for flexible geo-grain 
-    definitions but is recommended for geographic aggregation levels 
-    of cities or higher for daily or weekly data. 
+    provides tools to perform power calculations to plan future
+    studies, market selection,  as well as inference to calculate
+    the lift of a study. GeoLift allows for flexible geo-grain
+    definitions but is recommended for geographic aggregation levels
+    of cities or higher for daily or weekly data.
     To run a GeoLift experiment at least 25 pre-treatment
     periods and over 20 geo-units are recommended.
-License: 
+License:
     GPL (>= 2)
 Depends:
     R (>= 4.0.0)

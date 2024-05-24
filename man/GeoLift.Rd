@@ -205,8 +205,9 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Kanishka Panchal \email{kpanchal@fb.com} [contributor]
-  \item Michael Khalil \email{michaelkhalil@fb.com} [contributor]
+  \item Kanishka Panchal \email{kpanchal@meta.com} [contributor]
+  \item Michael Khalil \email{michaelkhalil@meta.com} [contributor]
+  \item Jussan Nascimento \email{jussan@meta.com} [contributor]
 }
 
 }

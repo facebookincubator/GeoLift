@@ -15,12 +15,10 @@ GeoLift requires or works with:
 - R version 4.0.0 or newer.
 
 ## Installing GeoLift
-To install the package, first make sure that `remotes` and
-`augsynth` are installed.
+To install the package, first make sure that `remotes` is installed.
 
 ```
 install.packages("remotes", repos='http://cran.us.r-project.org')
-remotes::install_github("ebenmichael/augsynth")
 ```
 
 Then, install the package from GitHub:

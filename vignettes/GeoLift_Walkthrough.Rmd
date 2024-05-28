@@ -44,8 +44,7 @@ You can install `GeoLift` from our [GitHub repository](https://github.com/facebo
 ```{r install, results="hide", message=F, eval=F}
 ## Install remotes if noy already installed
 install.packages("remotes", repos = "http://cran.us.r-project.org")
-## Install augsynth & GeoLift from GitHub
-remotes::install_github("ebenmichael/augsynth")
+## Install GeoLift from GitHub
 remotes::install_github("facebookincubator/GeoLift")
 ```
 

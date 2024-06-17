@@ -1990,8 +1990,7 @@ GeoLiftMarketSelection <- function(data,
   if (nrow(resultsM) > 0) {
     resultsM$ID <- 1:nrow(resultsM)
   } else {
-    message("\nWarning: No markets meet the criteria you provided. Consider modifying
-          the input parameters")
+    stop("\nNo markets meet the criteria you provided. Consider modifying the input parameters")
   }
 
   # Re-order columns

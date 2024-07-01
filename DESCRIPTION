@@ -61,5 +61,8 @@ RoxygenNote: 7.2.3
 Suggests:
     CommutingZones,
     rmarkdown
+Remotes:
+    ebenmichael/augsynth,
+    facebookincubator/CommutingZones
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

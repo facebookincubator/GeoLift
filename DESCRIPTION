@@ -63,5 +63,6 @@ Suggests:
     rmarkdown
 Remotes:
     ebenmichael/augsynth
+    facebookincubator/CommutingZones
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

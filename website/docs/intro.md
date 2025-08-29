@@ -16,4 +16,4 @@ Meta recommends its advertisers to use people-based experimentation where possib
 
 Get started by **[installing the GeoLift R package](https://github.com/facebookincubator/GeoLift)**.
 
-Or try our **[GeoLift walkthrough](./GettingStarted/Walkthrough)**.
+Or try our **[GeoLift walkthrough](./GettingStarted/Walkthrough.md)**.

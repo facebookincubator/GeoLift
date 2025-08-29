@@ -6,7 +6,7 @@
 GeoLift is an end-to-end solution to measure Lift at a Geo-level using the latest developments in Synthetic Control Methods. Through this package it is possible to do a data-driven market selection for a geo-test using a variety of Power Calculators. Moreover, GeoLift features easy-to-use inference and plotting functionalities to analyze the results of a test.
 
 Check out the vignette for a more detailed description of the main functionalities of the package:
-- [GeoLift Walkthrough](https://github.com/facebookincubator/GeoLift/blob/master/vignettes/GeoLift_Walkthrough.md)
+- [GeoLift Walkthrough](https://github.com/facebookincubator/GeoLift/blob/main/vignettes/GeoLift_Walkthrough.md)
 - [GeoLift Multi-Cell Walkthrough](https://github.com/facebookincubator/GeoLift/blob/main/vignettes/GeoLift_MultiCell_Walkthrough.md)
 - [Incorporating Commuting Zones](https://github.com/facebookincubator/GeoLift/blob/main/vignettes/Incorporating_CommutingZones.md)
 

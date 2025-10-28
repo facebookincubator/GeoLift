@@ -45,7 +45,7 @@ GeoPlot <- function(data,
 
   p <- ggplot(data, aes(y = !!sym(Y_id), x = !!sym(time_id), colour = !!sym(location_id), label = !!sym(location_id))) +
     geom_line(show.legend = FALSE) +
-    geom_vline(xintercept = treatment_start, linetype = "dashed", size = size_vline, color = "grey35") +
+    geom_vline(xintercept = treatment_start, linetype = "dashed", linewidth = size_vline, color = "grey35") +
     geom_dl(aes(label = !!sym(location_id)), method = list(dl.combine("last.points"), cex = 0.8)) +
     xlim(0, 1.15 * (max(data[[time_id]]))) +
     labs(y = KPI_id, caption = notes) +

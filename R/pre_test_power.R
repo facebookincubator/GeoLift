@@ -951,14 +951,10 @@ GeoLiftPower.search <- function(data,
                                 ProgressBar = FALSE,
                                 run_stochastic_process = FALSE,
                                 parallel = TRUE,
-                                parallel_setup = "sequential",
-                                import_augsynth_from = "library(augsynth)",
-                                import_tidyr_from = "library(tidyr)") {
+                                parallel_setup = "sequential") {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup,
-      import_augsynth_from = import_augsynth_from,
-      import_tidyr_from = import_tidyr_from
+      parallel_setup = parallel_setup
     )
   }
 
@@ -1192,14 +1188,10 @@ NumberLocations <- function(data,
                             stat_func = NULL,
                             ProgressBar = FALSE,
                             parallel = TRUE,
-                            parallel_setup = "sequential",
-                            import_augsynth_from = "library(augsynth)",
-                            import_tidyr_from = "library(tidyr)") {
+                            parallel_setup = "sequential") {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup,
-      import_augsynth_from = import_augsynth_from,
-      import_tidyr_from = import_tidyr_from
+      parallel_setup = parallel_setup
     )
   }
 
@@ -1467,14 +1459,10 @@ GeoLiftPower <- function(data,
                          parallel_setup = "sequential",
                          side_of_test = "two_sided",
                          conformal_type = "iid",
-                         ns = 1000,
-                         import_augsynth_from = "library(augsynth)",
-                         import_tidyr_from = "library(tidyr)") {
+                         ns = 1000) {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup,
-      import_augsynth_from = import_augsynth_from,
-      import_tidyr_from = import_tidyr_from
+      parallel_setup = parallel_setup
     )
   }
 
@@ -1661,14 +1649,10 @@ GeoLiftMarketSelection <- function(data,
                                    parallel_setup = "sequential",
                                    side_of_test = "two_sided",
                                    conformal_type = "iid",
-                                   ns = 1000,
-                                   import_augsynth_from = "library(augsynth)",
-                                   import_tidyr_from = "library(tidyr)") {
+                                   ns = 1000) {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup,
-      import_augsynth_from = import_augsynth_from,
-      import_tidyr_from = import_tidyr_from
+      parallel_setup = parallel_setup
     )
   }
 

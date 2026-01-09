@@ -25,7 +25,7 @@ GeoLiftPower.search(
   ProgressBar = FALSE,
   run_stochastic_process = FALSE,
   parallel = TRUE,
-  parallel_setup = "sequential",
+  parallel_setup = "sequential"
 )
 }
 \arguments{

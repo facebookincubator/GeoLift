@@ -26,7 +26,7 @@ GeoLiftPower(
   parallel_setup = "sequential",
   side_of_test = "two_sided",
   conformal_type = "iid",
-  ns = 1000,
+  ns = 1000
 )
 
 \method{plot}{GeoLiftPower}(

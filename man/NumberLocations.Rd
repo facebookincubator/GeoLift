@@ -90,7 +90,6 @@ speed up calculations. Set to TRUE by default.}
 
 \item{parallel_setup}{A string indicating parallel workers set-up.
 Set to "sequential" by default.}
-
 }
 \value{
 Table of average power by number of locations.

@@ -25,7 +25,7 @@ GeoLiftPowerFinder(
   run_stochastic_process = FALSE,
   parallel = TRUE,
   parallel_setup = "sequential",
-  side_of_test = "two_sided",
+  side_of_test = "two_sided"
 )
 }
 \arguments{
@@ -104,7 +104,6 @@ using a one sided or a two sided test.
 If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 }}
-
 }
 \value{
 Data frame with the ordered list of best locations and their

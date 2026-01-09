@@ -922,10 +922,6 @@ GeoLiftPowerFinder <- function(data,
 #' speed up calculations. Set to TRUE by default.
 #' @param parallel_setup A string indicating parallel workers set-up.
 #' Set to "sequential" by default.
-#' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes.
-#' @param import_tidyr_from Points to where the tidyr package
-#' should be imported from to send to the nodes.
 #'
 #' @return
 #' Data frame with the ordered list of best locations and their
@@ -1161,10 +1157,6 @@ GeoLiftPower.search <- function(data,
 #' speed up calculations. Set to TRUE by default.
 #' @param parallel_setup A string indicating parallel workers set-up.
 #' Set to "sequential" by default.
-#' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes.
-#' @param import_tidyr_from Points to where the tidyr package
-#' should be imported from to send to the nodes.
 #'
 #' @return
 #' Table of average power by number of locations.
@@ -1419,10 +1411,6 @@ NumberLocations <- function(data,
 #' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
-#' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes.
-#' @param import_tidyr_from Points to where the tidyr package
-#' should be imported from to send to the nodes.
 #'
 #' @return
 #' GeoLiftPower object that contains:
@@ -1604,10 +1592,6 @@ GeoLiftPower <- function(data,
 #' @param conformal_type Type of conformal inference used. Can be either "iid" for Independent and identically
 #' distributed or "block" for moving block permutations. Set to "iid" by default.
 #' @param ns Number of resamples for "iid" permutations if `conformal_type = "iid`. Set to 1000 by default.
-#' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes.
-#' @param import_tidyr_from Points to where the tidyr package
-#' should be imported from to send to the nodes.
 #'
 #' @return
 #' A list with three Data Frames. \itemize{

@@ -105,11 +105,6 @@ If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; 
 If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 }}
 
-\item{import_augsynth_from}{Points to where the augsynth package
-should be imported from to send to the nodes.}
-
-\item{import_tidyr_from}{Points to where the tidyr package
-should be imported from to send to the nodes.}
 }
 \value{
 Data frame with the ordered list of best locations and their

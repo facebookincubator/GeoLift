@@ -53,10 +53,6 @@ fn_treatment <- function(df,
 #'
 #' @param parallel_setup A string indicating parallel workers set-up.
 #' Can be "sequential" or "parallel".
-#' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes.
-#' @param import_tidyr_from Points to where the tidyr package
-#' should be imported from to send to the nodes.
 #' @return
 #' Cluster object that will parallelize operations.
 #' @export

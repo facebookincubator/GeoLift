@@ -24,9 +24,7 @@ NumberLocations(
   stat_func = NULL,
   ProgressBar = FALSE,
   parallel = TRUE,
-  parallel_setup = "sequential",
-  import_augsynth_from = "library(augsynth)",
-  import_tidyr_from = "library(tidyr)"
+  parallel_setup = "sequential"
 )
 }
 \arguments{
@@ -93,11 +91,6 @@ speed up calculations. Set to TRUE by default.}
 \item{parallel_setup}{A string indicating parallel workers set-up.
 Set to "sequential" by default.}
 
-\item{import_augsynth_from}{Points to where the augsynth package
-should be imported from to send to the nodes.}
-
-\item{import_tidyr_from}{Points to where the tidyr package
-should be imported from to send to the nodes.}
 }
 \value{
 Table of average power by number of locations.

@@ -34,9 +34,7 @@ GeoLiftMarketSelection(
   parallel_setup = "sequential",
   side_of_test = "two_sided",
   conformal_type = "iid",
-  ns = 1000,
-  import_augsynth_from = "library(augsynth)",
-  import_tidyr_from = "library(tidyr)"
+  ns = 1000
 )
 
 \method{print}{GeoLiftMarketSelection}(x, ...)
@@ -160,12 +158,6 @@ If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; H
 distributed or "block" for moving block permutations. Set to "iid" by default.}
 
 \item{ns}{Number of resamples for "iid" permutations if \verb{conformal_type = "iid}. Set to 1000 by default.}
-
-\item{import_augsynth_from}{Points to where the augsynth package
-should be imported from to send to the nodes.}
-
-\item{import_tidyr_from}{Points to where the tidyr package
-should be imported from to send to the nodes.}
 
 \item{x}{\code{GeoLiftMarketSelection()}}
 

@@ -26,8 +26,6 @@ GeoLiftPowerFinder(
   parallel = TRUE,
   parallel_setup = "sequential",
   side_of_test = "two_sided",
-  import_augsynth_from = "library(augsynth)",
-  import_tidyr_from = "library(tidyr)"
 )
 }
 \arguments{

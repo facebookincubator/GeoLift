@@ -60,9 +60,7 @@ fn_treatment <- function(df,
 #' @return
 #' Cluster object that will parallelize operations.
 #' @export
-build_cluster <- function(parallel_setup,
-                          import_augsynth_from,
-                          import_tidyr_from) {
+build_cluster <- function(parallel_setup) {
   message("Setting up cluster.")
   if (parallel_setup == "sequential") {
     cl <- parallel::makeCluster(parallel::detectCores() - 1, setup_strategy = parallel_setup)
@@ -76,11 +74,11 @@ build_cluster <- function(parallel_setup,
 
   message("Importing functions into cluster.")
   parallel::clusterCall(cl, function() {
-    eval(parse(text = import_augsynth_from))
+    attachNamespace("augsynth")
   })
 
   parallel::clusterCall(cl, function() {
-    eval(parse(text = import_tidyr_from))
+    attachNamespace("tidyr")
   })
 
   parallel::clusterCall(cl, function() {

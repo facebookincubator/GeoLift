@@ -617,11 +617,6 @@ run_simulations <- function(data,
 #'          If the effect being applied is negative, then defaults to -sum(x). H0: ES >= 0; HA: ES < 0.
 #'          If the effect being applied is positive, then defaults to sum(x). H0: ES <= 0; HA: ES > 0.}
 #'          }
-#' @param import_augsynth_from Points to where the augsynth package
-#' should be imported from to send to the nodes.
-#' @param import_tidyr_from Points to where the tidyr package
-#' should be imported from to send to the nodes.
-#'
 #' @return
 #' Data frame with the ordered list of best locations and their
 #' average power.
@@ -646,14 +641,10 @@ GeoLiftPowerFinder <- function(data,
                                run_stochastic_process = FALSE,
                                parallel = TRUE,
                                parallel_setup = "sequential",
-                               side_of_test = "two_sided",
-                               import_augsynth_from = "library(augsynth)",
-                               import_tidyr_from = "library(tidyr)") {
+                               side_of_test = "two_sided") {
   if (parallel == TRUE) {
     cl <- build_cluster(
-      parallel_setup = parallel_setup,
-      import_augsynth_from = import_augsynth_from,
-      import_tidyr_from = import_tidyr_from
+      parallel_setup = parallel_setup
     )
   }
 

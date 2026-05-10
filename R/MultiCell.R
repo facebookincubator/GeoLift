@@ -836,6 +836,16 @@ GeoLiftMultiCell <- function(Y_id = "Y",
     stop("\nPlease specify a valid geolift_type test ('standard', 'inverse').")
   }
 
+  # Check treatment_start_time                                                  
+  if(!(treatment_start_time==as.integer(treatment_start_time))){
+    stop("\nPlease specify a valid integer treatment_start_time.")              
+  }                                                                             
+
+  # Check treatment_end_time                                                    
+  if(!(treatment_end_time==as.integer(treatment_end_time))){
+    stop("\nPlease specify a valid integer treatment_end_time.")                
+  }
+
   # Check stat_test
   if (!(stat_test %in% c("Total", "Negative", "Positive"))) {
     stop("\nEnter a valid stat_test ('Total', 'Negative', 'Positive').")

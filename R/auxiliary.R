@@ -42,6 +42,102 @@ fn_treatment <- function(df,
 }
 
 
+#' Resolve model = "best" into a concrete outcome model.
+#'
+#' @description
+#' Internal helper used by \code{GeoLift} and \code{GetWeights} when
+#' \code{model = "best"}. Fits the candidate prognostic functions
+#' ("none", "ridge", "GSYN") and returns the name of the one with the
+#' lowest Scaled L2 Imbalance; ties go to the simpler model (none, then
+#' ridge, then GSYN). A candidate that fails to fit, or whose imbalance
+#' is not a single finite number, is excluded from the comparison with a
+#' message; if every candidate fails, an error is raised.
+#'
+#' @param data A data.frame containing the historical conversions by
+#' geographic unit.
+#' @param treatment_locations Vector of treatment locations.
+#' @param treatment_start_time Time index of the start of the treatment.
+#' @param treatment_end_time Time index of the end of the treatment.
+#' @param Y_id Name of the outcome variable (String).
+#' @param time_id Name of the time variable (String).
+#' @param location_id Name of the location variable (String).
+#' @param X List of names of covariates.
+#' @param fixed_effects A logic flag indicating whether to include unit
+#' fixed effects in the model. Set to TRUE by default.
+#'
+#' @return
+#' String with the name of the selected model ("none", "ridge" or "GSYN").
+#'
+#' @noRd
+ResolveBestModel <- function(data,
+                             treatment_locations,
+                             treatment_start_time,
+                             treatment_end_time,
+                             Y_id = "Y",
+                             time_id = "time",
+                             location_id = "location",
+                             X = c(),
+                             fixed_effects = TRUE) {
+  ascm_imbalances <- list()
+  for (progfunc in c("none", "ridge", "GSYN")) {
+    if (length(treatment_locations) == 1 & progfunc == "GSYN") {
+      message("model = 'best': skipping the GSYN candidate (single treatment location).")
+      ascm_imbalances[[progfunc]] <- Inf
+    } else {
+      ascm_imbalances[[progfunc]] <- tryCatch(
+        expr = {
+          l2 <- ASCMExecution(
+            data = data,
+            treatment_locations = treatment_locations,
+            treatment_start_time = treatment_start_time,
+            treatment_end_time = treatment_end_time,
+            Y_id = Y_id,
+            time_id = time_id,
+            location_id = location_id,
+            X = X,
+            model = progfunc,
+            fixed_effects = fixed_effects
+          )$augsynth_model$scaled_l2_imbalance
+          if (!(is.numeric(l2) && length(l2) == 1 && is.finite(l2))) {
+            stop("scaled_l2_imbalance is not a single finite number")
+          }
+          round(l2, 3)
+        },
+        error = function(e) {
+          message(sprintf(
+            "model = 'best': candidate '%s' failed and was excluded from the comparison (%s)",
+            progfunc, conditionMessage(e)
+          ))
+          Inf
+        }
+      )
+    }
+  }
+
+  scores <- unlist(ascm_imbalances[c("none", "ridge", "GSYN")])
+
+  if (all(is.infinite(scores))) {
+    stop(
+      "model = 'best': every candidate model failed to fit. ",
+      "See the messages above for the underlying errors."
+    )
+  }
+
+  # Lowest Scaled L2 Imbalance among the candidates that fitted, as
+  # documented; ties go to the simpler model (none, then ridge, then GSYN).
+  best <- names(scores)[which.min(scores)]
+
+  if (best == "GSYN") {
+    message("Selected GSYN as best model.")
+  } else if (best == "ridge") {
+    message("Selected Ridge as best model.")
+  } else {
+    message("Selected model without prognostic function as best model.")
+  }
+  return(best)
+}
+
+
 
 #' Build cluster to parallelize operations across nodes in machine.
 #'
@@ -299,7 +395,7 @@ CorrelationCoefficient <- function(data, locs = c()) {
 #'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
 #'                          to improve fit for larger panels (more than 40 locations and 100
 #'                          time-stamps. }
-#'          \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
+#'          \item{"best":}{ Fits the model with the lowest Scaled L2 Imbalance.}
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
@@ -337,6 +433,18 @@ GetWeights <- function(Y_id = "Y",
   } else {
     treatment_start_time <- pretreatment_end_time + 1
     treatment_end_time <- max(data$time)
+  }
+
+  # Optimizing model based on Scaled L2 Score
+  if (model == "best") {
+    model <- ResolveBestModel(
+      data = data,
+      treatment_locations = locations,
+      treatment_start_time = treatment_start_time,
+      treatment_end_time = treatment_end_time,
+      X = X,
+      fixed_effects = fixed_effects
+    )
   }
 
   data_aux <- fn_treatment(data,

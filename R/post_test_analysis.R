@@ -33,7 +33,6 @@
 #'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
 #'                          to improve fit for larger panels (more than 40 locations and 100
 #'                          time-stamps. }
-#'          \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
@@ -137,7 +136,7 @@ ASCMExecution <- function(
 #'          \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
 #'                          to improve fit for larger panels (more than 40 locations and 100
 #'                          time-stamps. }
-#'          \item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
+#'          \item{"best":}{ Fits the model with the lowest Scaled L2 Imbalance.}
 #'          }
 #' @param fixed_effects A logic flag indicating whether to include unit fixed
 #' effects in the model. Set to TRUE by default.
@@ -205,44 +204,17 @@ GeoLift <- function(Y_id = "Y",
                     ns = 1000) {
   # Optimizing model based on Scaled L2 Score
   if (model == "best") {
-    ascm_imbalances <- list()
-    for (progfunc in c("none", "ridge", "GSYN")) {
-      if (length(locations) == 1 & progfunc == "GSYN") {
-        ascm_imbalances[[progfunc]] <- list("scaled_l2_imbalance" = 1)
-      } else {
-        ascm <- tryCatch(
-          expr = {
-            ASCMExecution(
-              data = data,
-              treatment_locations = locations,
-              treatment_start_time = treatment_start_time,
-              treatment_end_time = treatment_end_time,
-              Y_id = Y_id,
-              time_id = time_id,
-              location_id = location_id,
-              X = X,
-              model = progfunc,
-              fixed_effects = fixed_effects
-            )$augsynth_model
-          },
-          error = function(e) {
-            list("scaled_l2_imbalance" = 1)
-          }
-        )
-        ascm_imbalances[[eval(progfunc)]] <- round(ascm$scaled_l2_imbalance, 3)
-      }
-    }
-
-    if (ascm_imbalances$none > ascm_imbalances$GSYN & ascm_imbalances$ridge > ascm_imbalances$GSYN) {
-      message("Selected GSYN as best model.")
-      model <- "GSYN"
-    } else if (ascm_imbalances$none > ascm_imbalances$ridge & ascm_imbalances$GSYN > ascm_imbalances$ridge) {
-      message("Selected Ridge as best model.")
-      model <- "ridge"
-    } else {
-      message("Selected model without prognostic function as best model.")
-      model <- "none"
-    }
+    model <- ResolveBestModel(
+      data = data,
+      treatment_locations = locations,
+      treatment_start_time = treatment_start_time,
+      treatment_end_time = treatment_end_time,
+      Y_id = Y_id,
+      time_id = time_id,
+      location_id = location_id,
+      X = X,
+      fixed_effects = fixed_effects
+    )
   }
   augsynth_result_list <- ASCMExecution(
     data = data,

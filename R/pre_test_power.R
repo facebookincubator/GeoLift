@@ -642,6 +642,13 @@ GeoLiftPowerFinder <- function(data,
                                parallel = TRUE,
                                parallel_setup = "sequential",
                                side_of_test = "two_sided") {
+  if (model == "best") {
+    stop(
+      "model = 'best' is only supported in GeoLift() and GetWeights(), ",
+      "which fit a single design. Simulation-based functions fit one ",
+      "outcome model at a time: use model = 'none', 'ridge' or 'GSYN'."
+    )
+  }
   if (parallel == TRUE) {
     cl <- build_cluster(
       parallel_setup = parallel_setup
@@ -948,6 +955,13 @@ GeoLiftPower.search <- function(data,
                                 run_stochastic_process = FALSE,
                                 parallel = TRUE,
                                 parallel_setup = "sequential") {
+  if (model == "best") {
+    stop(
+      "model = 'best' is only supported in GeoLift() and GetWeights(), ",
+      "which fit a single design. Simulation-based functions fit one ",
+      "outcome model at a time: use model = 'none', 'ridge' or 'GSYN'."
+    )
+  }
   if (parallel == TRUE) {
     cl <- build_cluster(
       parallel_setup = parallel_setup
@@ -1181,6 +1195,13 @@ NumberLocations <- function(data,
                             ProgressBar = FALSE,
                             parallel = TRUE,
                             parallel_setup = "sequential") {
+  if (model == "best") {
+    stop(
+      "model = 'best' is only supported in GeoLift() and GetWeights(), ",
+      "which fit a single design. Simulation-based functions fit one ",
+      "outcome model at a time: use model = 'none', 'ridge' or 'GSYN'."
+    )
+  }
   if (parallel == TRUE) {
     cl <- build_cluster(
       parallel_setup = parallel_setup
@@ -1448,6 +1469,13 @@ GeoLiftPower <- function(data,
                          side_of_test = "two_sided",
                          conformal_type = "iid",
                          ns = 1000) {
+  if (model == "best") {
+    stop(
+      "model = 'best' is only supported in GeoLift() and GetWeights(), ",
+      "which fit a single design. Simulation-based functions fit one ",
+      "outcome model at a time: use model = 'none', 'ridge' or 'GSYN'."
+    )
+  }
   if (parallel == TRUE) {
     cl <- build_cluster(
       parallel_setup = parallel_setup
@@ -1634,6 +1662,13 @@ GeoLiftMarketSelection <- function(data,
                                    side_of_test = "two_sided",
                                    conformal_type = "iid",
                                    ns = 1000) {
+  if (model == "best") {
+    stop(
+      "model = 'best' is only supported in GeoLift() and GetWeights(), ",
+      "which fit a single design. Simulation-based functions fit one ",
+      "outcome model at a time: use model = 'none', 'ridge' or 'GSYN'."
+    )
+  }
   if (parallel == TRUE) {
     cl <- build_cluster(
       parallel_setup = parallel_setup

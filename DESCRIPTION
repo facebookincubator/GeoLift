@@ -60,6 +60,7 @@ LazyData: true
 RoxygenNote: 7.2.3
 Suggests:
     CommutingZones,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

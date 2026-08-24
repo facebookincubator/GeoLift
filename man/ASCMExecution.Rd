@@ -47,7 +47,6 @@ for smaller panels (less than 40 locations and 100 time-stamps.))}
 \item{"GSYN":}{ Augments with a Generalized Synthetic Control Method. Recommended
 to improve fit for larger panels (more than 40 locations and 100
 time-stamps. }
-\item{"best:}{ Fits the model with the lowest Scaled L2 Imbalance.}
 }}
 
 \item{fixed_effects}{A logic flag indicating whether to include unit fixed
